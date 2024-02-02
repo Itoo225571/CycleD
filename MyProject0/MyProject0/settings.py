@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     #MyApp0追加
     "MyApp0.apps.Myapp0Config",
+    "django_bootstrap5",#Bootstrap5追加
 ]
 
 MIDDLEWARE = [
