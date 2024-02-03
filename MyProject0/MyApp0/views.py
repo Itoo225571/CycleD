@@ -8,12 +8,12 @@ from MyApp0.forms import BookForm
 #各URLで実行するものの関数
 def book_list(request):
     books=Book.objects.all().order_by("id")
-    #renderの引数:(「HttpResponseのインスタンス」+)
-    #             「テンプレートファイルのパス」+「テンプレートファイルに埋め込みたいデータ」
-    #renderの返却値:「データを埋め込んだHTMLをボディとするレスポンス」
-    return render(request,
-                  "MyApp0/book_list.html",
-                  {"books":books})
+    #render(HttpResponseのインスタンス,テンプレートファイルのパス,テンプレートファイルに埋め込みたいデータ...)
+    #renderの返却値:データを埋め込んだHTMLをボディとするレスポンス
+    return render(request=request,
+                  template_name="MyApp0/book_list.html",
+                  #(contextには複数のキー,値を設定可能)
+                  context={"books":books})
     
 def book_edit(request,book_id=None):
     if book_id:
