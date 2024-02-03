@@ -1,4 +1,4 @@
-<!-- ウェブページ表示に使用されるテンプレートファイルのもと -->
+{% comment %} <!-- ウェブページ表示に使用されるテンプレートファイルのもと --> {% endcomment %}
 
 {% load i18n static %}
 <!DOCTYPE html>{% get_current_language as LANGUAGE_CODE %}
@@ -7,11 +7,10 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<!--     <link rel="stylesheet" href="{% static 'MyApp0/css/bootstrap.min.css' %}"> -->
+{% comment %} <link rel="stylesheet" href="{% static 'MyApp0/css/bootstrap.min.css' %}"> {% endcomment %}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     
-<!--     {% block ブロック名}{% endblock %}で「ブロック名」のブロックを定義する
-    ここを子templateファイルで編集していく -->
+{% comment %} {% block ブロック名}{% endblock %}で「ブロック名」のブロックを定義する。ここを子templateファイルで編集していく {% endcomment %}
     {% block extra_css %}{% endblock %}
     <title>{% block title %}My books{% endblock %}</title>
   </head>

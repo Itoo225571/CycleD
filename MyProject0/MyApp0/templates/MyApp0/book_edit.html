@@ -8,9 +8,14 @@
         書籍の編集
     </h4>
     {% if book_id %}
-    <form action="{% url 'MyApp0:book_mod' book_id=book_id %}" method="post">
+        {% comment %} URLはbook_mod(修正)、methodはPOST(編集等)を指定 {% endcomment %}
+        <form action="{% url 'MyApp0:book_mod' book_id=book_id %}" method="post">
     {% else %}
-    <form action="{% url 'MyApp:book_add' %}" method="get">
+        {% comment %} 
+            URLはbook_add(追加)、methodはPOST(編集等)を指定
+            使用する関数は上と同じだけど、URLを変えられる
+        {% endcomment %}
+        <form action="{% url 'MyApp0:book_add' %}" method="post">
     {% endif %}
         
         {% csrf_token %}

@@ -7,18 +7,16 @@ from MyApp0.forms import BookForm
 #requestに応じて、ModelとTemplateを適切に利用する
 #各URLで実行するものの関数
 def book_list(request):
+    # book_listファイル内で使う変数booksの指定
     books=Book.objects.all().order_by("id")
     #render(HttpResponseのインスタンス,テンプレートファイルのパス,テンプレートファイルに埋め込みたいデータ...)
     #renderの返却値:データを埋め込んだHTMLをボディとするレスポンス
-    return render(request=request,
-                  template_name="MyApp0/book_list.html",
-                  #(contextには複数のキー,値を設定可能)
-                  context={"books":books})
+    return render(request=request, template_name="MyApp0/book_list.html", context={"books":books})
     
 def book_edit(request,book_id=None):
-    if book_id:
+    if book_id:#編集
         book=get_object_or_404(Book,pk=book_id)
-    else:
+    else:#追加
         book=Book()
 
     #POST:データ(ユーザーのコメント等)の送信
@@ -36,7 +34,12 @@ def book_edit(request,book_id=None):
     #例：ログイン画面の表示...URL+GET
     elif request.method=="GET":
         #DB上に保存された情報を付け足したHTMLを返却
-        form=BookForm(request,"MyApp0/book_edit.html",dict(form=form,book_id=book_id))
+        form=BookForm(instance=book)
+
+    return render(request,"MyApp0/book_edit.html", dict(form=form,book_id=book_id))
 
 def book_del(request,book_id):
-    return HttpResponse("書籍の削除")
+    # return HttpResponse("書籍の削除")
+    book=get_object_or_404(Book,pk=book_id)
+    book.delete()
+    return redirect("MyApp0:book_list")
