@@ -1,6 +1,13 @@
+<!-- 親templateファイルで、headとかbodyとかを記述しているので、書く必要がない！ -->
+
+<!-- ☆タグ：%で囲まれる部分は(template)タグ名...関数的なもん -->
+<!-- ★extends:親templateを継承 -->
 {% extends "MyApp0/base.html" %}
 
+
+<!-- 親templateファイルで空欄にしたtitle(ブロック名)の中身を編集 -->
 {% block title %}書籍の一覧{% endblock title %}
+
 
 {% block content %}
   <h4 class="mt-4 border-bottom">書籍の一覧</h4>
@@ -16,8 +23,10 @@
       </tr>
     </thead>
     <tbody>
+<!--       books中の全部に対して～ -->
       {% for book in books %}
       <tr>
+<!--         ☆変数：{{変数}}でviews.py中のrender関数で指定した変数(=contextのキー値)を使用できる -->
         <th scope="row">{{ book.id }}</th>
         <td>{{ book.name }}</td>
         <td>{{ book.publish }}</td>
@@ -27,6 +36,7 @@
           <a href="{% url 'MyApp0:book_del' book_id=book.id %}" class="btn btn-outline-danger btn-sm">削除</a>
         </td>
       </tr>
+<!--       forの終わり -->
       {% endfor %}
     </tbody>
   </table>
