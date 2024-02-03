@@ -4,19 +4,25 @@ from django.http import HttpResponse
 from MyApp0.models import Book
 from MyApp0.forms import BookForm
 
-#各URLで表示するものの関数
+#requestに応じて、ModelとTemplateを適切に利用する
+#各URLで実行するものの関数
 def book_list(request):
     books=Book.objects.all().order_by("id")
+    #renderの引数:(「HttpResponseのインスタンス」+)
+    #             「テンプレートファイルのパス」+「テンプレートファイルに埋め込みたいデータ」
+    #renderの返却値:「データを埋め込んだHTMLをボディとするレスポンス」
     return render(request,
                   "MyApp0/book_list.html",
                   {"books":books})
-
+    
 def book_edit(request,book_id=None):
     if book_id:
         book=get_object_or_404(Book,pk=book_id)
     else:
         book=Book()
-    
+
+    #POST:データ(ユーザーのコメント等)の送信
+    #例：ログインに必要な情報の送信...URL+POST
     if request.method=="POST":
         #POSTされたrequestのデータからフォームを作る
         form=BookForm(request.POST,instance=book)
@@ -24,7 +30,11 @@ def book_edit(request,book_id=None):
             book=form.save(commit=False)
             book.save()
             return redirect("MyApp0:book_list")
+            
+    #GET：データ(なんかの登録画面等)の取得
+    #例：ログイン画面の表示...URL+GET
     elif request.method=="GET":
+        #DB上に保存された情報を付け足したHTMLを返却
         form=BookForm(request,"MyApp0/book_edit.html",dict(form=form,book_id=book_id))
 
 def book_del(request,book_id):
