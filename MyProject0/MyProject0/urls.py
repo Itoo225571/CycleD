@@ -21,5 +21,6 @@ from django.urls import path,include
 urlpatterns = [
     path("admin/", admin.site.urls),
     #アプリのパス
+    #これを追加することでアプリごとのurlsを取り込める
     path("MyApp0/",include("MyApp0.urls")),
 ]
