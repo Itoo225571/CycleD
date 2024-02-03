@@ -29,6 +29,7 @@ def book_edit(request,book_id=None):
         if form.is_valid():
             book=form.save(commit=False)
             book.save()
+            #MyApp0のurls内のURL名にリダイレクト(URLを直接指定することも可)
             return redirect("MyApp0:book_list")
             
     #GET：データ(なんかの登録画面等)の取得
