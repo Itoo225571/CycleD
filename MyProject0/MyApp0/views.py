@@ -1,8 +1,22 @@
 from django.shortcuts import render,get_object_or_404,redirect
 from django.http import HttpResponse
+from django.views.generic.list import ListView
 
-from MyApp0.models import Book
-from MyApp0.forms import BookForm
+from MyApp0.models import Book,Evaluation
+from MyApp0.forms import BookForm,EvaluationForm
+
+class EvaluationList(ListView):
+    context_object_name="evaluation"
+    template_name="MyApp0/evaluation_list.html"
+    paginate_by=3
+    
+    def get(self,request,*args,**kwargs):
+        book=get_object_or_404(Book,pk=kwargs["book_id"])
+        evaluations=book.evaluations.all().order_by("id")
+        self.object_list=evaluations
+        
+        context=self.get_context_data(object_list=self.object_list,book=book)
+        return self.render_to_response(context)
 
 #requestに応じて、ModelとTemplateを適切に利用する
 #各URLで実行するものの関数
