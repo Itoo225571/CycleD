@@ -8,9 +8,9 @@ class BookForm(ModelForm):
         class Meta:
                 model=Book
                 #本来は、name=models.CharField()みたく登録するが、modelsは既にmodels.pyで定義されてる
-                fields=("name","publish","page")
+                fields=("name","publish",)
         
 class EvaluationForm(ModelForm):
         class Meta:
                 model=Evaluation
-                fields=("star","comment",)
+                fields=("score","comment",)

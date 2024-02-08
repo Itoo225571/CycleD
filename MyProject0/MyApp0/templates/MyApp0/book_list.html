@@ -26,7 +26,7 @@
           <th scope="col">ID</th>
           <th scope="col">書籍名</th>
           <th scope="col">出版社</th>
-          <th scope="col">ページ数</th>
+          {% comment %} <th scope="col">ページ数</th> {% endcomment %}
           <th scope="col">操作</th>
         </tr>
       </thead>
@@ -42,7 +42,7 @@
 <!--         td："変数"を示すi -->
         <td>{{ book.name }}</td>
         <td>{{ book.publish }}</td>
-        <td>{{ book.page }}</td>
+        {% comment %} <td>{{ book.page }}</td> {% endcomment %}
         <td>
           <a href="{% url 'MyApp0:book_mod' book_id=book.id %}" class="btn btn-outline-primary btn-sm">修正</a>
           <a href="{% url 'MyApp0:book_del' book_id=book.id %}" class="btn btn-outline-danger btn-sm">削除</a>
