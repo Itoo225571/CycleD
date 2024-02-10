@@ -1,14 +1,14 @@
 from django.db import models
 
 class User(models.Model):
-    username=models.CharField(max_length=128)
+    name=models.CharField(max_length=128)
     email_address=models.EmailField()
     # password=models.CharField(max_length=128)
     # creation_date=models.DateField()
     # last_login_date=models.DateField()
     
     def __str__(self):
-        return self.username
+        return self.name
     
 class Diary(models.Model):
     content=models.TextField()
@@ -21,4 +21,4 @@ class Diary(models.Model):
     # image=models.ImageField(upload_tp="images/")
     
     def __str__(self):
-        return self.creation_date
+        return self.creation_date.strftime("%Y/%m/%d")
