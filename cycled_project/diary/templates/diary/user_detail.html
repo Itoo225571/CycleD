@@ -1,13 +1,13 @@
 <h1>
-    {{user.name}}の詳細情報
+    {{user.name}}の日記一覧
 </h1>
 
 <ul>
 <!-- ForeignKeyを使うと、自動的にdiary_setがuser内に作成される -->
 {% for diary in user.diary_set.all %}
-    <h5>
+    <h4>
         {{diary.creation_date}}
-    </h5>
+    </h4>
     <li>
         {{diary.content}}
     </li>
