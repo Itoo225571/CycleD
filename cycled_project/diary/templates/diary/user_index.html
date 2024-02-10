@@ -3,7 +3,7 @@
     <ul>
         {% for user in user_list %}
             <li>
-                <a href="/cycled_project/{{user.id}}">
+                <a href="{% url 'diary:user_detail' user.id %}">
                     {{user.name}}
                 </a>
             </li>
