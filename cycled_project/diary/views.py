@@ -1,5 +1,19 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import render,get_object_or_404
 
-def index(request):
-    return HttpResponse("Hell World")
+from .models import User
+
+from datetime import datetime
+
+def user_index(request):
+    user_list=User.objects.order_by("id")
+    # output=",".join([user.name for user in user_list])
+    
+    # template=loader.get_template("diary/user_index.html")
+    template="diary/user_index.html"
+    context={
+            "user_list":user_list,
+            }
+    
+    return render(context=context,
+                  request=request,
+                  template_name=template)
