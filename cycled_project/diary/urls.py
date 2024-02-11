@@ -4,7 +4,8 @@ from . import views
 
 app_name="diary"
 urlpatterns = [
-    path("user",views.user_index,name="user_index"),
-    path("user/<int:user_id>/",views.user_detail,name="user_detail"),
+    path("",views.UserIndexView.as_view(),name="user_index"),
+    path("<int:pk>/",views.UserDetailView.as_view(),name="user_detail"),
+    path("<int:pk>/<int:diary_id>/write",views.diary_write,name="diary_write"),
     
 ]
