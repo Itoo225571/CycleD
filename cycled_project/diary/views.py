@@ -15,13 +15,12 @@ class UserIndexView(generic.ListView):
         # def get_queryset(self):
         #         return User.objects.order_by("id")
         model=User
-
         
 class UserDetailView(generic.DetailView):
         model=User
         template_name="diary/user_detail.html"
         
-class DiaryWriteView(generic.UpdateView):
+class DiaryCreateView(generic.CreateView):
         pass
 
 def diary_write(request,user_id):
@@ -32,7 +31,7 @@ def diary_write(request,user_id):
                 error_message="なんにもかいてないよぅ"
                 return render(request,
                               "diary/user_detail.html",
-                              {"user":user,"error_message":error_message},
+                              {"user":user,"error_message":error_message}
                               )
         else:
                 content.save()
