@@ -11,7 +11,7 @@ class User(models.Model):
         return self.name
     
 class Diary(models.Model):
-    content=models.TextField()
+    comment=models.TextField(blank=True)
     place=models.CharField(max_length=256,default="tmp field")
     creation_date=models.DateField()
     # last_update_date=models.DateField()

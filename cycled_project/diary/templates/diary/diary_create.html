@@ -1,22 +1,39 @@
 {% extends "diary/base.html" %}
+{% load django_bootstrap5 %}
 
 {% block title %}
     日記作成
 {% endblock title %}
     
 {% block content %}
-    {% if user_list %}
-        <ul>
-            {% for user in user_list %}
-                <li>
-                    <a href="{% url 'diary:user_detail' user.id %}">
-                        {{user.name}}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
+    <h1>
+        日記新規作成
+    </h1>
 
-    {% else %}
-        <p>No users are available.</p>
-    {% endif %}
+
+{% comment %}    
+    <div class="mb-3">
+        <label for="place" class="form-label">場所</label>
+        <input type="text" class="form-control" name="place" id="place">
+        <!-- <small id="helpId" class="form-text text-muted">Help text</small> -->
+    </div>
+    
+    <div class="mb-3">
+        <label for="comment" class="form-label">備考</label>
+        <textarea class="form-control" name="comment" id="comment" rows="4"></textarea>
+    </div>
+{% endcomment %}
+
+    <form action="{% url 'diary:diary_write' user.id %}" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary" >
+                投稿
+            </button>
+        </div>
+    </form>
+
+    <a href="{% url 'diary:user_detail' user.id %}"btn btn-light">戻る</a>
+    
 {% endblock content %}

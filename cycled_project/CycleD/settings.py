@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     
     "diary.apps.DiaryConfig",
+    "django_bootstrap5",#Bootstrap5追加
 ]
 
 MIDDLEWARE = [
