@@ -1,16 +1,23 @@
-<h1>
-    {{user.name}}の日記一覧
-</h1>
+{% extends "diary/base.html" %}
 
-<ul>
-<!-- ForeignKeyを使うと、自動的にdiary_setがuser内に作成される -->
-{% for diary in user.diary_set.all %}
-    <a href="{% url 'diary:diary_write' user.id %}">
-        {{diary.creation_date}}
-    </a>
-    <li>
-        {{diary.content}}
-    </li>
-{% endfor %}
-</ul>
+{% block title %}
+    日記
+{% endblock title %}
 
+{% block content %}
+    <h1>
+        {{user.name}}の日記一覧
+    </h1>
+
+    <ul>
+    <!-- ForeignKeyを使うと、自動的にdiary_setがuser内に作成される -->
+    {% for diary in user.diary_set.all %}
+        <a href="{% url 'diary:diary_update' user.id %}">
+            {{diary.creation_date}}:{{diary.place}}
+        </a>
+        <li>
+            {{diary.content}}
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock content %}

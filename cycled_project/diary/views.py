@@ -21,7 +21,12 @@ class UserDetailView(generic.DetailView):
         template_name="diary/user_detail.html"
         
 class DiaryCreateView(generic.CreateView):
-        pass
+        model=Diary
+        template_name="diary/diary_create.html"
+
+class DiaryUpdateView(generic.UpdateView):
+        model=Diary
+        template_name="diary/diary_update.html"
 
 def diary_write(request,user_id):
         user=get_object_or_404(User,pk=user_id)

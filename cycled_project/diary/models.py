@@ -12,7 +12,7 @@ class User(models.Model):
     
 class Diary(models.Model):
     content=models.TextField()
-    # place=models.CharField()
+    place=models.CharField(max_length=256,default="tmp field")
     creation_date=models.DateField()
     # last_update_date=models.DateField()
     # publish_flag=models.BooleanField(default=True)
