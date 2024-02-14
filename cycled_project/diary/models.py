@@ -4,8 +4,8 @@ class User(models.Model):
     name=models.CharField(max_length=128)
     email_address=models.EmailField()
     password=models.CharField(max_length=128,verbose_name="password",null=True,blank=False)
-    creation_date=models.DateField(verbose_name="creation date",null=True,blank=False)
-    last_login_date=models.DateField(verbose_name="last login date",null=True,blank=False)
+    creation_date=models.DateField(verbose_name="creation date",auto_now_add=True,null=True,blank=False)
+    last_login_date=models.DateField(verbose_name="last login date",auto_now=True,null=True,blank=False)
     
     def __str__(self):
         return self.name
