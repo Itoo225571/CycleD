@@ -12,9 +12,9 @@ class User(models.Model):
     
 class Diary(models.Model):
     comment=models.TextField(blank=True)
-    place=models.CharField(max_length=256,default="tmp field")
-    creation_date=models.DateField()
-    # last_update_date=models.DateField()
+    place=models.CharField(max_length=256,null=True,blank=False)
+    creation_date=models.DateField(verbose_name="creation date",auto_now_add=True,null=True,blank=False)
+    last_updated_date=models.DateField(verbose_name="last updated date",auto_now=True,null=True,blank=False)
     # publish_flag=models.BooleanField(default=True)
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     # tags=models.CharField(max_length=64)
