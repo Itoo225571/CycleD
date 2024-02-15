@@ -3,7 +3,7 @@ from django.db.models.query import QuerySet
 from django.shortcuts import render,get_object_or_404,redirect
 from django.http import HttpResponse,HttpResponseRedirect
 from django.views import generic
-from django.urls import reverse
+from django.urls import reverse,reverse_lazy
 
 from .models import User,Diary
 
@@ -26,11 +26,13 @@ class DiaryCreateView(generic.CreateView):
         model=Diary
         template_name="diary/diary_create.html"
         fields=("place","comment",)
+        success_url=reverse_lazy("user_detail")
 
 class DiaryUpdateView(generic.UpdateView):
         model=Diary
         template_name="diary/diary_update.html"
         fields=("place","comment",)
+        success_url=reverse_lazy("user_detail")
 
 def diary_write(request,user_id,diary_id=None):
         user=get_object_or_404(User,pk=user_id)
