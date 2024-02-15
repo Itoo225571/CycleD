@@ -18,7 +18,7 @@ class Diary(models.Model):
     # publish_flag=models.BooleanField(default=True)
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     # tags=models.CharField(max_length=64)
-    # image=models.ImageField(upload_tp="images/")
+    image=models.ImageField(upload_to="images/",blank=True,null=True)
     
     def __str__(self):
         return self.creation_date.strftime("%Y/%m/%d")

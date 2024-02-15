@@ -13,6 +13,9 @@ from pathlib import Path
 
 #プロジェクトのベースフォルダを示す（今回の場合、/workspaces/MyDjango/CycleD_project）
 BASE_DIR = Path(__file__).resolve().parent.parent
+#media用
+MEDIA_ROOT=BASE_DIR.joinpath("media")
+MEDIA_URL="/media/"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
