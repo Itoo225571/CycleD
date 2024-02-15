@@ -9,7 +9,7 @@ from .models import User,Diary
 
 from .forms import UserForm,DiaryForm
 
-from datetime import datetime
+# from datetime import datetime
 
 class UserIndexView(generic.ListView):
         template_name="diary/user_index.html"
@@ -39,7 +39,7 @@ def diary_write(request,user_id,diary_id=None):
                 diary=get_object_or_404(Diary,pk=diary_id)
         else:
                 diary=Diary(user=user)
-        diary.creation_date=datetime.today()
+        # diary.creation_date=datetime.today()
         if request.method=="POST":
                 form=DiaryForm(request.POST,instance=diary)
                 if form.is_valid():
