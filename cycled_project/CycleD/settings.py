@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     
     "diary.apps.DiaryConfig",
     "django_bootstrap5",#Bootstrap5追加
+    "debug_toolbar",#Debug-toolbar追加
 ]
 
 MIDDLEWARE = [
@@ -50,6 +51,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    
+    "debug_toolbar.middleware.DebugToolbarMiddleware",#Debug-toolbar
 ]
 
 ROOT_URLCONF = "CycleD.urls"
@@ -124,3 +127,13 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+#debug-toolbar
+
+INTERNAL_IPS=[
+    "127.0.0.1",
+]
+
+DEBUG_TOOLBAR_CONFIG={
+    "SHOW_TOOLBAR_CALLBACK": lambda request: True,
+}
