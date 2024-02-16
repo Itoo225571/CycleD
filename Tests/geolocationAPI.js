@@ -8,6 +8,7 @@ document.getElementById("btn").onclick = function(){
 function successCallback(position){
     // 緯度を取得し画面に表示
     var latitude = position.coords.latitude;
+    //id="latitude"にlatitudeを代入
     document.getElementById("latitude").innerHTML = latitude;
     // 経度を取得し画面に表示
     var longitude = position.coords.longitude;
