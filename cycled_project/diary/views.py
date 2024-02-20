@@ -6,7 +6,6 @@ from django.views import generic
 from django.urls import reverse,reverse_lazy
 
 from .models import User,Diary
-
 from .forms import UserForm,DiaryForm
 
 # from datetime import datetime
