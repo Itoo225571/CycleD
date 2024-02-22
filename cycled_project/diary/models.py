@@ -23,12 +23,12 @@ class Diary(models.Model):
     def __str__(self):
         return self.creation_date.strftime("%Y/%m/%d")
     
-class Place(models.Model):
-    image=models.ImageField(upload_to="images/")
-    address=models.CharField(max_length=256,blank=False)
-    date=models.DateField()
+# class Place(models.Model):
+#     image=models.ImageField(upload_to="images/")
+#     address=models.CharField(max_length=256,blank=False)
+#     date=models.DateField()
     
-    Diary=models.ForeignKey(Diary,on_delete=models.CASCADE)
+#     Diary=models.ForeignKey(Diary,on_delete=models.CASCADE)
     
-    def __str__(self):
-        return self.date.strftime("%Y/%m/%d")+" : "+self.place
+#     def __str__(self):
+#         return self.date.strftime("%Y/%m/%d")+" : "+self.place
