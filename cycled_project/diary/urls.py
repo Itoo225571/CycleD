@@ -10,4 +10,6 @@ urlpatterns = [
     path("<int:user_id>/<int:diary_id>/write",views.diary_write,name="diary_write"),
     path("<int:user_id>/create",views.DiaryCreateView.as_view(),name="diary_create"),
     path("<int:user_id>/write",views.diary_write,name="diary_write"),
+    
 ]
+
