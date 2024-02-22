@@ -7,13 +7,12 @@ class DiaryInline(admin.TabularInline):
     extra=3
 
 class UserAdmin(admin.ModelAdmin):
-    # fields=["name","email_address",]
     fieldsets=[
         (None,{"fields":["name"]}),
-        ("Email Information",{"fields":["email_address"]})
+        ("Email Information",{"fields":["email"]})
     ]
     inlines=[DiaryInline]
-    list_display=["name","creation_date","last_login_date",]
+    list_display=["name","date_created","date_last_login",]
     search_fields=["name",]
     
 admin.site.register(User,UserAdmin)
