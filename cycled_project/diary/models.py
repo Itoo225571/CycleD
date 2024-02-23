@@ -8,14 +8,14 @@ class User(models.Model):
     date_last_login=models.DateField(verbose_name="last login date",auto_now=True,null=True)
     is_admin=models.BooleanField(verbose_name="is admin",default=False)
     address=models.CharField(max_length=256,verbose_name="address",blank=True)
-    place_favorite=models.CharField(max_length=128,blank=True,varbose_name="favorite place")
+    place_favorite=models.CharField(max_length=128,blank=True,verbose_name="favorite place")
     
     def __str__(self):
         return self.name
     
 class Diary(models.Model):
     date=models.DateField(verbose_name="diary date",null=True)
-    name_place=models.CharField(verbose_name="place name",null=True)
+    name_place=models.CharField(max_length=128,verbose_name="place name",null=True)
     user=models.ForeignKey(User,on_delete=models.CASCADE)
     image=models.ImageField(upload_to="images/",blank=True,null=True)
     date_created=models.DateField(verbose_name="creation date",auto_now_add=True,null=True)

@@ -16,7 +16,7 @@ app_name="diary"
 urlpatterns = [
     path("",views.toppage,name="top_page"),
     
-    path("signin/",views.login,name="signin"),
+    path("signin/",views.signin,name="signin"),
     path("signup/",views.signup,name="signup"),
     
     path("user/<int:user_id>/",views.user_profile,name="user_profile"),
@@ -25,6 +25,7 @@ urlpatterns = [
     path("diary/<int:user_id>/",views.diary,name="diary"),
     path("diary/<int:user_id>/new/",views.diary_new,name="diary_new"),
     path("diary/<int:user_id>/edit/<int:diary_id>",views.diary_edit,name="diary_edit"),
+    path("diary/<int:user_id>/delete/<int:diary_id>",views.diary_delete,name="diary_delete"),
     
     path("calendar/<int:user_id>",views.calendar,name="calendar"),    
 ]
