@@ -11,7 +11,7 @@ from .forms import UserForm,DiaryForm
 # from datetime import datetime
 
 class ToppageView(generic.TemplateView):
-    template_name="dairy/toppage.html"
+    template_name="diary/toppage.html"
     
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         return super().get(request, *args, **kwargs)
