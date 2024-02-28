@@ -1,0 +1,14 @@
+{% extends "diary/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+    ログイン
+{% endblock title %}
+    
+{% block content %}
+    <form method="post">
+      {% csrf_token %}
+      {{ form }}
+      <input type="submit" value="送信">
+    </form>
+{% endblock content %}

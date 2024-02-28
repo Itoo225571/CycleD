@@ -6,7 +6,7 @@ from django.views import generic
 from django.urls import reverse,reverse_lazy
 
 from .models import User,Diary
-from .forms import UserForm,DiaryForm
+from .forms import SignupForm,SigninForm,DiaryForm
 
 # from datetime import datetime
 
@@ -17,13 +17,24 @@ class ToppageView(generic.TemplateView):
         return super().get(request, *args, **kwargs)
 toppage=ToppageView.as_view()
 
+
 class SigninView(generic.FormView):
-    pass
+    template_name="diary/signin.html"
+    form_class=SigninForm
+    success_url="diary/toppage.html"
+    
+    def form_valid(self, form: Any) -> HttpResponse:
+        
+        return HttpResponseRedirect(self.get_success_url())
+    
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        return super().get(request, *args, **kwargs)
 signin=SigninView.as_view()
 
 class SignupView(generic.CreateView):
     pass
 signup=SignupView.as_view()
+
 
 class UserProfileView(generic.TemplateView):
     pass
@@ -32,6 +43,7 @@ user_profile=UserProfileView.as_view()
 class UserEditView(generic.UpdateView):
     pass
 user_edit=UserEditView.as_view()
+
 
 class DiaryView(generic.TemplateView):
     pass
@@ -48,6 +60,7 @@ diary_edit=DiaryEdit.as_view()
 class DiaryDelete(generic.DeleteView):
     pass
 diary_delete=DiaryDelete.as_view()
+
 
 class CalendarView(generic.TemplateView):
     pass

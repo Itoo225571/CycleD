@@ -22,7 +22,7 @@
 
         <div class="container-fluid d-flex flex-row">
 
-          <a class="navbar-brand mb-0 h1 " href="{% url 'diary:top_page' %}">
+          <a class="navbar-brand mb-0 h1 " href="{% url 'diary:toppage' %}">
             さいくるにっき
           </a>
           
@@ -53,11 +53,19 @@
             </ul>
             <ul class="navbar-nav flex-row flex-wrap ms-md-auto">
               <li class="nav-item">
-                {% if user.is_authenticated %}
+
+                <a class="btn btn-outline-light" href="{% url 'diary:signin' %}" role="button">ログイン</a>
+                
+                {% comment %}
+                  {% if user.is_authenticated %}
                   <a class="nav-link" href="{% url 'diary:user_profile' user.id%}">プロフィール</a>
-                {% else %}
-                  <a class="btn btn-outline-light" href="{% url 'diary:signin' %}" role="button">ログイン</a>
-                {% endif %}
+                  {% else %}
+                    <a class="btn btn-outline-light" href="{% url 'diary:signin' %}" role="button">ログイン</a>
+                  {% endif %}
+                {% endcomment %}
+                  
+
+                
               </li>
             </ul>
           </div>
@@ -74,14 +82,14 @@
     <footer class="text-center bg-dark text-light">
       
       <section class="h6 d-flexjustify-content-between p-3">
-        <a class="text-reset fw-bold me-4" href="{% url 'diary:top_page' %}">ホーム</a>
+        <a class="text-reset fw-bold me-4" href="{% url 'diary:toppage' %}">ホーム</a>
         <a class="text-reset fw-bold me-4" href="#">プライバシーポリシー</a>
         <a class="text-reset fw-bold me-4" href="#">お問い合わせ</a>
       </section>
 
       <div class="text-center p-3">
         © 2024 Copyright : 
-        <a class="text-reset fw-bold" href="{% url 'diary:top_page' %}">さいくるにっき</a>
+        <a class="text-reset fw-bold" href="{% url 'diary:toppage' %}">さいくるにっき</a>
       </div>
       
     </footer>
