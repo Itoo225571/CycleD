@@ -14,7 +14,7 @@ app_name="diary"
 # ]
 
 urlpatterns = [
-    path("",views.toppage,name="top_page"),
+    path("",views.toppage,name="toppage"),
     
     path("signin/",views.signin,name="signin"),
     path("signup/",views.signup,name="signup"),

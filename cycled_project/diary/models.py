@@ -3,7 +3,7 @@ from django.db import models
 class User(models.Model):
     name=models.CharField(max_length=128,verbose_name="name")
     email=models.EmailField(verbose_name="email address")
-    password=models.CharField(max_length=128,verbose_name="password",null=True)
+    password=models.CharField(max_length=128,verbose_name="password")
     date_created=models.DateField(verbose_name="creation date",auto_now_add=True,null=True)
     date_last_login=models.DateField(verbose_name="last login date",auto_now=True,null=True)
     is_admin=models.BooleanField(verbose_name="is admin",default=False)
