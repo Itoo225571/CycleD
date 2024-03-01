@@ -2,12 +2,12 @@
 {% load django_bootstrap5 %}
 
 {% block title %}
-    新規アカウント作成
+    マイページ
 {% endblock title %}
     
 {% block content %}
-    <h2>新規アカウント作成</h2>
-    <form method="post">
+    <h2>マイページ</h2>
+    <form method="get">
         {% csrf_token %}
         {{ form.as_p }}
         <input type="submit" value="送信">
