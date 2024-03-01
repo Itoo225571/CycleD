@@ -6,9 +6,16 @@
 {% endblock title %}
     
 {% block content %}
+    <h2>ログイン</h2>
     <form method="post">
       {% csrf_token %}
-      {{ form }}
+      {{ form.as_p }}
       <input type="submit" value="送信">
     </form>
+
+    <p class="">
+      アカウントをお持ちでない方
+    </p>
+    <a href="{% url 'diary:signup' %}">新規登録</a>
+
 {% endblock content %}

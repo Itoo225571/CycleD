@@ -53,19 +53,13 @@
             </ul>
             <ul class="navbar-nav flex-row flex-wrap ms-md-auto">
               <li class="nav-item">
-
-                <a class="btn btn-outline-light" href="{% url 'diary:signin' %}" role="button">ログイン</a>
                 
-                {% comment %}
-                  {% if user.is_authenticated %}
-                  <a class="nav-link" href="{% url 'diary:user_profile' user.id%}">プロフィール</a>
-                  {% else %}
-                    <a class="btn btn-outline-light" href="{% url 'diary:signin' %}" role="button">ログイン</a>
-                  {% endif %}
-                {% endcomment %}
+                {% if user.is_authenticated %}
+                <a class="nav-link" href="{% url 'diary:user_profile' user.id%}">プロフィール</a>
+                {% else %}
+                  <a class="btn btn-outline-light" href="{% url 'diary:signin' %}" role="button">ログイン</a>
+                {% endif %}
                   
-
-                
               </li>
             </ul>
           </div>

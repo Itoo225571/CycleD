@@ -21,10 +21,9 @@ toppage=ToppageView.as_view()
 class SigninView(generic.FormView):
     template_name="diary/signin.html"
     form_class=SigninForm
-    success_url="diary/toppage.html"
+    success_url=reverse_lazy("diary:toppage")
     
     def form_valid(self, form: Any) -> HttpResponse:
-        
         return HttpResponseRedirect(self.get_success_url())
     
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
@@ -32,11 +31,13 @@ class SigninView(generic.FormView):
 signin=SigninView.as_view()
 
 class SignupView(generic.CreateView):
-    pass
+    template_name="diary/signup.html"
+    form_class=SignupForm
+    success_url=reverse_lazy("diary:toppage")
 signup=SignupView.as_view()
 
 
-class UserProfileView(generic.TemplateView):
+class UserProfileView(generic.DetailView):
     pass
 user_profile=UserProfileView.as_view()
 
