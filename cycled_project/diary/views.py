@@ -6,23 +6,27 @@ from django.http import HttpRequest, HttpResponse,HttpResponseRedirect
 from django.views import generic
 from django.urls import reverse,reverse_lazy
 
+from django.contrib.auth.views import LoginView,LogoutView
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 from .models import User,Diary
 from .forms import SignupForm,SigninForm,DiaryForm
 
 # from datetime import datetime
 
-class ToppageView(generic.TemplateView):
-    template_name="diary/toppage.html"
+class TopView(generic.TemplateView):
+    template_name="diary/top.html"
     
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         return super().get(request, *args, **kwargs)
-toppage=ToppageView.as_view()
+top=TopView.as_view()
 
+class Home
 
 class SigninView(generic.FormView):
     template_name="diary/signin.html"
     form_class=SigninForm
-    success_url=reverse_lazy("diary:toppage")
+    success_url=reverse_lazy("diary:top")
     
     def form_valid(self, form: Any) -> HttpResponse:
         return HttpResponseRedirect(self.get_success_url())
@@ -34,7 +38,7 @@ signin=SigninView.as_view()
 class SignupView(generic.CreateView):
     template_name="diary/signup.html"
     form_class=SignupForm
-    success_url=reverse_lazy("diary:toppage")
+    success_url=reverse_lazy("diary:top")
     
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         print("save data")
@@ -42,6 +46,7 @@ class SignupView(generic.CreateView):
         return super().form_valid(form)
 signup=SignupView.as_view()
 
+class SignoutView(generic.)
 
 class UserProfileView(generic.DetailView):
     template_name="diary/user_profile.html"
