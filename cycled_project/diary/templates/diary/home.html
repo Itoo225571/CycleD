@@ -1,0 +1,18 @@
+{% extends "diary/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+    ほーむぺーじ
+{% endblock title %}
+    
+{% block content %}
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col">
+                <h1>Welcome to さいくるにっき {{user.name}}</h1>
+                <p>さいくるにっきは日々のサイクリングを日記として記録に残すことで</p>
+                <p>日々の運動の継続をサポートする目的でつくられたサイトです</p>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
