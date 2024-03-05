@@ -123,6 +123,9 @@ USE_TZ = True
 SESSION_COOKIE_AGE = 60 * 5
 SESSION_SAVE_EVERY_REQUEST = True
 
+LOGIN_URL='diary:signin'
+LOGIN_REDIRECT_URL='diary:home'
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
