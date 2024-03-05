@@ -18,7 +18,7 @@
 
   <body>
     <header>
-      <nav class="navbar bd-navbar navbar-expand-lg fixed-top navbar-dark bg-dark p-3 ">
+      <nav class="navbar bd-navbar navbar-expand-lg fixed-top navbar-light bg-light p-3 ">
 
         <div class="container-fluid d-flex flex-row">
 
@@ -56,10 +56,11 @@
                 
                 {% if user.is_authenticated %}
                 <div class="nav-item dropdown">
-                  <a type="button" class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
-                    <img src="{% static 'diary/img/cycle_man.png' %}" class="rounded-circle" height="25" alt="icon" loading="lazy">
+                  <a type="button" class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                    <img src="{% static 'diary/img/cycle_man.png' %}" class="rounded-circle" width="30" height="35" alt="icon" loading="lazy">
                   </a>
                   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
+                    <!-- <span class="dropdown-item-text">ユーザー名：</span> -->
                     <li>
                       <a class="dropdown-item" href="{% url 'diary:user_profile' user.id %}">ぷろふぃ～る</a>
                     </li>
@@ -90,7 +91,7 @@
       {% endblock %}
     </div>
 
-    <footer class="text-center bg-dark text-light">
+    <footer class="text-center bg-light text-dark">
       
       <section class="h6 d-flexjustify-content-between p-3">
         <a class="text-reset fw-bold me-4" href="{% url 'diary:top' %}">ホーム</a>

@@ -10,31 +10,23 @@ from django.contrib.auth.views import LoginView,LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import User,Diary
-from .forms import SignupForm,SigninForm,DiaryForm
+from .forms import *
 
 # from datetime import datetime
 
 class TopView(generic.TemplateView):
     template_name="diary/top.html"
     
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        return super().get(request, *args, **kwargs)
 top=TopView.as_view()
 
 class HomeView(LoginRequiredMixin,generic.TemplateView):
     template_name="diary/home.html"
 home=HomeView.as_view()
 
-class SigninView(generic.FormView):
+class SigninView(LoginView):
     template_name="diary/signin.html"
     form_class=SigninForm
-    success_url=reverse_lazy("diary:home")
-    
-    def form_valid(self, form: Any) -> HttpResponse:
-        return HttpResponseRedirect(self.get_success_url())
-    
-    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        return super().get(request, *args, **kwargs)
+    # success_url=reverse_lazy("diary:home")
 signin=SigninView.as_view()
 
 class SignoutView(LoginRequiredMixin,LogoutView):
@@ -44,17 +36,13 @@ signout=SignoutView.as_view()
 class SignupView(generic.CreateView):
     template_name="diary/signup.html"
     form_class=SignupForm
-    success_url=reverse_lazy("diary:home")
+    # success_url=reverse_lazy("diary:home")
     
-    def form_valid(self, form: BaseModelForm) -> HttpResponse:
-        print("save data")
-        print(form.cleaned_data)
-        return super().form_valid(form)
 signup=SignupView.as_view()
 
-class UserProfileView(generic.DetailView):
+class UserProfileView(LoginRequiredMixin,generic.DetailView):
     template_name="diary/user_profile.html"
-    form_class=User
+    form_class=UserForm
 user_profile=UserProfileView.as_view()
 
 class UserEditView(generic.UpdateView):

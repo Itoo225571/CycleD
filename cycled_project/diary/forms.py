@@ -1,19 +1,24 @@
 from typing import Any
-from django.forms import *
+from django.forms import ModelForm,CharField
+from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
 
 from diary.models import User,Diary
 
-class SignupForm(ModelForm):
+class SignupForm(UserCreationForm):
     class Meta:
         model=User
         fields=["name","email","password",]
 
-class SigninForm(ModelForm):
-    username_or_email = CharField(label='ユーザー名またはメールアドレス')
+class SigninForm(AuthenticationForm):
+    # username_or_email = CharField(label='ユーザー名またはメールアドレス')
     class Meta:
         model=User
-        fields=["username_or_email","password",]
+        fields=["name","password",]
         
+class UserForm(ModelForm):
+    class Meta:
+        model=User
+        fields=["name","email","password",]
 
 class DiaryForm(ModelForm):
     class Meta:
