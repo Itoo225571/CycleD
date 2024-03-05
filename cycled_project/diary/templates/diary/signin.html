@@ -8,9 +8,10 @@
 {% block content %}
     <h2>ログイン</h2>
     <form method="post">
+      <table>
+        {{form.as_table}}
+      </table>
       {% csrf_token %}
-      {{ form.as_table }}
-      <tr><td></td></tr>
       <input type="submit" value="送信">
     </form>
 

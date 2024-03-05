@@ -21,12 +21,14 @@ class TopView(generic.TemplateView):
         return super().get(request, *args, **kwargs)
 top=TopView.as_view()
 
-class Home
+class HomeView(LoginRequiredMixin,generic.TemplateView):
+    template_name="diary/home.html"
+home=HomeView.as_view()
 
 class SigninView(generic.FormView):
     template_name="diary/signin.html"
     form_class=SigninForm
-    success_url=reverse_lazy("diary:top")
+    success_url=reverse_lazy("diary:home")
     
     def form_valid(self, form: Any) -> HttpResponse:
         return HttpResponseRedirect(self.get_success_url())
@@ -35,18 +37,20 @@ class SigninView(generic.FormView):
         return super().get(request, *args, **kwargs)
 signin=SigninView.as_view()
 
+class SignoutView(LoginRequiredMixin,LogoutView):
+    template_name="diary/signout.html"
+signout=SignoutView.as_view()
+
 class SignupView(generic.CreateView):
     template_name="diary/signup.html"
     form_class=SignupForm
-    success_url=reverse_lazy("diary:top")
+    success_url=reverse_lazy("diary:home")
     
     def form_valid(self, form: BaseModelForm) -> HttpResponse:
         print("save data")
         print(form.cleaned_data)
         return super().form_valid(form)
 signup=SignupView.as_view()
-
-class SignoutView(generic.)
 
 class UserProfileView(generic.DetailView):
     template_name="diary/user_profile.html"
