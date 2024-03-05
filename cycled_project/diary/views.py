@@ -1,5 +1,6 @@
 from typing import Any
 from django.db.models.query import QuerySet
+from django.forms.models import BaseModelForm
 from django.shortcuts import render,get_object_or_404,redirect
 from django.http import HttpRequest, HttpResponse,HttpResponseRedirect
 from django.views import generic
@@ -34,11 +35,17 @@ class SignupView(generic.CreateView):
     template_name="diary/signup.html"
     form_class=SignupForm
     success_url=reverse_lazy("diary:toppage")
+    
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        print("save data")
+        print(form.cleaned_data)
+        return super().form_valid(form)
 signup=SignupView.as_view()
 
 
 class UserProfileView(generic.DetailView):
-    pass
+    template_name="diary/user_profile.html"
+    form_class=User
 user_profile=UserProfileView.as_view()
 
 class UserEditView(generic.UpdateView):
