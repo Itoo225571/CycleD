@@ -1,7 +1,7 @@
 from django.db import models
 
 class User(models.Model):
-    name=models.CharField(max_length=128,verbose_name="name")
+    username=models.CharField(max_length=128,verbose_name="name")
     email=models.EmailField(verbose_name="email address")
     password=models.CharField(max_length=128,verbose_name="password")
     date_created=models.DateField(verbose_name="creation date",auto_now_add=True,null=True)
@@ -11,7 +11,7 @@ class User(models.Model):
     place_favorite=models.CharField(max_length=128,blank=True,verbose_name="favorite place")
     
     def __str__(self):
-        return self.name
+        return self.username
     
 class Diary(models.Model):
     date=models.DateField(verbose_name="diary date",null=True)
