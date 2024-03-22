@@ -1,7 +1,8 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
-class User(models.Model):
-    username=models.CharField(max_length=128,verbose_name="name")
+class User(AbstractUser):
+    # username=models.CharField(max_length=128,verbose_name="name")
     email=models.EmailField(verbose_name="email address")
     password=models.CharField(max_length=128,verbose_name="password")
     date_created=models.DateField(verbose_name="creation date",auto_now_add=True,null=True)
