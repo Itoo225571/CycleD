@@ -7,18 +7,18 @@ from diary.models import User,Diary
 class SignupForm(UserCreationForm):
     class Meta:
         model=User
-        fields=["name","email","password",]
+        fields=["username","email","password",]
 
 class SigninForm(AuthenticationForm):
     # username_or_email = CharField(label='ユーザー名またはメールアドレス')
     class Meta:
         model=User
-        fields=["name","password",]
+        fields=["username","password",]
         
 class UserForm(ModelForm):
     class Meta:
         model=User
-        fields=["name","email","password",]
+        fields=["username","email","password",]
 
 class DiaryForm(ModelForm):
     class Meta:
