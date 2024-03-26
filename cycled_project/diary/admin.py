@@ -4,15 +4,17 @@ from .models import User,Diary
 
 class DiaryInline(admin.TabularInline):
     model=Diary
-    extra=3
+    extra=1
 
 class UserAdmin(admin.ModelAdmin):
     fieldsets=[
         (None,{"fields":["username"]}),
-        ("Email Information",{"fields":["email"]})
+        ("Email Information",{"fields":["email"]}),
+        ("パスワード",{"fields":["password"]}),
+        ("アイコン選択",{"fields":["icon"]}),
     ]
     inlines=[DiaryInline]
-    list_display=["username","date_created","date_last_login",]
+    list_display=["username",]
     search_fields=["username",]
     
 admin.site.register(User,UserAdmin)
