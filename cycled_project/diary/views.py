@@ -14,7 +14,7 @@ from .forms import *
 
 # from datetime import datetime
 
-class HomeView(LoginRequiredMixin,generic.TemplateView):
+class HomeView(generic.TemplateView):
     template_name="diary/home.html"
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         context={"user":request.user}
