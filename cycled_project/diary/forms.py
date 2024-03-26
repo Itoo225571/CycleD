@@ -1,15 +1,16 @@
 from typing import Any
 from django.forms import ModelForm,CharField,PasswordInput,ValidationError
 from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
+from django.contrib.auth.hashers import make_password,check_password
 
 from diary.models import User,Diary
 
-class SignupForm(ModelForm):
+class SignupForm(UserCreationForm):
     '''     定義文      '''
     class Meta:
         model=User
-        fields=["username","email","password","icon",]
-        widgets={"password":PasswordInput(attrs={"placeholder":"パスワード入力欄"})}
+        fields=["icon","username","email","password1",]
+        widgets={"password1":PasswordInput(attrs={"placeholder":"パスワード入力欄"})}
     password2=CharField(
         label="パスワード再入力欄",
         required=True,
@@ -34,11 +35,11 @@ class SignupForm(ModelForm):
         return value
     #password
     def clean_password(self):
-        value = self.cleaned_data['password']
+        value = self.cleaned_data['password1']
         return value
     #フォーム全体
     def clean(self):
-        password = self.cleaned_data['password']
+        password = self.cleaned_data['password1']
         password2 = self.cleaned_data['password2']
         if password != password2:
             raise ValidationError("パスワードと確認用パスワードが合致しません")
