@@ -14,19 +14,17 @@ from .forms import *
 
 # from datetime import datetime
 
-class TopView(generic.TemplateView):
-    template_name="diary/top.html"
-    
-top=TopView.as_view()
-
 class HomeView(LoginRequiredMixin,generic.TemplateView):
     template_name="diary/home.html"
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        context={"user":request.user}
+        return self.render_to_response(context)
 home=HomeView.as_view()
 
 class SigninView(LoginView):
     template_name="diary/signin.html"
     form_class=SigninForm
-    # success_url=reverse_lazy("diary:home")
+    success_url=reverse_lazy("diary:home")
 signin=SigninView.as_view()
 
 class SignoutView(LoginRequiredMixin,LogoutView):
@@ -36,7 +34,7 @@ signout=SignoutView.as_view()
 class SignupView(generic.CreateView):
     template_name="diary/signup.html"
     form_class=SignupForm
-    # success_url=reverse_lazy("diary:home")
+    success_url=reverse_lazy("diary:signin")
     
 signup=SignupView.as_view()
 

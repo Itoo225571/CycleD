@@ -22,7 +22,7 @@
 
         <div class="container-fluid d-flex flex-row">
 
-          <a class="navbar-brand mb-0 h1 " href="{% url 'diary:top' %}">
+          <a class="navbar-brand mb-0 h1 " href="{% url 'diary:home' %}">
             さいくるにっき
           </a>
           
@@ -75,7 +75,7 @@
                 </div>
                 
                 {% else %}
-                  <a class="btn btn-outline-light" href="{% url 'diary:signin' %}" role="button">ログイン</a>
+                  <a class="btn btn-outline-primary" href="{% url 'diary:signin' %}" role="button">ログイン</a>
                 {% endif %}
                   
               </li>
@@ -94,14 +94,14 @@
     <footer class="text-center bg-light text-dark">
       
       <section class="h6 d-flexjustify-content-between p-3">
-        <a class="text-reset fw-bold me-4" href="{% url 'diary:top' %}">ホーム</a>
+        <a class="text-reset fw-bold me-4" href="{% url 'diary:home' %}">ホーム</a>
         <a class="text-reset fw-bold me-4" href="#">プライバシーポリシー</a>
         <a class="text-reset fw-bold me-4" href="#">お問い合わせ</a>
       </section>
 
       <div class="text-center p-3">
         © 2024 Copyright : 
-        <a class="text-reset fw-bold" href="{% url 'diary:top' %}">さいくるにっき</a>
+        <a class="text-reset fw-bold" href="{% url 'diary:home' %}">さいくるにっき</a>
       </div>
       
     </footer>

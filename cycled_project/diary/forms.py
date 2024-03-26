@@ -8,7 +8,7 @@ class SignupForm(ModelForm):
     '''     定義文      '''
     class Meta:
         model=User
-        fields=["username","email","password",]
+        fields=["username","email","password","icon",]
         widgets={"password":PasswordInput(attrs={"placeholder":"パスワード入力欄"})}
     password2=CharField(
         label="パスワード再入力欄",

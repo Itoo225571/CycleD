@@ -2,14 +2,26 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
-    # username=models.CharField(max_length=128,verbose_name="name")
-    email=models.EmailField(verbose_name="email address")
-    password=models.CharField(max_length=128,verbose_name="password")
-    date_created=models.DateField(verbose_name="creation date",auto_now_add=True,null=True)
-    date_last_login=models.DateField(verbose_name="last login date",auto_now=True,null=True)
-    is_admin=models.BooleanField(verbose_name="is admin",default=False)
+    # username=models.CharField(max_length=128,verbose_name="user   name")
+    # email=None
+    first_name=None
+    last_name=None
+    groups=None
+    icon=models.ImageField(upload_to="images/",blank=True,null=True)
+    # password=models.CharField(max_length=128,verbose_name="password")
+    # date_created=models.DateField(verbose_name="creation date",auto_now_add=True,null=True)
+    # date_last_login=models.DateField(verbose_name="last login date",auto_now=True,null=True)
+    # is_admin=models.BooleanField(verbose_name="is admin",default=False)
+    
     address=models.CharField(max_length=256,verbose_name="address",blank=True)
-    place_favorite=models.CharField(max_length=128,blank=True,verbose_name="favorite place")
+    place_favorite=models.CharField(max_length=256,blank=True,verbose_name="favorite place")
+    
+    REQUIRED_FIELDS = ["email",]
+    
+    class Meta:
+        db_table = 'CycleDiary_User'
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'
     
     def __str__(self):
         return self.username
