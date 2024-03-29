@@ -28,13 +28,13 @@ class SigninView(LoginView):
 signin=SigninView.as_view()
 
 class SignoutView(LoginRequiredMixin,LogoutView):
-    template_name="diary/signout.html"
+    template_name="diary/home.html"
 signout=SignoutView.as_view()
 
 class SignupView(generic.CreateView):
     template_name="diary/signup.html"
     form_class=SignupForm
-    success_url=reverse_lazy("diary:signin")
+    success_url=reverse_lazy("diary:home")
     
 signup=SignupView.as_view()
 

@@ -55,25 +55,27 @@
               <li class="nav-item">
                 
                 {% if user.is_authenticated %}
-                <div class="nav-item dropdown">
-                  <a type="button" class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                    <img src="{{ MEDIA_URL }}{{user.icon}}" class="rounded-circle" width="30" height="35" alt="icon" loading="lazy">
-                  </a>
-                  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
-                    <!-- <span class="dropdown-item-text">ユーザー名：</span> -->
-                    <li>
-                      <a class="dropdown-item" href="{% url 'diary:user_profile' user.id %}">ぷろふぃ～る</a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item" href="#">設定</a>
-                    </li>
-                    <li><hr class="dropdown-divider"></li><!-- 横仕切り線 -->
-                    <li>
-                      <a class="dropdown-item" href="{% url 'diary:signout' %}">ログアウト</a>
-                    </li>
-                  </ul>
-                </div>
-                
+                  <div class="nav-item dropdown">
+                    <a type="button" class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                      <img src="{{ MEDIA_URL }}{{user.icon}}" class="rounded-circle" width="40" height="40" alt="icon" loading="lazy">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
+                      <!-- <span class="dropdown-item-text">ユーザー名：</span> -->
+                      <li>
+                        <a class="dropdown-item" href="{% url 'diary:user_profile' user.id %}">ぷろふぃ～る</a>
+                      </li>
+                      <li>
+                        <a class="dropdown-item" href="#">設定</a>
+                      </li>
+                      <li><hr class="dropdown-divider"></li><!-- 横仕切り線 -->
+                      <li>
+                        <form action="{% url 'diary:signout' %}" method="post">
+                          {% csrf_token %}
+                          <a class="dropdown-item" href="#" onclick="this.closest('form').submit();return false;">ログアウト</a>
+                        </form>
+                      </li>
+                    </ul>
+                  </div>
                 {% else %}
                   <a class="btn btn-outline-primary" href="{% url 'diary:signin' %}" role="button">ログイン</a>
                 {% endif %}
