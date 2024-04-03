@@ -9,10 +9,17 @@
     {% if user.is_authenticated %}
         <div class="container mt-5">
             <div class="row">
-                <div class="col">
+                <div class="col my-title">
                     <h1>Welcome to さいくるにっき{{user.username}}さん</h1>
-                    <p>さいくるにっきは日々のサイクリングを日記として記録に残すことで</p>
-                    <p>日々の運動の継続をサポートする目的でつくられたサイトです</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 my-content">
+                    <h3>今日の天気</h3>
+                    
+                </div>
+                <div class="col-md-6 my-content">
+                    <h3>明日の天気</h3>
                 </div>
             </div>
         </div>

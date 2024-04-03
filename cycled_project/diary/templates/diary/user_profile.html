@@ -8,8 +8,6 @@
 {% block content %}
     <h2>マイページ</h2>
     <form method="get">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="送信">
+        
     </form>
 {% endblock content %}

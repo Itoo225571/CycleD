@@ -1,15 +1,11 @@
 from typing import Any
-from django.db.models.query import QuerySet
-from django.forms.models import BaseModelForm
-from django.shortcuts import render,get_object_or_404,redirect
-from django.http import HttpRequest, HttpResponse,HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse
 from django.views import generic
-from django.urls import reverse,reverse_lazy
+from django.urls import reverse_lazy
 
 from django.contrib.auth.views import LoginView,LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import User,Diary
 from .forms import *
 
 # from datetime import datetime
@@ -28,7 +24,7 @@ class SigninView(LoginView):
 signin=SigninView.as_view()
 
 class SignoutView(LoginRequiredMixin,LogoutView):
-    template_name="diary/home.html"
+    template_name="diary/signout.html"
 signout=SignoutView.as_view()
 
 class SignupView(generic.CreateView):
