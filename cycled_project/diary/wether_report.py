@@ -10,7 +10,7 @@ API = "https://weather.tsukumijima.net/api/forecast"
 
 #パラメータを定義
 paramValue = {
-	#名古屋のIDを指定
+	#都市のIDを指定
 	'city': '130010'
 }
 
@@ -27,7 +27,7 @@ data = requests.get(url).json()
 # text = data.decode("utf-8")
 
 #テキストとして表示
-# pprint(data)
+pprint(params)
 
 with open("json_test.json","w") as f:
     json.dump(data,f,indent=4,ensure_ascii=False)
