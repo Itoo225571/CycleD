@@ -1,4 +1,5 @@
-def decode(codes):
+def weather_decode(codes):
+
     weather_categories = {
         0: "Clear",
         1: "Cloudy",
@@ -66,14 +67,25 @@ def decode(codes):
         99: "Thunderstorm"
     }
 
-    if type(codes)==list:
-        return [weather_categories.get(code, None) for code in codes]
-    else:
-        return weather_categories.get(codes, None)
+    return weather_categories.get(codes, None)
+    
+def en_to_ja(weather):
+    weather_dict = {
+    "Clear": "晴れ",
+    "Cloudy": "曇り",
+    "Mist": "霧",
+    "Light Rain": "小雨",
+    "Rain": "雨",
+    "Snow": "雪",
+    "Showers": "時々雨",
+    "Snow Showers": "時々雪",
+    "Thunderstorm": "雷"
+    }
+    return weather_dict.get(weather, None)
 
 if __name__=="__main__":
     list1=[
         1,2,3,7,10
     ]
-    list1=decode(list1)
+    list1=[ weather_decode(code) for code in list1 ]
     print(list1)
