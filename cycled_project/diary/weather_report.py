@@ -1,9 +1,9 @@
 import requests
 
-from pprint import pprint
 import urllib.parse
 import pandas as pd
 from decimal import Decimal, ROUND_HALF_UP
+from datetime import datetime
 
 class WeatherReport:
 	def __init__(self,latitude,longtitude):
@@ -25,11 +25,16 @@ class WeatherReport:
 		# self.data["daily"]["time"] = [item.replace("T", " ") for item in self.data["daily"]["time"]]
 		# self.data["current"]["time"] = self.data["current"]["time"].replace("T", " ")
 
+		self.data["hourly"]["time"]=self.decode_time(self.data["hourly"]["time"])
+		self.data["daily"]["time"]=self.decode_time(self.data["daily"]["time"])
+		self.data["current"]["time"]=self.decode_time(self.data["current"]["time"])
+
 		self.data["hourly"]["weather"]=self.decode_weather_category(self.data["hourly"]["weather_code"])
 		self.data["daily"]["weather"]=self.decode_weather_category(self.data["daily"]["weather_code"])
 		self.data["current"]["weather"]=self.decode_weather_category(self.data["current"]["weather_code"])
 
 		self.data["hourly"]["wind_direction_10m_ja"]=self.en_to_ja_direction(self.data["hourly"]["wind_direction_10m"])
+		self.data["current"]["wind_direction_10m_ja"]=self.en_to_ja_direction(self.data["current"]["wind_direction_10m"])
 
 		self.df_hourly = pd.DataFrame(index=self.data["hourly"]["time"],data=self.data["hourly"])
 		self.df_daily = pd.DataFrame(index=self.data["daily"]["time"],data=self.data["daily"])
@@ -112,6 +117,21 @@ class WeatherReport:
 		elif isinstance(codes, int):
 			return weather_categories.get(codes, None)
 		return new_codes
+	
+	def decode_time(self,times):
+		new_times=[]
+		if isinstance(times,list):
+			for time in times:
+				if "T" in time:
+					new_times.append(datetime.strptime(time, "%Y-%m-%dT%H:%M"))
+				else:
+					new_times.append(datetime.strptime(time, "%Y-%m-%d"))
+		elif isinstance(times,str):
+			if "T" in times:
+				return datetime.strptime(times, "%Y-%m-%dT%H:%M")
+			else:
+				return datetime.strptime(times, "%Y-%m-%d")
+		return new_times
 	
 	"""__翻訳用__"""
 	def en_to_ja_weather(self,weather):
