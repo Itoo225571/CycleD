@@ -1,4 +1,5 @@
 import requests
+import geocoder.osm
 
 import urllib.parse
 import pandas as pd
@@ -6,7 +7,18 @@ from decimal import Decimal, ROUND_HALF_UP
 from datetime import datetime
 
 class WeatherReport:
-	def __init__(self,latitude,longtitude):
+	def __init__(self,*args):
+		if len(args)==2 and isinstance(args[0],(float,int)) and isinstance(args[1],(float,int)):
+			latitude,longtitude=args
+			location_name=None
+		elif len(args)==1 and isinstance(args[0],str):
+			location_name=args[0]
+			ret=geocoder.osm(location_name,timeout=5.0)
+			latitude,longtitude=ret.latlng
+		else:
+			raise ValueError("Invalid arguments")
+
+		self.location_name=location_name
 		self.params={
 			"latitude": latitude,
 			"longitude": longtitude,
@@ -18,13 +30,9 @@ class WeatherReport:
 
 		params_url=urllib.parse.urlencode(self.params,True)
 		url = f"https://api.open-meteo.com/v1/forecast?{params_url}"
-		response = requests.get(url)
+		response = requests.get(url,timeout=3.5)
 		self.data=response.json()
-
-		# self.data["hourly"]["time"] = [item.replace("T", " ") for item in self.data["hourly"]["time"]]
-		# self.data["daily"]["time"] = [item.replace("T", " ") for item in self.data["daily"]["time"]]
-		# self.data["current"]["time"] = self.data["current"]["time"].replace("T", " ")
-
+		
 		self.data["hourly"]["time"]=self.decode_time(self.data["hourly"]["time"])
 		self.data["daily"]["time"]=self.decode_time(self.data["daily"]["time"])
 		self.data["current"]["time"]=self.decode_time(self.data["current"]["time"])
@@ -39,8 +47,6 @@ class WeatherReport:
 		self.df_hourly = pd.DataFrame(index=self.data["hourly"]["time"],data=self.data["hourly"])
 		self.df_daily = pd.DataFrame(index=self.data["daily"]["time"],data=self.data["daily"])
 		self.df_current=pd.DataFrame(index=[self.data["current"]["time"]],data=self.data["current"])
-
-		print(type(self.data["daily"]["sunrise"][0]))
 
 	"""__コード解読用メソッド__"""
 	def decode_weather_category(self,codes):
@@ -174,11 +180,12 @@ class WeatherReport:
 
 	"""__デバッグ用__"""
 	def to_csv(self):
-		self.df_hourly.to_csv("hourly.csv")
-		self.df_daily.to_csv("daily.csv")
-		self.df_current.to_csv("current.csv")
+		self.df_hourly.to_csv(str(self.location_name)+"_hourly.csv")
+		self.df_daily.to_csv(str(self.location_name)+"_daily.csv")
+		self.df_current.to_csv(str(self.location_name)+"_current.csv")
 		
 	
 if __name__=="__main__":
-	w=WeatherReport(35.72475432967049,139.58134714317478)
+	# w=WeatherReport(35.72475432967049,139.58134714317478)
+	w=WeatherReport("関町東")
 	w.to_csv()
