@@ -1,23 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>Geolocation Sample</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geolocationの例</title>
 </head>
 <body>
-    <div class="center">
-        <div class="btn-margin">
-            <button id="btn" class="btn btn-outline-primary btn-lg">
-                現在位置を取得する
-            </button>
-        </div>
-        <div class="txt-margin">
-            <p>緯度：<span id="latitude">???</span><span>度</span></p>
-            <p>経度：<span id="longitude">???</span><span>度</span></p>
-        </div>
-    </div>
-    <script src="geolocationAPI.js"></script>
+  <h1>位置情報取得</h1>
+  <p id="location-info">位置情報はここに表示されます。</p>
+
+  <script>
+    // Geolocationのサポートを確認
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        // 位置情報が取得できた場合のコールバック関数
+        function (position) {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          // 取得した位置情報を表示
+          const locationInfoElement = document.getElementById("location-info");
+          locationInfoElement.textContent = `緯度: ${latitude}, 経度: ${longitude}`;
+        },
+        // 位置情報が取得できなかった場合のコールバック関数
+        function (error) {
+          console.error("位置情報の取得に失敗しました。", error);
+          const locationInfoElement = document.getElementById("location-info");
+          locationInfoElement.textContent = "位置情報の取得に失敗しました。";
+        }
+      );
+    } else {
+      console.error("このブラウザはGeolocationをサポートしていません。");
+      const locationInfoElement = document.getElementById("location-info");
+      locationInfoElement.textContent = "このブラウザはGeolocationをサポートしていません。";
+    }
+  </script>
 </body>
 </html>
