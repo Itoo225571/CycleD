@@ -1,10 +1,12 @@
 from typing import Any
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse,JsonResponse
 from django.views import generic,View
 from django.urls import reverse_lazy
 
 from django.contrib.auth.views import LoginView,LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
+
+from .diary_weather_report import DiaryWeatherReport
 
 from .forms import *
 
@@ -70,7 +72,24 @@ class DiaryDelete(generic.DeleteView):
     pass
 diary_delete=DiaryDelete.as_view()
 
-
 class CalendarView(generic.TemplateView):
     pass
 calendar=CalendarView.as_view()
+
+def ajax_getLocation(request):
+    if request.method == 'POST':
+        latitude = float(request.POST.get('latitude',None))
+        longitude = float(request.POST.get('longitude',None))
+        weather=DiaryWeatherReport(latitude,longitude)
+        
+        # 位置情報を含むレスポンスを作成
+        response = {
+            'message': 'Location data received successfully.',
+            "current": weather.current,
+            "today":weather.today,
+            "tomorrow":weather.tomorrow,
+        }
+        
+        return JsonResponse(response)
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=400)

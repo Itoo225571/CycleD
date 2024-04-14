@@ -1,4 +1,4 @@
-from subs.weather_report import WeatherReport
+from diary.subs.weather_report import WeatherReport
 
 class DiaryWeatherReport(WeatherReport):
 	def __init__(self, *args):

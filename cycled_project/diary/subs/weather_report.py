@@ -4,13 +4,15 @@ import geocoder.osm
 import urllib.parse
 import pandas as pd
 import json
-from os import getcwd
+from os import path
 from decimal import Decimal, ROUND_HALF_UP
-from datetime import datetime
+from datetime import datetime,timedelta
+
+from pprint import pprint
 
 class WeatherReport:
-
-	with open("subs/weather_category.json",mode="rt") as f:
+	p = path.join(path.dirname(__file__), 'weather_category.json')
+	with open(p,mode="rt") as f:
 			weather_categories = json.load(f)
 	# 文字列から整数にキーを変換する
 	weather_categories = {int(key): value for key, value in weather_categories.items()}
@@ -52,6 +54,10 @@ class WeatherReport:
 		self.data["hourly"]["wind_direction_10m_ja"]=self.en_to_ja_direction(self.data["hourly"]["wind_direction_10m"])
 		self.data["current"]["wind_direction_10m_ja"]=self.en_to_ja_direction(self.data["current"]["wind_direction_10m"])
 
+		self.df_hourly = pd.DataFrame(index=self.data["hourly"]["time"],data=self.data["hourly"]).drop(columns=["time"])
+		self.df_daily = pd.DataFrame(index=self.data["daily"]["time"],data=self.data["daily"]).drop(columns=["time"])
+		self.df_current=pd.DataFrame(index=[self.data["current"]["time"]],data=self.data["current"]).drop(columns=["time"])
+
 	"""__コード解読用メソッド__"""
 	def decode_weather_category(self,codes):
 		descriptions=[]
@@ -66,17 +72,14 @@ class WeatherReport:
 	
 	def decode_time(self,times):
 		new_times=[]
-		if isinstance(times,list):
-			for time in times:
-				if "T" in time:
-					new_times.append(datetime.strptime(time, "%Y-%m-%dT%H:%M"))
-				else:
-					new_times.append(datetime.strptime(time, "%Y-%m-%d"))
-		elif isinstance(times,str):
-			if "T" in times:
-				return datetime.strptime(times, "%Y-%m-%dT%H:%M")
+		if isinstance(times,str):
+			times=[times]
+		for time in times:
+			if "T" in time:
+				new_times.append(datetime.strptime(time, '%Y-%m-%dT%H:%M'))
 			else:
-				return datetime.strptime(times, "%Y-%m-%d")
+				tdatetime = datetime.strptime(time, '%Y-%m-%d')
+				new_times.append(tdatetime.date())
 		return new_times
 	
 	"""__翻訳用__"""
@@ -122,14 +125,29 @@ class WeatherReport:
 
 	"""__デバッグ用__"""
 	def to_csv(self):
-		self.df_hourly = pd.DataFrame(index=self.data["hourly"]["time"],data=self.data["hourly"])
-		self.df_daily = pd.DataFrame(index=self.data["daily"]["time"],data=self.data["daily"])
-		self.df_current=pd.DataFrame(index=[self.data["current"]["time"]],data=self.data["current"])
-	
 		self.df_hourly.to_csv(str(self.location_name)+"_hourly.csv")
 		self.df_daily.to_csv(str(self.location_name)+"_daily.csv")
 		self.df_current.to_csv(str(self.location_name)+"_current.csv")
 
+	"""__表示用__"""
+	@property
+	def current(self):
+		return self.data["current"]
+	@property
+	def today(self):
+		index=self.data["daily"]["time"].index(datetime.today().date())
+		weather = {}
+		for key, values in self.data["daily"].items():
+			weather[key] = values[index]
+		return weather
+	@property
+	def tomorrow(self):
+		index=self.data["daily"]["time"].index(datetime.today().date()+timedelta(days=1))
+		weather = {}
+		for key, values in self.data["daily"].items():
+			weather[key] = values[index]
+		return weather
+
 if __name__=="__main__":    	
 	w=WeatherReport("関町")
-	w.to_csv()
+	pprint(w.tomorrow)
