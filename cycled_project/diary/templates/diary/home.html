@@ -15,12 +15,11 @@
         <div class="row">
             <div class="col-md-6 my-content">
                 <h3>今日の天気</h3>
-                <p id="getErrMag">位置情報はここに表示されます。</p>
-                <p id="getLatitude"></p>
-                <p id="getLongitude"></p>
+                <p id="getCurrentWeather"></p>
             </div>
             <div class="col-md-6 my-content">
                 <h3>明日の天気</h3>
+                <p id="getTomorrowWeather"></p>
             </div>
         </div>
     </div>
@@ -28,48 +27,61 @@
 
 {% block extra_js %}
     <script>
-        {% comment %} ウィンドウがロードされた時に実行 {% endcomment %}
-        window.onload=MyPosGet;
-
-        function GetOk(argPos){
-            document.getElementById("getLatitude").innerHTML         = argPos.coords.latitude;          
-            document.getElementById("getLongitude").innerHTML        = argPos.coords.longitude;         
-        }
-
-        function GetErr(argErr){
-            var wErrMsg = "";
-            switch(argErr.code){
-                case 1 : wErrMsg = "位置情報の利用が許可されていません";break;
-                case 2 : wErrMsg = "デバイスの位置が判定できません";break;
-                case 3 : wErrMsg = "タイムアウトしました";break;
+        $(document).ready(function() {
+            // ページが読み込まれた時に位置情報を取得する
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+                    sendLocationToServer(latitude, longitude);
+                });
+            } else {
+                console.log("Geolocation is not supported by this browser.");
             }
-            if(wErrMsg == ""){wErrMsg = argErr.message;} 
-            // --- エラーメッセージ出力 --------------------------------------------------------------------
-            document.getElementById("getErrMag").innerHTML = wErrMsg;
+        });
+        
+        // サーバーに位置情報を送信する関数
+        function sendLocationToServer(latitude, longitude) {
+            // CSRFトークンを取得
+            var csrftoken = getCookie('csrftoken');
+            
+            $.ajax({
+                type: "POST",
+                url: "/diary/ajax/getLocation/",
+                headers: {
+                    "X-CSRFToken": csrftoken  // CSRFトークンをヘッダーに追加
+                },
+                data: {
+                    'latitude': latitude,
+                    'longitude': longitude,
+                    'csrfmiddlewaretoken': csrftoken  // フォームの場合と同じように、CSRFトークンを含める
+                },
+                dataType: 'json',
+                success: function(data) {
+                    document.getElementById("getCurrentWeather").innerHTML         = data.today.weather
+                    document.getElementById("getTomorrowWeather").innerHTML        = data.tomorrow.weather
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error sending location data:", error);
+                }
+            });
         }
         
-        {% comment %} 実行関数 {% endcomment %}
-        function MyPosGet(){
-            // --- ブラウザが対応しているかチェック --------------------------------------------------------
-            if (typeof navigator.geolocation === 'undefined') {
-                document.getElementById("getErrMag").innerHTML = 'ブラウザが位置情報取得に対応していません';
-                cmanGetDisplayCtrl('ERR');
-                return false;
+        // CSRFトークンを取得する関数
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    // クッキーが名前と一致する場合、値を取得
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
             }
-        
-            // --- オプション設定 --------------------------------------------------------------------------
-            var wOptions = {
-                "enableHighAccuracy": false,                       // true : 高精度
-                "timeout": 10000,                                 // タイムアウト : ミリ秒
-                "maximumAge": 0,                                  // データをキャッシュ時間 : ミリ秒
-            };
-        
-            // --- 位置取得 --------------------------------------------------------------------------------
-            navigator.geolocation.getCurrentPosition(GetOk,   // 位置取得成功時に実行される関数
-                                                     GetErr,  // 位置取得失敗時に実行される関数
-                                                     wOptions );  // オプション
-        
-            return true;
+            return cookieValue;
         }
         
     </script>
