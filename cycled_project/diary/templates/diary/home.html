@@ -15,7 +15,9 @@
         <div class="row">
             <div class="col-md-6 my-content">
                 <h3>今日の天気</h3>
-                <p id="location-info">位置情報はここに表示されます。</p>
+                <p id="getErrMag">位置情報はここに表示されます。</p>
+                <p id="getLatitude"></p>
+                <p id="getLongitude"></p>
             </div>
             <div class="col-md-6 my-content">
                 <h3>明日の天気</h3>
@@ -26,6 +28,49 @@
 
 {% block extra_js %}
     <script>
+        {% comment %} ウィンドウがロードされた時に実行 {% endcomment %}
+        window.onload=MyPosGet;
 
+        function GetOk(argPos){
+            document.getElementById("getLatitude").innerHTML         = argPos.coords.latitude;          
+            document.getElementById("getLongitude").innerHTML        = argPos.coords.longitude;         
+        }
+
+        function GetErr(argErr){
+            var wErrMsg = "";
+            switch(argErr.code){
+                case 1 : wErrMsg = "位置情報の利用が許可されていません";break;
+                case 2 : wErrMsg = "デバイスの位置が判定できません";break;
+                case 3 : wErrMsg = "タイムアウトしました";break;
+            }
+            if(wErrMsg == ""){wErrMsg = argErr.message;} 
+            // --- エラーメッセージ出力 --------------------------------------------------------------------
+            document.getElementById("getErrMag").innerHTML = wErrMsg;
+        }
+        
+        {% comment %} 実行関数 {% endcomment %}
+        function MyPosGet(){
+            // --- ブラウザが対応しているかチェック --------------------------------------------------------
+            if (typeof navigator.geolocation === 'undefined') {
+                document.getElementById("getErrMag").innerHTML = 'ブラウザが位置情報取得に対応していません';
+                cmanGetDisplayCtrl('ERR');
+                return false;
+            }
+        
+            // --- オプション設定 --------------------------------------------------------------------------
+            var wOptions = {
+                "enableHighAccuracy": false,                       // true : 高精度
+                "timeout": 10000,                                 // タイムアウト : ミリ秒
+                "maximumAge": 0,                                  // データをキャッシュ時間 : ミリ秒
+            };
+        
+            // --- 位置取得 --------------------------------------------------------------------------------
+            navigator.geolocation.getCurrentPosition(GetOk,   // 位置取得成功時に実行される関数
+                                                     GetErr,  // 位置取得失敗時に実行される関数
+                                                     wOptions );  // オプション
+        
+            return true;
+        }
+        
     </script>
 {% endblock %}
