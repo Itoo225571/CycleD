@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "mydjango"
+version = "0.1.0"
+description = ""
+authors = ["UnchiFactory <153418263+UnchiFactory@users.noreply.github.com>"]
+readme = "README.md"
+
+packages = [
+    { include = "subs" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "^2.31.0"
+geocoder = "^1.38.1"
+pandas = "^2.2.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
