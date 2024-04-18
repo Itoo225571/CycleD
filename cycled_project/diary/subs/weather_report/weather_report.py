@@ -67,7 +67,8 @@ class WeatherReport:
 		for code in codes:
 			weather=self.weather_categories.get(code, None)
 			descriptions.append(weather["description"])
-			imgs.append(weather["img"])
+			p = path.join(path.dirname(__file__),"img",weather["img"])
+			imgs.append(p)
 		return descriptions,imgs
 	
 	def decode_time(self,times):

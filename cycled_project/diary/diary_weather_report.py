@@ -1,4 +1,4 @@
-from diary.subs.weather_report import WeatherReport
+from subs.weather_report.weather_report import WeatherReport
 
 class DiaryWeatherReport(WeatherReport):
 	def __init__(self, *args):
@@ -9,4 +9,4 @@ class DiaryWeatherReport(WeatherReport):
 		
 if __name__=="__main__":    	
 	w=DiaryWeatherReport("関町")
-	# w.to_csv()
+	w.to_csv()
