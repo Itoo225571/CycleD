@@ -11,7 +11,7 @@ from datetime import datetime,timedelta
 
 from pprint import pprint
 
-class WeatherReport:
+class WeatherReport():
 	p = path.join(path.dirname(__file__), 'weather_category.json')
 	with open(p,mode="rt") as f:
 		weather_categories = json.load(f)
@@ -28,12 +28,12 @@ class WeatherReport:
 			raise ValueError("Invalid arguments")
 
 		latitude,longtitude=ret.latitude,ret.longitude
-		address=ret.address.split()
+		address=ret.address
 		print(address)
-		self.location={
-			"name":address[0],
-		}
-		self.params={
+		# self.location={
+		# 	"name":address[0],
+		# }
+		self.weather_params={
 			"latitude": latitude,
 			"longitude": longtitude,
 			"current": ["temperature_2m", "relative_humidity_2m", "apparent_temperature", "precipitation", "weather_code", "wind_speed_10m", "wind_direction_10m"],
@@ -42,7 +42,7 @@ class WeatherReport:
 			"timezone": "Asia/Tokyo"
 			}
 
-		params_url=urllib.parse.urlencode(self.params,True)
+		params_url=urllib.parse.urlencode(self.weather_params,True)
 		url = f"https://api.open-meteo.com/v1/forecast?{params_url}"
 		response = requests.get(url,timeout=3.5)
 		self.data=response.json()
@@ -155,16 +155,16 @@ class WeatherReport:
 
 if __name__=="__main__":    	
 	# w=WeatherReport("練馬区役所")
-	# pprint(w.params)
+	# pprint(w.weather_params)
 	# print(w.location_name)
 	# print(w.location_name)
 	# w1=WeatherReport(35.7247316,139.5812637)
-	# pprint(w1.params)
+	# pprint(w1.weather_params)
 	# print(w1.location["name"])
 	# geolocator = Nominatim(user_agent="user")
 	# ret=geolocator.geocode("東京スカイツリー")
 	# print(ret)
-	test_list=["練馬区","東京スカイツリー","国立展示場","海城高校"]
+	test_list=["練馬区","東京スカイツリー","国立展示場","海城高校","幕張メッセ"]
 	for city in test_list:
 		w=WeatherReport(city)
-		print(w.location["name"])
+		# print(w.location["name"])
