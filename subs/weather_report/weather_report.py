@@ -1,5 +1,6 @@
 import requests
-import geocoder.osm
+# import geocoder.osm
+from geopy.geocoders import Nominatim
 
 import urllib.parse
 import pandas as pd
@@ -13,22 +14,25 @@ from pprint import pprint
 class WeatherReport:
 	p = path.join(path.dirname(__file__), 'weather_category.json')
 	with open(p,mode="rt") as f:
-			weather_categories = json.load(f)
+		weather_categories = json.load(f)
 	# 文字列から整数にキーを変換する
 	weather_categories = {int(key): value for key, value in weather_categories.items()}
 	
 	def __init__(self,*args):
+		geolocator = Nominatim(user_agent="user")
 		if len(args)==2 and isinstance(args[0],(float,int)) and isinstance(args[1],(float,int)):
-			latitude,longtitude=args
-			location_name=None
+			ret=geolocator.reverse(args,timeout=5.0)
 		elif len(args)==1 and isinstance(args[0],str):
-			location_name=args[0]
-			ret=geocoder.osm(location_name,timeout=5.0)
-			latitude,longtitude=ret.latlng
+			ret=geolocator.geocode(args[0],timeout=5.0)
 		else:
 			raise ValueError("Invalid arguments")
 
-		self.location_name=location_name
+		latitude,longtitude=ret.latitude,ret.longitude
+		address=ret.address.split()
+		print(address)
+		self.location={
+			"name":address[0],
+		}
 		self.params={
 			"latitude": latitude,
 			"longitude": longtitude,
@@ -126,9 +130,9 @@ class WeatherReport:
 
 	"""__デバッグ用__"""
 	def to_csv(self):
-		self.df_hourly.to_csv(str(self.location_name)+"_hourly.csv")
-		self.df_daily.to_csv(str(self.location_name)+"_daily.csv")
-		self.df_current.to_csv(str(self.location_name)+"_current.csv")
+		self.df_hourly.to_csv(str(self.location["name"])+"_hourly.csv")
+		self.df_daily.to_csv(str(self.location["name"])+"_daily.csv")
+		self.df_current.to_csv(str(self.location["name"])+"_current.csv")
 
 	"""__表示用__"""
 	@property
@@ -150,5 +154,17 @@ class WeatherReport:
 		return weather
 
 if __name__=="__main__":    	
-	w=WeatherReport("関町")
-	pprint(w.tomorrow)
+	# w=WeatherReport("練馬区役所")
+	# pprint(w.params)
+	# print(w.location_name)
+	# print(w.location_name)
+	# w1=WeatherReport(35.7247316,139.5812637)
+	# pprint(w1.params)
+	# print(w1.location["name"])
+	# geolocator = Nominatim(user_agent="user")
+	# ret=geolocator.geocode("東京スカイツリー")
+	# print(ret)
+	test_list=["練馬区","東京スカイツリー","国立展示場","海城高校"]
+	for city in test_list:
+		w=WeatherReport(city)
+		print(w.location["name"])

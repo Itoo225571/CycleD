@@ -15,7 +15,6 @@
         <div class="row">
             <div class="col-md-6 my-content">
                 <h3>今日の天気</h3>
-                {% comment %} <img src="{{ MEDIA_URL }}{{data.today.weather_img}}" alt="weather_today"> {% endcomment %}
                 <p id="getTodayWeather"></p>
             </div>
             <div class="col-md-6 my-content">
@@ -35,9 +34,15 @@
                     var latitude = position.coords.latitude;
                     var longitude = position.coords.longitude;
                     sendLocationToServer(latitude, longitude);
+                },
+                function(error){
+                    console.log("Geolocation is not supported by this browser.");
+                },{
+                    // オプション
+                    enableHighAccuracy: false,
+                    timeout: 5 * 1000,
+                    maximumAge: 60 * 1000
                 });
-            } else {
-                console.log("Geolocation is not supported by this browser.");
             }
         });
         
@@ -59,9 +64,9 @@
                 },
                 dataType: 'json',
                 success: function(data) {
-                    document.getElementById("getCurrentWeather").innerHTML         = data.current.weather
                     document.getElementById("getTodayWeather").innerHTML         = data.today.weather
                     document.getElementById("getTomorrowWeather").innerHTML        = data.tomorrow.weather
+                    document.getElementById("getMessage").innerHTML= data.message
                 },
                 error: function(xhr, status, error) {
                     console.error("Error sending location data:", error);
