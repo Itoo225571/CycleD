@@ -88,6 +88,7 @@ def ajax_getLocation(request):
             "current": weather.current,
             "today":weather.today,
             "tomorrow":weather.tomorrow,
+            "location":weather.location_params,
         }
         
         return JsonResponse(response)
