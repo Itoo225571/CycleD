@@ -1,6 +1,5 @@
 import requests
-# import geocoder.osm
-from geopy.geocoders import Nominatim
+from get_location import Location
 
 import urllib.parse
 import pandas as pd
@@ -11,7 +10,7 @@ from datetime import datetime,timedelta
 
 from pprint import pprint
 
-class WeatherReport():
+class WeatherReport(Location):
 	p = path.join(path.dirname(__file__), 'weather_category.json')
 	with open(p,mode="rt") as f:
 		weather_categories = json.load(f)
@@ -19,23 +18,10 @@ class WeatherReport():
 	weather_categories = {int(key): value for key, value in weather_categories.items()}
 	
 	def __init__(self,*args):
-		geolocator = Nominatim(user_agent="user")
-		if len(args)==2 and isinstance(args[0],(float,int)) and isinstance(args[1],(float,int)):
-			ret=geolocator.reverse(args,timeout=5.0)
-		elif len(args)==1 and isinstance(args[0],str):
-			ret=geolocator.geocode(args[0],timeout=5.0)
-		else:
-			raise ValueError("Invalid arguments")
-
-		latitude,longtitude=ret.latitude,ret.longitude
-		address=ret.address
-		print(address)
-		# self.location={
-		# 	"name":address[0],
-		# }
+		super().__init__(*args)
 		self.weather_params={
-			"latitude": latitude,
-			"longitude": longtitude,
+			"latitude": self.location_params["latitude"],
+			"longitude": self.location_params["longitude"],
 			"current": ["temperature_2m", "relative_humidity_2m", "apparent_temperature", "precipitation", "weather_code", "wind_speed_10m", "wind_direction_10m"],
 			"hourly": ["temperature_2m", "relative_humidity_2m", "apparent_temperature", "precipitation_probability", "weather_code", "wind_speed_10m", "wind_direction_10m",],
 			"daily": ["weather_code", "temperature_2m_max", "temperature_2m_min", "apparent_temperature_max", "apparent_temperature_min", "sunrise", "sunset", "precipitation_probability_max",],
@@ -156,7 +142,7 @@ class WeatherReport():
 if __name__=="__main__":    	
 	# w=WeatherReport("練馬区役所")
 	# pprint(w.weather_params)
-	# print(w.location_name)
+	# print(w.location_params)
 	# print(w.location_name)
 	# w1=WeatherReport(35.7247316,139.5812637)
 	# pprint(w1.weather_params)
@@ -167,4 +153,5 @@ if __name__=="__main__":
 	test_list=["練馬区","東京スカイツリー","国立展示場","海城高校","幕張メッセ"]
 	for city in test_list:
 		w=WeatherReport(city)
-		# print(w.location["name"])
+		print(w.location_params)
+		print(w.weather_params)
