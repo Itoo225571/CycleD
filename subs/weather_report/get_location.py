@@ -8,9 +8,8 @@ class Location():
         geolocator = Nominatim(user_agent="user")
         if len(args)==2 and isinstance(args[0],(float,int)) and isinstance(args[1],(float,int)):
             ret=geolocator.reverse(args,timeout=5.0)
-        # elif isinstance(args,(list,tuple)) and isinstance(args[0],(float,int)) and isinstance(args[1],(float,int)):
-        #     args = ' '.join(map(str, args)) 
-        #     ret=geolocator.reverse(args,timeout=5.0)
+        elif len(args)==1 and isinstance(args[0],(list,tuple)) and isinstance(args[0][0],(float,int)) and isinstance(args[0][1],(float,int)):
+            ret=geolocator.reverse(args[0],timeout=5.0)
         elif len(args)==1 and isinstance(args[0],str):
             ret=geolocator.geocode(args[0],timeout=5.0)
         else:
@@ -28,7 +27,11 @@ class Location():
     def _organize(self,address):
         # 正規表現を使って郵便番号を取り除く
         clean_pattern = r'\b\d{3}-\d{4}\b,'
+        post_number=re.search(clean_pattern,address)
+        post_number = post_number.group() if post_number else None
+
         address=re.sub(clean_pattern,"",address)
+        
         # 文字列反転
         address_list = address.split(', ')[::-1]
         while len(address_list) < 5:
@@ -39,16 +42,31 @@ class Location():
             "district":address_list[2],#練馬区とかさいたま市はここ
             "city": address_list[3],
             # "street": address_list[4],
+            "post_number":post_number,
         }
         return address_dict
-
+    
+    # 地名入力の場合：地名を返す
+    # 緯度経度入力の場合：地区を返す
+    def __str__(self) -> str:
+        if self.location_params["name"] is not "":
+            return str(self.location_params["name"])
+        else:
+            return str(self.location_params["district"])
+        
 if __name__=="__main__":
     # サンプルのaddress
-    addresses = ["東京都","東京都千代田区丸の内1丁目","東京タワー","練馬区","幕張メッセ",]
-    for address in addresses:
-        print(address)
-        loc=Location(address)
-        pprint(loc.location_params)
+    # addresses = ["東京都","東京都千代田区丸の内1丁目","東京タワー","練馬区","幕張メッセ",(35.7247316,139.5812637)]
+    # for address in addresses:
+    #     loc=Location(address)
+    #     print(loc)
+    #     pprint(loc.location_params)
+
     # address="幕張メッセ"
     # loc=Location(address)
     # pprint(loc.location_params)
+
+    address=(35.7247316,139.5812637)
+    loc=Location(address)
+    print(loc)
+    pprint(loc.location_params)
