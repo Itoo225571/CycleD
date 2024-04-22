@@ -1,5 +1,4 @@
 import requests
-from get_location import Location
 
 import urllib.parse
 import pandas as pd
@@ -10,25 +9,25 @@ from datetime import datetime,timedelta
 
 from pprint import pprint
 
-class WeatherReport(Location):
+# 使用にはlatitudeとlongitudeが必要<-Locationで取得可能
+class WeatherReport():
 	p = path.join(path.dirname(__file__), 'weather_category.json')
 	with open(p,mode="rt") as f:
 		weather_categories = json.load(f)
 	# 文字列から整数にキーを変換する
 	weather_categories = {int(key): value for key, value in weather_categories.items()}
 	
-	def __init__(self,*args):
-		super().__init__(*args)
-		self.weather_params={
-			"latitude": self.location_params["latitude"],
-			"longitude": self.location_params["longitude"],
+	def __init__(self,latitude,longitude):
+		self._params={
+			"latitude": latitude,
+			"longitude": longitude,
 			"current": ["temperature_2m", "relative_humidity_2m", "apparent_temperature", "precipitation", "weather_code", "wind_speed_10m", "wind_direction_10m"],
 			"hourly": ["temperature_2m", "relative_humidity_2m", "apparent_temperature", "precipitation_probability", "weather_code", "wind_speed_10m", "wind_direction_10m",],
 			"daily": ["weather_code", "temperature_2m_max", "temperature_2m_min", "apparent_temperature_max", "apparent_temperature_min", "sunrise", "sunset", "precipitation_probability_max",],
 			"timezone": "Asia/Tokyo"
 			}
 
-		params_url=urllib.parse.urlencode(self.weather_params,True)
+		params_url=urllib.parse.urlencode(self._params,True)
 		url = f"https://api.open-meteo.com/v1/forecast?{params_url}"
 		response = requests.get(url,timeout=3.5)
 		self.data=response.json()
@@ -123,35 +122,33 @@ class WeatherReport(Location):
 	"""__表示用__"""
 	@property
 	def current(self):
-		return self.data["current"]
+		return self.data.get("current")
+
 	@property
 	def today(self):
-		index=self.data["daily"]["time"].index(datetime.today().date())
-		weather = {}
-		for key, values in self.data["daily"].items():
-			weather[key] = values[index]
-		return weather
+		today_date = datetime.today().date()
+		index = self.data["daily"]["time"].index(today_date) if today_date in self.data["daily"]["time"] else None
+		if index is not None:
+			weather = {}
+			for key, values in self.data["daily"].items():
+				weather[key] = values[index]
+			return weather
+		else:
+			return None
+
 	@property
 	def tomorrow(self):
-		index=self.data["daily"]["time"].index(datetime.today().date()+timedelta(days=1))
-		weather = {}
-		for key, values in self.data["daily"].items():
-			weather[key] = values[index]
-		return weather
+		tomorrow_date = datetime.today().date() + timedelta(days=1)
+		index = self.data["daily"]["time"].index(tomorrow_date) if tomorrow_date in self.data["daily"]["time"] else None
+		if index is not None:
+			weather = {}
+			for key, values in self.data["daily"].items():
+				weather[key] = values[index]
+			return weather
+		else:
+			return None
+
 
 if __name__=="__main__":    	
-	# w=WeatherReport("練馬区役所")
-	# pprint(w.weather_params)
-	# print(w.location_params)
-	# print(w.location_name)
-	# w1=WeatherReport(35.7247316,139.5812637)
-	# pprint(w1.weather_params)
-	# print(w1.location["name"])
-	# geolocator = Nominatim(user_agent="user")
-	# ret=geolocator.geocode("東京スカイツリー")
-	# print(ret)
-	test_list=["練馬区","東京スカイツリー","国立展示場","海城高校","幕張メッセ"]
-	for city in test_list:
-		w=WeatherReport(city)
-		print(w.location_params)
-		print(w.weather_params)
+	w1=WeatherReport(35.7247316,139.5812637)
+	pprint(w1.today)
