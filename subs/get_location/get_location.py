@@ -8,17 +8,18 @@ class Location():
     def __init__(self,*args):
         geolocator = Nominatim(user_agent="user",timeout=10)
         if len(args)==2 and isinstance(args[0],(float,int)) and isinstance(args[1],(float,int)):
-            reverse=RateLimiter(geolocator.reverse,min_delay_seconds=1)
-            ret=reverse(args,language="ja",timeout=5.0)
+            geo=RateLimiter(geolocator.reverse,min_delay_seconds=1)
+            arg=args
         elif len(args)==1 and isinstance(args[0],(list,tuple)) and isinstance(args[0][0],(float,int)) and isinstance(args[0][1],(float,int)):
-            reverse=RateLimiter(geolocator.reverse,min_delay_seconds=1)
-            ret=reverse(args[0],language="ja",timeout=5.0)
+            geo=RateLimiter(geolocator.reverse,min_delay_seconds=1)
+            arg=args[0]
         elif len(args)==1 and isinstance(args[0],str):
             geo=RateLimiter(geolocator.geocode,min_delay_seconds=1)
-            ret=geo(args[0],language="ja",timeout=5.0)
+            arg=args[0]
         else:
             raise ValueError("Invalid arguments")
-
+        
+        ret=geo(arg,language="ja",timeout=5.0)
         self._data={
             "name":ret.raw["name"],
             "latitude":ret.latitude,
