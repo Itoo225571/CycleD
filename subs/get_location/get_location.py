@@ -9,17 +9,16 @@ class Location():
         geolocator = Nominatim(user_agent="user",timeout=10)
         if len(args)==2 and isinstance(args[0],(float,int)) and isinstance(args[1],(float,int)):
             geo=RateLimiter(geolocator.reverse,min_delay_seconds=1)
-            arg=args
+            ret=geo(args,language="ja",timeout=5.0)
         elif len(args)==1 and isinstance(args[0],(list,tuple)) and isinstance(args[0][0],(float,int)) and isinstance(args[0][1],(float,int)):
             geo=RateLimiter(geolocator.reverse,min_delay_seconds=1)
-            arg=args[0]
+            ret=geo(args[0],language="ja",timeout=5.0)
         elif len(args)==1 and isinstance(args[0],str):
             geo=RateLimiter(geolocator.geocode,min_delay_seconds=1)
-            arg=args[0]
+            ret=geo(args[0],language="ja",country_codes="jp",timeout=5.0)
         else:
             raise ValueError("Invalid arguments")
         
-        ret=geo(arg,language="ja",timeout=5.0)
         self._data={
             "name":ret.raw["name"],
             "latitude":ret.latitude,
@@ -39,6 +38,7 @@ class Location():
         
         # 文字列反転
         address_list = address.split(',')[::-1]
+        address_list = address_list[:-1]
         address_list = [item.strip() for item in address_list if item]
 
         address_str="".join(address_list)

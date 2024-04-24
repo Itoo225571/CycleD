@@ -1,6 +1,5 @@
 import requests
 
-import urllib.parse
 import pandas as pd
 import json
 from os import path
@@ -27,9 +26,8 @@ class WeatherReport():
 			"timezone": "Asia/Tokyo"
 			}
 
-		params_url=urllib.parse.urlencode(self._params,True)
 		url = f"https://api.open-meteo.com/v1/forecast?{params_url}"
-		response = requests.get(url,timeout=3.5)
+		response = requests.get(url,timeout=3.5,params=self._params)
 		self.data=response.json()
 		
 		self.data["hourly"]["time"]=self.decode_time(self.data["hourly"]["time"])
