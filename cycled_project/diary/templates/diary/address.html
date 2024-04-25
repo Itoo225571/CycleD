@@ -41,7 +41,7 @@
 
             $.ajax({
                 type: "GET",
-                url: "{% url 'diary:address_search' %}",
+                url: "diary/ajax/address_search/",
                 headers: {
                     "X-CSRFToken": csrftoken  // CSRFトークンをヘッダーに追加
                 },
@@ -53,46 +53,19 @@
                 beforeSend: function(){
                     $('.loading').removeClass('display-none');
                 },
-                success: function(data){
+                success: function(data_list){
                     $('.loading').addClass('display-none');
-                    let html ="";
-                    $.each(data,function(index,value){
-                        let label = value.label;
-                        let lat = value.lat;
-                        let lon = value.lon;
-                        $("#address-table-body").append(
-                            '<tr onclick="sendAddress(lat,lon);"><td>'+label+'</td></tr>'+
-                            '<tr><td><input type="hidden" name="lat" value="'+lat+'</td></tr>'+
-                            '<tr><td><input type="hidden" name="lon" value="'+lon+'</td></tr>'
-                        );
-                    })
+                    let address_table = document.getElementById("address-table-body")
+                    for (const data of data_list) {
+                        let lat = data.lat;
+                        let lon = data.lon;
+                        let label = data.label
+                        let html = '<tr><td>' + label + '</td></tr>';
+                        address_table.append(html);
+                    }
                 },
             });
         })
 
-        function sendAddress(lat,lon){
-            // CSRFトークンを取得
-            var csrftoken = getCookie('csrftoken');
-            
-            $.ajax({
-                type: "POST",
-                url: "{% url 'diary:address_choice' %}",
-                headers: {
-                    "X-CSRFToken": csrftoken  // CSRFトークンをヘッダーに追加
-                },
-                data: {
-                    'lat': lat,
-                    'lon': lon,
-                    'csrfmiddlewaretoken': csrftoken  // フォームの場合と同じように、CSRFトークンを含める
-                },
-                dataType: 'json',
-                success: function(data) {
-                    {% comment %} ホームに戻る {% endcomment %}
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error sending location data:", error);
-                }
-            });
-        }
     </script>
 {% endblock %}

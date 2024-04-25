@@ -21,6 +21,7 @@
                 <h3>明日の天気</h3>
                 <p id="getTomorrowWeather"></p>
             </div>
+            
         </div>
     </div>
 {% endblock content %}
@@ -53,7 +54,7 @@
             
             $.ajax({
                 type: "POST",
-                url: "{% url 'diary:ajax_getLocation' %}",
+                url: "diary/ajax/getLocation/",
                 headers: {
                     "X-CSRFToken": csrftoken  // CSRFトークンをヘッダーに追加
                 },
