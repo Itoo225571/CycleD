@@ -8,6 +8,7 @@ from django.contrib.auth.views import LoginView,LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .diary_weather_report import DiaryWeatherReport
+from subs.get_location.new_get_location import Location
 
 from .forms import *
 
@@ -97,10 +98,11 @@ def ajax_getLocation(request):
 def address_search(request):
     if request.method == 'GET':
         name =str(request.GET.get("name",None))
-        
+        loc = Location()
+        loc.make_data_list(name)
         # 位置情報を含むレスポンスを作成
         response = {
-            
+            "data_list":loc.data_list
         }
         
         return JsonResponse(response)
