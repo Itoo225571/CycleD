@@ -53,7 +53,7 @@
             
             $.ajax({
                 type: "POST",
-                url: "/diary/ajax/getLocation/",
+                url: "{% url 'diary:ajax_getLocation' %}",
                 headers: {
                     "X-CSRFToken": csrftoken  // CSRFトークンをヘッダーに追加
                 },

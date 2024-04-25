@@ -19,6 +19,11 @@ urlpatterns = [
 
     path("ajax/getLocation/",views.ajax_getLocation,name="ajax_getLocation"),
     
+    path("ajax/address_search/",views.address_search,name="address_search"),
+    path("ajax/address_choice/",views.address_choice,name="address_choice"),
+    
+    path("address/",views.address,name="address"),
+    
     path("signin/",views.signin,name="signin"),
     path("signup/",views.signup,name="signup"),
     path("signout/",views.signout,name="signout"),
