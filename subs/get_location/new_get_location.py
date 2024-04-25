@@ -1,6 +1,6 @@
 import requests
 from time import sleep
-import re
+# import re
 # import copy.deepcopy
 
 from pprint import pprint
@@ -60,7 +60,9 @@ class Location():
                 else:
                     behind.append(dictionary)
             self._data_list[len(self._data_list):len(self._data_list)] = behind
+            return self._data_list
     
+    """__いらないかも___"""
     def get_geocode(self,num):
         if len(self._data_list) > num :
             code = self._data_list[num]

@@ -1,4 +1,5 @@
 from typing import Any
+from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponse,JsonResponse
 from django.views import generic,View
 from django.urls import reverse_lazy
@@ -31,7 +32,6 @@ class SigninView(LoginView):
     template_name="diary/signin.html"
     form_class=SigninForm
     success_url=reverse_lazy("diary:home")
-
 signin=SigninView.as_view()
 
 class SignoutView(LoginRequiredMixin,LogoutView):
@@ -42,7 +42,6 @@ class SignupView(generic.CreateView):
     template_name="diary/signup.html"
     form_class=SignupForm
     success_url=reverse_lazy("diary:home")
-    
 signup=SignupView.as_view()
 
 class UserProfileView(LoginRequiredMixin,generic.DetailView):
@@ -89,6 +88,19 @@ def ajax_getLocation(request):
             "today":weather.today,
             "tomorrow":weather.tomorrow,
             "location":weather.location_params,
+        }
+        
+        return JsonResponse(response)
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=400)
+    
+def address_search(request):
+    if request.method == 'GET':
+        name =str(request.GET.get("name",None))
+        
+        # 位置情報を含むレスポンスを作成
+        response = {
+            
         }
         
         return JsonResponse(response)

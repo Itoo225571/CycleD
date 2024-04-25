@@ -1,0 +1,98 @@
+{% extends "diary/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+    地域選択
+{% endblock title %}
+
+{% block content %}
+    <h2>キーワードから地域を探す</h2>
+    <div class="search-wrapper">
+        <div class="user-search-form">
+            <form method="get">
+                {% csrf_token %}
+                <input type="search" value="{{request.GET.query}}" name="query" type="text" placeholder=" 地名・施設名・駅名など">
+                <button class="btn search-icon">検索</button>
+            </form>
+        </div>
+        <div class="address-table-wrapper">
+            <table>
+                <tbody id="address-table-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block extra_js %}
+    <script src="{% static 'diary/js/getCookie.js' %}"></script>
+    <script>
+        $('.user-search-form .search-icon').on('click',function(){
+            var csrftoken = getCookie('csrftoken');
+
+            $('.address-table tbody').empty();
+            $('.search-null').remove()
+
+            let addressName = $('#search_name').val();
+
+            if(!addressName){
+                return false;
+            }
+
+            $.ajax({
+                type: "GET",
+                url: "{% url 'diary:address_search' %}",
+                headers: {
+                    "X-CSRFToken": csrftoken  // CSRFトークンをヘッダーに追加
+                },
+                data: {
+                    "name":addressName,
+                    'csrfmiddlewaretoken': csrftoken  // フォームの場合と同じように、CSRFトークンを含める
+                },
+                dataType: 'json',
+                beforeSend: function(){
+                    $('.loading').removeClass('display-none');
+                },
+                success: function(data){
+                    $('.loading').addClass('display-none');
+                    let html ="";
+                    $.each(data,function(index,value){
+                        let label = value.label;
+                        let lat = value.lat;
+                        let lon = value.lon;
+                        $("#address-table-body").append(
+                            '<tr onclick="sendAddress(lat,lon);"><td>'+label+'</td></tr>'+
+                            '<tr><td><input type="hidden" name="lat" value="'+lat+'</td></tr>'+
+                            '<tr><td><input type="hidden" name="lon" value="'+lon+'</td></tr>'
+                        );
+                    })
+                },
+            });
+        })
+
+        function sendAddress(lat,lon){
+            // CSRFトークンを取得
+            var csrftoken = getCookie('csrftoken');
+            
+            $.ajax({
+                type: "POST",
+                url: "{% url 'diary:address_choice' %}",
+                headers: {
+                    "X-CSRFToken": csrftoken  // CSRFトークンをヘッダーに追加
+                },
+                data: {
+                    'lat': lat,
+                    'lon': lon,
+                    'csrfmiddlewaretoken': csrftoken  // フォームの場合と同じように、CSRFトークンを含める
+                },
+                dataType: 'json',
+                success: function(data) {
+                    {% comment %} ホームに戻る {% endcomment %}
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error sending location data:", error);
+                }
+            });
+        }
+    </script>
+{% endblock %}
