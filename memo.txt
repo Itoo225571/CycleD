@@ -52,3 +52,7 @@
                'query': '',
                'version': '0.1.0'},
  'type': 'FeatureCollection'}
+
+  {'geometry': {'coordinates': [138.3832904, 34.97518679], 'type': 'Point'},
+  'properties': {'addressCode': '22101', 'dataSource': '3', 'title': '静岡市葵区役所'},
+  'type': 'Feature'},
