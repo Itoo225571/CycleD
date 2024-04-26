@@ -25,6 +25,7 @@
 
 {% block extra_js %}
     <script src="{% static 'diary/js/getCookie.js' %}"></script>
+
     <script>
         $("form").submit(function(event) {
             // フォームのデフォルトの動作をキャンセル
@@ -49,11 +50,10 @@
                 // data_list内の各オブジェクトを処理
                 $.each(data.data_list, function(index, value) {
                     // オブジェクトのプロパティを取り出して表示
-                    $('#address-table-body').append('<p>' + value.label + '</p>');
+                    $('#address-table-body').append('<p>' + value.address.name + " : " + value.address.label + '</p>');
                 })
             })
         });
-        
         
     </script>
 {% endblock %}

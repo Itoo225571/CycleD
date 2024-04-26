@@ -54,7 +54,6 @@ class AddressSearchView(generic.FormView):
 
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         form = self.get_form(self.form_class)
-        print(form)
         if form.is_valid():
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return self.address_search(form)
@@ -64,7 +63,7 @@ class AddressSearchView(generic.FormView):
     def address_search(self,form):
         name = form.cleaned_data.get('name')
         loc = Location()
-        loc.make_data_list(name)
+        loc.get_geocode(name)
         # 位置情報を含むレスポンスを作成
         response = {
             "data_list":loc.data_list
