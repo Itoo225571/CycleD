@@ -29,6 +29,7 @@ class HomeView(LoginRequiredMixin,generic.TemplateView):
     template_name="diary/home.html"
 home=HomeView.as_view()
 
+"""_____SignIn関係______"""
 class SigninView(LoginView):
     template_name="diary/signin.html"
     form_class=SigninForm
@@ -45,6 +46,35 @@ class SignupView(generic.CreateView):
     success_url=reverse_lazy("diary:home")
 signup=SignupView.as_view()
 
+"""______Address関係______"""
+class AddressSearchView(generic.FormView):
+    template_name = "diary/address_search.html"
+    form_class = AddressSearchForm
+    success_url = reverse_lazy('diary:address_search')
+
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        form = self.get_form(self.form_class)
+        print(form)
+        if form.is_valid():
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return self.address_search(form)
+            return self.form_valid(form)
+        return super().form_invalid(form)
+    
+    def address_search(self,form):
+        name = form.cleaned_data.get('name')
+        loc = Location()
+        loc.make_data_list(name)
+        # 位置情報を含むレスポンスを作成
+        response = {
+            "data_list":loc.data_list
+        }
+        return JsonResponse(response,json_dumps_params={'ensure_ascii': False})
+    
+address_search = AddressSearchView.as_view()
+
+
+"""______User関係______"""
 class UserProfileView(LoginRequiredMixin,generic.DetailView):
     template_name="diary/user_profile.html"
     form_class=UserForm
@@ -54,7 +84,7 @@ class UserEditView(generic.UpdateView):
     pass
 user_edit=UserEditView.as_view()
 
-
+"""______Diary関係______"""
 class DiaryView(generic.TemplateView):
 
     pass
@@ -76,8 +106,10 @@ class CalendarView(generic.TemplateView):
     pass
 calendar=CalendarView.as_view()
 
+"""______AJAX______"""
 def ajax_getLocation(request):
     if request.method == 'POST':
+        print(request.POST)
         latitude = float(request.POST.get('latitude',None))
         longitude = float(request.POST.get('longitude',None))
         weather=DiaryWeatherReport(latitude,longitude)
@@ -95,16 +127,3 @@ def ajax_getLocation(request):
     else:
         return JsonResponse({'error': 'Invalid request method.'}, status=400)
     
-def address_search(request):
-    if request.method == 'GET':
-        name =str(request.GET.get("name",None))
-        loc = Location()
-        loc.make_data_list(name)
-        # 位置情報を含むレスポンスを作成
-        response = {
-            "data_list":loc.data_list
-        }
-        
-        return JsonResponse(response)
-    else:
-        return JsonResponse({'error': 'Invalid request method.'}, status=400)

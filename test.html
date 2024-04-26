@@ -1,0 +1,9 @@
+<a id="link" href="/">Click me</a>
+
+<script>
+  let link = document.getElementById('link');
+  link.onclick = (e) => {
+    // URLへジャンプさせない
+    e.preventDefault();
+  };
+</script>
