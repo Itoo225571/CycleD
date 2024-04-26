@@ -49,7 +49,7 @@
                 // data_list内の各オブジェクトを処理
                 $.each(data.data_list, function(index, value) {
                     // オブジェクトのプロパティを取り出して表示
-                    $('#address-table-body').append('<p>lat: ' + value.lat + ', lon: ' + value.lon + ', label: ' + value.label + '</p>');
+                    $('#address-table-body').append('<p>' + value.label + '</p>');
                 })
             })
         });
