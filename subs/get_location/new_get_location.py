@@ -30,12 +30,9 @@ class Location():
     def __init__(self) -> None:
         self._data_keys=["lat","lon","address",]
         self._address_keys=["country","state","city","district","locality","street","name","postcode","type","label",]
-        self._data=dict.fromkeys(self._data_keys)
-        self._data["address"]=dict.fromkeys(self._address_keys)
+        self._empty_data=dict.fromkeys(self._data_keys)
+        self._empty_data["address"]=dict.fromkeys(self._address_keys)
         self._data_list = []
-
-    def __str__(self) -> str:
-        return str(self._data["address"].get("label",""))+str(self._data["address"]["name"])
 
     """___GET___"""
     def make_data_list(self,place_name:str):
@@ -45,23 +42,21 @@ class Location():
         url = f"https://msearch.gsi.go.jp/address-search/AddressSearch"
         res = requests.get(url=url,params=params_gsi,timeout=3.5)
         data_list = res.json()[::-1]
-        # behind = []
         if data_list:
-            for data in data_list:
-                name = data["properties"]["title"]
-                lon,lat = data["geometry"]["coordinates"]
-                dictionary = {
-                    "lat":lat,
-                    "lon":lon,
-                    "label":name,
+            for future in data_list:
+                data = deepcopy(self._empty_data)
+                coord = {
+                    "lon":future["geometry"]["coordinates"][0],
+                    "lat":future["geometry"]["coordinates"][1],
                 }
-                if place_name in name:
-                    self._data_list.append(dictionary)
-                # else:
-                    # behind.append(dictionary)
-            # self._data_list[len(self._data_list):len(self._data_list)] = behind
-            return self._data_list
-            # return data_list
+                address = {
+                    "label":future["properties"]["title"]
+                }
+                if place_name in address["label"]:
+                    data.update(coord)
+                    data["address"].update(address)
+                self._data_list.append(data)
+        return data_list
 
     def get_reverse(self,*latlon):
         if len(latlon)==2 and isinstance(latlon[0],(float,int)) and isinstance(latlon[1],(float,int)):
@@ -111,7 +106,7 @@ class Location():
             return 
             
         for feature in features:
-            data = deepcopy(self._data)
+            data = deepcopy(self._empty_data)
             geometry = feature.get("geometry")
             properties = feature.get("properties")
             geocoding = properties.get("geocoding")
@@ -137,7 +132,7 @@ class Location():
 
     @property
     def data(self):
-        return self._data
+        return self._empty_data
     @property
     def data_list(self):
         return self._data_list
@@ -147,11 +142,13 @@ if __name__=="__main__":
     # サンプルのaddress
     # addresses = ["東京都千代田区丸の内1丁目","東京タワー","練馬区","原爆ドーム","明治大学","富士山","札幌駅北口駅前広場"]
     # addresses = ["静岡市","新宿区","札幌駅北口駅前広場","京王プレリアホテル札幌",]
-    addresses = ["新宿"]
+    addresses = ["新宿駅"]
     for address in addresses:
         loc=Location()
-        # pprint(loc.make_data_list(address))
-        pprint(loc.get_geocode(address))
+        # loc.make_data_list(address)
+        loc.get_geocode(address)
+        pprint(loc.data_list)
+        # pprint(loc.get_geocode(address))
         # print(loc)
         # pprint(loc.data_list)
         

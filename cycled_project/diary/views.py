@@ -64,6 +64,7 @@ class AddressSearchView(generic.FormView):
         name = form.cleaned_data.get('name')
         loc = Location()
         loc.get_geocode(name)
+        # loc.make_data_list(name)
         # 位置情報を含むレスポンスを作成
         response = {
             "data_list":loc.data_list

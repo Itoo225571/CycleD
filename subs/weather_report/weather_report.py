@@ -26,7 +26,7 @@ class WeatherReport():
 			"timezone": "Asia/Tokyo"
 			}
 
-		url = f"https://api.open-meteo.com/v1/forecast?{params_url}"
+		url = f"https://api.open-meteo.com/v1/forecast?{self._params}"
 		response = requests.get(url,timeout=3.5,params=self._params)
 		self.data=response.json()
 		
@@ -113,9 +113,9 @@ class WeatherReport():
 
 	"""__デバッグ用__"""
 	def to_csv(self):
-		self.df_hourly.to_csv(str(self.location["name"])+"_hourly.csv")
-		self.df_daily.to_csv(str(self.location["name"])+"_daily.csv")
-		self.df_current.to_csv(str(self.location["name"])+"_current.csv")
+		self.df_hourly.to_csv("hourly.csv")
+		self.df_daily.to_csv("daily.csv")
+		self.df_current.to_csv("current.csv")
 
 	"""__表示用__"""
 	@property
@@ -149,4 +149,5 @@ class WeatherReport():
 
 if __name__=="__main__":    	
 	w1=WeatherReport(35.7247316,139.5812637)
+	w1.to_csv()
 	pprint(w1.today)

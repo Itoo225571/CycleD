@@ -18,8 +18,8 @@
         </div>
     </div>
 
-    <div id="address-table-body">
-    </div>
+    <ol id="address-table-body" style="list-style-type: none;">
+    </ol>
     
 {% endblock content %}
 
@@ -50,7 +50,9 @@
                 // data_list内の各オブジェクトを処理
                 $.each(data.data_list, function(index, value) {
                     // オブジェクトのプロパティを取り出して表示
-                    $('#address-table-body').append('<p>' + value.address.name + " : " + value.address.label + '</p>');
+                    $('#address-table-body').append('<li>'+ 
+                                                            '<a href="#">'+ value.address.label + '</a>' +
+                                                    '</li>');
                 })
             })
         });
