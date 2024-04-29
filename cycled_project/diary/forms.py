@@ -1,8 +1,10 @@
-from typing import Any
+from typing import Any, Mapping
 from django.forms import ModelForm,CharField,PasswordInput,ValidationError
 from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
 from django.contrib.auth.hashers import make_password,check_password
 from django import forms
+from django.forms.renderers import BaseRenderer
+from django.forms.utils import ErrorList
 
 from diary.models import User,Diary
 
@@ -53,7 +55,9 @@ class SigninForm(AuthenticationForm):
         fields=["username","password",]
 
 class AddressSearchForm(forms.Form):
-    name = forms.CharField(max_length=64,
+    keyword = forms.CharField(
+                        label="",
+                        max_length=64,
                         widget=forms.TextInput(attrs={"placeholder":" 地名・施設名・駅名など"})
                         )
         
