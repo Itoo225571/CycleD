@@ -61,13 +61,13 @@ class AddressSearchView(generic.FormView):
         return super().form_invalid(form)
     
     def address_search(self,form):
-        name = form.cleaned_data.get('name')
+        keyword = form.cleaned_data.get('keyword')
         loc = Location()
-        loc.get_geocode(name)
+        loc.get_geocode(keyword)
         # loc.make_data_list(name)
         # 位置情報を含むレスポンスを作成
         response = {
-            "data_list":loc.data_list
+            "data_list":loc.data_list,
         }
         return JsonResponse(response,json_dumps_params={'ensure_ascii': False})
     
