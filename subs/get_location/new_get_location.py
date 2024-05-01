@@ -145,11 +145,8 @@ if __name__=="__main__":
     addresses = ["新宿"]
     for address in addresses:
         loc=Location()
-        # pprint(loc.make_data_list(address))
-        pprint(loc.get_geocode(address))
-        # pprint(loc.data_list)
+        pprint(loc.make_data_list(address))
         # pprint(loc.get_geocode(address))
-        # print(loc)
         # pprint(loc.data_list)
         
     # loc = Location()
