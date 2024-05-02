@@ -1,124 +1,172 @@
-from geopy.geocoders import Nominatim
-from geopy.extra.rate_limiter import RateLimiter
+from pydantic import BaseModel
+from time import sleep
+import requests
+import json
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
+import pandas as pd
+from pathlib import Path
 import re
+from io import BytesIO
+import datetime
+import os.path
 
 from pprint import pprint
 
-class Location():
-    def __init__(self,*args):
-        geolocator = Nominatim(user_agent="user",timeout=10)
-        if len(args)==2 and isinstance(args[0],(float,int)) and isinstance(args[1],(float,int)):
-            geo=RateLimiter(geolocator.reverse,min_delay_seconds=1)
-            ret=geo(args,language="ja",timeout=5.0)
-        elif len(args)==1 and isinstance(args[0],(list,tuple)) and isinstance(args[0][0],(float,int)) and isinstance(args[0][1],(float,int)):
-            geo=RateLimiter(geolocator.reverse,min_delay_seconds=1)
-            ret=geo(args[0],language="ja",timeout=5.0)
-        elif len(args)==1 and isinstance(args[0],str):
-            geo=RateLimiter(geolocator.geocode,min_delay_seconds=1)
-            ret=geo(args[0],language="ja",country_codes="jp",timeout=5.0)
-        else:
-            raise ValueError("Invalid arguments")
-        
-        self._data={
-            "name":ret.raw["name"],
-            "latitude":ret.latitude,
-            "longitude":ret.longitude,
-            "original_address":ret.address
-        }
-        address_dict=self._organize(ret.address)
-        self._data.update(address_dict)
 
-    def _organize(self,address):
-        # 正規表現を使って郵便番号を取り除く
-        clean_pattern = r'\b\d{3}-\d{4}\b,'
-        post_number=re.search(clean_pattern,address)
-        post_number = post_number.group() if post_number else None
+def _agg_dup_col(df_: pd.core.frame.DataFrame) -> pd.core.frame.DataFrame:
+    '''カラム名重複のあるデータフレームを，カラムの欠損を保管し合う+重複削除し，データフレームとして返す
+    Args:
+        df_ (pd.core.frame.DataFrame): any dataframe
+    Returns:
+        pd.core.frame.DataFrame
+    '''
+    df = df_.copy()
+    dup_col = set(df.columns[df.columns.duplicated()])
+    for col in dup_col:
+        value = [[v for v in values if v == v and v is not None]
+					for values in df[col].values.tolist()]
+        value = [v[0] if v != [] else None for v in value]
+        df = df.drop(col, axis=1)
+        df[col] = value
+    return df
 
-        address=re.sub(clean_pattern,"",address)
-        
-        # 文字列反転
-        address_list = address.split(',')[::-1]
-        address_list = address_list[:-1]
-        address_list = [item.strip() for item in address_list if item]
 
-        address_str="".join(address_list)
-        while len(address_list) < 5:
-            address_list.append(None)
-        address_dict={
-            "country": address_list[0],
-            "prefecture": address_list[1],
-            "district":address_list[2],#練馬区とかさいたま市はここ
-            "city": address_list[3],
-            # "street": address_list[4],
-            "post_number":post_number,
-            "address":address_str,
-        }
-        return address_dict
-    
-    # 地名入力の場合：地名を返す
-    # 緯度経度入力の場合：地区を返す
-    def __str__(self) -> str:
-        if self.name != "":
-            return str(self.name)
-        else:
-            return str(self.district)
-    @property
-    def city(self):
-        return self._data.get('city')
+def _get_addressCode():
+	file_path = os.path.join(os.path.dirname(__file__), 'addressCode.json')
+	myfile = Path(file_path)
+	myfile.touch(exist_ok=True)
+	try:
+		with open(file_path, 'r') as file:
+			addressCode = json.load(file)
+			update_info = addressCode.get("update_info")
+			update_year = addressCode.get("update_year")
+	except json.decoder.JSONDecodeError:
+		update_info = None
+		update_year = None
 
-    @property
-    def country(self):
-        return self._data.get('country')
+	# 今年更新されていなかったら更新
+	if update_year != datetime.datetime.now().year:
+		# スクレイピング対象の URL にリクエストを送り HTML を取得する
+		sleep(1)
+		res = requests.get('https://www.soumu.go.jp/denshijiti/code.html',timeout=3.5)
+		# レスポンスの HTML から BeautifulSoup オブジェクトを作る
+		soup = BeautifulSoup(res.content, 'html.parser', from_encoding='UTF-8')
+		tag_items = soup.select('li:-soup-contains("都道府県コード及び市区町村コード"):not(:-soup-contains("改正一覧表"))')
+		
+		for tag_item in tag_items:
+			date_info = re.search(r'（(.*?)更新）', tag_item.text).group(1)
+			# サイト上で更新されていたら
+			if update_info != date_info:
+				# リンク要素を取得
+				links = tag_item.find_all('a', href=True)
+				if links:
+					for link in links:
+						# リンクテキストが"Excelファイル"と一致するか確認
+						if "Excelファイル" in link.text:
+							# ExcelファイルのURLを取得
+							excel_url = link['href']
+							excel_url = urljoin(f"https://www.soumu.go.jp",excel_url)
 
-    @property
-    def district(self):
-        return self._data.get('district')
+							# Excelファイルをダウンロード
+							response = requests.get(excel_url)
+							input_book = pd.ExcelFile(BytesIO(response.content))
+							all_sheet_data = []
+							for sheet_name in input_book.sheet_names:
+								sheet_data = input_book.parse(sheet_name)
+								all_sheet_data.append(sheet_data)
 
-    @property
-    def latitude(self):
-        return self._data.get('latitude')
+							# すべてのシートのDataFrameを連結する
+							input_sheet_df = pd.concat(all_sheet_data, ignore_index=True)
+							input_sheet_df.loc[:, "団体コード"] = [int(num/10) for num in input_sheet_df.loc[:, "団体コード"]]
 
-    @property
-    def longitude(self):
-        return self._data.get('longitude')
+							input_sheet_df.set_index("団体コード",inplace=True)
+							input_sheet_df = input_sheet_df.rename(columns={'都道府県名\n（漢字）': 'state','市区町村名\n（漢字）':'city','都道府県名\n（カナ）':'state_kana','市区町村名\n（カナ）':'city_kana','都道府県名\n（ｶﾅ）':'state_kana','市区町村名\n（ｶﾅ）':'city_kana',})
+							input_sheet_df = _agg_dup_col(input_sheet_df)
+							input_sheet_df = input_sheet_df[~input_sheet_df.index.duplicated(keep='first')]
 
-    @property
-    def name(self):
-        return self._data.get('name')
+							json_str = input_sheet_df.to_json(force_ascii=False,orient="index")
+							
+							# JSON をデコードして表示
+							addressCode = json.loads(json_str)
+							addressCode["update_info"] = date_info
+							addressCode["update_year"] = datetime.datetime.now().year
+							updated_json = json.dumps(addressCode,indent=4,ensure_ascii=False)
 
-    @property
-    def original_address(self):
-        return self._data.get('original_address')
+							with open(file_path, 'w') as file:
+								file.write(updated_json)
 
-    @property
-    def post_number(self):
-        return self._data.get('post_number')
+							# 1つのExcelファイルを見つけたらループを終了する
+							break
+					else:
+						raise ValueError("Excelファイルが見つかりませんでした。")
+	return addressCode
 
-    @property
-    def prefecture(self):
-        return self._data.get('prefecture')
-    
-    @property
-    def address(self):
-        return self._data.get('address')
+_addressCode = _get_addressCode()
 
-    @property
-    def data(self):
-        return self._data
-    
+EMPTY_VALUE = -1
+
+class AddressData(BaseModel):
+	name: str = ""          	#目的地
+	country: str = "日本"		#国名
+	state: str = ""         	#都道府県
+	city: str = ""          	#市町村（区もつなげる）
+	# districtはcityと結合
+	locality: str = ""      	#居住域
+	street: str = ""        	#道路？
+	fulladdress: str = ""   	#以上を合わせたもの
+
+	code: int = EMPTY_VALUE				#住所コード
+	source: int = EMPTY_VALUE			#データの参照元(優先度(数値が小さいほど高い))
+	postcode: int = EMPTY_VALUE      	#郵便番号
+	type: str = ""          			#目的地の種類
+
+	def __init__(self,**data):
+		super().__init__(**data)
+		if self.code != EMPTY_VALUE:
+			self.state = _addressCode[str(self.code)].get("state")
+			self.city = _addressCode[str(self.code)].get("city")
+		self.fulladdress = self.country + self.state + self.city + self.locality + self.street + self.name
+
+class LocationData(BaseModel):
+    address: AddressData
+    lat: float = None	#緯度
+    lon: float = None	#経度
+
+def geocode_gsi(place_name:str) -> list:
+	params_gsi={
+		"q":place_name
+	}
+	url = f"https://msearch.gsi.go.jp/address-search/AddressSearch"
+	sleep(1)
+	res = requests.get(url=url,params=params_gsi,timeout=3.5)
+	data_list = res.json()
+	geocode_list = []
+	if data_list:
+		for future in data_list:
+			coord = {
+				"lon":future["geometry"]["coordinates"][0],
+				"lat":future["geometry"]["coordinates"][1],
+			}
+			code=future["properties"].get('addressCode',EMPTY_VALUE)
+			source=future["properties"].get('dataSource',EMPTY_VALUE)
+			if code == "":
+				code = EMPTY_VALUE
+			if source == "":
+				source = EMPTY_VALUE
+			address = {
+				"name":future["properties"]["title"],
+				"code":code,
+				"source":source,
+			}
+			if place_name in address["name"]:
+				loc = LocationData(address=AddressData(**address),lat=coord["lat"],lon=coord["lon"])
+				geocode_list.append(loc)
+	return geocode_list
+
 if __name__=="__main__":
-    # サンプルのaddress
-    addresses = ["東京都","東京都千代田区丸の内1丁目","東京タワー","練馬区","幕張メッセ",(35.7247316,139.5812637)]
-    for address in addresses:
-        loc=Location(address)
-        print(loc)
-        pprint(loc.data)
-
-    # address="幕張メッセ"
-    # loc=Location(address)
-    # pprint(loc.location_params)
-
-    # address=(35.7247316,139.5812637)
-    # loc=Location(address)
-    # print(loc)
-    # pprint(loc.location_params)
+	address = "新宿"
+	geo = geocode_gsi(address)
+	for l in geo:
+		print(l.address.name+"("+l.address.state+l.address.city+")"+str(l.lat)+","+str(l.lon))
+	# print(_addressCode["11208"])

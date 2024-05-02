@@ -1,5 +1,5 @@
 from weather_report.weather_report import WeatherReport
-from get_location.get_location import Location
+from subs.get_location.get_location_old import Location
 
 import requests
 import json
@@ -52,9 +52,11 @@ def get_addressCode(file_path = 'addressCode.json'):
 	myfile.touch(exist_ok=True)
 	try:
 		with open(file_path, 'r') as file:
+			
 			update_data = json.load(file).get("update")
 	except json.decoder.JSONDecodeError:
 		update_data = None
+		update_year = None
 
 	# スクレイピング対象の URL にリクエストを送り HTML を取得する
 	res = requests.get('https://www.soumu.go.jp/denshijiti/code.html')
@@ -87,9 +89,9 @@ def get_addressCode(file_path = 'addressCode.json'):
 
 						json_str = input_sheet_df.to_json(force_ascii=False)
 						# JSON をデコードして表示
-						json_data = json.loads(json_str)
-						json_data["update"]=date_info
-						updated_json = json.dumps(json_data,indent=4,ensure_ascii=False)
+						json_data_new = json.loads(json_str)
+						json_data_new["update"]=date_info
+						updated_json = json.dumps(json_data_new,indent=4,ensure_ascii=False)
 
 						with open(file_path, 'w') as file:
 							file.write(updated_json)
