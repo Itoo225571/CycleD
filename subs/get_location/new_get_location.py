@@ -142,11 +142,11 @@ if __name__=="__main__":
     # サンプルのaddress
     # addresses = ["東京都千代田区丸の内1丁目","東京タワー","練馬区","原爆ドーム","明治大学","富士山","札幌駅北口駅前広場"]
     # addresses = ["静岡市","新宿区","札幌駅北口駅前広場","京王プレリアホテル札幌",]
-    addresses = ["新宿"]
+    addresses = ["静岡市役所"]
     for address in addresses:
         loc=Location()
-        pprint(loc.make_data_list(address))
-        # pprint(loc.get_geocode(address))
+        # pprint(loc.make_data_list(address))
+        pprint(loc.get_geocode(address))
         # pprint(loc.data_list)
         
     # loc = Location()
