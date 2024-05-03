@@ -102,6 +102,17 @@ def _get_addressCode():
 						raise ValueError("Excelファイルが見つかりませんでした。")
 	return addressCode
 
+def _have_word(handle, target):
+	have_space = bool(re.search(r'[\s]', handle))
+	if have_space:
+		words = handle.split()
+		for word in words:
+			if word not in target:
+				return False
+		return True
+	else:
+		return bool(handle in target)
+
 _addressCode = _get_addressCode()
 
 EMPTY_VALUE = -1
@@ -115,6 +126,7 @@ class AddressData(BaseModel):
 	locality: str = ""      	#居住域
 	street: str = ""        	#道路？
 	fulladdress: str = ""   	#以上を合わせたもの
+	label: str = ""				#一般表記
 
 	code: int = EMPTY_VALUE				#住所コード
 	source: int = EMPTY_VALUE			#データの参照元(優先度(数値が小さいほど高い))
@@ -127,13 +139,20 @@ class AddressData(BaseModel):
 			self.state = _addressCode[str(self.code)].get("state")
 			self.city = _addressCode[str(self.code)].get("city")
 		self.fulladdress = self.country + self.state + self.city + self.locality + self.street + self.name
+		state_city = self.state + self.city
+		if state_city != "":
+			self.label = self.name + "（" + self.state + self.city + "）"
+		else:
+			self.label = self.name 
 
 class LocationData(BaseModel):
     address: AddressData
-    lat: float = None	#緯度
-    lon: float = None	#経度
+    lat: float 			#緯度
+    lon: float 			#経度
 
 def geocode_gsi(place_name:str) -> list:
+	place_name = re.sub(r'　', ' ', place_name)
+	
 	params_gsi={
 		"q":place_name
 	}
@@ -144,10 +163,6 @@ def geocode_gsi(place_name:str) -> list:
 	geocode_list = []
 	if data_list:
 		for future in data_list:
-			coord = {
-				"lon":future["geometry"]["coordinates"][0],
-				"lat":future["geometry"]["coordinates"][1],
-			}
 			code=future["properties"].get('addressCode',EMPTY_VALUE)
 			source=future["properties"].get('dataSource',EMPTY_VALUE)
 			if code == "":
@@ -159,14 +174,20 @@ def geocode_gsi(place_name:str) -> list:
 				"code":code,
 				"source":source,
 			}
-			if place_name in address["name"]:
-				loc = LocationData(address=AddressData(**address),lat=coord["lat"],lon=coord["lon"])
+			location = {
+				"lon":future["geometry"]["coordinates"][0],
+				"lat":future["geometry"]["coordinates"][1],
+				"address":address,
+			}
+
+			if _have_word(place_name,address["name"]):
+				loc = LocationData(**location)
 				geocode_list.append(loc)
+		geocode_list = sorted(geocode_list, key=lambda x:x.address.source)
 	return geocode_list
 
 if __name__=="__main__":
-	address = "新宿"
+	address = "東京"
 	geo = geocode_gsi(address)
 	for l in geo:
-		print(l.address.name+"("+l.address.state+l.address.city+")"+str(l.lat)+","+str(l.lon))
-	# print(_addressCode["11208"])
+		print(l.address.label+" : "+str(l.address.source))
