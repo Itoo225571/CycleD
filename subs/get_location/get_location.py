@@ -13,6 +13,7 @@ import os.path
 
 from pprint import pprint
 
+EMPTY_VALUE = -1
 
 def _agg_dup_col(df_: pd.core.frame.DataFrame) -> pd.core.frame.DataFrame:
     '''カラム名重複のあるデータフレームを，カラムの欠損を保管し合う+重複削除し，データフレームとして返す
@@ -31,6 +32,34 @@ def _agg_dup_col(df_: pd.core.frame.DataFrame) -> pd.core.frame.DataFrame:
         df[col] = value
     return df
 
+def _have_word(handle, target):
+	have_space = bool(re.search(r'[\s]', handle))
+	if have_space:
+		words = handle.split()
+		for word in words:
+			if word not in target:
+				return False
+		return True
+	else:
+		return bool(handle in target)
+	
+def _assign_prefecture_number(label):
+	prefectures = [
+		"東京都", "神奈川県", "大阪府", "愛知県", "埼玉県",
+		"千葉県", "兵庫県", "北海道", "福岡県", "静岡県",
+		"茨城県", "広島県", "京都府", "宮城県", "新潟県",
+		"長野県", "岐阜県", "群馬県", "栃木県", "岡山県",
+		"福島県", "三重県", "熊本県", "鹿児島県", "沖縄県",
+		"滋賀県", "山口県", "愛媛県", "奈良県", "長崎県",
+		"青森県", "岩手県", "石川県", "大分県", "宮崎県",
+		"山形県", "富山県", "秋田県", "香川県", "和歌山県",
+		"佐賀県", "山梨県", "福井県", "徳島県", "高知県",
+		"島根県", "鳥取県"
+	]
+	for i, state in enumerate(prefectures, 1):
+		if state in label:
+			return i
+	return EMPTY_VALUE
 
 def _get_addressCode():
 	file_path = os.path.join(os.path.dirname(__file__), 'addressCode.json')
@@ -102,20 +131,7 @@ def _get_addressCode():
 						raise ValueError("Excelファイルが見つかりませんでした。")
 	return addressCode
 
-def _have_word(handle, target):
-	have_space = bool(re.search(r'[\s]', handle))
-	if have_space:
-		words = handle.split()
-		for word in words:
-			if word not in target:
-				return False
-		return True
-	else:
-		return bool(handle in target)
-
 _addressCode = _get_addressCode()
-
-EMPTY_VALUE = -1
 
 class AddressData(BaseModel):
 	name: str = ""          	#目的地
@@ -129,7 +145,8 @@ class AddressData(BaseModel):
 	label: str = ""				#一般表記
 
 	code: int = EMPTY_VALUE				#住所コード
-	source: int = EMPTY_VALUE			#データの参照元(優先度(数値が小さいほど高い))
+	priority: int = EMPTY_VALUE			#優先度(2つ目)
+	source: int = EMPTY_VALUE			#データの参照元(優先度(1つ目))
 	postcode: int = EMPTY_VALUE      	#郵便番号
 	type: str = ""          			#目的地の種類
 
@@ -144,13 +161,14 @@ class AddressData(BaseModel):
 			self.label = self.name + "（" + self.state + self.city + "）"
 		else:
 			self.label = self.name 
+		self.priority = _assign_prefecture_number(self.label)
 
 class LocationData(BaseModel):
     address: AddressData
-    lat: float 			#緯度
-    lon: float 			#経度
+    lat: float  # 緯度
+    lon: float  # 経度
 
-def geocode_gsi(place_name:str) -> list:
+def geocode_gsi(place_name:str,to_json=False) -> list[LocationData]:
 	place_name = re.sub(r'　', ' ', place_name)
 	
 	params_gsi={
@@ -183,11 +201,13 @@ def geocode_gsi(place_name:str) -> list:
 			if _have_word(place_name,address["name"]):
 				loc = LocationData(**location)
 				geocode_list.append(loc)
-		geocode_list = sorted(geocode_list, key=lambda x:x.address.source)
+		geocode_list = sorted(geocode_list, key=lambda x:(x.address.source,x.address.priority,x.address.code))
+		if to_json:
+			geocode_list = [v.model_dump() for v in geocode_list]
 	return geocode_list
 
 if __name__=="__main__":
-	address = "東京"
+	address = "新宿"
 	geo = geocode_gsi(address)
 	for l in geo:
 		print(l.address.label+" : "+str(l.address.source))

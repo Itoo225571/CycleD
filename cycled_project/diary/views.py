@@ -8,7 +8,7 @@ from django.contrib.auth.views import LoginView,LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .diary_weather_report import DiaryWeatherReport
-from subs.get_location.new_get_location import Location
+from subs.get_location.get_location import geocode_gsi
 
 from .forms import *
 
@@ -62,12 +62,11 @@ class AddressSearchView(generic.FormView):
     
     def address_search(self,form):
         keyword = form.cleaned_data.get('keyword')
-        loc = Location()
-        loc.get_geocode(keyword)
+        data_list = geocode_gsi(keyword,to_json=True)
         # loc.make_data_list(name)
         # 位置情報を含むレスポンスを作成
         response = {
-            "data_list":loc.data_list,
+            "data_list":data_list,
         }
         return JsonResponse(response,json_dumps_params={'ensure_ascii': False})
     
@@ -109,7 +108,7 @@ calendar=CalendarView.as_view()
 """______AJAX______"""
 def ajax_getLocation(request):
     if request.method == 'POST':
-        print(request.POST)
+        # print(request.POST)
         latitude = float(request.POST.get('latitude',None))
         longitude = float(request.POST.get('longitude',None))
         weather=DiaryWeatherReport(latitude,longitude)
