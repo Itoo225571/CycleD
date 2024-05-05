@@ -3,6 +3,7 @@ from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponse,JsonResponse
 from django.views import generic,View
 from django.urls import reverse_lazy
+from django.core.paginator import Paginator,PageNotAnInteger,EmptyPage
 
 from django.contrib.auth.views import LoginView,LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -62,13 +63,37 @@ class AddressSearchView(generic.FormView):
     
     def address_search(self,form):
         keyword = form.cleaned_data.get('keyword')
-        data_list = geocode_gsi(keyword,to_json=True)
-        # loc.make_data_list(name)
-        # 位置情報を含むレスポンスを作成
+        geocode_data_list = geocode_gsi(keyword,to_json=True)
+
+        page_cnt = 13 #一画面あたり
+        onEachSide = 3 #選択ページの両側
+        onEnds = 2 #左右両端表示
+        paginator = Paginator(geocode_data_list,per_page=page_cnt)
+        page_number = self.request.GET.get('page', 1)
+        
+        try:
+            data_page = paginator.page(page_number)
+        except PageNotAnInteger:
+            data_page = paginator.page(1)
+        except EmptyPage:
+            data_page = paginator.page(paginator.num_pages)
+
+        # ページングされたデータのリストを JSON に変換
+        data_page_s = [data for data in data_page]
+        data_list = data_page.paginator.get_elided_page_range(page_number, on_each_side=onEachSide, on_ends=onEnds)
+        
         response = {
-            "data_list":data_list,
+            "data_list":  data_list,  # ページングされたデータのリスト
+            "data_page":  data_page,
+            # "number":data_page.number,
+            # "has_next": data_page.has_next(),  # 次のページがあるかどうか
+            # "has_previous": data_page.has_previous(),  # 前のページがあるかどうか
+            # "next_page_number": data_page.next_page_number() if data_page.has_next() else None,  # 次のページ番号
+            # "previous_page_number": data_page.previous_page_number() if data_page.has_previous() else None,  # 前のページ番号
+            # "total_pages": paginator.num_pages,  # 総ページ数
         }
-        return JsonResponse(response,json_dumps_params={'ensure_ascii': False})
+        return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
+        # return self.render_to_response(response)
     
 address_search = AddressSearchView.as_view()
 

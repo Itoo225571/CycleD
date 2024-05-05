@@ -10,6 +10,7 @@ import re
 from io import BytesIO
 import datetime
 import os.path
+from difflib import SequenceMatcher
 
 from pprint import pprint
 
@@ -145,10 +146,11 @@ class AddressData(BaseModel):
 	label: str = ""				#一般表記
 
 	code: int = EMPTY_VALUE				#住所コード
-	priority: int = EMPTY_VALUE			#優先度(2つ目)
-	source: int = EMPTY_VALUE			#データの参照元(優先度(1つ目))
+	priority: int = EMPTY_VALUE			#優先度
+	source: int = EMPTY_VALUE			#データの参照元
 	postcode: int = EMPTY_VALUE      	#郵便番号
 	type: str = ""          			#目的地の種類
+	matcher: float = 1.0					#目的地の名前にどれだけマッチしているか（０の方がマッチしてる）
 
 	def __init__(self,**data):
 		super().__init__(**data)
@@ -158,7 +160,7 @@ class AddressData(BaseModel):
 		self.fulladdress = self.country + self.state + self.city + self.locality + self.street + self.name
 		state_city = self.state + self.city
 		if state_city != "":
-			self.label = self.name + "（" + self.state + self.city + "）"
+			self.label = self.name + "（" + self.state + " " + self.city + "）"
 		else:
 			self.label = self.name 
 		self.priority = _assign_prefecture_number(self.label)
@@ -176,7 +178,15 @@ def geocode_gsi(place_name:str,to_json=False) -> list[LocationData]:
 	}
 	url = f"https://msearch.gsi.go.jp/address-search/AddressSearch"
 	sleep(1)
-	res = requests.get(url=url,params=params_gsi,timeout=3.5)
+	
+	try:
+		res = requests.get(url=url,params=params_gsi,timeout=5.0)
+	except requests.exceptions.Timeout:
+		raise(url+" get faild")
+	
+	if res.status_code != 200:
+		raise Exception(f"Error: {res.status_code}")
+
 	data_list = res.json()
 	geocode_list = []
 	if data_list:
@@ -187,10 +197,12 @@ def geocode_gsi(place_name:str,to_json=False) -> list[LocationData]:
 				code = EMPTY_VALUE
 			if source == "":
 				source = EMPTY_VALUE
+			matcher = 1 - SequenceMatcher(None, place_name ,future["properties"]["title"] ).ratio()
 			address = {
 				"name":future["properties"]["title"],
 				"code":code,
 				"source":source,
+				"matcher":matcher,
 			}
 			location = {
 				"lon":future["geometry"]["coordinates"][0],
@@ -201,7 +213,7 @@ def geocode_gsi(place_name:str,to_json=False) -> list[LocationData]:
 			if _have_word(place_name,address["name"]):
 				loc = LocationData(**location)
 				geocode_list.append(loc)
-		geocode_list = sorted(geocode_list, key=lambda x:(x.address.source,x.address.priority,x.address.code))
+		geocode_list = sorted(geocode_list, key=lambda x:(x.address.source,x.address.priority,x.address.matcher,x.address.code))
 		if to_json:
 			geocode_list = [v.model_dump() for v in geocode_list]
 	return geocode_list
