@@ -103,4 +103,24 @@ def get_addressCode(file_path = 'addressCode.json'):
 			
 
 if __name__=="__main__":
-	get_addressCode()
+	import difflib
+	str_list = ["東京都葛飾区新宿",
+				"東京都新宿区",
+				"東京都新宿区新宿",
+				"東新宿駅",
+				"東新宿駅",
+				"西武新宿駅",
+				"新宿御苑前駅",
+				"西新宿駅",
+				"新宿三丁目駅",
+				"西新宿五丁目駅",
+				"西新宿ＪＣＴ",
+				"新宿駅",
+				"東久留米"]
+	str1 = "新宿"
+	# for str2 in str_list:
+	# 	s = difflib.SequenceMatcher(None, str1, str2).ratio()
+	# 	print(s)
+	geo_request_url = 'https://get.geojs.io/v1/ip/geo.json'
+	geo_data = requests.get(geo_request_url).json()
+	pprint(geo_data)

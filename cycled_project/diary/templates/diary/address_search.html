@@ -19,6 +19,10 @@
     </div>
 
     <ul class="list-group" id="address-list"></ul>
+
+    <nav aria-label="pagenator-aria">
+        <ul class="pagination"></ul>
+    </nav>
     
 {% endblock content %}
 
@@ -63,11 +67,21 @@
                     // オブジェクトのプロパティを取り出して表示
                     var html =  '<button type="button" class="list-group-item list-group-item-action">'+ 
                                 //    value.address.name + '(' + value.address.city +')' +
-                                value.address.label + ' : ' +value.lat +
+                                value.address.label + " : " + value.address.matcher +
                                 '</button>'
+                    var pagination
+                    
                     $('#address-list').append(html);
                 })
             })
+
+            .fail(function(jqXHR, textStatus, errorThrown) {
+                //Loadingアイコン削除
+                $('#address-loading').remove();
+                // エラーメッセージを表示
+                $('#address-list').append('<div class="alert alert-danger" role="alert">リクエストがタイムアウトしました。</div>');
+            });
+
         });
         
     </script>
