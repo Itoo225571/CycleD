@@ -7,7 +7,7 @@ from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList
 from betterforms.multiform import MultiModelForm    #2つのフォームを1つにまとめる
 
-from diary.models import User,Diary
+from diary.models import *
 
 class SignupForm(UserCreationForm):
     '''     定義文      '''
@@ -62,11 +62,10 @@ class AddressSearchForm(forms.Form):
                         widget=forms.TextInput(attrs={"placeholder":" 地名・施設名・駅名など"})
                         )
     
-class AddressSelectForm(forms.Form):
-    lat = forms.FloatField()
-    lon = forms.FloatField()
-    state = forms.CharField()
-    display = forms.CharField()
+class AddressSelectForm(ModelForm):
+    class Meta:
+        model = Location
+        exclude = ["user",]
 
 class AddressForm(MultiModelForm):
     form_classes = {
