@@ -20,6 +20,7 @@ class BaseView(generic.TemplateView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["user"]=request.user
+        context["home"] = request.user.home
         return context
 
 class TopView(generic.TemplateView):
@@ -48,18 +49,43 @@ class SignupView(generic.CreateView):
 signup=SignupView.as_view()
 
 """______Address関係______"""
-class AddressSearchView(generic.FormView):
+class AddressSearchView(LoginRequiredMixin,generic.FormView):
     template_name = "diary/address_search.html"
     form_class = AddressSearchForm
     success_url = reverse_lazy('diary:address_search')
 
+    def get_form_class(self) -> type:
+        if "address-search-form" in self.request.POST:
+            return AddressSearchForm
+        elif "address-select-form" in self.request.POST:
+            return AddressForm
+        return super().get_form_class()
+
+    def get_success_url(self) -> str:
+        if "address-search-form" in self.request.POST:
+            return reverse_lazy('diary:address_search')
+        elif "address-select-form" in self.request.POST:
+            return reverse_lazy('diary:home')
+        return super().get_success_url()
+
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
-        form = self.get_form(self.form_class)
+        if "address-search-form" in request.POST:
+            form = AddressSearchForm(request.POST)
+            
+        elif "address-select-form" in request.POST:
+            form = AddressSelectForm(request.POST)
+            if form.is_valid():
+                location_instance = form.save(commit=False)
+                location_instance.save()
+                request.user.home = location_instance
+                request.user.save()
+        else:
+            form = self.get_form(self.form_class)
+        
         if form.is_valid():
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return self.address_search(form)
             return self.form_valid(form)
-        return super().form_invalid(form)
     
     def address_search(self,form):
         keyword = form.cleaned_data.get('keyword')
@@ -95,9 +121,7 @@ class AddressSearchView(generic.FormView):
         return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
         # return self.render_to_response(response)
 
-    
 address_search = AddressSearchView.as_view()
-
 
 """______User関係______"""
 class UserProfileView(LoginRequiredMixin,generic.DetailView):

@@ -1,5 +1,6 @@
 {% extends "diary/base.html" %}
 {% load django_bootstrap5 %}
+{% load static %}
 
 {% block title %}
     ほーむぺーじ
@@ -12,7 +13,16 @@
                 <h1>Welcome to さいくるにっき{{user.username}}さん</h1>
             </div>
         </div>
+        {% if not user.home %}
+        <div>
+            <p>住所が登録されていません</p>
+            <p>住所を登録することで天気を見ることができます</p>
+            <a href="{% url 'diary:address_search' %}">新しく登録する</a>
+        </div>
+        {% else %}
         <div class="row">
+            <h3>{{user.home.display}}</h3>
+            <h4>{{user.home.state}}</h4>
             <div class="col-md-6 my-content">
                 <h3>今日の天気</h3>
                 <p id="getTodayWeather"></p>
@@ -23,29 +33,15 @@
             </div>
             
         </div>
+        {% endif %}
+        
     </div>
 {% endblock content %}
 
 {% block extra_js %}
+    <script src="{% static 'diary/js/getCookie.js' %}"></script>
+
     <script>
-        $(document).ready(function() {
-            // ページが読み込まれた時に位置情報を取得する
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    var latitude = position.coords.latitude;
-                    var longitude = position.coords.longitude;
-                    sendLocationToServer(latitude, longitude);
-                },
-                function(error){
-                    console.log("Geolocation is not supported by this browser.");
-                },{
-                    // オプション
-                    enableHighAccuracy: false,
-                    timeout: 5 * 1000,
-                    maximumAge: 60 * 1000
-                });
-            }
-        });
         
         // サーバーに位置情報を送信する関数
         function sendLocationToServer(latitude, longitude) {
@@ -73,24 +69,7 @@
                     console.error("Error sending location data:", error);
                 }
             });
-        }
-        
-        // CSRFトークンを取得する関数
-        function getCookie(name) {
-            var cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                var cookies = document.cookie.split(';');
-                for (var i = 0; i < cookies.length; i++) {
-                    var cookie = cookies[i].trim();
-                    // クッキーが名前と一致する場合、値を取得
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
+        };
         
     </script>
 
