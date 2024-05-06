@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "diary.apps.DiaryConfig",
     "django_bootstrap5",#Bootstrap5追加
     "debug_toolbar",#Debug-toolbar追加
+	"betterforms",  # formを複数にするやつ追加
 ]
 
 MIDDLEWARE = [

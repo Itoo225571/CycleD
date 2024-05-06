@@ -13,8 +13,7 @@ class User(AbstractUser):
     # date_last_login=models.DateField(verbose_name="last login date",auto_now=True,null=True)
     # is_admin=models.BooleanField(verbose_name="is admin",default=False)
     
-    address=models.CharField(max_length=256,verbose_name="address",blank=True)
-    place_favorite=models.CharField(max_length=256,blank=True,verbose_name="favorite place")
+    locations = models.ManyToManyField('Location', blank=True)
     
     REQUIRED_FIELDS = ["email",]
     
@@ -36,7 +35,15 @@ class Diary(models.Model):
     is_publish=models.BooleanField(verbose_name="is publish",default=False)
     comment=models.TextField(blank=True)
     datetime=models.DateTimeField("time detail",blank=True)
+
+    locations = models.ManyToManyField('Location', blank=True)
     
     def __str__(self):
         return self.name_place
+
+class Location(models.Model):
+    lat = models.FloatField()
+    lon = models.FloatField()
+    state = models.CharField(max_length=128)
+    display = models.CharField(max_length=128)
     
