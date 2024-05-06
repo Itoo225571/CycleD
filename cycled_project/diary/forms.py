@@ -5,6 +5,7 @@ from django.contrib.auth.hashers import make_password,check_password
 from django import forms
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList
+from betterforms.multiform import MultiModelForm    #2つのフォームを1つにまとめる
 
 from diary.models import User,Diary
 
@@ -12,7 +13,7 @@ class SignupForm(UserCreationForm):
     '''     定義文      '''
     class Meta:
         model=User
-        fields=["icon","username","email","password1",]
+        fields=["username","email","password1",]
         widgets={"password1":PasswordInput(attrs={"placeholder":"パスワード入力欄"})}
     password2=CharField(
         label="パスワード再入力欄",
@@ -60,7 +61,19 @@ class AddressSearchForm(forms.Form):
                         max_length=64,
                         widget=forms.TextInput(attrs={"placeholder":" 地名・施設名・駅名など"})
                         )
-        
+    
+class AddressSelectForm(forms.Form):
+    lat = forms.FloatField()
+    lon = forms.FloatField()
+    state = forms.CharField()
+    display = forms.CharField()
+
+class AddressForm(MultiModelForm):
+    form_classes = {
+        "search":AddressSearchForm,
+        "select":AddressSelectForm,
+    }
+
 class UserForm(ModelForm):
     class Meta:
         model=User

@@ -83,8 +83,8 @@ class AddressSearchView(generic.FormView):
         data_list = data_page.paginator.get_elided_page_range(page_number, on_each_side=onEachSide, on_ends=onEnds)
         
         response = {
-            "data_list":  data_list,  # ページングされたデータのリスト
-            "data_page":  data_page,
+            "data_list":  geocode_data_list,  # ページングされたデータのリスト
+            # "data_page":  data_page,
             # "number":data_page.number,
             # "has_next": data_page.has_next(),  # 次のページがあるかどうか
             # "has_previous": data_page.has_previous(),  # 前のページがあるかどうか
@@ -94,6 +94,7 @@ class AddressSearchView(generic.FormView):
         }
         return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
         # return self.render_to_response(response)
+
     
 address_search = AddressSearchView.as_view()
 

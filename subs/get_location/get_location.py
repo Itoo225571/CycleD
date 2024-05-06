@@ -44,8 +44,7 @@ def _have_word(handle, target):
 	else:
 		return bool(handle in target)
 	
-def _assign_prefecture_number(label):
-	prefectures = [
+_prefectures = [
 		"東京都", "神奈川県", "大阪府", "愛知県", "埼玉県",
 		"千葉県", "兵庫県", "北海道", "福岡県", "静岡県",
 		"茨城県", "広島県", "京都府", "宮城県", "新潟県",
@@ -57,7 +56,9 @@ def _assign_prefecture_number(label):
 		"佐賀県", "山梨県", "福井県", "徳島県", "高知県",
 		"島根県", "鳥取県"
 	]
-	for i, state in enumerate(prefectures, 1):
+
+def _assign_prefecture_number(label):
+	for i, state in enumerate(_prefectures, 1):
 		if state in label:
 			return i
 	return EMPTY_VALUE
@@ -135,34 +136,44 @@ def _get_addressCode():
 _addressCode = _get_addressCode()
 
 class AddressData(BaseModel):
-	name: str = ""          	#目的地
-	country: str = "日本"		#国名
-	state: str = ""         	#都道府県
-	city: str = ""          	#市町村（区もつなげる）
-	# districtはcityと結合
-	locality: str = ""      	#居住域
-	street: str = ""        	#道路？
-	fulladdress: str = ""   	#以上を合わせたもの
-	label: str = ""				#一般表記
+	search: str							#検索名
+	name: str            				#目的地
+	display: str =""
+	label: str = "" 					#一般表記
+	country: str = "日本"				#国名
+	state: str = ""         			#都道府県
+	city: str = ""          			#市町村（区もつなげる）
+	locality: str = ""      			#居住域
+	street: str = ""        			#道路？
+	fulladdress: str = ""   			#以上を合わせたもの	
+	postcode: int = EMPTY_VALUE      	#郵便番号
+	type: str = ""          			#目的地の種類
 
 	code: int = EMPTY_VALUE				#住所コード
 	priority: int = EMPTY_VALUE			#優先度
 	source: int = EMPTY_VALUE			#データの参照元
-	postcode: int = EMPTY_VALUE      	#郵便番号
-	type: str = ""          			#目的地の種類
-	matcher: float = 1.0					#目的地の名前にどれだけマッチしているか（０の方がマッチしてる）
+	matcher: float = 1.0				#目的地の名前にどれだけマッチしているか（０の方がマッチしてる）
 
 	def __init__(self,**data):
 		super().__init__(**data)
+		# コードがある場合
 		if self.code != EMPTY_VALUE:
 			self.state = _addressCode[str(self.code)].get("state")
 			self.city = _addressCode[str(self.code)].get("city")
-		self.fulladdress = self.country + self.state + self.city + self.locality + self.street + self.name
-		state_city = self.state + self.city
-		if state_city != "":
 			self.label = self.name + "（" + self.state + " " + self.city + "）"
+			self.fulladdress = self.country + self.state + self.city + self.locality + self.street + self.name
+			self.display = self.name
 		else:
-			self.label = self.name 
+			for pre in _prefectures:
+				if pre in self.name:
+					self.state = pre
+					self.city = self.name.lstrip(pre)
+					if self.city.endswith(self.search):
+						self.city = self.city.rstrip(self.search)
+			self.label = self.name
+			self.fulladdress = self.country + self.name
+			self.display = self.city
+		
 		self.priority = _assign_prefecture_number(self.label)
 
 class LocationData(BaseModel):
@@ -199,6 +210,7 @@ def geocode_gsi(place_name:str,to_json=False) -> list[LocationData]:
 				source = EMPTY_VALUE
 			matcher = 1 - SequenceMatcher(None, place_name ,future["properties"]["title"] ).ratio()
 			address = {
+				"search":place_name,
 				"name":future["properties"]["title"],
 				"code":code,
 				"source":source,
@@ -222,4 +234,4 @@ if __name__=="__main__":
 	address = "新宿"
 	geo = geocode_gsi(address)
 	for l in geo:
-		print(l.address.label+" : "+str(l.address.source))
+		print(l)

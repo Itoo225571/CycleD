@@ -10,9 +10,9 @@
     <h2>キーワードから地域を探す</h2>
     <div class="search-wrapper">
         <div class="address-search-form">
-            <form action="" method="post" >
+            <form method="post" id="address-search">
                 {% csrf_token %}
-                {{ form }}
+                {{ form.keyword }}
                 <button class="btn btn-primary m-3" type="submit">検索</button>
             </form>
         </div>
@@ -35,9 +35,11 @@
     <script src="{% static 'diary/js/getCookie.js' %}"></script>
 
     <script>
-        $("form").submit(function(event) {
+        $("#address-search").submit(function(event) {
+            
             // フォームのデフォルトの動作をキャンセル
             event.preventDefault();
+
             //前の検索結果を消す
             $('#address-list').children().remove();
             //Loadingアイコン表示
@@ -51,12 +53,11 @@
                 method: form.prop("method"),
                 url: form.prop("action"),
                 headers: {
-                    "X-Requested-With": "XMLHttpRequest",  // 追加するヘッダー
                     "X-CSRFToken": csrftoken  // CSRFトークンも必要な場合
                 },
                 data: form.serialize(),
                 dataType: 'json',
-                timeout:10000,
+                timeout:15000,
             })
         
             .done(function(data) {
@@ -65,13 +66,21 @@
                 // data_list内の各オブジェクトを処理
                 $.each(data.data_list, function(index, value) {
                     // オブジェクトのプロパティを取り出して表示
-                    var html =  '<button type="button" class="list-group-item list-group-item-action">'+ 
-                                //    value.address.name + '(' + value.address.city +')' +
-                                value.address.label + " : " + value.address.matcher +
-                                '</button>'
-                    var pagination
+                    var html =  '<form method="post" class="search-select" id="search-select' + index + '">'+
+                                    '{% csrf_token %}'+
+                                    '<input type="hidden" name="lat" value="' + value.lat + '">'  +
+                                    '<input type="hidden" name="lon" value="' + value.lon + '">'  +
+                                    '<input type="hidden" name="state" value="' + value.address.state + '">'  +
+                                    '<input type="hidden" name="display" value="' + value.address.display + '">'  +
+                                    '<button type="submit" class="list-group-item list-group-item-action boder border-3 border-light rounded-3 m-1 p-2">'+ 
+                                        '<img src="{% static 'diary/img/location.png' %}" alt="location" width="30px" height="30px" class="ms-1 me-4">' +
+                                        value.address.label +
+                                    '</button>'+
+                                '</form>';
+                    //var pagenation = ;
                     
                     $('#address-list').append(html);
+                    //$('#pagination').append(pagination);
                 })
             })
 
