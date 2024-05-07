@@ -7,9 +7,9 @@ class DiaryWeatherReport(WeatherReport):
 	def __init__(self, *args):
 		super().__init__(*args)
 		
-		self.data["hourly"]["weather_img"] = [static('diary/img/' + name) for name in self.data["hourly"]["weather_img"]]
-		self.data["daily"]["weather_img"] = [static('diary/img/' + name) for name in self.data["daily"]["weather_img"]]
-		self.data["current"]["weather_img"] = [static('diary/img/' + name) for name in self.data["current"]["weather_img"]]
+		self.data["hourly"]["weather_img"] = [static('diary_weather_report/img/' + name) for name in self.data["hourly"]["weather_img"]]
+		self.data["daily"]["weather_img"] = [static('diary_weather_report/img/' + name) for name in self.data["daily"]["weather_img"]]
+		self.data["current"]["weather_img"] = [static('diary_weather_report/img/' + name) for name in self.data["current"]["weather_img"]]
 		
 if __name__=="__main__":    	
 	# w=DiaryWeatherReport(35.7247316,139.5812637)

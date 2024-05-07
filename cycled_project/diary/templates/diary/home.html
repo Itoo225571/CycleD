@@ -22,7 +22,7 @@
             </div>
         </div>
 
-        <div class="row text-center">
+        <div class="row justify-content-md-center text-center">
             <div class="col">
                 <h3>今日の天気</h3>
                 <div id="getTodayWeather"></div>
@@ -45,8 +45,10 @@
         $(document).ready(sendLocationToServer({{ user.home.lat }}, {{ user.home.lon }}));
 
         function sendLocationToServer(lat,lon) {
-            var loading = '<div class="spinner-border text-dark m-4" id="weather-loading" role="status"></div> '
-            $('#getTodayWeather').append(loading);
+            var loading_today = '<div class="spinner-border text-dark m-4" id="weather-loading_today" role="status"></div> '
+            var loading_tomorrow = '<div class="spinner-border text-dark m-4" id="weather-loading_tomorrow" role="status"></div> '
+            $('#getTodayWeather').append(loading_today);
+            $('#getTomorrowWeather').append(loading_tomorrow);
         
             // ここからAjaxリクエストの処理
             var csrftoken = getCookie('csrftoken');
@@ -69,10 +71,8 @@
             .done(function(data) {
                 //Loadingアイコン削除
                 $('.spinner-border').remove();
-                var today = '<p>' + data.today.weather + '</p>' +
-                            '<img src=' + data.today.weather_img + ' alt="today_weather" width="100px" height="100px" class="ms-1 me-4">'
-                var tomorrow =  '<p>' + data.tomorrow.weather + '</p>'+
-                                '<img src=' + data.tomorrow.weather_img + ' alt="today_weather" width="100px" height="100px" class="ms-1 me-4">'
+                var today =     '<img src=' + data.today.weather_img + ' alt="today_weather" width="100px" height="100px" class="ms-1 me-4">'
+                var tomorrow =  '<img src=' + data.tomorrow.weather_img + ' alt="today_weather" width="100px" height="100px" class="ms-1 me-4">'
                 $('#getTodayWeather').append(today);
                 $('#getTomorrowWeather').append(tomorrow);
             })
