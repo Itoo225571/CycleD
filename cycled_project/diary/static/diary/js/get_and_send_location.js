@@ -34,7 +34,7 @@ function sendLocationToServer(latitude, longitude) {
     
     $.ajax({
         type: "POST",
-        url: "/diary/ajax/getLocation/",
+        url: "/diary/ajax/location2weather/",
         headers: {
             "X-CSRFToken": csrftoken  // CSRFトークンをヘッダーに追加
         },

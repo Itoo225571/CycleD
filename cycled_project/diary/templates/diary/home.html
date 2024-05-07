@@ -8,11 +8,6 @@
 
 {% block content %}
     <div class="container mt-5">
-        <div class="row">
-            <div class="col my-title">
-                <h1>Welcome to さいくるにっき{{user.username}}さん</h1>
-            </div>
-        </div>
         {% if not user.home %}
         <div>
             <p>住所が登録されていません</p>
@@ -20,16 +15,21 @@
             <a href="{% url 'diary:address_search' %}">新しく登録する</a>
         </div>
         {% else %}
-        <div class="row">
-            <h3>{{user.home.display}}</h3>
-            <h4>{{user.home.state}}</h4>
-            <div class="col-md-6 my-content">
-                <h3>今日の天気</h3>
-                <p id="getTodayWeather"></p>
+        <div class = "row justify-content-md-center text-center">
+            <div class="col-md-auto">
+                <h3>{{user.home.display}}</h3>
+                <h4>（{{user.home.state}}）</h4>
             </div>
-            <div class="col-md-6 my-content">
+        </div>
+
+        <div class="row text-center">
+            <div class="col">
+                <h3>今日の天気</h3>
+                <div id="getTodayWeather"></div>
+            </div>
+            <div class="col">
                 <h3>明日の天気</h3>
-                <p id="getTomorrowWeather"></p>
+                <div id="getTomorrowWeather"></div>
             </div>
             
         </div>
@@ -40,69 +40,50 @@
 
 {% block extra_js %}
     <script src="{% static 'diary/js/getCookie.js' %}"></script>
-
     <script>
         
-        // サーバーに位置情報を送信する関数
-        function sendLocationToServer(latitude, longitude) {
-            // CSRFトークンを取得
-            var csrftoken = getCookie('csrftoken');
-            
-            $.ajax({
-                type: "POST",
-                url: "diary/ajax/getLocation/",
-                headers: {
-                    "X-CSRFToken": csrftoken  // CSRFトークンをヘッダーに追加
-                },
-                data: {
-                    'latitude': latitude,
-                    'longitude': longitude,
-                    'csrfmiddlewaretoken': csrftoken  // フォームの場合と同じように、CSRFトークンを含める
-                },
-                dataType: 'json',
-                success: function(data) {
-                    document.getElementById("getTodayWeather").innerHTML         = data.today.weather
-                    document.getElementById("getTomorrowWeather").innerHTML        = data.tomorrow.weather
-                    document.getElementById("getMessage").innerHTML= data.message
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error sending location data:", error);
-                }
-            });
-        };
-        
-    </script>
+        $(document).ready(sendLocationToServer({{ user.home.lat }}, {{ user.home.lon }}));
 
-    <script>
-        $("form").submit(function(event) {
-            // フォームのデフォルトの動作をキャンセル
-            event.preventDefault();
+        function sendLocationToServer(lat,lon) {
+            var loading = '<div class="spinner-border text-dark m-4" id="weather-loading" role="status"></div> '
+            $('#getTodayWeather').append(loading);
         
             // ここからAjaxリクエストの処理
             var csrftoken = getCookie('csrftoken');
-            var form = $(this);
             
             $.ajax({
-                method: form.prop("method"),
-                url: form.prop("action"),
+                method: "POST",
+                url: "{% url 'diary:ajax_location2weather' %}",
                 headers: {
-                    "X-Requested-With": "XMLHttpRequest",  // 追加するヘッダー
                     "X-CSRFToken": csrftoken  // CSRFトークンも必要な場合
                 },
-                data: form.serialize(),
+                data: {
+                    'latitude': lat,
+                    'longitude': lon,
+                    'csrfmiddlewaretoken': csrftoken  // フォームの場合と同じように、CSRFトークンを含める
+                },
                 dataType: 'json',
-                timeout:10000,
+                timeout:15000,
             })
         
             .done(function(data) {
-                // data_list内の各オブジェクトを処理
-                $.each(data.data_list, function(index, value) {
-                    // オブジェクトのプロパティを取り出して表示
-                    $('#address-table-body').append('<p>lat: ' + value.lat + ', lon: ' + value.lon + ', label: ' + value.label + '</p>');
-                });
-            });
-        });
+                //Loadingアイコン削除
+                $('.spinner-border').remove();
+                var today = '<p>' + data.today.weather + '</p>' +
+                            '<img src=' + data.today.weather_img + ' alt="today_weather" width="100px" height="100px" class="ms-1 me-4">'
+                var tomorrow =  '<p>' + data.tomorrow.weather + '</p>'+
+                                '<img src=' + data.tomorrow.weather_img + ' alt="today_weather" width="100px" height="100px" class="ms-1 me-4">'
+                $('#getTodayWeather').append(today);
+                $('#getTomorrowWeather').append(tomorrow);
+            })
         
-
+            .fail(function(jqXHR, textStatus, errorThrown) {
+                //Loadingアイコン削除
+                $('.spinner-border').remove();
+                // エラーメッセージを表示
+                console.error("Error sending location data:", error);
+            });
+        
+        };
     </script>
 {% endblock %}

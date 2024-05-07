@@ -5,9 +5,6 @@ description = ""
 authors = ["UnchiFactory <153418263+UnchiFactory@users.noreply.github.com>"]
 readme = "README.md"
 
-packages = [
-    { include = "subs" },
-]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -22,7 +19,6 @@ geopy = "^2.4.1"
 beautifulsoup4 = "^4.12.3"
 xlrd = "^2.0.1"
 pydantic = "^2.7.1"
-django-betterforms = "^2.0.0"
 
 
 [build-system]

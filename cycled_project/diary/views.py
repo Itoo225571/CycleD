@@ -31,6 +31,26 @@ class HomeView(LoginRequiredMixin,generic.TemplateView):
     template_name="diary/home.html"
 home=HomeView.as_view()
 
+def ajax_location2weather(request):
+    if request.method == 'POST':
+        # print(request.POST)
+        latitude = float(request.POST.get('latitude',None))
+        longitude = float(request.POST.get('longitude',None))
+        weather=DiaryWeatherReport(latitude,longitude)
+        
+        # 位置情報を含むレスポンスを作成
+        response = {
+            'message': 'Location data received successfully.',
+            "current": weather.current,
+            "today":weather.today,
+            "tomorrow":weather.tomorrow,
+            # "location":weather.location_params,
+        }
+        
+        return JsonResponse(response)
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=400)
+
 """_____SignIn関係______"""
 class SigninView(LoginView):
     template_name="diary/signin.html"
@@ -155,24 +175,4 @@ class CalendarView(generic.TemplateView):
     pass
 calendar=CalendarView.as_view()
 
-"""______AJAX______"""
-def ajax_getLocation(request):
-    if request.method == 'POST':
-        # print(request.POST)
-        latitude = float(request.POST.get('latitude',None))
-        longitude = float(request.POST.get('longitude',None))
-        weather=DiaryWeatherReport(latitude,longitude)
-        
-        # 位置情報を含むレスポンスを作成
-        response = {
-            'message': 'Location data received successfully.',
-            "current": weather.current,
-            "today":weather.today,
-            "tomorrow":weather.tomorrow,
-            "location":weather.location_params,
-        }
-        
-        return JsonResponse(response)
-    else:
-        return JsonResponse({'error': 'Invalid request method.'}, status=400)
     
