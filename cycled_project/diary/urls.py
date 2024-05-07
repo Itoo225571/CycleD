@@ -17,7 +17,7 @@ urlpatterns = [
     path("",views.top,name="top"),
     path("home/",views.home,name="home"),
 
-    path("ajax/getLocation/",views.ajax_getLocation,name="ajax_getLocation"),
+    path("home/location2weather",views.ajax_location2weather,name="ajax_location2weather"),
     
     path("address_search/",views.address_search,name="address_search"),
     # path("address_choice/",views.address_choice,name="address_choice"),

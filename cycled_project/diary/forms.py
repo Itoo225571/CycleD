@@ -5,7 +5,6 @@ from django.contrib.auth.hashers import make_password,check_password
 from django import forms
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList
-from betterforms.multiform import MultiModelForm    #2つのフォームを1つにまとめる
 
 from diary.models import *
 
@@ -66,12 +65,6 @@ class AddressSelectForm(ModelForm):
     class Meta:
         model = Location
         exclude = ["user",]
-
-class AddressForm(MultiModelForm):
-    form_classes = {
-        "search":AddressSearchForm,
-        "select":AddressSelectForm,
-    }
 
 class UserForm(ModelForm):
     class Meta:
