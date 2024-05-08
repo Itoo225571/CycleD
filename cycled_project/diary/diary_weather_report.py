@@ -6,7 +6,7 @@ from django.templatetags.static import static
 class DiaryWeatherReport(WeatherReport):
 	def __init__(self, *args):
 		super().__init__(*args)
-		
+		# イメージ画像用のパスをweather_img内に書く
 		self.data["hourly"]["weather_img"] = [static('diary_weather_report/img/' + name) for name in self.data["hourly"]["weather_img"]]
 		self.data["daily"]["weather_img"] = [static('diary_weather_report/img/' + name) for name in self.data["daily"]["weather_img"]]
 		self.data["current"]["weather_img"] = [static('diary_weather_report/img/' + name) for name in self.data["current"]["weather_img"]]
