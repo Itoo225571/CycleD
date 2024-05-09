@@ -1,5 +1,5 @@
 from weather_report.weather_report import WeatherReport
-from subs.get_location.get_location_old import Location
+from get_location.get_location import *
 
 import requests
 import json
@@ -103,24 +103,28 @@ def get_addressCode(file_path = 'addressCode.json'):
 			
 
 if __name__=="__main__":
-	import difflib
-	str_list = ["東京都葛飾区新宿",
-				"東京都新宿区",
-				"東京都新宿区新宿",
-				"東新宿駅",
-				"東新宿駅",
-				"西武新宿駅",
-				"新宿御苑前駅",
-				"西新宿駅",
-				"新宿三丁目駅",
-				"西新宿五丁目駅",
-				"西新宿ＪＣＴ",
-				"新宿駅",
-				"東久留米"]
-	str1 = "新宿"
-	# for str2 in str_list:
-	# 	s = difflib.SequenceMatcher(None, str1, str2).ratio()
-	# 	print(s)
-	geo_request_url = 'https://get.geojs.io/v1/ip/geo.json'
-	geo_data = requests.get(geo_request_url).json()
-	pprint(geo_data)
+	import os
+	import datetime
+	import js2py
+	url = f"https://maps.gsi.go.jp/js/muni.js"
+	file_path = os.path.join(os.path.dirname(__file__), 'muniCodejson')
+	myfile = Path(file_path)
+	myfile.touch(exist_ok=True)
+	try:
+		with open(file_path, 'r') as file:
+			addressCode = json.load(file)
+			update_info = addressCode.get("update_info")
+			update_year = addressCode.get("update_year")
+	except json.decoder.JSONDecodeError:
+		update_info = None
+		update_year = None
+	if update_year != datetime.datetime.now().year:
+		# スクレイピング対象の URL にリクエストを送り JS を取得する
+		res = requests.get(url,timeout=3.5)
+		data_raw = f'var GSI = {{\n    MUNI_ARRAY: {{}}\n}};\n' + res.text
+		context = js2py.EvalJs()
+		context.execute(data_raw)
+		
+		js_object = context.GSI.MUNI_ARRAY
+		result_dict = js_object.to_dict()
+		print(result_dict["9213"])
