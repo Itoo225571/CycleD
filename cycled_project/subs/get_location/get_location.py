@@ -11,10 +11,23 @@ from io import BytesIO
 import datetime
 import os.path
 from difflib import SequenceMatcher
-
+from js2py import EvalJs
 from pprint import pprint
 
 EMPTY_VALUE = -1
+
+_prefectures = [
+		"東京都", "神奈川県", "大阪府", "愛知県", "埼玉県",
+		"千葉県", "兵庫県", "北海道", "福岡県", "静岡県",
+		"茨城県", "広島県", "京都府", "宮城県", "新潟県",
+		"長野県", "岐阜県", "群馬県", "栃木県", "岡山県",
+		"福島県", "三重県", "熊本県", "鹿児島県", "沖縄県",
+		"滋賀県", "山口県", "愛媛県", "奈良県", "長崎県",
+		"青森県", "岩手県", "石川県", "大分県", "宮崎県",
+		"山形県", "富山県", "秋田県", "香川県", "和歌山県",
+		"佐賀県", "山梨県", "福井県", "徳島県", "高知県",
+		"島根県", "鳥取県"
+	]
 
 def _agg_dup_col(df_: pd.core.frame.DataFrame) -> pd.core.frame.DataFrame:
     '''カラム名重複のあるデータフレームを，カラムの欠損を保管し合う+重複削除し，データフレームとして返す
@@ -43,19 +56,6 @@ def _have_word(handle, target):
 		return True
 	else:
 		return bool(handle in target)
-	
-_prefectures = [
-		"東京都", "神奈川県", "大阪府", "愛知県", "埼玉県",
-		"千葉県", "兵庫県", "北海道", "福岡県", "静岡県",
-		"茨城県", "広島県", "京都府", "宮城県", "新潟県",
-		"長野県", "岐阜県", "群馬県", "栃木県", "岡山県",
-		"福島県", "三重県", "熊本県", "鹿児島県", "沖縄県",
-		"滋賀県", "山口県", "愛媛県", "奈良県", "長崎県",
-		"青森県", "岩手県", "石川県", "大分県", "宮崎県",
-		"山形県", "富山県", "秋田県", "香川県", "和歌山県",
-		"佐賀県", "山梨県", "福井県", "徳島県", "高知県",
-		"島根県", "鳥取県"
-	]
 
 def _assign_prefecture_number(label):
 	for i, state in enumerate(_prefectures, 1):
@@ -121,7 +121,7 @@ def _get_addressCode():
 							# JSON をデコードして表示
 							addressCode = json.loads(json_str)
 							addressCode["update_info"] = date_info
-							addressCode["update_year"] = datetime.datetime.now().year
+							addressCode["update_year"] = str(datetime.datetime.now().year)
 							updated_json = json.dumps(addressCode,indent=4,ensure_ascii=False)
 
 							with open(file_path, 'w') as file:
@@ -132,8 +132,49 @@ def _get_addressCode():
 					else:
 						raise ValueError("Excelファイルが見つかりませんでした。")
 	return addressCode
-
+		
 _addressCode = _get_addressCode()
+
+def _get_muniCode():
+	file_path = os.path.join(os.path.dirname(__file__), 'muniCode.json')
+	myfile = Path(file_path)
+	myfile.touch(exist_ok=True)
+	try:
+		with open(file_path, 'r') as file:
+			muniCode = json.load(file)
+			update_info = muniCode.get("update_info")
+			update_year = muniCode.get("update_year")
+	except json.decoder.JSONDecodeError:
+		update_info = None
+		update_year = None
+
+	if update_year != datetime.datetime.now().year:
+		# スクレイピング対象の URL にリクエストを送り js を取得する
+		sleep(1)
+		res = requests.get('https://maps.gsi.go.jp/js/muni.js',timeout=3.5)
+
+		if update_info != str(datetime.datetime.strptime(res.headers['Last-Modified'], "%a, %d %b %Y %H:%M:%S GMT")):
+			data_raw = f'var GSI = {{\n    MUNI_ARRAY: {{}}\n}};\n' + res.text
+			context = EvalJs()
+			context.execute(data_raw)
+			js_object = context.GSI.MUNI_ARRAY
+			data_dict = js_object.to_dict()
+
+			muniCode = {}
+			for key, value in data_dict.items():
+				values = value.split(',')
+				muniCode[key] = {
+					"state_code": values[0],
+					"state": values[1],
+					"city": values[3],
+					}
+			muniCode["update_info"] = str(datetime.datetime.strptime(res.headers['Last-Modified'], "%a, %d %b %Y %H:%M:%S GMT"))
+			muniCode["update_year"] = str(datetime.datetime.now().year)
+			json_str = json.dumps(muniCode,indent=4,ensure_ascii=False)
+			with open(file_path, 'w') as file:
+				file.write(json_str)
+	return muniCode
+_muniCode = _get_muniCode()
 
 class AddressData(BaseModel):
 	search: str							#検索名
@@ -184,14 +225,14 @@ class LocationData(BaseModel):
 def geocode_gsi(place_name:str,to_json=False) -> list[LocationData]:
 	place_name = re.sub(r'　', ' ', place_name)
 	
-	params_gsi={
+	params={
 		"q":place_name
 	}
 	url = f"https://msearch.gsi.go.jp/address-search/AddressSearch"
 	sleep(1)
 	
 	try:
-		res = requests.get(url=url,params=params_gsi,timeout=5.0)
+		res = requests.get(url=url,params=params,timeout=5.0)
 	except requests.exceptions.Timeout:
 		raise(url+" get faild")
 	
@@ -230,8 +271,22 @@ def geocode_gsi(place_name:str,to_json=False) -> list[LocationData]:
 			geocode_list = [v.model_dump() for v in geocode_list]
 	return geocode_list
 
+def regeocode_gsi(lat:float,lon:float) -> LocationData:
+	url = f"https://maps.gsi.go.jp/js/muni.js"
+	params = {
+		"lat": lat,
+		"lon": lon,
+	}
+	sleep(1)
+	try:
+		res = requests.get(url=url,params=params,timeout=5.0)
+	except requests.exceptions.Timeout:
+		raise(url+" get faild")
+	if res.status_code != 200:
+		raise Exception(f"Error: {res.status_code}")
+	
+	
+
 if __name__=="__main__":
-	address = "新宿"
-	geo = geocode_gsi(address)
-	for l in geo:
-		print(l)
+	regeocode_nominatim(35.7247316,139.5812637)
+	regeocode_nominatim(35.7247316,139.0612637)

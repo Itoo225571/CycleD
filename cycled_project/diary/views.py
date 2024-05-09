@@ -78,7 +78,7 @@ class AddressSearchView(LoginRequiredMixin,generic.FormView):
         if "address-search-form" in self.request.POST:
             return AddressSearchForm
         elif "address-select-form" in self.request.POST:
-            return AddressForm
+            return AddressSelectForm
         return super().get_form_class()
 
     def get_success_url(self) -> str:
