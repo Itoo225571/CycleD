@@ -30,5 +30,5 @@ https://sozai.cman.jp/icon/
 
 ## 
 <h3>国土地理院API</h3>
-https://github.com/gsi-cyberjapan/gsimaps
-https://github.com/gsi-cyberjapan/gsimaps/blob/906e51941cde9ba6f83dbad4270b0bd93506e617/js/setting.js#L754
+<p>https://github.com/gsi-cyberjapan/gsimaps</p>
+<p>https://github.com/gsi-cyberjapan/gsimaps/blob/906e51941cde9ba6f83dbad4270b0bd93506e617/js/setting.js#L754</p>
