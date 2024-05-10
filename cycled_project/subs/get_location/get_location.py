@@ -11,7 +11,6 @@ from io import BytesIO
 import datetime
 import os.path
 from difflib import SequenceMatcher
-from js2py import EvalJs
 from pprint import pprint
 
 EMPTY_VALUE = -1
@@ -135,6 +134,9 @@ def _get_addressCode():
 		
 _addressCode = _get_addressCode()
 
+# muniCode = addressCode
+# addressCodeのもう一つの獲得方法
+# 使うには from js2py import EvalJs が必要
 def _get_muniCode():
 	file_path = os.path.join(os.path.dirname(__file__), 'muniCode.json')
 	myfile = Path(file_path)
@@ -174,11 +176,10 @@ def _get_muniCode():
 			with open(file_path, 'w') as file:
 				file.write(json_str)
 	return muniCode
-_muniCode = _get_muniCode()
 
 class AddressData(BaseModel):
-	search: str							#検索名
-	name: str            				#目的地
+	name: str =""           			#目的地
+	search: str	=""						#検索名
 	display: str =""
 	label: str = "" 					#一般表記
 	country: str = "日本"				#国名
@@ -199,8 +200,10 @@ class AddressData(BaseModel):
 		super().__init__(**data)
 		# コードがある場合
 		if self.code != EMPTY_VALUE:
-			self.state = _addressCode[str(self.code)].get("state")
-			self.city = _addressCode[str(self.code)].get("city")
+			place = _addressCode.get(str(self.code))
+			if place:
+				self.state = place.get("state")
+				self.city = place.get("city")
 			self.label = self.name + "（" + self.state + " " + self.city + "）"
 			self.fulladdress = self.country + self.state + self.city + self.locality + self.street + self.name
 			self.display = self.name
@@ -221,7 +224,7 @@ class LocationData(BaseModel):
     address: AddressData
     lat: float  # 緯度
     lon: float  # 経度
-
+	
 def geocode_gsi(place_name:str,to_json=False) -> list[LocationData]:
 	place_name = re.sub(r'　', ' ', place_name)
 	
@@ -264,6 +267,7 @@ def geocode_gsi(place_name:str,to_json=False) -> list[LocationData]:
 			}
 
 			if _have_word(place_name,address["name"]):
+				# ここでcodeは諸々に変換される
 				loc = LocationData(**location)
 				geocode_list.append(loc)
 		geocode_list = sorted(geocode_list, key=lambda x:(x.address.source,x.address.priority,x.address.matcher,x.address.code))
@@ -272,7 +276,7 @@ def geocode_gsi(place_name:str,to_json=False) -> list[LocationData]:
 	return geocode_list
 
 def regeocode_gsi(lat:float,lon:float) -> LocationData:
-	url = f"https://maps.gsi.go.jp/js/muni.js"
+	url = f"https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress"
 	params = {
 		"lat": lat,
 		"lon": lon,
@@ -284,9 +288,26 @@ def regeocode_gsi(lat:float,lon:float) -> LocationData:
 		raise(url+" get faild")
 	if res.status_code != 200:
 		raise Exception(f"Error: {res.status_code}")
-	
-	
+	data = res.json()
+	if data:
+		result = data.get("results")
+		code = result.get("muniCd",EMPTY_VALUE)
+		name = result.get("lv01Nm")
+		address = {
+			"name": name,
+			"code": code,
+		}
+		location = {
+			"lat": lat,
+			"lon": lon,
+			"address": address,
+		}
+		loc = LocationData(**location)
+	else:
+		raise Exception(f"Error data is empty")
+	return loc
 
 if __name__=="__main__":
-	regeocode_nominatim(35.7247316,139.5812637)
-	regeocode_nominatim(35.7247316,139.0612637)
+	geo = geocode_gsi("神")
+	# geo = regeocode_nominatim(35.7247316,139.0612637)
+	print(geo)
