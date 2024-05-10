@@ -8,6 +8,8 @@ from django.forms.utils import ErrorList
 
 from diary.models import *
 
+from subs.get_location.get_location import regeocode_gsi
+
 class SignupForm(UserCreationForm):
     '''     定義文      '''
     class Meta:
@@ -64,7 +66,23 @@ class AddressSearchForm(forms.Form):
 class AddressSelectForm(ModelForm):
     class Meta:
         model = Location
-        exclude = ["user",]
+        fields = ["lat","lon","state","display",]
+        widgets = {
+            'state': forms.TextInput(attrs={'required': False}),
+            'display': forms.TextInput(attrs={'required': False}),
+        }
+    def clean_state(self):
+        cleaned_data = super().clean()
+        state = cleaned_data.get('state')
+        if not state:
+            geo = regeocode_gsi(cleaned_data.get('lat'),cleaned_data.get('lon'))
+            return geo["address"]["state"]
+    def clean_display(self):
+        cleaned_data = super().clean()
+        display = cleaned_data.get('display')
+        if not display:
+            geo = regeocode_gsi(cleaned_data.get('lat'),cleaned_data.get('lon'))
+            return geo["address"]["display"]
 
 class UserForm(ModelForm):
     class Meta:

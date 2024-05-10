@@ -69,10 +69,10 @@ class SignupView(generic.CreateView):
 signup=SignupView.as_view()
 
 """______Address関係______"""
-class AddressSearchView(LoginRequiredMixin,generic.FormView):
-    template_name = "diary/address_search.html"
+class AddressView(LoginRequiredMixin,generic.FormView):
+    template_name = "diary/address.html"
     form_class = AddressSearchForm
-    success_url = reverse_lazy('diary:address_search')
+    success_url = reverse_lazy('diary:address')
 
     def get_form_class(self) -> type:
         if "address-search-form" in self.request.POST:
@@ -83,12 +83,13 @@ class AddressSearchView(LoginRequiredMixin,generic.FormView):
 
     def get_success_url(self) -> str:
         if "address-search-form" in self.request.POST:
-            return reverse_lazy('diary:address_search')
-        elif "address-select-form" in self.request.POST:
+            return reverse_lazy('diary:address')
+        elif "address-select-form" in self.request.POST :
             return reverse_lazy('diary:home')
         return super().get_success_url()
 
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        print(request.POST)
         if "address-search-form" in request.POST:
             form = AddressSearchForm(request.POST)
             
@@ -99,6 +100,7 @@ class AddressSearchView(LoginRequiredMixin,generic.FormView):
                 location_instance.save()
                 request.user.home = location_instance
                 request.user.save()
+
         else:
             form = self.get_form(self.form_class)
         
@@ -106,6 +108,7 @@ class AddressSearchView(LoginRequiredMixin,generic.FormView):
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 return self.address_search(form)
             return self.form_valid(form)
+        return self.form_invalid(form)
     
     def address_search(self,form):
         keyword = form.cleaned_data.get('keyword')
@@ -141,7 +144,9 @@ class AddressSearchView(LoginRequiredMixin,generic.FormView):
         return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
         # return self.render_to_response(response)
 
-address_search = AddressSearchView.as_view()
+address = AddressView.as_view()
+
+
 
 """______User関係______"""
 class UserProfileView(LoginRequiredMixin,generic.DetailView):
