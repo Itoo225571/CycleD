@@ -72,17 +72,18 @@
                     // data_list内の各オブジェクトを処理
                     $.each(data.data_list, function(index, value) {
                         // オブジェクトのプロパティを取り出して表示
-                        var html =  '<form method="post" class="search-select" id="search-select' + index + '">'+
-                                        '{% csrf_token %}'+
-                                        '<input type="hidden" name="lat" value="' + value.lat + '">'  +
-                                        '<input type="hidden" name="lon" value="' + value.lon + '">'  +
-                                        '<input type="hidden" name="state" value="' + value.address.state + '">'  +
-                                        '<input type="hidden" name="display" value="' + value.address.display + '">'  +
-                                        '<button type="submit" class="list-group-item list-group-item-action boder border-3 border-light rounded-3 m-1 p-2" name="address-select-form" >'+ 
-                                            '<img src="{% static 'diary/img/location.png' %}" alt="location" width="30px" height="30px" class="ms-1 me-4">' +
-                                            value.address.label +
-                                        '</button>'+
-                                    '</form>';   
+                        var html = `<form method="post" class="search-select" id="search-select${index}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="lat" value="${value.lat}">
+                                        <input type="hidden" name="lon" value="${value.lon}">
+                                        <input type="hidden" name="state" value="${value.address.state}">
+                                        <input type="hidden" name="display" value="${value.address.display}">
+                                        <button type="submit" class="list-group-item list-group-item-action boder border-3 border-light rounded-3 m-1 p-2" name="address-select-form">
+                                            <img src="{% static 'diary/img/location.png' %}" alt="location" width="30px" height="30px" class="ms-1 me-4">
+                                            ${value.address.label}
+                                        </button>
+                                    </form>`;
+                                    
                         $('#address-list').append(html);
                     
                     })
