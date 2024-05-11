@@ -8,10 +8,9 @@
 
 {% block content %}
     <h2>キーワードから地域を探す</h2>
-    <div class="get-current-position-form">
-        <form method="post" id="get-current-position-form" name="address-select-form">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-outline-primary m-1 p-2" >現在地から地域を取得する</button>
+    <div class="get-current-address-form">
+        <form method="post" id="get-current-address-form" name="get-current-address-form">
+            <button type="button" class="get-current-address-button btn btn-outline-primary m-1 p-2" id="get-current-address-button" >現在地から地域を取得する</button>
         </form>
     </div>
     
@@ -28,7 +27,7 @@
     <ul class="list-group" id="address-list"></ul>
 
     <nav aria-label="pagenator-aria">
-        <ul class="pagination"></ul>
+        <ul class="pagination" id="pagination"></ul>
     </nav>
     
 {% endblock content %}
@@ -62,7 +61,7 @@
                     headers: {
                         "X-CSRFToken": csrftoken  // CSRFトークンも必要な場合
                     },
-                    data: form.serialize() + "&" + form.prop("name") ,
+                    data: form.serialize() + "&" + form.attr("name"),
                     dataType: 'json',
                     timeout:15000,
                 })
@@ -83,12 +82,13 @@
                                             '<img src="{% static 'diary/img/location.png' %}" alt="location" width="30px" height="30px" class="ms-1 me-4">' +
                                             value.address.label +
                                         '</button>'+
-                                    '</form>';
-                        //var pagenation = ;
-                        
+                                    '</form>';   
                         $('#address-list').append(html);
-                        //$('#pagination').append(pagination);
+                    
                     })
+                    
+                    var pagination = "";
+                    $('#pagination').append(pagination);
                 })
 
                 .fail(function(jqXHR, textStatus, errorThrown) {
@@ -100,41 +100,42 @@
 
             });
             
-            $("#get-current-position-form").submit(function(event) {
-                // フォームのデフォルトの動作をキャンセル
-                event.preventDefault();
-                var csrftoken = getCookie('csrftoken');
-                var form = $(this);
+            $(".get-current-address-button").on('click', function(){
 
-                function successCallback(position) {
-                    var lat = position.coords.latitude;
-                    var lon = position.coords.longitude;
-                    var name = form.prop("name");
-                    $.ajax({
-                        method: form.prop("method"),
-                        url: form.prop("action"),
-                        headers: {
-                            "X-CSRFToken": csrftoken  // CSRFトークンも必要な場合
-                        },
-                        data:{
-                            "lat" : lat,
-                            "lon" : lon,
-                            [name] : "",
-                        },
-                        dataType: 'json',
-                        timeout:15000,
-                        success: function(response) {
-                            // 成功時の処理
-                            console.log("ajaxリクエストが成功しました");
-                        },
-                        error: function(xhr, status, error) {
-                            // エラー時の処理
-                            console.error("ajax送信に失敗しました:", error);
-                        }
-                    })
+                var csrftoken = getCookie('csrftoken');
+                var form = $(this).parents('form');
+
+                function successCallback(address) {
+                    var lat = address.coords.latitude;
+                    var lon = address.coords.longitude;
+
+                    $('<input>').attr({
+                        'type': 'hidden',
+                        'name': 'csrfmiddlewaretoken', // CSRFトークンの名前は 'csrfmiddlewaretoken' である必要があります
+                        'value': csrftoken
+                    }).appendTo(form);
+
+                    $('<input>').attr({
+                        'type': 'hidden',
+                        'name': 'lat',
+                        'value': lat
+                    }).appendTo(form);
+            
+                    $('<input>').attr({
+                        'type': 'hidden',
+                        'name': 'lon',
+                        'value': lon
+                    }).appendTo(form);
                     
+                    $('<input>').attr({
+                        'type': 'hidden',
+                        'name': form.prop("name"),
+                        'value': ""
+                    }).appendTo(form);
+
+                    form.submit();
                 }
-                
+
                 function errorCallback(error) {
                     console.error('位置情報の送信に失敗しました:', error.message);
                 }
