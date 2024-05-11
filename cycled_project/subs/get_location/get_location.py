@@ -178,9 +178,9 @@ def _get_muniCode():
 	return muniCode
 
 class AddressData(BaseModel):
-	name: str =""           			#目的地
-	search: str	=""						#検索名
-	display: str =""
+	name: str = ""           			#目的地
+	search: str	= ""						#検索名
+	display: str = ""
 	label: str = "" 					#一般表記
 	country: str = "日本"				#国名
 	state: str = ""         			#都道府県
@@ -206,7 +206,10 @@ class AddressData(BaseModel):
 				self.city = place.get("city")
 			self.label = self.name + "（" + self.state + " " + self.city + "）"
 			self.fulladdress = self.country + self.state + self.city + self.locality + self.street + self.name
-			self.display = self.name
+			if self.search == "":
+				self.display = self.city
+			else:
+				self.display = self.name
 		else:
 			for pre in _prefectures:
 				if pre in self.name:
@@ -281,7 +284,7 @@ def regeocode_gsi(lat:float,lon:float) -> LocationData:
 		"lat": lat,
 		"lon": lon,
 	}
-	sleep(1)
+	# sleep(1)
 	try:
 		res = requests.get(url=url,params=params,timeout=5.0)
 	except requests.exceptions.Timeout:
@@ -293,6 +296,8 @@ def regeocode_gsi(lat:float,lon:float) -> LocationData:
 		result = data.get("results")
 		code = result.get("muniCd",EMPTY_VALUE)
 		name = result.get("lv01Nm")
+		if name== '－':
+			name = ""
 		address = {
 			"name": name,
 			"code": code,
@@ -308,6 +313,6 @@ def regeocode_gsi(lat:float,lon:float) -> LocationData:
 	return loc
 
 if __name__=="__main__":
-	geo = geocode_gsi("神")
-	# geo = regeocode_nominatim(35.7247316,139.0612637)
+	# geo = geocode_gsi("神")
+	geo = regeocode_gsi(35.7247454,139.5812729)
 	print(geo)

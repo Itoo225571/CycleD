@@ -5,8 +5,8 @@ class Location(models.Model):
     # user = models.ForeignKey(User,on_delete=models.CASCADE)
     lat = models.FloatField()
     lon = models.FloatField()
-    state = models.CharField(max_length=128)
-    display = models.CharField(max_length=128)
+    state = models.CharField(max_length=128,blank=True)
+    display = models.CharField(max_length=128,blank=True)
 
 class User(AbstractUser):
     # username=models.CharField(max_length=128,verbose_name="user   name")

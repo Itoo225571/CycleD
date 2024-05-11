@@ -4,12 +4,13 @@ from django.http import HttpRequest, HttpResponse,JsonResponse
 from django.views import generic,View
 from django.urls import reverse_lazy
 from django.core.paginator import Paginator,PageNotAnInteger,EmptyPage
+from django.shortcuts import render
 
 from django.contrib.auth.views import LoginView,LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .diary_weather_report import DiaryWeatherReport
-from subs.get_location.get_location import geocode_gsi
+from subs.get_location.get_location import geocode_gsi,regeocode_gsi
 
 from .forms import *
 
@@ -78,75 +79,79 @@ class AddressView(LoginRequiredMixin,generic.FormView):
         if "address-search-form" in self.request.POST:
             return AddressSearchForm
         elif "address-select-form" in self.request.POST:
-            return AddressSelectForm
+            return LocationForm
+        elif "get-current-address-form" in self.request.POST:
+            return LocationCoordForm
         return super().get_form_class()
 
     def get_success_url(self) -> str:
         if "address-search-form" in self.request.POST:
             return reverse_lazy('diary:address')
-        elif "address-select-form" in self.request.POST :
+        elif "address-select-form" in self.request.POST or "get-current-address-form" in self.request.POST:
             return reverse_lazy('diary:home')
         return super().get_success_url()
 
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
-        print(request.POST)
         if "address-search-form" in request.POST:
             form = AddressSearchForm(request.POST)
+            if form.is_valid():
+                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return self.address_search(form)
+                return self.form_valid(form)
+            return self.form_invalid(form)
             
         elif "address-select-form" in request.POST:
-            form = AddressSelectForm(request.POST)
+            form = LocationForm(request.POST)
             if form.is_valid():
-                location_instance = form.save(commit=False)
-                location_instance.save()
-                request.user.home = location_instance
+                loc = form.save(commit=False)
+                loc.save()
+                request.user.home = loc
                 request.user.save()
-
-        else:
-            form = self.get_form(self.form_class)
+            else:
+                return self.form_invalid(form)
         
-        if form.is_valid():
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return self.address_search(form)
-            return self.form_valid(form)
-        return self.form_invalid(form)
-    
+        elif "get-current-address-form" in self.request.POST:
+            form = LocationCoordForm(request.POST)
+            if form.is_valid():
+                loc = form.save(commit=False)
+                lat = form.cleaned_data["lat"]
+                lon = form.cleaned_data["lon"]
+                geo = regeocode_gsi(lat,lon)
+                loc.state = geo.address.state
+                loc.display = geo.address.display
+
+                loc.save()
+                request.user.home = loc
+                request.user.save()
+            else:
+                return self.form_invalid(form)
+
+        # else:
+        #     form = self.get_form(self.form_class)
+        return self.form_valid(form)
+        
     def address_search(self,form):
         keyword = form.cleaned_data.get('keyword')
         geocode_data_list = geocode_gsi(keyword,to_json=True)
 
-        page_cnt = 13 #一画面あたり
+        page = 1
+        page_cnt = 8 #一画面あたり
         onEachSide = 3 #選択ページの両側
         onEnds = 2 #左右両端表示
-        paginator = Paginator(geocode_data_list,per_page=page_cnt)
-        page_number = self.request.GET.get('page', 1)
-        
-        try:
-            data_page = paginator.page(page_number)
-        except PageNotAnInteger:
-            data_page = paginator.page(1)
-        except EmptyPage:
-            data_page = paginator.page(paginator.num_pages)
 
-        # ページングされたデータのリストを JSON に変換
-        data_page_s = [data for data in data_page]
-        data_list = data_page.paginator.get_elided_page_range(page_number, on_each_side=onEachSide, on_ends=onEnds)
-        
+        paginator = Paginator(geocode_data_list,per_page=page_cnt)
+        data_p = paginator.get_page(page)
+        data_p_list = data_p.paginator.get_elided_page_range(page, on_each_side=onEachSide, on_ends=onEnds)
+
         response = {
-            "data_list":  geocode_data_list,  # ページングされたデータのリスト
-            # "data_page":  data_page,
-            # "number":data_page.number,
-            # "has_next": data_page.has_next(),  # 次のページがあるかどうか
-            # "has_previous": data_page.has_previous(),  # 前のページがあるかどうか
-            # "next_page_number": data_page.next_page_number() if data_page.has_next() else None,  # 次のページ番号
-            # "previous_page_number": data_page.previous_page_number() if data_page.has_previous() else None,  # 前のページ番号
-            # "total_pages": paginator.num_pages,  # 総ページ数
+            # "data_p_list":  data_p_list,  # ページングされたデータのリスト
+            # "data_p":  data_p,
+            "data_list": geocode_data_list,
         }
         return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
-        # return self.render_to_response(response)
+        # return render(self.request,self.template_name,response)
 
 address = AddressView.as_view()
-
-
 
 """______User関係______"""
 class UserProfileView(LoginRequiredMixin,generic.DetailView):
