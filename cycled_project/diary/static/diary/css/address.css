@@ -1,0 +1,39 @@
+.pagination-button {
+	background-color: #007bff;
+	border-color: #007bff;
+	color: #fff;
+	padding: .375rem .75rem;
+	font-size: 1rem;
+	line-height: 1.5;
+	border-radius: .25rem;
+}
+
+.paginationjs-pages ul {
+	list-style: none;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	}
+	
+.paginationjs-pages li:not(:first-child, :last-child) {
+		padding: .5em;
+		border: 1px solid #000;
+	}
+	
+.paginationjs-pages li {
+		margin-right: 1em;
+	}
+	
+.paginationjs-pages li a {
+		text-decoration: none;
+		color: #000;
+	}
+	
+.active {
+		background-color: #000;
+	}
+	
+.paginationjs-pages .active a {
+		color: #fff;
+	}
+
