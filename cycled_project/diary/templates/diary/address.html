@@ -24,11 +24,11 @@
         </div>
     </div>
 
-    <ul class="list-group" id="address-list"></ul>
+    <ul id="address-list-all-contents">
+        <div id="address-list"></div>
+    </ul>
 
-    <nav aria-label="pagenator-aria">
-        <ul class="pagination" id="pagination"></ul>
-    </nav>
+    <div class="pager" id="address-list-pager"></div>
     
 {% endblock content %}
 
@@ -39,8 +39,28 @@
 
 {% block extra_js %}
     <script src="{% static 'diary/js/getCookie.js' %}"></script>
+    <script src="{% static 'diary/js/pagination.min.js' %}">
 
     <script>
+        function template(dataArray){
+            return dataArray.map(function(data,index){
+                var html = 
+                    `<form method="post" class="search-select" id="search-select${index}">
+                        {% csrf_token %}
+                        <input type="hidden" name="lat" value="${data.lat}">
+                        <input type="hidden" name="lon" value="${data.lon}">
+                        <input type="hidden" name="state" value="${data.address.state}">
+                        <input type="hidden" name="display" value="${data.address.display}">
+                        <button type="submit" class="list-group-item list-group-item-action boder border-3 border-light rounded-3 m-1 p-2" name="address-select-form">
+                            <img src="{% static 'diary/img/location.png' %}" alt="location" width="30px" height="30px" class="ms-1 me-4">
+                            ${data.address.label}
+                        </button>
+                    </form>`;
+                console.log(data);
+                return html;
+            })
+        }
+
         $(document).ready(function(){
             $("#address-search-form").submit(function(event) {
                 // フォームのデフォルトの動作をキャンセル
@@ -69,27 +89,24 @@
                 .done(function(data) {
                     //Loadingアイコン削除
                     $('#address-loading').remove();
-                    // data_list内の各オブジェクトを処理
+                    
+                    var formDataArray = []; // フォームデータを格納する配列
                     $.each(data.data_list, function(index, value) {
-                        // オブジェクトのプロパティを取り出して表示
-                        var html = `<form method="post" class="search-select" id="search-select${index}">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="lat" value="${value.lat}">
-                                        <input type="hidden" name="lon" value="${value.lon}">
-                                        <input type="hidden" name="state" value="${value.address.state}">
-                                        <input type="hidden" name="display" value="${value.address.display}">
-                                        <button type="submit" class="list-group-item list-group-item-action boder border-3 border-light rounded-3 m-1 p-2" name="address-select-form">
-                                            <img src="{% static 'diary/img/location.png' %}" alt="location" width="30px" height="30px" class="ms-1 me-4">
-                                            ${value.address.label}
-                                        </button>
-                                    </form>`;
-                                    
-                        $('#address-list').append(html);
+                        var formData = value
+                        formDataArray.push(formData); // 配列にフォームデータを追加する
+                    });
                     
-                    })
-                    
-                    var pagination = "";
-                    $('#pagination').append(pagination);
+                    $('#address-list-pager').pagination({
+                        dataSource: formDataArray,
+                        pageSize: 8,
+                        pageRange: 3,
+                        ellipsisText: '...',
+                        prevText: 'Prev',
+                        nextText: 'Next',
+                        callback: function(data2,pagination){
+                            $('#address-list').html(template(data2));
+                        }
+                    });
                 })
 
                 .fail(function(jqXHR, textStatus, errorThrown) {
@@ -102,7 +119,6 @@
             });
             
             $(".get-current-address-button").on('click', function(){
-
                 var csrftoken = getCookie('csrftoken');
                 var form = $(this).parents('form');
 
