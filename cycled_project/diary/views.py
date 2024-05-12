@@ -134,22 +134,10 @@ class AddressView(LoginRequiredMixin,generic.FormView):
         keyword = form.cleaned_data.get('keyword')
         geocode_data_list = geocode_gsi(keyword,to_json=True)
 
-        page = 1
-        page_cnt = 8 #一画面あたり
-        onEachSide = 3 #選択ページの両側
-        onEnds = 2 #左右両端表示
-
-        paginator = Paginator(geocode_data_list,per_page=page_cnt)
-        data_p = paginator.get_page(page)
-        data_p_list = data_p.paginator.get_elided_page_range(page, on_each_side=onEachSide, on_ends=onEnds)
-
         response = {
-            # "data_p_list":  data_p_list,  # ページングされたデータのリスト
-            # "data_p":  data_p,
             "data_list": geocode_data_list,
         }
         return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
-        # return render(self.request,self.template_name,response)
 
 address = AddressView.as_view()
 
