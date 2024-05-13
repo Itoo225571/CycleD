@@ -11,7 +11,7 @@ from pprint import pprint
 # 使用にはlatitudeとlongitudeが必要<-Locationで取得可能
 class WeatherReport():
 	p = path.join(path.dirname(__file__), 'weather_category.json')
-	with open(p,mode="rt") as f:
+	with open(p,mode="rt", encoding='utf-8') as f:
 		weather_categories = json.load(f)
 	# 文字列から整数にキーを変換する
 	weather_categories = {int(key): value for key, value in weather_categories.items()}
