@@ -40,6 +40,7 @@
 {% block extra_js %}
     <script src="{% static 'diary/js/getCookie.js' %}"></script>
     <script src="{% static 'diary/js/pagination.js' %}"></script>
+    <script src="{% static 'diary/js/loading_overlay.js' %}"></script>
 
     <script>
         function template(dataArray){
@@ -69,7 +70,7 @@
                 $('#address-list').children().remove();
                 //Loadingアイコン表示
                 var loading = '<div class="spinner-border text-dark m-4" id="address-loading" role="status"></div> '
-                $('#address-list').append(loading);
+                $('#address-list').append(loading);   
                 // ここからAjaxリクエストの処理
                 var csrftoken = getCookie('csrftoken');
                 var form = $(this);
@@ -88,7 +89,7 @@
                 .done(function(data) {
                     //Loadingアイコン削除
                     $('#address-loading').remove();
-                    
+                
                     var formDataArray = []; // フォームデータを格納する配列
                     $.each(data.data_list, function(index, value) {
                         var formData = value
@@ -120,6 +121,8 @@
             $(".get-current-address-button").on('click', function(){
                 var csrftoken = getCookie('csrftoken');
                 var form = $(this).parents('form');
+                
+                start_loading();
 
                 function successCallback(address) {
                     var lat = address.coords.latitude;
@@ -148,14 +151,21 @@
                         'name': form.prop("name"),
                         'value': ""
                     }).appendTo(form);
-
+                    remove_loading();
                     form.submit();
                 }
 
                 function errorCallback(error) {
+                    remove_loading();
                     console.error('位置情報の送信に失敗しました:', error.message);
                 }
-                navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+                navigator.geolocation.getCurrentPosition(
+                    successCallback,
+                    errorCallback,
+                    {
+                        enableHighAccuracy: true,
+                        timeout : 5000
+                    });
             });
 
         });
