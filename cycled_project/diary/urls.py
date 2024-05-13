@@ -19,7 +19,9 @@ urlpatterns = [
 
     path("home/location2weather",views.ajax_location2weather,name="ajax_location2weather"),
     
-    path("address/",views.address,name="address"),
+    # path("address/",views.address,name="address"),
+	path("home/address",views.address,name= "address_home"),
+	path("diary/address",views.address,name="address_dairy" ),
     # path("address_choice/",views.address_choice,name="address_choice"),
     
     # path("address/",views.address,name="address"),
