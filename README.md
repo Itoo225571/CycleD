@@ -24,10 +24,6 @@ https://github.com/Nmomos/django-ajax/blob/master/templates/signup.html
 <h3>JavaScript部分</h3>
 https://web-designer.cman.jp/javascript_ref/others/gps/
 
-## 2024/5/4
-<h3>アイコン</h3>
-https://sozai.cman.jp/icon/
-
 ## 
 <h3>国土地理院API</h3>
 <p>https://github.com/gsi-cyberjapan/gsimaps</p>
