@@ -67,7 +67,7 @@ def _get_addressCode():
 	myfile = Path(file_path)
 	myfile.touch(exist_ok=True)
 	try:
-		with open(file_path, 'r') as file:
+		with open(file_path, 'r', encoding='utf-8') as file:
 			addressCode = json.load(file)
 			update_info = addressCode.get("update_info")
 			update_year = addressCode.get("update_year")
@@ -123,7 +123,7 @@ def _get_addressCode():
 							addressCode["update_year"] = str(datetime.datetime.now().year)
 							updated_json = json.dumps(addressCode,indent=4,ensure_ascii=False)
 
-							with open(file_path, 'w') as file:
+							with open(file_path, 'w', encoding='utf-8') as file:
 								file.write(updated_json)
 
 							# 1つのExcelファイルを見つけたらループを終了する
@@ -142,7 +142,7 @@ def _get_muniCode():
 	myfile = Path(file_path)
 	myfile.touch(exist_ok=True)
 	try:
-		with open(file_path, 'r') as file:
+		with open(file_path, 'r', encoding='utf-8') as file:
 			muniCode = json.load(file)
 			update_info = muniCode.get("update_info")
 			update_year = muniCode.get("update_year")
@@ -173,7 +173,7 @@ def _get_muniCode():
 			muniCode["update_info"] = str(datetime.datetime.strptime(res.headers['Last-Modified'], "%a, %d %b %Y %H:%M:%S GMT"))
 			muniCode["update_year"] = str(datetime.datetime.now().year)
 			json_str = json.dumps(muniCode,indent=4,ensure_ascii=False)
-			with open(file_path, 'w') as file:
+			with open(file_path, 'w', encoding='utf-8') as file:
 				file.write(json_str)
 	return muniCode
 

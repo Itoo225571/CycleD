@@ -51,7 +51,7 @@ def get_addressCode(file_path = 'addressCode.json'):
 	myfile = Path(file_path)
 	myfile.touch(exist_ok=True)
 	try:
-		with open(file_path, 'r') as file:
+		with open(file_path, 'r', encoding='utf-8') as file:
 			
 			update_data = json.load(file).get("update")
 	except json.decoder.JSONDecodeError:
@@ -93,7 +93,7 @@ def get_addressCode(file_path = 'addressCode.json'):
 						json_data_new["update"]=date_info
 						updated_json = json.dumps(json_data_new,indent=4,ensure_ascii=False)
 
-						with open(file_path, 'w') as file:
+						with open(file_path, 'w', encoding='utf-8') as file:
 							file.write(updated_json)
 
 						# 1つのExcelファイルを見つけたらループを終了する
@@ -111,7 +111,7 @@ if __name__=="__main__":
 	myfile = Path(file_path)
 	myfile.touch(exist_ok=True)
 	try:
-		with open(file_path, 'r') as file:
+		with open(file_path, 'r', encoding='utf-8') as file:
 			addressCode = json.load(file)
 			update_info = addressCode.get("update_info")
 			update_year = addressCode.get("update_year")
