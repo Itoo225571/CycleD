@@ -1,20 +1,15 @@
 .paginationjs-pages {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    list-style: none;
     padding: 0;
-	flex-wrap: wrap; /* 小さな画面で改行されるようにする */
-	width: 100%; /* ページネーション全体の幅を100%に設定 */
+    width: 100%; /* ページネーション全体の幅を100%に設定 */
     margin: 0 auto; /* ページネーションを中央に配置 */
     overflow: hidden; /* 横方向のオーバーフローを非表示にする */
 }
 
 .paginationjs-pages ul {
-	list-style: none;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .paginationjs-pages li {
@@ -22,7 +17,7 @@
 }
 
 .paginationjs-pages li:not(:first-child, :last-child) {
-	padding: .5em;
+    padding: .5em;
 }
 
 .paginationjs-pages li a {
@@ -31,7 +26,7 @@
     padding: 0.5rem 0.75rem; /* Bootstrapのボタンのパディングに合わせる */
     border: 1px solid #dee2e6; /* Bootstrapのボタンのボーダーに合わせる */
     border-radius: 0.25rem; /* Bootstrapのボタンの角丸に合わせる */
-	cursor: pointer;
+    cursor: pointer;
 }
 
 .paginationjs-pages .active a {
@@ -43,4 +38,15 @@
 .paginationjs-pages li a:hover {
     background-color: #bdbdbd; /* ボタンの背景色を変更 */
     color: #007bff; /* ボタンのテキスト色を変更 */
+}
+
+/* 画面の幅が768px以下の場合 */
+@media (max-width: 768px) {
+    .paginationjs-pages li {
+        margin-right: auto;
+    }
+    .paginationjs-pages li a {
+        padding: 0.3rem 0.5rem; /* ボタンのパディングを小さくする */
+        font-size: 0.8rem; /* フォントサイズを小さくする */
+    }
 }
