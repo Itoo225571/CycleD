@@ -151,8 +151,9 @@
                         'name': form.prop("name"),
                         'value': ""
                     }).appendTo(form);
-                    remove_loading();
                     form.submit();
+                    remove_loading();
+                    
                 }
 
                 function errorCallback(error) {
