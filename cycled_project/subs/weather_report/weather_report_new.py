@@ -10,11 +10,15 @@ from pydantic import BaseModel
 from pprint import pprint
 
 class WeatherData(BaseModel):
+    time: datetime
     tempareture: float
     humid: int
     code: int                       #weather_code
     wind_speed:float
     wind_direction: int
+
+    weather_str: str = ""
+    wind_direction_str: str = ""
 
 def _get_weather_categories():
     p = path.join(path.dirname(__file__), 'weather_category.json')
