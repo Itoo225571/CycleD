@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+	'corsheaders',
     
     "diary.apps.DiaryConfig",
     "django_bootstrap5",#Bootstrap5追加
@@ -57,6 +58,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     
     "debug_toolbar.middleware.DebugToolbarMiddleware",#Debug-toolbar
+	'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = "CycleD.urls"
