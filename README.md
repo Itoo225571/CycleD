@@ -30,3 +30,7 @@ https://web-designer.cman.jp/javascript_ref/others/gps/
 <p>https://github.com/gsi-cyberjapan/gsimaps/blob/906e51941cde9ba6f83dbad4270b0bd93506e617/js/setting.js#L754</p>
 <h3>Nominatim API</h3>
 https://nominatim.org/release-docs/latest/api/Reverse/#example-with-formatgeojson
+
+## 2024/5/15
+<h3>Pydantic</h3>
+https://zenn.dev/gdtypk/articles/pydantic-merit-and-thoughts
