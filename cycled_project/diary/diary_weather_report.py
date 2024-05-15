@@ -1,5 +1,5 @@
 # from subs.weather_report.weather_report import WeatherReport
-from subs.weather_report.weather_report import WeatherReport
+from cycled_project.subs.weather_report.weather_report_old import WeatherReport
 
 from django.templatetags.static import static
 

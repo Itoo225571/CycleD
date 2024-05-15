@@ -3,151 +3,109 @@ import requests
 import pandas as pd
 import json
 from os import path
-from decimal import Decimal, ROUND_HALF_UP
-from datetime import datetime,timedelta
+from datetime import datetime,timedelta,timezone,date
+from pydantic import BaseModel
+from typing import List
 
 from pprint import pprint
 
-# 使用にはlatitudeとlongitudeが必要<-Locationで取得可能
-class WeatherReport():
-	p = path.join(path.dirname(__file__), 'weather_category.json')
-	with open(p,mode="rt", encoding='utf-8') as f:
-		weather_categories = json.load(f)
-	# 文字列から整数にキーを変換する
-	weather_categories = {int(key): value for key, value in weather_categories.items()}
-	
-	def __init__(self,latitude,longitude):
-		self._params={
-			"latitude": latitude,
-			"longitude": longitude,
-			"current": ["temperature_2m", "relative_humidity_2m", "apparent_temperature", "precipitation", "weather_code", "wind_speed_10m", "wind_direction_10m"],
-			"hourly": ["temperature_2m", "relative_humidity_2m", "apparent_temperature", "precipitation_probability", "weather_code", "wind_speed_10m", "wind_direction_10m",],
-			"daily": ["weather_code", "temperature_2m_max", "temperature_2m_min", "apparent_temperature_max", "apparent_temperature_min", "sunrise", "sunset", "precipitation_probability_max",],
-			"timezone": "Asia/Tokyo"
-			}
+def _get_weather_categories():
+    p = path.join(path.dirname(__file__), 'weather_category.json')
+    with open(p,mode="rt", encoding='utf-8') as f:
+        weather_categories = json.load(f)
+    return weather_categories
 
-		url = f"https://api.open-meteo.com/v1/forecast?{self._params}"
-		response = requests.get(url,timeout=3.5,params=self._params)
-		self.data=response.json()
-		
-		self.data["hourly"]["time"]=self.decode_time(self.data["hourly"]["time"])
-		self.data["daily"]["time"]=self.decode_time(self.data["daily"]["time"])
-		self.data["current"]["time"]=self.decode_time(self.data["current"]["time"])
+_weather_category = _get_weather_categories()
 
-		self.data["hourly"]["weather"],self.data["hourly"]["weather_img"]=self.decode_weather_category(self.data["hourly"]["weather_code"])
-		self.data["daily"]["weather"],self.data["daily"]["weather_img"]=self.decode_weather_category(self.data["daily"]["weather_code"])
-		self.data["current"]["weather"],self.data["current"]["weather_img"]=self.decode_weather_category(self.data["current"]["weather_code"])
+class WeatherDataHourly(BaseModel):
+    """___必須項目___"""
+    time: datetime
+    temperature_2m: float
+    relative_humidity_2m:int            #湿度
+    apparent_temperature: float         #見かけの温度
+    precipitation_probability: int      #降水確率
+    weather_code: int
+    wind_speed_10m: float 
+    wind_direction_10m: int
+    """___上から導く項目____"""
+    weather: str = ""
+    img_file_name: str = ""
+    within48: bool = False
 
-		self.data["hourly"]["wind_direction_10m_ja"]=self.en_to_ja_direction(self.data["hourly"]["wind_direction_10m"])
-		self.data["current"]["wind_direction_10m_ja"]=self.en_to_ja_direction(self.data["current"]["wind_direction_10m"])
+    def __init__(self, **data):
+        super().__init__(**data) 
+        data = _weather_category.get(str(self.weather_code))
+        self.weather = data.get("description")
+        self.img_file_name =  data.get("img")
+        current = datetime.now(timezone(timedelta(hours=9))).replace(tzinfo=None)
+        if self.time - current <= timedelta(hours=48) and self.time - current >= timedelta(hours=-1):
+            self.within48 = True
 
-	"""__コード解読用メソッド__"""
-	def decode_weather_category(self,codes):
-		descriptions=[]
-		imgs=[]
-		if isinstance(codes,int):
-			codes=[codes]
-		for code in codes:
-			weather=self.weather_categories.get(code, None)
-			descriptions.append(weather["description"])
-			p = weather["img"]
-			imgs.append(p)
-		return descriptions,imgs
-	
-	def decode_time(self,times):
-		new_times=[]
-		if isinstance(times,str):
-			times=[times]
-		for time in times:
-			if "T" in time:
-				new_times.append(datetime.strptime(time, '%Y-%m-%dT%H:%M'))
-			else:
-				tdatetime = datetime.strptime(time, '%Y-%m-%d')
-				new_times.append(tdatetime.date())
-		return new_times
-	
-	"""__翻訳用__"""
-	def en_to_ja_weather(self,weather):
-		weather_dict = {
-		"Clear": "快晴",
-		"Mainly_Sunny":"晴れ",
-		"Partly_Cloudy":"一部曇り",
-		"Cloudy": "曇り",
-		"Mist": "霧",
-		"Light_Rain": "小雨",
-		"Rain": "雨",
-		"Snow": "雪",
-		"Showers": "時々雨",
-		"Snow_Showers": "時々雪",
-		"Thunderstorm": "雷"
-		}
-		new_weathers=[]
-		if isinstance(weather,list):
-			new_weathers.append(weather_dict.get(weather,None))
-		elif isinstance(weather,str):
-			return weather_dict.get(weather, None)
-		return new_weathers
-	
-	def en_to_ja_direction(self,azimuth):
-		# 16方位の方角を定義する
-		directions = ['北', '北北東','北東', '東北東',
-					'東', '東南東', '南東', '南南東',
-					'南', '南南西', '南西', '西南西',
-					'西', '西北西', '北西', '北北西',
-					'北'
-					]
-		# Decimalモジュールで小数第一位を四捨五入
-		dirs=[]
-		if isinstance(azimuth,list):
-			for azi in azimuth:
-				directions_index = Decimal(azi / 22.5).quantize(Decimal('1.'), rounding=ROUND_HALF_UP)
-				dirs.append(directions[int(directions_index)])
-		elif isinstance(azimuth,int):
-			directions_index = Decimal(azimuth / 22.5).quantize(Decimal('1.'), rounding=ROUND_HALF_UP)
-			return directions[int(directions_index)]
-		return dirs
+class WeatherDataDaily(BaseModel):
+    time: date
+    weather_code: int
+    temperature_2m_max: float
+    temperature_2m_min: float
+    apparent_temperature_max: float
+    apparent_temperature_min: float
+    sunrise: datetime
+    sunset: datetime
+    wind_speed_10m_max: float
+    wind_gusts_10m_max: float
+    wind_direction_10m_dominant: int
+    """___上から導く項目____"""
+    weather: str = ""
+    img_file_name: str = ""
+        
+    def __init__(self, **data):
+        super().__init__(**data) 
+        data = _weather_category.get(str(self.weather_code))
+        self.weather = data.get("description")
+        self.img_file_name =  data.get("img")
+        current = datetime.now(timezone(timedelta(hours=9))).replace(tzinfo=None)
+        
+class WeatherData(BaseModel):
+    lat: float
+    lon: float
+    hourly: List[WeatherDataHourly]
+    today: WeatherDataDaily
+    tomorrow: WeatherDataDaily
+    
+def get_weather(lat,lon):
+    params = {
+        "latitude": lat,
+        "longitude": lon,
+        "hourly": ["temperature_2m", "relative_humidity_2m", "apparent_temperature", "precipitation_probability", "precipitation", "rain", "showers", "snowfall", "weather_code", "wind_speed_10m", "wind_speed_80m", "wind_speed_120m", "wind_speed_180m", "wind_direction_10m", "wind_direction_80m", "wind_direction_120m", "wind_direction_180m", "wind_gusts_10m", "temperature_80m", "temperature_120m", "temperature_180m"],
+        "daily": ["weather_code", "temperature_2m_max", "temperature_2m_min", "apparent_temperature_max", "apparent_temperature_min", "sunrise", "sunset", "wind_speed_10m_max", "wind_gusts_10m_max", "wind_direction_10m_dominant"],
+        "timezone": "Asia/Tokyo",
+    }
+    url = f"https://api.open-meteo.com/v1/forecast"
+    response = requests.get(url,params,timeout=3.5)
+    data_json = response.json()
+    
+    df_hourly = pd.DataFrame(data=data_json["hourly"])
+    hourly_list = []
+    for index, row in df_hourly.iterrows():
+        row_dict = row.to_dict()
+        wData = WeatherDataHourly(**row_dict)
+        if wData.within48:
+            hourly_list.append(wData)
+            
+    df_daily = pd.DataFrame(data=data_json["daily"])
+    data_today = df_daily.iloc[0]
+    data_tomorrow = df_daily.iloc[1]
+    today = WeatherDataDaily(**data_today)
+    tomorrow = WeatherDataDaily(**data_tomorrow)
+    
+    weather_data_param = {
+        "lat": lat,
+        "lon": lon,
+        "hourly": hourly_list,
+        "today": today,
+        "tomorrow": tomorrow,
+    }
+    return WeatherData(**weather_data_param)
 
-	"""__デバッグ用__"""
-	def to_csv(self):
-		df_hourly = pd.DataFrame(index=self.data["hourly"]["time"],data=self.data["hourly"]).drop(columns=["time"])
-		df_daily = pd.DataFrame(index=self.data["daily"]["time"],data=self.data["daily"]).drop(columns=["time"])
-		df_current=pd.DataFrame(index=[self.data["current"]["time"]],data=self.data["current"]).drop(columns=["time"])
-
-		df_hourly.to_csv("hourly.csv")
-		df_daily.to_csv("daily.csv")
-		df_current.to_csv("current.csv")
-
-	"""__表示用__"""
-	@property
-	def current(self):
-		return self.data.get("current")
-
-	@property
-	def today(self):
-		today_date = datetime.today().date()
-		index = self.data["daily"]["time"].index(today_date) if today_date in self.data["daily"]["time"] else None
-		if index is not None:
-			weather = {}
-			for key, values in self.data["daily"].items():
-				weather[key] = values[index]
-			return weather
-		else:
-			return None
-
-	@property
-	def tomorrow(self):
-		tomorrow_date = datetime.today().date() + timedelta(days=1)
-		index = self.data["daily"]["time"].index(tomorrow_date) if tomorrow_date in self.data["daily"]["time"] else None
-		if index is not None:
-			weather = {}
-			for key, values in self.data["daily"].items():
-				weather[key] = values[index]
-			return weather
-		else:
-			return None
-
-
-if __name__=="__main__":    	
-	w1=WeatherReport(35.7247316,139.5812637)
-	w1.to_csv()
-	pprint(w1.today)
+if __name__ == "__main__":
+    data = get_weather(35.7247316,139.5812637)
+    date = datetime.now()
