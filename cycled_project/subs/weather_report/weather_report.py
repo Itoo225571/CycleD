@@ -6,6 +6,7 @@ from os import path
 from datetime import datetime,timedelta,timezone,date
 from pydantic import BaseModel
 from typing import List
+from pathlib import Path
 
 from pprint import pprint
 
@@ -17,33 +18,36 @@ def _get_weather_categories():
 
 _weather_category = _get_weather_categories()
 
-class WeatherDataHourly(BaseModel):
-    """___必須項目___"""
+class WeatherDataBase(BaseModel):
     time: datetime
-    temperature_2m: float
-    relative_humidity_2m:int            #湿度
-    apparent_temperature: float         #見かけの温度
-    precipitation_probability: int      #降水確率
     weather_code: int
-    wind_speed_10m: float 
-    wind_direction_10m: int
     """___上から導く項目____"""
     weather: str = ""
     img_file_name: str = ""
-    within48: bool = False
-
-    def __init__(self, **data):
+    img_file_path: str = ""
+    
+    def __init__(self,dir_name=None,**data):
         super().__init__(**data) 
         data = _weather_category.get(str(self.weather_code))
         self.weather = data.get("description")
         self.img_file_name =  data.get("img")
-        current = datetime.now(timezone(timedelta(hours=9))).replace(tzinfo=None)
-        if self.time - current <= timedelta(hours=48) and self.time - current >= timedelta(hours=-1):
-            self.within48 = True
+        if dir_name != None and isinstance(dir_name,str):
+            self.img_file_path = (Path(dir_name) / self.img_file_name).as_posix()
+        else:
+            self.img_file_path = (Path(__file__).parent / Path('./img') / self.img_file_name).as_posix()
 
-class WeatherDataDaily(BaseModel):
-    time: date
-    weather_code: int
+class WeatherDataHourly(WeatherDataBase):
+    """___必須項目___"""
+    temperature_2m: float
+    relative_humidity_2m:int            #湿度
+    apparent_temperature: float         #見かけの温度
+    precipitation_probability: int      #降水確率
+    wind_speed_10m: float 
+    wind_direction_10m: int
+    """___設定___"""
+    time_range: int = 48
+
+class WeatherDataDaily(WeatherDataBase):
     temperature_2m_max: float
     temperature_2m_min: float
     apparent_temperature_max: float
@@ -53,16 +57,6 @@ class WeatherDataDaily(BaseModel):
     wind_speed_10m_max: float
     wind_gusts_10m_max: float
     wind_direction_10m_dominant: int
-    """___上から導く項目____"""
-    weather: str = ""
-    img_file_name: str = ""
-        
-    def __init__(self, **data):
-        super().__init__(**data) 
-        data = _weather_category.get(str(self.weather_code))
-        self.weather = data.get("description")
-        self.img_file_name =  data.get("img")
-        current = datetime.now(timezone(timedelta(hours=9))).replace(tzinfo=None)
         
 class WeatherData(BaseModel):
     lat: float
@@ -71,7 +65,7 @@ class WeatherData(BaseModel):
     today: WeatherDataDaily
     tomorrow: WeatherDataDaily
     
-def get_weather(lat,lon):
+def get_weather(lat,lon,dir_name= None):
     params = {
         "latitude": lat,
         "longitude": lon,
@@ -87,15 +81,16 @@ def get_weather(lat,lon):
     hourly_list = []
     for index, row in df_hourly.iterrows():
         row_dict = row.to_dict()
-        wData = WeatherDataHourly(**row_dict)
-        if wData.within48:
+        wData = WeatherDataHourly(dir_name,**row_dict)
+        current = datetime.now(timezone(timedelta(hours=9))).replace(tzinfo=None)
+        if wData.time - current <= timedelta(hours=wData.time_range) and wData.time - current >= timedelta(hours=-1):
             hourly_list.append(wData)
             
     df_daily = pd.DataFrame(data=data_json["daily"])
     data_today = df_daily.iloc[0]
     data_tomorrow = df_daily.iloc[1]
-    today = WeatherDataDaily(**data_today)
-    tomorrow = WeatherDataDaily(**data_tomorrow)
+    today = WeatherDataDaily(dir_name,**data_today)
+    tomorrow = WeatherDataDaily(dir_name,**data_tomorrow)
     
     weather_data_param = {
         "lat": lat,
