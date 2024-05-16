@@ -69,11 +69,12 @@
                 timeout:15000,
             })
         
-            .done(function(data) {
+            .done(function(data_raw) {
                 //Loadingアイコン削除
                 $('.spinner-border').remove();
-                var today =     '<img src=' + data.today.weather_img + ' alt="today_weather" width="100px" height="100px" class="ms-1 me-4">'
-                var tomorrow =  '<img src=' + data.tomorrow.weather_img + ' alt="today_weather" width="100px" height="100px" class="ms-1 me-4">'
+                var data = data_raw.weather
+                var today =     '<img src=' + data.today.img_file_path + ' alt="today_weather" width="100px" height="100px" class="ms-1 me-4">'
+                var tomorrow =  '<img src=' + data.tomorrow.img_file_path + ' alt="today_weather" width="100px" height="100px" class="ms-1 me-4">'
                 $('#getTodayWeather').append(today);
                 $('#getTomorrowWeather').append(tomorrow);
             })

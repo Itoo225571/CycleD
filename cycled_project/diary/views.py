@@ -5,12 +5,14 @@ from django.views import generic,View
 from django.urls import reverse_lazy
 from django.core.paginator import Paginator,PageNotAnInteger,EmptyPage
 from django.shortcuts import render
+from django.templatetags.static import static
 
 from django.contrib.auth.views import LoginView,LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .diary_weather_report import DiaryWeatherReport
+# from .diary_weather_report import DiaryWeatherReport
 from subs.get_location.get_location import geocode_gsi,regeocode_gsi
+from subs.weather_report.weather_report import get_weather
 
 from .forms import *
 
@@ -37,14 +39,15 @@ def ajax_location2weather(request):
         # print(request.POST)
         latitude = float(request.POST.get('latitude',None))
         longitude = float(request.POST.get('longitude',None))
-        weather=DiaryWeatherReport(latitude,longitude)
+        # weather=DiaryWeatherReport(latitude,longitude)
+        img_path = static('diary_weather_report/img/')
+        
+        data = get_weather(latitude,longitude,dir_name = img_path)
         
         # 位置情報を含むレスポンスを作成
         response = {
             'message': 'Location data received successfully.',
-            "current": weather.current,
-            "today":weather.today,
-            "tomorrow":weather.tomorrow,
+            "weather": data.model_dump(),
             # "location":weather.location_params,
         }
         
