@@ -11,14 +11,13 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import environ
-import os
 
 #プロジェクトのベースフォルダを示す（今回の場合、/workspaces/MyDjango/CycleD_project）
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # .envファイルを読み込む
-env = environ.Env()
-env.read_env(os.path.join(BASE_DIR, '.env'))
+env =environ.Env()
+env.read_env(BASE_DIR.joinpath('.env'))
 
 #media用
 MEDIA_ROOT=BASE_DIR.joinpath("media")
