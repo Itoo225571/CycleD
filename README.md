@@ -34,3 +34,7 @@ https://nominatim.org/release-docs/latest/api/Reverse/#example-with-formatgeojso
 ## 2024/5/15
 <h3>Pydantic</h3>
 https://zenn.dev/gdtypk/articles/pydantic-merit-and-thoughts
+
+## 2024/5/17
+<h3>YahooジオコーディングAPI</h3>
+https://developer.yahoo.co.jp/webapi/map/openlocalplatform/v1/geocoder.html
