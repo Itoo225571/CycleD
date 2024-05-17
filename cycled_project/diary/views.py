@@ -23,7 +23,7 @@ class BaseView(generic.TemplateView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["user"]=request.user
-        context["home"] = request.user.home
+        # context["home"] = request.user.home
         return context
 
 class TopView(generic.TemplateView):
@@ -108,6 +108,8 @@ class AddressView(LoginRequiredMixin,generic.FormView):
             if form.is_valid():
                 loc = form.save(commit=False)
                 loc.save()
+                if request.user.home:
+                    request.user.home.delete()
                 request.user.home = loc
                 request.user.save()
             else:
@@ -117,11 +119,15 @@ class AddressView(LoginRequiredMixin,generic.FormView):
             form = LocationCoordForm(request.POST)
             if form.is_valid():
                 loc = form.save(commit=False)
+                
                 lat = form.cleaned_data["lat"]
                 lon = form.cleaned_data["lon"]
                 geo = regeocode_gsi(lat,lon)
                 loc.state = geo.address.state
                 loc.display = geo.address.display
+                
+                if request.user.home:
+                    request.user.home.delete()
 
                 loc.save()
                 request.user.home = loc
@@ -135,10 +141,10 @@ class AddressView(LoginRequiredMixin,generic.FormView):
         
     def address_search(self,form):
         keyword = form.cleaned_data.get('keyword')
-        geocode_data_list = geocode_gsi(keyword,to_json=True)
+        geocode_data_list = geocode_gsi(keyword)
 
         response = {
-            "data_list": geocode_data_list,
+            "data_list": geocode_data_list.model_dump(),
         }
         return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
 

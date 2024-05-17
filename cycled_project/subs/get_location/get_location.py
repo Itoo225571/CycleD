@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,RootModel
+from typing import List
 from time import sleep
 import requests
 import json
@@ -11,6 +12,7 @@ from io import BytesIO
 import datetime
 import os.path
 from difflib import SequenceMatcher
+
 from pprint import pprint
 
 EMPTY_VALUE = -1
@@ -99,8 +101,8 @@ def _get_addressCode():
 							excel_url = urljoin(f"https://www.soumu.go.jp",excel_url)
 
 							# Excelファイルをダウンロード
-							response = requests.get(excel_url)
-							input_book = pd.ExcelFile(BytesIO(response.content))
+							res = requests.get(excel_url)
+							input_book = pd.ExcelFile(BytesIO(res.content))
 							all_sheet_data = []
 							for sheet_name in input_book.sheet_names:
 								sheet_data = input_book.parse(sheet_name)
@@ -179,7 +181,7 @@ def _get_muniCode():
 
 class AddressData(BaseModel):
 	name: str = ""           			#目的地
-	search: str	= ""						#検索名
+	search: str	= ""					#検索名
 	display: str = ""
 	label: str = "" 					#一般表記
 	country: str = "日本"				#国名
@@ -202,8 +204,10 @@ class AddressData(BaseModel):
 		if self.code != EMPTY_VALUE:
 			place = _addressCode.get(str(self.code))
 			if place:
-				self.state = place.get("state")
-				self.city = place.get("city")
+				self.state = place.get("state","")
+				self.city = place.get("city","")
+				if self.city is None:
+					self.city = ""
 			self.label = self.name + "（" + self.state + " " + self.city + "）"
 			self.fulladdress = self.country + self.state + self.city + self.locality + self.street + self.name
 			if self.search == "":
@@ -227,8 +231,11 @@ class LocationData(BaseModel):
     address: AddressData
     lat: float  # 緯度
     lon: float  # 経度
+    
+class LocationDataList(RootModel[list[LocationData]]):
+    pass
 	
-def geocode_gsi(place_name:str,to_json=False) -> list[LocationData]:
+def geocode_gsi(place_name:str):
 	place_name = re.sub(r'　', ' ', place_name)
 	
 	params={
@@ -236,16 +243,46 @@ def geocode_gsi(place_name:str,to_json=False) -> list[LocationData]:
 	}
 	url = f"https://msearch.gsi.go.jp/address-search/AddressSearch"
 	sleep(1)
-	
+
 	try:
-		res = requests.get(url=url,params=params,timeout=5.0)
+		headers = {
+			'Cache-Control': 'no-cache'
+		}
+		res = requests.get(url,params,timeout=5.0,headers=headers)
+		res.raise_for_status()  # HTTPエラーチェック
+		if not res.text.strip():
+			count = 5
+			for i in range(count) :
+				print(i)
+				sleep((i+1)*4)
+				res = requests.get(url,params,timeout=5.0)
+				res.raise_for_status()  # HTTPエラーチェック
+				if res.text.strip():
+					break
+				if i >= count-1 :
+					print(res.status_code)        # HTTPステータスコード
+					print(res.headers)            # レスポンスヘッダー
+					print(res.text)               # レスポンスの本文を文字列として取得
+					print(res.content)            # レスポンスの本文をバイナリとして取得
+					print(res.url)                # リクエストのURL
+					print(res.cookies)            # クッキー
+					print(res.elapsed)    
+					print(f"History: {res.history}")
+					raise ValueError(f"レスポンスが空です: {res.url}")
+		
+		try:
+			data_list = res.json()
+		except requests.exceptions.JSONDecodeError:
+			raise ValueError(f"JSONデコードエラー: {res.text}")  # デバッグのためにレスポンスを出力
+			
 	except requests.exceptions.Timeout:
-		raise(url+" get faild")
-	
+		raise ValueError("リクエストがタイムアウトしました。")
+	except requests.RequestException as e:
+		raise ValueError(f"リクエストエラー: {e}")
+
 	if res.status_code != 200:
 		raise Exception(f"Error: {res.status_code}")
 
-	data_list = res.json()
 	geocode_list = []
 	if data_list:
 		for future in data_list:
@@ -274,9 +311,8 @@ def geocode_gsi(place_name:str,to_json=False) -> list[LocationData]:
 				loc = LocationData(**location)
 				geocode_list.append(loc)
 		geocode_list = sorted(geocode_list, key=lambda x:(x.address.source,x.address.priority,x.address.matcher,x.address.code))
-		if to_json:
-			geocode_list = [v.model_dump() for v in geocode_list]
-	return geocode_list
+		
+	return LocationDataList(geocode_list)
 
 def regeocode_gsi(lat:float,lon:float) -> LocationData:
 	url = f"https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress"
@@ -284,7 +320,7 @@ def regeocode_gsi(lat:float,lon:float) -> LocationData:
 		"lat": lat,
 		"lon": lon,
 	}
-	# sleep(1)
+	sleep(1)
 	try:
 		res = requests.get(url=url,params=params,timeout=5.0)
 	except requests.exceptions.Timeout:
@@ -313,6 +349,13 @@ def regeocode_gsi(lat:float,lon:float) -> LocationData:
 	return loc
 
 if __name__=="__main__":
-	# geo = geocode_gsi("神")
-	geo = regeocode_gsi(35.7247454,139.5812729)
-	print(geo)
+	import string
+	import random
+
+	for i in range(10):
+		print(i)
+		result = ''.join(random.choices(string.ascii_uppercase, k=5))
+		print(result)
+		geo = geocode_gsi(result)
+	# geo = regeocode_gsi(35.7247454,139.5812729)
+	# print(geo)

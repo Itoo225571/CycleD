@@ -68,6 +68,7 @@
 
                 //前の検索結果を消す
                 $('#address-list').children().remove();
+                $('#address-list-pager').children().remove();
                 //Loadingアイコン表示
                 var loading = '<div class="spinner-border text-dark m-4" id="address-loading" role="status"></div> '
                 $('#address-list').append(loading);   
@@ -83,7 +84,7 @@
                     },
                     data: form.serialize() + "&" + form.attr("name"),
                     dataType: 'json',
-                    timeout:15000,
+                    timeout:60000,
                 })
             
                 .done(function(data) {

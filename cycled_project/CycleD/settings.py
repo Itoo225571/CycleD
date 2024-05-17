@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from .settings_secret import *
 
 #プロジェクトのベースフォルダを示す（今回の場合、/workspaces/MyDjango/CycleD_project）
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,10 +20,6 @@ MEDIA_URL="/media/"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-#秘密鍵　ご内密に
-SECRET_KEY = "django-insecure-r7f2ue+-wl$8iov=0%$x&)!cw-tb!6+@^w%img-q1%k*y_@((="
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #Trueの時はブラウザにエラーメッセジがでる　当然本番ではFalseに
