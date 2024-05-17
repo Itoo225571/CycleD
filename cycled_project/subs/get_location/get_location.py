@@ -245,30 +245,10 @@ def geocode_gsi(place_name:str):
 	sleep(1)
 
 	try:
-		headers = {
-			'Cache-Control': 'no-cache'
-		}
-		res = requests.get(url,params,timeout=5.0,headers=headers)
+		res = requests.get(url,params,timeout=5.0)
 		res.raise_for_status()  # HTTPエラーチェック
 		if not res.text.strip():
-			count = 5
-			for i in range(count) :
-				print(i)
-				sleep((i+1)*4)
-				res = requests.get(url,params,timeout=5.0)
-				res.raise_for_status()  # HTTPエラーチェック
-				if res.text.strip():
-					break
-				if i >= count-1 :
-					print(res.status_code)        # HTTPステータスコード
-					print(res.headers)            # レスポンスヘッダー
-					print(res.text)               # レスポンスの本文を文字列として取得
-					print(res.content)            # レスポンスの本文をバイナリとして取得
-					print(res.url)                # リクエストのURL
-					print(res.cookies)            # クッキー
-					print(res.elapsed)    
-					print(f"History: {res.history}")
-					raise ValueError(f"レスポンスが空です: {res.url}")
+			raise ValueError(f"レスポンスが空です: {res.url}")
 		
 		try:
 			data_list = res.json()
@@ -314,6 +294,35 @@ def geocode_gsi(place_name:str):
 		
 	return LocationDataList(geocode_list)
 
+def geocode_yahoo(place_name,cliant_id):
+	params = {
+		"appid": cliant_id,
+		"query": place_name,
+		"sort": "address2",
+		"output": "json",
+	}
+	url = f"https://map.yahooapis.jp/geocode/V1/geoCoder"
+	sleep(1)
+	try:
+		res = requests.get(url,params,timeout=5.0)
+		res.raise_for_status()  # HTTPエラーチェック
+		if not res.text.strip():
+			raise ValueError(f"レスポンスが空です: {res.url}")
+		
+		try:
+			data_list = res.json()
+		except requests.exceptions.JSONDecodeError:
+			raise ValueError(f"JSONデコードエラー: {res.text}")  # デバッグのためにレスポンスを出力
+			
+	except requests.exceptions.Timeout:
+		raise ValueError("リクエストがタイムアウトしました。")
+	except requests.RequestException as e:
+		raise ValueError(f"リクエストエラー: {e}")
+	if res.status_code != 200:
+		raise Exception(f"Error: {res.status_code}")
+
+	return data_list
+
 def regeocode_gsi(lat:float,lon:float) -> LocationData:
 	url = f"https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress"
 	params = {
@@ -349,13 +358,14 @@ def regeocode_gsi(lat:float,lon:float) -> LocationData:
 	return loc
 
 if __name__=="__main__":
-	import string
-	import random
+	# import string
+	# import random
 
-	for i in range(10):
-		print(i)
-		result = ''.join(random.choices(string.ascii_uppercase, k=5))
-		print(result)
-		geo = geocode_gsi(result)
+	# for i in range(10):
+	# 	print(i)
+	# 	result = ''.join(random.choices(string.ascii_uppercase, k=5))
+	# 	print(result)
+	# 	geo = geocode_gsi(result)
 	# geo = regeocode_gsi(35.7247454,139.5812729)
 	# print(geo)
+	pass

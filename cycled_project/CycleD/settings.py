@@ -18,6 +18,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # .envファイルを読み込む
 env =environ.Env()
 env.read_env(BASE_DIR.joinpath('.env'))
+# SECURITY WARNING: don't run with debug turned on in production!
+#Trueの時はブラウザにエラーメッセジがでる　当然本番ではFalseに
+SECRET_KEY = env('SECRET_KEY')
+DEBUG = env.bool('DEBUG')
+#Cliant ID
+CLIANT_ID_YAHOO = env('CLIANT_ID_YAHOO')
 
 #media用
 MEDIA_ROOT=BASE_DIR.joinpath("media")
@@ -25,11 +31,6 @@ MEDIA_URL="/media/"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
-# SECURITY WARNING: don't run with debug turned on in production!
-#Trueの時はブラウザにエラーメッセジがでる　当然本番ではFalseに
-SECRET_KEY = env('SECRET_KEY')
-DEBUG = env.bool('DEBUG')
 
 ALLOWED_HOSTS = []
 
@@ -84,7 +85,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "CycleD.wsgi.application"
-
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
