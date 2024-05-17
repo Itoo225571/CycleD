@@ -154,4 +154,3 @@ DEBUG_TOOLBAR_CONFIG={
 # ユーザーモデル変更
 AUTH_USER_MODEL = 'diary.User'
 
-SECRETS_GEN = True　# 不要なときはFalse
