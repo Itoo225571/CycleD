@@ -21,6 +21,7 @@ xlrd = "^2.0.1"
 pydantic = "^2.7.1"
 js2py = "^0.74"
 django-cors-headers = "^4.3.1"
+django-environ = "^0.11.2"
 
 
 [tool.poetry.group.dev.dependencies]
