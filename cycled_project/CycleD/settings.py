@@ -10,7 +10,10 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-from .settings_secret import *
+try:
+    from .settings_secret import *
+except ImportError:
+    pass
 
 #プロジェクトのベースフォルダを示す（今回の場合、/workspaces/MyDjango/CycleD_project）
 BASE_DIR = Path(__file__).resolve().parent.parent
