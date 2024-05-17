@@ -52,7 +52,6 @@ def get_addressCode(file_path = 'addressCode.json'):
 	myfile.touch(exist_ok=True)
 	try:
 		with open(file_path, 'r', encoding='utf-8') as file:
-			
 			update_data = json.load(file).get("update")
 	except json.decoder.JSONDecodeError:
 		update_data = None

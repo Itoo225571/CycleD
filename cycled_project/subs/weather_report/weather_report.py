@@ -7,6 +7,7 @@ from datetime import datetime,timedelta,timezone,date
 from pydantic import BaseModel
 from typing import List
 from pathlib import Path
+from time import sleep
 
 from pprint import pprint
 
@@ -74,7 +75,11 @@ def get_weather(lat,lon,dir_name= None):
         "timezone": "Asia/Tokyo",
     }
     url = f"https://api.open-meteo.com/v1/forecast"
-    response = requests.get(url,params,timeout=3.5)
+    sleep(1)
+    try:
+        response = requests.get(url=url,params=params,timeout=5.0)
+    except requests.exceptions.Timeout:
+        raise(url+" get faild")
     data_json = response.json()
     
     df_hourly = pd.DataFrame(data=data_json["hourly"])
