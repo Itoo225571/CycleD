@@ -34,6 +34,8 @@ MEDIA_URL="/media/"
 
 ALLOWED_HOSTS = []
 
+RATELIMIT_ENABLE = True
+RATELIMIT_USE_CACHE = "default"
 
 # Application definition
 
@@ -50,6 +52,7 @@ INSTALLED_APPS = [
     "django_bootstrap5",#Bootstrap5追加
     "debug_toolbar",#Debug-toolbar追加
 	# "subs",
+	'ratelimit', #APIリクエスト制限
 ]
 
 MIDDLEWARE = [
