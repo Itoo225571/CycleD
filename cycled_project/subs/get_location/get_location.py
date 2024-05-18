@@ -179,7 +179,31 @@ def _get_muniCode():
 				file.write(json_str)
 	return muniCode
 
+class ResponseEmptyError(ValueError):
+    pass
+
+def _fetch_data(url,params,timeout=5.0):
+	sleep(1)
+	try:
+		res = requests.get(url,params,timeout=timeout)
+		res.raise_for_status()  # HTTPエラーチェック
+		if not res.text.strip():
+			raise ResponseEmptyError(f"レスポンスが空です: {res.url}")
+		try:
+			data = res.json()
+		except requests.exceptions.JSONDecodeError:
+			raise ValueError(f"JSONデコードエラー: {res.text}")  # デバッグのためにレスポンスを出力
+	except requests.exceptions.Timeout:
+		raise ValueError("リクエストがタイムアウトしました。")
+	except requests.RequestException as e:
+		raise ValueError(f"リクエストエラー: {e}")
+	if res.status_code != 200:
+		raise Exception(f"Error: {res.status_code}")
+	return data
+
 class AddressData(BaseModel):
+	geo_type: str
+
 	name: str = ""           			#目的地
 	search: str	= ""					#検索名
 	display: str = ""
@@ -200,32 +224,44 @@ class AddressData(BaseModel):
 
 	def __init__(self,**data):
 		super().__init__(**data)
-		# コードがある場合
-		if self.code != EMPTY_VALUE:
+		if self.geo_type == "yahoo" :
 			place = _addressCode.get(str(self.code))
 			if place:
 				self.state = place.get("state","")
 				self.city = place.get("city","")
 				if self.city is None:
 					self.city = ""
-			self.label = self.name + "（" + self.state + " " + self.city + "）"
-			self.fulladdress = self.country + self.state + self.city + self.locality + self.street + self.name
-			if self.search == "":
+				self.label = self.name
 				self.display = self.city
+
+		elif self.geo_type == "gsi":
+			if self.code != EMPTY_VALUE:
+				place = _addressCode.get(str(self.code))
+				if place:
+					if self.state == "":
+						self.state = place.get("state","")
+					if self.city == "":
+						self.city = place.get("city","")
+					if self.city is None:
+						self.city = ""
+				self.label = self.name + "（" + self.state + " " + self.city + "）"
+				self.fulladdress = self.country + self.state + self.city + self.locality + self.street + self.name
+				if self.search == "":
+					self.display = self.city
+				else:
+					self.display = self.name
 			else:
-				self.display = self.name
-		else:
-			for pre in _prefectures:
-				if pre in self.name:
-					self.state = pre
-					self.city = self.name.lstrip(pre)
-					if self.city.endswith(self.search):
-						self.city = self.city.rstrip(self.search)
-			self.label = self.name
-			self.fulladdress = self.country + self.name
-			self.display = self.city
-		
-		self.priority = _assign_prefecture_number(self.label)
+				for pre in _prefectures:
+					if pre in self.name:
+						self.state = pre
+						self.city = self.name.lstrip(pre)
+						if self.city.endswith(self.search):
+							self.city = self.city.rstrip(self.search)
+				self.label = self.name
+				self.fulladdress = self.country + self.name
+				self.display = self.city
+			
+			self.priority = _assign_prefecture_number(self.label)
 
 class LocationData(BaseModel):
     address: AddressData
@@ -242,26 +278,11 @@ def geocode_gsi(place_name:str):
 		"q":place_name
 	}
 	url = f"https://msearch.gsi.go.jp/address-search/AddressSearch"
-	sleep(1)
-
 	try:
-		res = requests.get(url,params,timeout=5.0)
-		res.raise_for_status()  # HTTPエラーチェック
-		if not res.text.strip():
-			raise ValueError(f"レスポンスが空です: {res.url}")
-		
-		try:
-			data_list = res.json()
-		except requests.exceptions.JSONDecodeError:
-			raise ValueError(f"JSONデコードエラー: {res.text}")  # デバッグのためにレスポンスを出力
-			
-	except requests.exceptions.Timeout:
-		raise ValueError("リクエストがタイムアウトしました。")
-	except requests.RequestException as e:
-		raise ValueError(f"リクエストエラー: {e}")
-
-	if res.status_code != 200:
-		raise Exception(f"Error: {res.status_code}")
+		data_list = _fetch_data(url,params)
+	except Exception as e:
+		print(f"エラーが発生しました: {e}")
+		raise 
 
 	geocode_list = []
 	if data_list:
@@ -274,6 +295,7 @@ def geocode_gsi(place_name:str):
 				source = EMPTY_VALUE
 			matcher = 1 - SequenceMatcher(None, place_name ,future["properties"]["title"] ).ratio()
 			address = {
+				"geotype": "gsi",
 				"search":place_name,
 				"name":future["properties"]["title"],
 				"code":code,
@@ -300,28 +322,49 @@ def geocode_yahoo(place_name,cliant_id):
 		"query": place_name,
 		"sort": "address2",
 		"output": "json",
+		"results": 100,
 	}
 	url = f"https://map.yahooapis.jp/geocode/V1/geoCoder"
-	sleep(1)
 	try:
-		res = requests.get(url,params,timeout=5.0)
-		res.raise_for_status()  # HTTPエラーチェック
-		if not res.text.strip():
-			raise ValueError(f"レスポンスが空です: {res.url}")
-		
-		try:
-			data_list = res.json()
-		except requests.exceptions.JSONDecodeError:
-			raise ValueError(f"JSONデコードエラー: {res.text}")  # デバッグのためにレスポンスを出力
-			
-	except requests.exceptions.Timeout:
-		raise ValueError("リクエストがタイムアウトしました。")
-	except requests.RequestException as e:
-		raise ValueError(f"リクエストエラー: {e}")
-	if res.status_code != 200:
-		raise Exception(f"Error: {res.status_code}")
+		data_list = _fetch_data(url,params).get('Feature')
+	except Exception as e:
+		print(f"エラーが発生しました: {e}")
+		raise 
 
-	return data_list
+	geocode_list = []
+	# もし該当箇所がなかったらlocalでもう一回検索
+	if not data_list:
+		params['sort'] = "-match"
+		url = f"https://map.yahooapis.jp/search/local/V1/localSearch"
+		try:
+			data_list = _fetch_data(url,params).get('Feature')
+		except Exception as e:
+			print(f"エラーが発生しました: {e}")
+			raise 
+
+	if data_list:
+		for future in data_list:
+			code = future['Property'].get('GovernmentCode',EMPTY_VALUE)
+			matcher = 1 - SequenceMatcher(None, place_name ,future['Name'] ).ratio()
+			
+			address = {
+				"geo_type": "yahoo",
+				"search": place_name,
+				"name":future['Name'],
+				"fulladdress": future['Property']['Address'],
+				"code": code,
+				"matcher":matcher,
+			}
+			location = {
+				"lon":future["Geometry"]["Coordinates"].split(',')[0],
+				"lat":future["Geometry"]["Coordinates"].split(',')[1],
+				"address":address,
+			}
+
+			loc = LocationData(**location)
+			geocode_list.append(loc)
+			
+	return LocationDataList(geocode_list)
 
 def regeocode_gsi(lat:float,lon:float) -> LocationData:
 	url = f"https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress"
@@ -329,14 +372,12 @@ def regeocode_gsi(lat:float,lon:float) -> LocationData:
 		"lat": lat,
 		"lon": lon,
 	}
-	sleep(1)
 	try:
-		res = requests.get(url=url,params=params,timeout=5.0)
-	except requests.exceptions.Timeout:
-		raise(url+" get faild")
-	if res.status_code != 200:
-		raise Exception(f"Error: {res.status_code}")
-	data = res.json()
+		data = _fetch_data(url,params)
+	except Exception as e:
+		print(f"エラーが発生しました: {e}")
+		raise 
+	
 	if data:
 		result = data.get("results")
 		code = result.get("muniCd",EMPTY_VALUE)
@@ -344,6 +385,7 @@ def regeocode_gsi(lat:float,lon:float) -> LocationData:
 		if name== '－':
 			name = ""
 		address = {
+			"geo_type": "gsi",
 			"name": name,
 			"code": code,
 		}
