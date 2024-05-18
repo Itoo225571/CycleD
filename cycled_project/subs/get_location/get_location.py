@@ -202,7 +202,7 @@ def _fetch_data(url,params,timeout=5.0):
 	return data
 
 class AddressData(BaseModel):
-	geo_type: str
+	geotype: str
 
 	name: str = ""           			#目的地
 	search: str	= ""					#検索名
@@ -224,17 +224,20 @@ class AddressData(BaseModel):
 
 	def __init__(self,**data):
 		super().__init__(**data)
-		if self.geo_type == "yahoo" :
+		if self.geotype == "yahoo" :
 			place = _addressCode.get(str(self.code))
 			if place:
 				self.state = place.get("state","")
 				self.city = place.get("city","")
 				if self.city is None:
 					self.city = ""
-				self.label = self.name
+				if self.city in self.name:
+					self.label = self.name
+				else:
+					self.label = self.name + f"({self.state} {self.city})"
 				self.display = self.city
 
-		elif self.geo_type == "gsi":
+		elif self.geotype == "gsi":
 			if self.code != EMPTY_VALUE:
 				place = _addressCode.get(str(self.code))
 				if place:
@@ -244,7 +247,7 @@ class AddressData(BaseModel):
 						self.city = place.get("city","")
 					if self.city is None:
 						self.city = ""
-				self.label = self.name + "（" + self.state + " " + self.city + "）"
+				self.label = self.name + f"({self.state} {self.city})"
 				self.fulladdress = self.country + self.state + self.city + self.locality + self.street + self.name
 				if self.search == "":
 					self.display = self.city
@@ -348,7 +351,7 @@ def geocode_yahoo(place_name,cliant_id):
 			matcher = 1 - SequenceMatcher(None, place_name ,future['Name'] ).ratio()
 			
 			address = {
-				"geo_type": "yahoo",
+				"geotype": "yahoo",
 				"search": place_name,
 				"name":future['Name'],
 				"fulladdress": future['Property']['Address'],
@@ -385,7 +388,7 @@ def regeocode_gsi(lat:float,lon:float) -> LocationData:
 		if name== '－':
 			name = ""
 		address = {
-			"geo_type": "gsi",
+			"geotype": "gsi",
 			"name": name,
 			"code": code,
 		}

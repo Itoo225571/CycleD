@@ -3,15 +3,17 @@ from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponse,JsonResponse
 from django.views import generic,View
 from django.urls import reverse_lazy
-from django.core.paginator import Paginator,PageNotAnInteger,EmptyPage
+from django.conf import settings
+
+from django_ratelimit.decorators import ratelimit
+
 from django.shortcuts import render
 from django.templatetags.static import static
 
 from django.contrib.auth.views import LoginView,LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-# from .diary_weather_report import DiaryWeatherReport
-from subs.get_location.get_location import geocode_gsi,regeocode_gsi
+from subs.get_location.get_location import geocode_gsi,geocode_yahoo,regeocode_gsi,ResponseEmptyError
 from subs.weather_report.weather_report import get_weather
 
 from .forms import *
@@ -73,6 +75,25 @@ class SignupView(generic.CreateView):
 signup=SignupView.as_view()
 
 """______Address関係______"""
+@ratelimit(key='user', rate='100/d', method='POST')
+def address_search(request,form):
+    keyword = form.cleaned_data.get('keyword')
+    try:
+        geocode_data_list = geocode_gsi(keyword)
+    except ResponseEmptyError:
+        try:
+            geocode_data_list = geocode_yahoo(keyword,settings.CLIANT_ID_YAHOO)
+        except :
+            raise
+    except Exception as e:
+        print(f"その他のエラーが発生しました: {e}")
+        raise
+
+    response = {
+        "data_list": geocode_data_list.model_dump(),
+    }
+    return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
+
 class AddressView(LoginRequiredMixin,generic.FormView):
     template_name = "diary/address.html"
     form_class = AddressSearchForm
@@ -99,7 +120,7 @@ class AddressView(LoginRequiredMixin,generic.FormView):
             form = AddressSearchForm(request.POST)
             if form.is_valid():
                 if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                    return self.address_search(form)
+                    return address_search(request,form)
                 return self.form_valid(form)
             return self.form_invalid(form)
             
@@ -138,15 +159,6 @@ class AddressView(LoginRequiredMixin,generic.FormView):
         # else:
         #     form = self.get_form(self.form_class)
         return self.form_valid(form)
-        
-    def address_search(self,form):
-        keyword = form.cleaned_data.get('keyword')
-        geocode_data_list = geocode_gsi(keyword)
-
-        response = {
-            "data_list": geocode_data_list.model_dump(),
-        }
-        return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
 
 address = AddressView.as_view()
 
