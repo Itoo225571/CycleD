@@ -73,8 +73,8 @@
                 //Loadingアイコン削除
                 $('.spinner-border').remove();
                 var data = data_raw.weather
-                var today =     '<img src=' + data.today.img_file_path + ' alt="today_weather" width="100px" height="100px" class="ms-1 me-4">'
-                var tomorrow =  '<img src=' + data.tomorrow.img_file_path + ' alt="today_weather" width="100px" height="100px" class="ms-1 me-4">'
+                var today =     `<img src="${data.today.img_file_path}" alt="today_weather" width="100px" height="100px" class="ms-1 me-4">`;
+                var tomorrow =  `<img src="${data.tomorrow.img_file_path}" alt="tomorrow_weather" width="100px" height="100px" class="ms-1 me-4">`;
                 $('#getTodayWeather').append(today);
                 $('#getTomorrowWeather').append(tomorrow);
             })
