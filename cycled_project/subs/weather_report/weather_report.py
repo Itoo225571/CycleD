@@ -3,8 +3,8 @@ import requests
 import pandas as pd
 import json
 from os import path
-from datetime import datetime,timedelta,timezone,date
-from pydantic import BaseModel
+from datetime import datetime,timedelta,timezone
+from pydantic import BaseModel,RootModel
 from typing import List
 from pathlib import Path
 from time import sleep
@@ -46,7 +46,7 @@ class WeatherDataHourly(WeatherDataBase):
     wind_speed_10m: float 
     wind_direction_10m: int
     """___設定___"""
-    time_range: int = 48
+    # time_range: int = 48
 
 class WeatherDataDaily(WeatherDataBase):
     temperature_2m_max: float
@@ -62,7 +62,7 @@ class WeatherDataDaily(WeatherDataBase):
 class WeatherData(BaseModel):
     lat: float
     lon: float
-    hourly: List[WeatherDataHourly]
+    hourly: RootModel[list[WeatherDataHourly]]    
     today: WeatherDataDaily
     tomorrow: WeatherDataDaily
     
@@ -88,8 +88,8 @@ def get_weather(lat,lon,dir_name= None):
         row_dict = row.to_dict()
         wData = WeatherDataHourly(dir_name,**row_dict)
         current = datetime.now(timezone(timedelta(hours=9))).replace(tzinfo=None)
-        if wData.time - current <= timedelta(hours=wData.time_range) and wData.time - current >= timedelta(hours=-1):
-            hourly_list.append(wData)
+        # if wData.time - current <= timedelta(hours=wData.time_range) and wData.time - current >= timedelta(hours=-1):
+        hourly_list.append(wData)
             
     df_daily = pd.DataFrame(data=data_json["daily"])
     data_today = df_daily.iloc[0]
