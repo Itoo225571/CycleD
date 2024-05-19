@@ -6,6 +6,10 @@
     ほーむぺーじ
 {% endblock title %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'diary/css/home.css' %}" type="text/css" >
+{% endblock extra_css %}
+
 {% block content %}
     <div class="container mt-5">
         {% if not user.home %}
@@ -33,25 +37,13 @@
                 <div id="getTomorrowWeather"></div>
             </div>
         </div>
-        <hr/>
-        <div class="weather-table-hourly">
-            <table class="table-secondary" id="weather_table_hourly">
-                <thead>
-                    <th scope="col">時刻</th>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td scope="row"></td>
-                    </tr>
-                    <tr>
-                        <td scope="row">気温</td>
-                    </tr>
-                    <tr>
-                        <td scope="row">降水確率</td>
-                    </tr>
-                </tbody>
-            </table>
+
+        <div class="weather-table-hourly table-responsive row justify-content-md-center">
+            <div class="col-md-auto">
+                <table class="table text-center" id="weather_table_hourly"></table>
+            </div>
         </div>
+
         {% endif %}
         
     </div>
@@ -90,12 +82,18 @@
                 //Loadingアイコン削除
                 $('.spinner-border').remove();
                 var data = data_raw.weather
-                var today =     `<img src="${data.today.img_file_path}" alt="today_weather" width="100px" height="100px" class="ms-1 me-4">`;
-                var tomorrow =  `<img src="${data.tomorrow.img_file_path}" alt="tomorrow_weather" width="100px" height="100px" class="ms-1 me-4">`;
+                var today = `
+                <h4>${data.today.time.month}/${data.today.time.day}</h4>
+                <img src="${data.today.img_file_path}" alt="today_weather" width="100px" height="100px" class="ms-1 me-4">
+                `;
+                var tomorrow =  `
+                <h4>${data.tomorrow.time.month}/${data.tomorrow.time.day}</h4>
+                <img src="${data.tomorrow.img_file_path}" alt="tomorrow_weather" width="100px" height="100px" class="ms-1 me-4">
+                `;
                 $('#getTodayWeather').append(today);
                 $('#getTomorrowWeather').append(tomorrow);
                 
-                
+                $('#weather_table_hourly').html(template(data.hourly))
             })
         
             .fail(function(jqXHR, textStatus, errorThrown) {
@@ -107,12 +105,29 @@
         
         };
 
-        function append_weather_table(dataArray){
-            return dataArray.map(function(data,index){
-                var html = 
-                    ``;
-                return html;
+        function template(dataArray){
+            var table = `
+                <thead style="border-bottom: 1px solid #000000; /* 下側のボーダーを追加 */">
+                    <tr id="time"><th scope="col">時刻</th></tr>
+                </thead>
+                <tbody>
+                    <tr id="img"><td scope="row"></td></tr>
+                    <tr id="tempareture"><td scope="row">気温</td></tr>
+                    <tr id="precipitation_probability"><td scope="row">降水<br>確率</td></tr>
+                </tbody>
+            `;
+            var tObject = $(table);
+            dataArray.map(function(data,index){
+                var time = `<th scope="col">${data.time.hour}</th>`
+                var img = `<td scope="row"><img src="${data.img_file_path}" alt="weather" width="40px" height="40px" class="ms-1 me-4"></td>`
+                var tempareture = `<td scope="row">${data.temperature_2m}℃</td>`
+                var precipitation_probability = `<td scope="row">${data.precipitation_probability}%</td>`
+                tObject.find('#time').append(time);
+                tObject.find('#img').append(img);
+                tObject.find('#tempareture').append(tempareture);
+                tObject.find('#precipitation_probability').append(precipitation_probability);
             })
+            return tObject
         }
     </script>
 {% endblock %}
