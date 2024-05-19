@@ -4,7 +4,7 @@ import pandas as pd
 import json
 from os import path
 from datetime import datetime,timedelta,timezone
-from pydantic import BaseModel,RootModel
+from pydantic import BaseModel,RootModel,field_serializer,field_validator
 from typing import List
 from pathlib import Path
 from time import sleep
@@ -37,27 +37,53 @@ class WeatherDataBase(BaseModel):
         else:
             self.img_file_path = (Path(__file__).parent / Path('./img') / self.img_file_name).as_posix()
 
+    @field_serializer("time")
+    def serialize_time(self, value: datetime) -> dict:
+        return {
+            'year': value.year,
+            'month': value.month,
+            'day': value.day,
+            'hour': value.hour,
+            'minute': value.minute,
+            'second': value.second
+        }
+
 class WeatherDataHourly(WeatherDataBase):
     """___必須項目___"""
-    temperature_2m: float
+    temperature_2m: int
     relative_humidity_2m:int            #湿度
-    apparent_temperature: float         #見かけの温度
+    apparent_temperature: int         #見かけの温度
     precipitation_probability: int      #降水確率
-    wind_speed_10m: float 
+    wind_speed_10m: int 
     wind_direction_10m: int
     """___設定___"""
-    # time_range: int = 48
+    time_range: int = 24
+
+    def __init__(self,*args, **kwargs):
+        kwargs['temperature_2m'] = int(kwargs['temperature_2m'])
+        kwargs['apparent_temperature'] = int(kwargs['apparent_temperature'])
+        kwargs['wind_speed_10m'] = int(kwargs['wind_speed_10m'])
+        super().__init__(*args,**kwargs)
 
 class WeatherDataDaily(WeatherDataBase):
-    temperature_2m_max: float
-    temperature_2m_min: float
-    apparent_temperature_max: float
-    apparent_temperature_min: float
+    temperature_2m_max: int
+    temperature_2m_min: int
+    apparent_temperature_max: int
+    apparent_temperature_min: int
     sunrise: datetime
     sunset: datetime
-    wind_speed_10m_max: float
-    wind_gusts_10m_max: float
+    wind_speed_10m_max: int
+    wind_gusts_10m_max: int
     wind_direction_10m_dominant: int
+
+    def __init__(self,*args, **data):
+        data['temperature_2m_max'] = int(data['temperature_2m_max'])
+        data['temperature_2m_min'] = int(data['temperature_2m_min'])
+        data['apparent_temperature_max'] = int(data['apparent_temperature_max'])
+        data['apparent_temperature_min'] = int(data['apparent_temperature_min'])
+        data['wind_speed_10m_max'] = int(data['wind_speed_10m_max'])
+        data['wind_gusts_10m_max'] = int(data['wind_gusts_10m_max'])
+        super().__init__(*args,**data)
         
 class WeatherData(BaseModel):
     lat: float
@@ -88,8 +114,8 @@ def get_weather(lat,lon,dir_name= None):
         row_dict = row.to_dict()
         wData = WeatherDataHourly(dir_name,**row_dict)
         current = datetime.now(timezone(timedelta(hours=9))).replace(tzinfo=None)
-        # if wData.time - current <= timedelta(hours=wData.time_range) and wData.time - current >= timedelta(hours=-1):
-        hourly_list.append(wData)
+        if wData.time - current <= timedelta(hours=wData.time_range) and wData.time - current >= timedelta(hours=-1):
+            hourly_list.append(wData)
             
     df_daily = pd.DataFrame(data=data_json["daily"])
     data_today = df_daily.iloc[0]
@@ -107,5 +133,5 @@ def get_weather(lat,lon,dir_name= None):
     return WeatherData(**weather_data_param)
 
 if __name__ == "__main__":
-    data = get_weather(35.7247316,139.5812637)
+    kwargs = get_weather(35.7247316,139.5812637)
     date = datetime.now()

@@ -1,0 +1,12 @@
+.weather-table-hourly {
+    overflow-x: auto;
+    white-space: nowrap;
+}
+.weather-table-hourly::-webkit-scrollbar {
+    display: none;
+}
+
+.weather-table-hourly {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
