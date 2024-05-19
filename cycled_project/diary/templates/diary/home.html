@@ -32,7 +32,25 @@
                 <h3>明日の天気</h3>
                 <div id="getTomorrowWeather"></div>
             </div>
-            
+        </div>
+        <hr/>
+        <div class="weather-table-hourly">
+            <table class="table-secondary" id="weather_table_hourly">
+                <thead>
+                    <th scope="col">時刻</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td scope="row"></td>
+                    </tr>
+                    <tr>
+                        <td scope="row">気温</td>
+                    </tr>
+                    <tr>
+                        <td scope="row">降水確率</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         {% endif %}
         
@@ -42,7 +60,6 @@
 {% block extra_js %}
     <script src="{% static 'diary/js/getCookie.js' %}"></script>
     <script>
-        
         $(document).ready(sendLocationToServer({{ user.home.lat }}, {{ user.home.lon }}));
 
         function sendLocationToServer(lat,lon) {
@@ -77,6 +94,8 @@
                 var tomorrow =  `<img src="${data.tomorrow.img_file_path}" alt="tomorrow_weather" width="100px" height="100px" class="ms-1 me-4">`;
                 $('#getTodayWeather').append(today);
                 $('#getTomorrowWeather').append(tomorrow);
+                
+                
             })
         
             .fail(function(jqXHR, textStatus, errorThrown) {
@@ -87,5 +106,13 @@
             });
         
         };
+
+        function append_weather_table(dataArray){
+            return dataArray.map(function(data,index){
+                var html = 
+                    ``;
+                return html;
+            })
+        }
     </script>
 {% endblock %}
