@@ -43,7 +43,7 @@
 /* 画面の幅が768px以下の場合 */
 @media (max-width: 768px) {
     .paginationjs-pages li {
-        margin-right: auto;
+        margin-right: 2px;
     }
     .paginationjs-pages li a {
         padding: 0.3rem 0.5rem; /* ボタンのパディングを小さくする */
