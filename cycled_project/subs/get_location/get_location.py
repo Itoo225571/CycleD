@@ -229,8 +229,6 @@ class AddressData(BaseModel):
 			if place:
 				self.state = place.get("state","")
 				self.city = place.get("city","")
-				if self.city is None:
-					self.city = ""
 				if self.city in self.name:
 					self.label = self.name
 				else:
@@ -258,7 +256,7 @@ class AddressData(BaseModel):
 					if pre in self.name:
 						self.state = pre
 						self.city = self.name.lstrip(pre)
-						if self.city.endswith(self.search):
+						if self.city.endswith(self.search) and self.city != self.search:
 							self.city = self.city.rstrip(self.search)
 				self.label = self.name
 				self.fulladdress = self.country + self.name

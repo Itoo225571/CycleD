@@ -113,15 +113,17 @@
                 <tbody>
                     <tr id="img"><td scope="row"></td></tr>
                     <tr id="tempareture"><td scope="row">気温</td></tr>
-                    <tr id="precipitation_probability"><td scope="row">降水<br>確率</td></tr>
+                    <tr id="precipitation_probability"><td scope="row">降水確率</td></tr>
+                    <tr id="precipitation"><td scope="row">降水量</td></tr>
                     <tr id="wind"><td scope="row">風</td></tr>
                 </tbody>
             `;
             var tObject = $(table);
             dataArray.map(function(data,index){
-                var time = `<th scope="col" >${data.time.hour}</th>`;
+                var time = `<th scope="col">${data.time.hour}</th>`;
                 var img = `<td scope="row"><img src="${data.img_file_path}" alt="weather" width="40px" height="40px" class="ms-auto"></td>`;
                 var tempareture = `<td scope="row">${data.temperature_2m}℃</td>`;
+                var precipitation = `<td scope="row">${data.precipitation}mm</td>`;
                 var precipitation_probability = `<td scope="row">${data.precipitation_probability}%</td>`;
                 var wind_src;
                 if (data.wind_speed_10m >= 0 && data.wind_speed_10m < 3) {
@@ -142,10 +144,10 @@
                         ${data.wind_speed_10m}m/s
                     </td>`;
 
-
                 tObject.find('#time').append(time);
                 tObject.find('#img').append(img); 
                 tObject.find('#tempareture').append(tempareture);
+                tObject.find('#precipitation').append(precipitation);
                 tObject.find('#precipitation_probability').append(precipitation_probability);
                 tObject.find('#wind').append(wind);
             })
