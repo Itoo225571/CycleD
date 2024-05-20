@@ -116,7 +116,7 @@ class AddressView(LoginRequiredMixin,generic.FormView):
         return super().get_success_url()
 
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
-        print(request.POST)
+        # print(request.POST)
         if "address-search-form" in request.POST:
             form = AddressSearchForm(request.POST)
             if form.is_valid():
