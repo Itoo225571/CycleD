@@ -245,7 +245,7 @@ class AddressData(BaseModel):
 						self.city = place.get("city","")
 					if self.city is None:
 						self.city = ""
-				self.label = self.name + f"({self.state} {self.city})"
+				self.label = self.name + f" ({self.state} {self.city}) "
 				self.fulladdress = self.country + self.state + self.city + self.locality + self.street + self.name
 				if self.search == "":
 					self.display = self.city
