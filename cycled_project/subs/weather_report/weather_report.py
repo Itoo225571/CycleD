@@ -5,11 +5,12 @@ import json
 from os import path
 from datetime import datetime,timedelta,timezone
 from pydantic import BaseModel,RootModel,field_serializer,field_validator
-from typing import List
 from pathlib import Path
 from time import sleep
 
 from pprint import pprint
+
+_EMPTY = -1
 
 def _get_weather_categories():
     p = path.join(path.dirname(__file__), 'weather_category.json')
@@ -51,18 +52,19 @@ class WeatherDataBase(BaseModel):
 class WeatherDataHourly(WeatherDataBase):
     """___必須項目___"""
     temperature_2m: int
+    precipitation: float                  #降水量
     relative_humidity_2m:int            #湿度
     apparent_temperature: int         #見かけの温度
     precipitation_probability: int      #降水確率
     wind_speed_10m: int 
     wind_direction_10m: int
     """___設定___"""
-    time_range: int = 24
+    time_range: int = 24 * 4
 
     def __init__(self,*args, **kwargs):
         kwargs['temperature_2m'] = int(kwargs['temperature_2m'])
         kwargs['apparent_temperature'] = int(kwargs['apparent_temperature'])
-        kwargs['wind_speed_10m'] = int(kwargs['wind_speed_10m'])
+        kwargs['wind_speed_10m'] = int(kwargs['wind_speed_10m']/3.6)
         super().__init__(*args,**kwargs)
 
 class WeatherDataDaily(WeatherDataBase):
@@ -81,8 +83,8 @@ class WeatherDataDaily(WeatherDataBase):
         data['temperature_2m_min'] = int(data['temperature_2m_min'])
         data['apparent_temperature_max'] = int(data['apparent_temperature_max'])
         data['apparent_temperature_min'] = int(data['apparent_temperature_min'])
-        data['wind_speed_10m_max'] = int(data['wind_speed_10m_max'])
-        data['wind_gusts_10m_max'] = int(data['wind_gusts_10m_max'])
+        data['wind_speed_10m_max'] = int(data['wind_speed_10m_max']/3.6)
+        data['wind_gusts_10m_max'] = int(data['wind_gusts_10m_max']/3.6)
         super().__init__(*args,**data)
         
 class WeatherData(BaseModel):
@@ -113,8 +115,11 @@ def get_weather(lat,lon,dir_name= None):
     for index, row in df_hourly.iterrows():
         row_dict = row.to_dict()
         wData = WeatherDataHourly(dir_name,**row_dict)
-        current = datetime.now(timezone(timedelta(hours=9))).replace(tzinfo=None)
-        if wData.time - current <= timedelta(hours=wData.time_range) and wData.time - current >= timedelta(hours=-1):
+        if wData.time_range != _EMPTY:
+            current = datetime.now(timezone(timedelta(hours=9))).replace(tzinfo=None)
+            if wData.time - current <= timedelta(hours=wData.time_range) and wData.time - current >= timedelta(hours=-2):
+                hourly_list.append(wData)
+        else:
             hourly_list.append(wData)
             
     df_daily = pd.DataFrame(data=data_json["daily"])
@@ -133,5 +138,5 @@ def get_weather(lat,lon,dir_name= None):
     return WeatherData(**weather_data_param)
 
 if __name__ == "__main__":
-    kwargs = get_weather(35.7247316,139.5812637)
+    data = get_weather(35.7247316,139.5812637)
     date = datetime.now()
