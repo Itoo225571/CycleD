@@ -1,8 +1,13 @@
-function start_loading() {
-	$('#loading-overlay').removeClass('d-none');
+function start_loading(overlay=true) {
+	if(overlay){
+		$('#loading-overlay').removeClass('d-none');
+	}
+	else{
+		$('#loading-container').removeClass('d-none');
+	}
 }
 
 //ローディング非表示
 function remove_loading() {
-	$('#loading-overlay').addClass('d-none');
+	$('.loading-whole').addClass('d-none');
 }

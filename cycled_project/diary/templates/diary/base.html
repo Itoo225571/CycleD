@@ -21,7 +21,7 @@
   </head>
 
   <body>
-    <div id="loading-overlay" class="position-absolute top-0 start-0 w-100 h-100 d-none">
+    <div id="loading-overlay" class="loading-whole position-absolute top-0 start-0 w-100 h-100 d-none">
       <div class="text-center position-absolute top-50 start-50 w-100 translate-middle">
           <div class="spinner-border text-primary" role="status"></div>
       </div>
@@ -30,7 +30,6 @@
     <div class="wrapper" style=" min-height: 100vh; position: relative;">
       <header class="sticky-top ">
         <nav class="navbar bd-navbar navbar-expand-lg navbar-light bg-light p-3 ">
-
           <div class="container-fluid d-flex flex-row">
 
             {% if user and user.is_authenticated %}
@@ -68,6 +67,7 @@
                     </a>
                 </li>
               </ul>
+
               <ul class="navbar-nav flex-row flex-wrap ms-md-auto">
                 <li class="nav-item">
                   
@@ -111,7 +111,12 @@
         </nav>
       </header>
 
-      <div class="container mt-3 ms-auto">
+      <div class="container mt-3 mx-auto">
+        <div id="loading-container" class="loading-whole top-0 start-0 w-100 h-100 d-none">
+          <div class="text-center position-absolute top-50 start-50 w-100 translate-middle">
+              <div class="spinner-border text-primary" role="status"></div>
+          </div>
+        </div>
         {% block content %}
           {{ content }}
         {% endblock %}

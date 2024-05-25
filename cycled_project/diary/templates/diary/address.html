@@ -101,8 +101,7 @@
                 $('#address-list').children().remove();
                 $('#address-list-pager').children().remove();
                 //Loadingアイコン表示
-                var loading = '<div class="spinner-border text-dark m-4" id="address-loading" role="status"></div> '
-                $('#address-list').append(loading);   
+                start_loading(false);
                 // ここからAjaxリクエストの処理
                 var csrftoken = getCookie('csrftoken');
                 var form = $(this);
@@ -120,7 +119,7 @@
             
                 .done(function(data) {
                     //Loadingアイコン削除
-                    $('#address-loading').remove();
+                    remove_loading();
                 
                     var formDataArray = []; // フォームデータを格納する配列
                     $.each(data.data_list, function(index, value) {
@@ -150,7 +149,7 @@
 
                 .fail(function(jqXHR, textStatus, errorThrown) {
                     //Loadingアイコン削除
-                    $('#address-loading').remove();
+                    remove_loading();
                     // エラーメッセージを表示
                     $('#address-list').append('<div class="alert alert-danger" role="alert">リクエストがタイムアウトしました。</div>');
                 });
@@ -159,7 +158,6 @@
             
             $(".get-current-address-button").on('click', function(){
                 var form = $(this).parents('form');
-                start_loading();
 
                 function successCallback(address) {
                     var data ={
@@ -167,11 +165,9 @@
                         lon : address.coords.longitude,
                     }
                     submit_loc(data,form);
-                    remove_loading();
                 }
 
                 function errorCallback(error) {
-                    remove_loading();
                     console.error('位置情報の送信に失敗しました:', error.message);
                 }
                 navigator.geolocation.getCurrentPosition(
