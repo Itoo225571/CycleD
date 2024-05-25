@@ -1,11 +1,13 @@
-.weather-table-hourly {
+.weather-table-hourly table {
     overflow-x: auto;
     white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
 }
+
+/* スクロールバーを非表示にする */
 .weather-table-hourly::-webkit-scrollbar {
     display: none;
 }
-
 .weather-table-hourly {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */

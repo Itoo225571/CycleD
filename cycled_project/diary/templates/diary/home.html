@@ -19,15 +19,17 @@
             <a href="{% url 'diary:address_home' %}">新しく登録する</a>
         </div>
         {% else %}
-        <div class = "row justify-content-md-center text-center">
-            <div class="col-md-auto">
-                <h3>{{user.home.display}}</h3>
-                <h4>（{{user.home.state}}）</h4>
+        <div class = "row">
+            <div class="col">
+                <p>{{user.home.display}}（{{user.home.state}}）</p>
                 <a href="{% url 'diary:address_home' %}">住所を変更する</a>
+            </div>
+            <div class="col">
+                <div id="currentWeather"></div>
             </div>
         </div>
 
-        <div class="row justify-content-md-center text-center">
+        {% comment %} <div class="row justify-content-md-center text-center">
             <div class="col text-center align-middle">
                 <h3>今日の天気</h3>
                 <div id="getTodayWeather"></div>
@@ -36,9 +38,9 @@
                 <h3>明日の天気</h3>
                 <div id="getTomorrowWeather"></div>
             </div>
-        </div>
+        </div> {% endcomment %}
 
-        <div class="weather-table-hourly table-responsive row justify-content-md-center m-3">
+        <div class="weather-table-hourly table-responsive row justify-content-md-center mt-3">
             <div class="col-md-auto">
                 <table class="table text-center" id="weather_table_hourly"></table>
             </div>
@@ -51,14 +53,12 @@
 
 {% block extra_js %}
     <script src="{% static 'diary/js/getCookie.js' %}"></script>
+    <script src="{% static 'diary/js/loading_overlay.js' %}"></script>
     <script>
         $(document).ready(sendLocationToServer({{ user.home.lat }}, {{ user.home.lon }}));
 
         function sendLocationToServer(lat,lon) {
-            var loading_today = '<div class="spinner-border text-dark m-4" id="weather-loading_today" role="status"></div> '
-            var loading_tomorrow = '<div class="spinner-border text-dark m-4" id="weather-loading_tomorrow" role="status"></div> '
-            $('#getTodayWeather').append(loading_today);
-            $('#getTomorrowWeather').append(loading_tomorrow);
+            start_loading(false);
         
             // ここからAjaxリクエストの処理
             var csrftoken = getCookie('csrftoken');
@@ -80,7 +80,7 @@
         
             .done(function(data_raw) {
                 //Loadingアイコン削除
-                $('.spinner-border').remove();
+                remove_loading();
                 var data = data_raw.weather
                 var today = `
                 <h4>${data.today.time.month}/${data.today.time.day}</h4>
@@ -98,7 +98,7 @@
         
             .fail(function(jqXHR, textStatus, errorThrown) {
                 //Loadingアイコン削除
-                $('.spinner-border').remove();
+                remove_loading();
                 // エラーメッセージを表示
                 console.error("Error sending location data:", errorThrown);
             });

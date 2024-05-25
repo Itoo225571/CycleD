@@ -106,12 +106,29 @@ class WeatherDataDaily(WeatherDataBase):
             'minute': value.minute,
             'second': value.second
         }
+
+class WeatherDataCurrent(WeatherDataBase):
+    temperature_2m: int
+    precipitation: float                  #降水量
+    relative_humidity_2m:int            #湿度
+    apparent_temperature: int         #見かけの温度
+    wind_speed_10m: int 
+    wind_direction_10m: int
+    is_day: bool
+
+    def __init__(self,*args, **kwargs):
+        kwargs['temperature_2m'] = int(kwargs['temperature_2m'])
+        kwargs['apparent_temperature'] = int(kwargs['apparent_temperature'])
+        kwargs['wind_speed_10m'] = int(kwargs['wind_speed_10m']/3.6)
+        super().__init__(*args,**kwargs)
+
 class WeatherData(BaseModel):
     lat: float
     lon: float
     hourly: RootModel[list[WeatherDataHourly]]    
     today: WeatherDataDaily
     tomorrow: WeatherDataDaily
+    current: WeatherDataCurrent
     
 def get_weather(lat,lon,dir_name= None,time_range=24*2):
     params = {
@@ -119,6 +136,7 @@ def get_weather(lat,lon,dir_name= None,time_range=24*2):
         "longitude": lon,
         "hourly": ["temperature_2m", "relative_humidity_2m", "apparent_temperature", "precipitation_probability", "precipitation", "rain", "showers", "snowfall", "weather_code", "wind_speed_10m", "wind_speed_80m", "wind_speed_120m", "wind_speed_180m", "wind_direction_10m", "wind_direction_80m", "wind_direction_120m", "wind_direction_180m", "wind_gusts_10m", "temperature_80m", "temperature_120m", "temperature_180m"],
         "daily": ["weather_code", "temperature_2m_max", "temperature_2m_min", "apparent_temperature_max", "apparent_temperature_min", "sunrise", "sunset", "wind_speed_10m_max", "wind_gusts_10m_max", "wind_direction_10m_dominant"],
+        "current": ["temperature_2m", "relative_humidity_2m", "apparent_temperature", "is_day", "precipitation", "weather_code", "wind_speed_10m", "wind_direction_10m"],
         "timezone": "Asia/Tokyo",
     }
     url = f"https://api.open-meteo.com/v1/forecast"
@@ -147,6 +165,9 @@ def get_weather(lat,lon,dir_name= None,time_range=24*2):
     data_tomorrow = df_daily.iloc[1]
     today = WeatherDataDaily(dir_name,**data_today)
     tomorrow = WeatherDataDaily(dir_name,**data_tomorrow)
+
+    data_current = data_json["current"]
+    current = WeatherDataCurrent(dir_name,**data_current)
     
     weather_data_param = {
         "lat": lat,
@@ -154,6 +175,7 @@ def get_weather(lat,lon,dir_name= None,time_range=24*2):
         "hourly": hourly_list,
         "today": today,
         "tomorrow": tomorrow,
+        "current": current,
     }
     return WeatherData(**weather_data_param)
 
