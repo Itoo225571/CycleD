@@ -28,7 +28,7 @@ class WeatherDataBase(BaseModel):
     img_file_name: str = ""
     img_file_path: str = ""
     
-    def __init__(self,dir_name=None,**data):
+    def __init__(self,dir_name=None,*args,**data):
         super().__init__(**data) 
         data = _weather_category.get(str(self.weather_code))
         self.weather = data.get("description")
@@ -58,8 +58,6 @@ class WeatherDataHourly(WeatherDataBase):
     precipitation_probability: int      #降水確率
     wind_speed_10m: int 
     wind_direction_10m: int
-    """___設定___"""
-    time_range: int = 24 * 4
 
     def __init__(self,*args, **kwargs):
         kwargs['temperature_2m'] = int(kwargs['temperature_2m'])
@@ -86,7 +84,28 @@ class WeatherDataDaily(WeatherDataBase):
         data['wind_speed_10m_max'] = int(data['wind_speed_10m_max']/3.6)
         data['wind_gusts_10m_max'] = int(data['wind_gusts_10m_max']/3.6)
         super().__init__(*args,**data)
-        
+
+    @field_serializer("sunrise")
+    def serialize_sunrise(self, value: datetime) -> dict:
+        return {
+            'year': value.year,
+            'month': value.month,
+            'day': value.day,
+            'hour': value.hour,
+            'minute': value.minute,
+            'second': value.second
+        }
+
+    @field_serializer("sunset")
+    def serialize_sunset(self, value: datetime) -> dict:
+        return {
+            'year': value.year,
+            'month': value.month,
+            'day': value.day,
+            'hour': value.hour,
+            'minute': value.minute,
+            'second': value.second
+        }
 class WeatherData(BaseModel):
     lat: float
     lon: float
@@ -94,7 +113,7 @@ class WeatherData(BaseModel):
     today: WeatherDataDaily
     tomorrow: WeatherDataDaily
     
-def get_weather(lat,lon,dir_name= None):
+def get_weather(lat,lon,dir_name= None,time_range=24*2):
     params = {
         "latitude": lat,
         "longitude": lon,
@@ -114,10 +133,11 @@ def get_weather(lat,lon,dir_name= None):
     hourly_list = []
     for index, row in df_hourly.iterrows():
         row_dict = row.to_dict()
+        row_dict['time_range'] = time_range
         wData = WeatherDataHourly(dir_name,**row_dict)
-        if wData.time_range != _EMPTY:
+        if time_range != None:
             current = datetime.now(timezone(timedelta(hours=9))).replace(tzinfo=None)
-            if wData.time - current <= timedelta(hours=wData.time_range) and wData.time - current >= timedelta(hours=-2):
+            if wData.time - current <= timedelta(hours=time_range) and wData.time - current >= timedelta(hours=-2):
                 hourly_list.append(wData)
         else:
             hourly_list.append(wData)

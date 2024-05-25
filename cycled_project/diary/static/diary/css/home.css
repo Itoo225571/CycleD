@@ -18,3 +18,8 @@
     z-index: 2;
     background-color: #fff;
 }
+
+.weather-table-hourly .daily-column {
+    background-color: rgb(205, 205, 205);
+    border: none;
+}

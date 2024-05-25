@@ -44,7 +44,7 @@ def ajax_location2weather(request):
         # weather=DiaryWeatherReport(latitude,longitude)
         img_path = static('diary_weather_report/img/')
         
-        data = get_weather(latitude,longitude,dir_name = img_path)
+        data = get_weather(latitude,longitude,dir_name = img_path,time_range=48)
         
         # 位置情報を含むレスポンスを作成
         response = {
@@ -52,7 +52,7 @@ def ajax_location2weather(request):
             "weather": data.model_dump(),
             # "location":weather.location_params,
         }
-        
+
         return JsonResponse(response)
     else:
         return JsonResponse({'error': 'Invalid request method.'}, status=400)

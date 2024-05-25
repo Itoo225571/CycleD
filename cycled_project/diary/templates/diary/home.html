@@ -100,18 +100,18 @@
                 //Loadingアイコン削除
                 $('.spinner-border').remove();
                 // エラーメッセージを表示
-                console.error("Error sending location data:", error);
+                console.error("Error sending location data:", errorThrown);
             });
         
         };
 
         function template(dataArray){
             var table = `
-                <thead style="border-bottom: 1px solid #000000; /* 下側のボーダーを追加 */">
+                <thead>
                     <tr id="time"><th scope="col">時刻</th></tr>
                 </thead>
                 <tbody>
-                    <tr id="img"><td scope="row"></td></tr>
+                    <tr id="img-and-day"><td scope="row"></td></tr>
                     <tr id="tempareture"><td scope="row">気温</td></tr>
                     <tr id="precipitation_probability"><td scope="row">降水確率</td></tr>
                     <tr id="precipitation"><td scope="row">降水量</td></tr>
@@ -121,6 +121,18 @@
             var tObject = $(table);
 
             dataArray.map(function(data,index){
+                
+                if(data.time.hour == 0){
+                    var colClass = `daily-column`;
+                    var elements = [
+                        { id: '#time', content: `<th scope="col" class=${colClass}></th>` },
+                        { id: '#img-and-day', content: `<td rowspan="5" scope="row" class="align-top ${colClass}">${data.time.day}日</td>` },
+                    ];
+                    elements.forEach(({ id, content }) => {
+                        tObject.find(id).append(content);
+                    });
+                } 
+                var colClass = `hourly-column`
                 var windImageMap = {
                     0: "{% static 'diary/img/arrow0.png' %}",
                     1: "{% static 'diary/img/arrow1.png' %}",
@@ -139,15 +151,15 @@
                 var windImageSrc = getWindImage(data.wind_speed_10m);
                 
                 var elements = [
-                    { id: '#time', content: `<th scope="col">${data.time.hour}</th>` },
-                    { id: '#img', content: `<td scope="row"><img src="${data.img_file_path}" alt="weather" width="40px" height="40px" class="ms-auto"></td>` },
-                    { id: '#tempareture', content: `<td scope="row">${data.temperature_2m}℃</td>` },
-                    { id: '#precipitation', content: `<td scope="row">${data.precipitation === 0 ? 'ー' : `${data.precipitation}mm`}</td>` },
-                    { id: '#precipitation_probability', content: `<td scope="row">${data.precipitation_probability}%</td>` },
+                    { id: '#time', content: `<th scope="col" class=${colClass}>${data.time.hour}</th>` },
+                    { id: '#img-and-day', content: `<td scope="row" class=${colClass}><img src="${data.img_file_path}" alt="weather" width="40px" height="40px" class="ms-auto"></td>` },
+                    { id: '#tempareture', content: `<td scope="row" class=${colClass}>${data.temperature_2m}℃</td>` },
+                    { id: '#precipitation', content: `<td scope="row" class=${colClass}>${data.precipitation === 0 ? 'ー' : `${data.precipitation}mm`}</td>` },
+                    { id: '#precipitation_probability', content: `<td scope="row" class=${colClass}>${data.precipitation_probability}%</td>` },
                     { 
                         id: '#wind', 
                         content: `
-                            <td scope="row" class="text-center align-middle">
+                            <td scope="row" class="text-center align-middle ${colClass}">
                                 <img src="${windImageSrc}" alt="wind" width="40px" height="40px" class="ms-auto" style="transform:rotate(${data.wind_direction_10m}deg);">
                                 <br>
                                 ${data.wind_speed_10m}m/s
