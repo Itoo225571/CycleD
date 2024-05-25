@@ -19,26 +19,21 @@
             <a href="{% url 'diary:address_home' %}">新しく登録する</a>
         </div>
         {% else %}
-        <div class = "row">
-            <div class="col">
-                <p>{{user.home.display}}（{{user.home.state}}）</p>
-                <a href="{% url 'diary:address_home' %}">住所を変更する</a>
+        <div class="row">
+            <div class="col-auto">
+                <div class="justify-content-md-center">
+                    <div class="row"><h3>{{user.home.display}}</h3></div>
+                    <div class="row"><h4>{{user.home.state}}</h4></div>
+                    <a href="{% url 'diary:address_home' %}">住所を変更する</a>
+                </div>
             </div>
-            <div class="col">
-                <div id="currentWeather"></div>
-            </div>
-        </div>
-
-        {% comment %} <div class="row justify-content-md-center text-center">
-            <div class="col text-center align-middle">
-                <h3>今日の天気</h3>
+            <div class="col-4 justify-content-md-center text-center">
                 <div id="getTodayWeather"></div>
             </div>
-            <div class="col text-center align-middle">
-                <h3>明日の天気</h3>
+            <div class="col-4 justify-content-md-center text-center">
                 <div id="getTomorrowWeather"></div>
             </div>
-        </div> {% endcomment %}
+        </div>
 
         <div class="weather-table-hourly table-responsive row justify-content-md-center mt-3">
             <div class="col-md-auto">
@@ -81,18 +76,46 @@
             .done(function(data_raw) {
                 //Loadingアイコン削除
                 remove_loading();
+                
                 var data = data_raw.weather
                 var today = `
-                <h4>${data.today.time.month}/${data.today.time.day}</h4>
-                <img src="${data.today.img_file_path}" alt="today_weather" width="100px" height="100px" class="ms-auto">
+                    <h4>${data.today.time.month}/${data.today.time.day}</h4>
+                    <img src="${data.today.img_file_path}" alt="today_weather" width="100px" height="100px" class="ms-auto">
                 `;
                 var tomorrow =  `
-                <h4>${data.tomorrow.time.month}/${data.tomorrow.time.day}</h4>
-                <img src="${data.tomorrow.img_file_path}" alt="tomorrow_weather" width="100px" height="100px" class="ms-auto">
+                    <h4>${data.tomorrow.time.month}/${data.tomorrow.time.day}</h4>
+                    <img src="${data.tomorrow.img_file_path}" alt="tomorrow_weather" width="100px" height="100px" class="ms-auto">
+                `;
+                var windImageMap = {
+                    0: "{% static 'diary/img/arrow0.png' %}",
+                    1: "{% static 'diary/img/arrow1.png' %}",
+                    2: "{% static 'diary/img/arrow2.png' %}",
+                    3: "{% static 'diary/img/arrow3.png' %}",
+                    error: "{% static 'diary/img/error.png' %}"
+                };
+                var getWindImage = (speed) => {
+                    if (speed < 3) return windImageMap[0];
+                    if (speed < 7) return windImageMap[1];
+                    if (speed < 10) return windImageMap[2];
+                    if (speed >= 10) return windImageMap[3];
+                    return windImageMap['error'];
+                };
+                var windImageSrc = getWindImage(data.current.wind_speed_10m);
+                var current = `
+                    <div class="col">
+                        <img src="${data.current.img_file_path}" alt="tomorrow_weather" width="100px" height="100px" class="ms-auto">
+                    </div>
+                    <div class="col">
+                        <div class="row"><h5>${data.current.temperature_2m}℃</h5></div>
+                        <div class="row">
+                            <img src="${windImageSrc}" alt="wind"  style="transform:rotate(${data.current.wind_direction_10m}deg);">
+                        </div>
+                        <div class="row"><p>${data.current.wind_speed_10m}m/s</p></div>
+                    </div>
                 `;
                 $('#getTodayWeather').append(today);
                 $('#getTomorrowWeather').append(tomorrow);
-                
+                $('#currentWeather').append(current);
                 $('#weather_table_hourly').html(template(data.hourly))
             })
         
@@ -159,11 +182,17 @@
                     { 
                         id: '#wind', 
                         content: `
-                            <td scope="row" class="text-center align-middle ${colClass}">
-                                <img src="${windImageSrc}" alt="wind" width="40px" height="40px" class="ms-auto" style="transform:rotate(${data.wind_direction_10m}deg);">
-                                <br>
-                                ${data.wind_speed_10m}m/s
-                            </td>`
+                            <td scope="row" class="text-center ${colClass}">
+                                <div class="ratio ratio-1x1">
+                                    <div>
+                                        <img src="${windImageSrc}" alt="wind" width="18px" height="18px" style="transform:rotate(${data.wind_direction_10m}deg);">
+                                    </div>
+                                </div>
+                                <div>
+                                    ${data.wind_speed_10m}m/s
+                                </div>
+                            </td>
+                            `
                     },
                 ];
                 
