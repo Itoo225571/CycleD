@@ -119,37 +119,45 @@
                 </tbody>
             `;
             var tObject = $(table);
-            dataArray.map(function(data,index){
-                var time = `<th scope="col">${data.time.hour}</th>`;
-                var img = `<td scope="row"><img src="${data.img_file_path}" alt="weather" width="40px" height="40px" class="ms-auto"></td>`;
-                var tempareture = `<td scope="row">${data.temperature_2m}℃</td>`;
-                var precipitation = `<td scope="row">${data.precipitation}mm</td>`;
-                var precipitation_probability = `<td scope="row">${data.precipitation_probability}%</td>`;
-                var wind_src;
-                if (data.wind_speed_10m >= 0 && data.wind_speed_10m < 3) {
-                    wind_src = "{% static 'diary/img/arrow0.png' %}";
-                } else if (data.wind_speed_10m >= 3 && data.wind_speed_10m < 7) {
-                    wind_src = "{% static 'diary/img/arrow1.png' %}";
-                } else if (data.wind_speed_10m >= 7 && data.wind_speed_10m < 10) {
-                    wind_src = "{% static 'diary/img/arrow2.png' %}";
-                } else if (data.wind_speed_10m >= 10) {
-                    wind_src = "{% static 'diary/img/arrow3.png' %}";
-                } else {
-                    wind_src = "{% static 'diary/img/error.png' %}";
-                }
-                var wind = `
-                    <td scope="row" class="text-center align-middle">
-                        <img src="${wind_src}" alt="wind" width="40px" height="40px" class="ms-auto" style="transform:rotate(${data.wind_direction_10m}deg);">
-                        <br>
-                        ${data.wind_speed_10m}m/s
-                    </td>`;
 
-                tObject.find('#time').append(time);
-                tObject.find('#img').append(img); 
-                tObject.find('#tempareture').append(tempareture);
-                tObject.find('#precipitation').append(precipitation);
-                tObject.find('#precipitation_probability').append(precipitation_probability);
-                tObject.find('#wind').append(wind);
+            dataArray.map(function(data,index){
+                var windImageMap = {
+                    0: "{% static 'diary/img/arrow0.png' %}",
+                    1: "{% static 'diary/img/arrow1.png' %}",
+                    2: "{% static 'diary/img/arrow2.png' %}",
+                    3: "{% static 'diary/img/arrow3.png' %}",
+                    error: "{% static 'diary/img/error.png' %}"
+                };
+                var getWindImage = (speed) => {
+                    if (speed < 3) return windImageMap[0];
+                    if (speed < 7) return windImageMap[1];
+                    if (speed < 10) return windImageMap[2];
+                    if (speed >= 10) return windImageMap[3];
+                    return windImageMap['error'];
+                };
+                
+                var windImageSrc = getWindImage(data.wind_speed_10m);
+                
+                var elements = [
+                    { id: '#time', content: `<th scope="col">${data.time.hour}</th>` },
+                    { id: '#img', content: `<td scope="row"><img src="${data.img_file_path}" alt="weather" width="40px" height="40px" class="ms-auto"></td>` },
+                    { id: '#tempareture', content: `<td scope="row">${data.temperature_2m}℃</td>` },
+                    { id: '#precipitation', content: `<td scope="row">${data.precipitation === 0 ? 'ー' : `${data.precipitation}mm`}</td>` },
+                    { id: '#precipitation_probability', content: `<td scope="row">${data.precipitation_probability}%</td>` },
+                    { 
+                        id: '#wind', 
+                        content: `
+                            <td scope="row" class="text-center align-middle">
+                                <img src="${windImageSrc}" alt="wind" width="40px" height="40px" class="ms-auto" style="transform:rotate(${data.wind_direction_10m}deg);">
+                                <br>
+                                ${data.wind_speed_10m}m/s
+                            </td>`
+                    },
+                ];
+                
+                elements.forEach(({ id, content }) => {
+                    tObject.find(id).append(content);
+                });
             })
             return tObject
         }
