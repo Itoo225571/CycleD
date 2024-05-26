@@ -169,29 +169,28 @@ class UserProfileView(LoginRequiredMixin,generic.DetailView):
     form_class=UserForm
 user_profile=UserProfileView.as_view()
 
-class UserEditView(generic.UpdateView):
+class UserEditView(LoginRequiredMixin,generic.UpdateView):
     pass
 user_edit=UserEditView.as_view()
 
 """______Diary関係______"""
-class DiaryView(generic.TemplateView):
-
+class DiaryView(LoginRequiredMixin,generic.TemplateView):
     pass
 diary=DiaryView.as_view()
 
-class DiaryNew(generic.CreateView):
+class DiaryNew(LoginRequiredMixin,generic.CreateView):
     pass
 diary_new=DiaryNew.as_view()
 
-class DiaryEdit(generic.UpdateView):
+class DiaryEdit(LoginRequiredMixin,generic.UpdateView):
     pass
 diary_edit=DiaryEdit.as_view()
 
-class DiaryDelete(generic.DeleteView):
+class DiaryDelete(LoginRequiredMixin,generic.DeleteView):
     pass
 diary_delete=DiaryDelete.as_view()
 
-class CalendarView(generic.TemplateView):
+class CalendarView(LoginRequiredMixin,generic.TemplateView):
     pass
 calendar=CalendarView.as_view()
 
