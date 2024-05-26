@@ -7,11 +7,8 @@ app_name="diary"
 urlpatterns = [
     path("",views.top,name="top"),
     path("home/",views.home,name="home"),
-
-    path("home/location2weather",views.ajax_location2weather,name="ajax_location2weather"),
-    
-	path("home/address",views.address,name= "address_home"),
-	path("diary/address",views.address,name="address_dairy" ),
+    path("home/location2weather/",views.ajax_location2weather,name="ajax_location2weather"),
+	path("home/address/",views.address,name= "address_home"),
     
     path("signin/",views.signin,name="signin"),
     path("signup/",views.signup,name="signup"),
@@ -24,7 +21,8 @@ urlpatterns = [
     path("diary/new/",views.diary_new,name="diary_new"),
     path("diary/edit/<int:diary_id>",views.diary_edit,name="diary_edit"),
     path("diary/delete/<int:diary_id>",views.diary_delete,name="diary_delete"),
+    path("diary/address/",views.address,name="address_dairy" ),
     
-    path("calendar/<int:user_id>",views.calendar,name="calendar"),    
+    path("calendar/",views.calendar,name="calendar"),    
 ]
 
