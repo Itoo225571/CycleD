@@ -1,39 +1,52 @@
-.pagination-button {
-	background-color: #007bff;
-	border-color: #007bff;
-	color: #fff;
-	padding: .375rem .75rem;
-	font-size: 1rem;
-	line-height: 1.5;
-	border-radius: .25rem;
+.paginationjs-pages {
+    padding: 0;
+    width: 100%; /* ページネーション全体の幅を100%に設定 */
+    margin: 0 auto; /* ページネーションを中央に配置 */
+    overflow: hidden; /* 横方向のオーバーフローを非表示にする */
 }
 
 .paginationjs-pages ul {
-	list-style: none;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	}
-	
-.paginationjs-pages li:not(:first-child, :last-child) {
-		padding: .5em;
-		border: 1px solid #000;
-	}
-	
-.paginationjs-pages li {
-		margin-right: 1em;
-	}
-	
-.paginationjs-pages li a {
-		text-decoration: none;
-		color: #000;
-	}
-	
-.active {
-		background-color: #000;
-	}
-	
-.paginationjs-pages .active a {
-		color: #fff;
-	}
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
+.paginationjs-pages li {
+    margin-right: 5px;
+}
+
+.paginationjs-pages li:not(:first-child, :last-child) {
+    padding: .5em;
+}
+
+.paginationjs-pages li a {
+    text-decoration: none;
+    color: #007bff; /* Bootstrapのリンク色に合わせる */
+    padding: 0.5rem 0.75rem; /* Bootstrapのボタンのパディングに合わせる */
+    border: 1px solid #dee2e6; /* Bootstrapのボタンのボーダーに合わせる */
+    border-radius: 0.25rem; /* Bootstrapのボタンの角丸に合わせる */
+    cursor: pointer;
+}
+
+.paginationjs-pages .active a {
+    background-color: #007bff; /* Bootstrapのアクティブリンクの背景色に合わせる */
+    color: #fff; /* アクティブリンクの文字色を白に設定 */
+    border-color: #007bff; /* Bootstrapのアクティブリンクのボーダー色に合わせる */
+}
+
+.paginationjs-pages li a:hover {
+    background-color: #bdbdbd; /* ボタンの背景色を変更 */
+    color: #007bff; /* ボタンのテキスト色を変更 */
+}
+
+/* 画面の幅が768px以下の場合 */
+@media (max-width: 768px) {
+    .paginationjs-pages li {
+        margin-right: 2px;
+    }
+    .paginationjs-pages li a {
+        padding: 0.3rem 0.5rem; /* ボタンのパディングを小さくする */
+        font-size: 0.8rem; /* フォントサイズを小さくする */
+    }
+}

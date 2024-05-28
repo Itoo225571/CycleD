@@ -10,9 +10,21 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import environ
 
 #プロジェクトのベースフォルダを示す（今回の場合、/workspaces/MyDjango/CycleD_project）
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# .envファイルを読み込む
+env =environ.Env()
+env.read_env(BASE_DIR.joinpath('.env'))
+# SECURITY WARNING: don't run with debug turned on in production!
+#Trueの時はブラウザにエラーメッセジがでる　当然本番ではFalseに
+SECRET_KEY = env('SECRET_KEY')
+DEBUG = env.bool('DEBUG')
+#Cliant ID
+CLIANT_ID_YAHOO = env('CLIANT_ID_YAHOO')
+
 #media用
 MEDIA_ROOT=BASE_DIR.joinpath("media")
 MEDIA_URL="/media/"
@@ -20,16 +32,10 @@ MEDIA_URL="/media/"
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-#秘密鍵　ご内密に
-SECRET_KEY = "django-insecure-r7f2ue+-wl$8iov=0%$x&)!cw-tb!6+@^w%img-q1%k*y_@((="
-
-# SECURITY WARNING: don't run with debug turned on in production!
-#Trueの時はブラウザにエラーメッセジがでる　当然本番ではFalseに
-DEBUG = True
-
 ALLOWED_HOSTS = []
 
+RATELIMIT_ENABLE = True
+RATELIMIT_USE_CACHE = "default"
 
 # Application definition
 
@@ -40,11 +46,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+	'corsheaders',
     
     "diary.apps.DiaryConfig",
     "django_bootstrap5",#Bootstrap5追加
     "debug_toolbar",#Debug-toolbar追加
 	# "subs",
+	'ratelimit', #APIリクエスト制限
 ]
 
 MIDDLEWARE = [
@@ -57,6 +65,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     
     "debug_toolbar.middleware.DebugToolbarMiddleware",#Debug-toolbar
+	'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = "CycleD.urls"
@@ -79,7 +88,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "CycleD.wsgi.application"
-
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -151,3 +159,4 @@ DEBUG_TOOLBAR_CONFIG={
 
 # ユーザーモデル変更
 AUTH_USER_MODEL = 'diary.User'
+

@@ -1,4 +1,4 @@
-from weather_report.weather_report import WeatherReport
+from cycled_project.subs.weather_report.weather_report_old import WeatherReport
 from get_location.get_location import *
 
 import requests
@@ -52,7 +52,6 @@ def get_addressCode(file_path = 'addressCode.json'):
 	myfile.touch(exist_ok=True)
 	try:
 		with open(file_path, 'r', encoding='utf-8') as file:
-			
 			update_data = json.load(file).get("update")
 	except json.decoder.JSONDecodeError:
 		update_data = None

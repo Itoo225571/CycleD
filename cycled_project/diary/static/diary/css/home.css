@@ -1,0 +1,27 @@
+.weather-table-hourly table {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* スクロールバーを非表示にする */
+.weather-table-hourly::-webkit-scrollbar {
+    display: none;
+}
+.weather-table-hourly {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.weather-table-hourly th:first-child,
+.weather-table-hourly td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background-color: #fff;
+}
+
+.weather-table-hourly .daily-column {
+    background-color: rgb(205, 205, 205);
+    border: none;
+}

@@ -21,15 +21,15 @@
   </head>
 
   <body>
-    <div id="loading-overlay" class="position-absolute top-0 start-0 w-100 h-100 d-none">
+    <div id="loading-overlay" class="loading-whole position-absolute top-0 start-0 w-100 h-100 d-none">
       <div class="text-center position-absolute top-50 start-50 w-100 translate-middle">
           <div class="spinner-border text-primary" role="status"></div>
       </div>
     </div>
-    <div class="wrapper" style=" min-height: 100vh; position: relative;">
-      <header>
-        <nav class="navbar bd-navbar navbar-expand-lg fixed-top navbar-light bg-light p-3 ">
 
+    <div class="wrapper" style=" min-height: 100vh; position: relative;">
+      <header class="sticky-top ">
+        <nav class="navbar bd-navbar navbar-expand-lg navbar-light bg-light p-3 ">
           <div class="container-fluid d-flex flex-row">
 
             {% if user and user.is_authenticated %}
@@ -67,6 +67,7 @@
                     </a>
                 </li>
               </ul>
+
               <ul class="navbar-nav flex-row flex-wrap ms-md-auto">
                 <li class="nav-item">
                   
@@ -85,7 +86,7 @@
                       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
                         <!-- <span class="dropdown-item-text">ユーザー名：</span> -->
                         <li>
-                          <a class="dropdown-item" href="{% url 'diary:user_profile' user.id %}">ぷろふぃ～る</a>
+                          <a class="dropdown-item" href="{% url 'diary:user_profile' %}">ぷろふぃ～る</a>
                         </li>
                         <li>
                           <a class="dropdown-item" href="#">設定</a>
@@ -110,7 +111,12 @@
         </nav>
       </header>
 
-      <div class="container" style="margin-top: 100px;">
+      <div class="container mt-3 mx-auto">
+        <div id="loading-container" class="loading-whole top-0 start-0 w-100 h-100 d-none">
+          <div class="text-center position-absolute top-50 start-50 w-100 translate-middle">
+              <div class="spinner-border text-primary" role="status"></div>
+          </div>
+        </div>
         {% block content %}
           {{ content }}
         {% endblock %}
@@ -131,7 +137,7 @@
         
       </footer>
     </div>
-    {% block extra_js %}{% endblock %}
     
+    {% block extra_js %}{% endblock %}
   </body>
 </html>

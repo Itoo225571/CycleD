@@ -24,7 +24,7 @@
         </div>
     </div>
 
-    <ul id="address-list-all-contents">
+    <ul id="address-list-all-contents" class="p-0">
         <div id="address-list"></div>
     </ul>
 
@@ -46,19 +46,50 @@
         function template(dataArray){
             return dataArray.map(function(data,index){
                 var html = 
-                    `<form method="post" class="search-select" id="search-select${index}">
-                        {% csrf_token %}
-                        <input type="hidden" name="lat" value="${data.lat}">
-                        <input type="hidden" name="lon" value="${data.lon}">
-                        <input type="hidden" name="state" value="${data.address.state}">
-                        <input type="hidden" name="display" value="${data.address.display}">
-                        <button type="submit" class="list-group-item list-group-item-action boder border-3 border-light rounded-3 m-1 p-2" name="address-select-form">
+                    `<form method="post" class="address-select" name="address-select-form">
+                        <button type="button" class="address-select-button list-group-item list-group-item-action boder border-3 border-light rounded-3 m-1 p-2" name="${index}">
                             <img src="{% static 'diary/img/location.png' %}" alt="location" width="30px" height="30px" class="ms-1 me-4">
                             ${data.address.label}
                         </button>
                     </form>`;
                 return html;
             })
+        }
+
+        function submit_loc(data,form){
+            var csrftoken = getCookie('csrftoken');
+            $('<input>').attr({
+                'type': 'hidden',
+                'name': 'csrfmiddlewaretoken', // CSRFトークンの名前は 'csrfmiddlewaretoken' である必要があります
+                'value': csrftoken
+            }).appendTo(form);
+
+            $('<input>').attr({
+                'type': 'hidden',
+                'name': form.prop("name"),
+                'value': ""
+            }).appendTo(form);
+            
+            appendObject(data,form);
+
+            //console.log(form);
+            form.submit();
+        }
+
+        function appendObject(data, form) {
+            $.each(data, function(key, value) {
+                if (typeof value === 'object' && value !== null) {
+                    // オブジェクトの場合、そのプロパティを再帰的に処理
+                    appendObject(value, form);
+                } else {
+                    // プリミティブ型の場合、そのままフォームに追加
+                    $('<input>').attr({
+                        'type': 'hidden',
+                        'name': key,
+                        'value': value
+                    }).appendTo(form);
+                }
+            });
         }
 
         $(document).ready(function(){
@@ -68,9 +99,9 @@
 
                 //前の検索結果を消す
                 $('#address-list').children().remove();
+                $('#address-list-pager').children().remove();
                 //Loadingアイコン表示
-                var loading = '<div class="spinner-border text-dark m-4" id="address-loading" role="status"></div> '
-                $('#address-list').append(loading);   
+                start_loading(false);
                 // ここからAjaxリクエストの処理
                 var csrftoken = getCookie('csrftoken');
                 var form = $(this);
@@ -83,12 +114,12 @@
                     },
                     data: form.serialize() + "&" + form.attr("name"),
                     dataType: 'json',
-                    timeout:15000,
+                    timeout:60000,
                 })
             
                 .done(function(data) {
                     //Loadingアイコン削除
-                    $('#address-loading').remove();
+                    remove_loading();
                 
                     var formDataArray = []; // フォームデータを格納する配列
                     $.each(data.data_list, function(index, value) {
@@ -98,20 +129,27 @@
                     
                     $('#address-list-pager').pagination({
                         dataSource: formDataArray,
-                        pageSize: 8,
-                        pageRange: 1,
+                        pageSize: 12,
+                        pageRange: 0,
                         ellipsisText: '...',
-                        prevText: '&lt; Prev',
-                        nextText: 'Next &gt;',
+                        prevText: 'Prev',
+                        nextText: 'Next',
                         callback: function(data2,pagination){
                             $('#address-list').html(template(data2));
                         }
+                    });
+
+                    $(".address-select-button").on('click', function(){
+                        var form = $(this).parents('form');
+                        var num = $(this).attr('name');
+                        var data = formDataArray[num];
+                        submit_loc(data,form)
                     });
                 })
 
                 .fail(function(jqXHR, textStatus, errorThrown) {
                     //Loadingアイコン削除
-                    $('#address-loading').remove();
+                    remove_loading();
                     // エラーメッセージを表示
                     $('#address-list').append('<div class="alert alert-danger" role="alert">リクエストがタイムアウトしました。</div>');
                 });
@@ -119,45 +157,17 @@
             });
             
             $(".get-current-address-button").on('click', function(){
-                var csrftoken = getCookie('csrftoken');
                 var form = $(this).parents('form');
-                
-                start_loading();
 
                 function successCallback(address) {
-                    var lat = address.coords.latitude;
-                    var lon = address.coords.longitude;
-
-                    $('<input>').attr({
-                        'type': 'hidden',
-                        'name': 'csrfmiddlewaretoken', // CSRFトークンの名前は 'csrfmiddlewaretoken' である必要があります
-                        'value': csrftoken
-                    }).appendTo(form);
-
-                    $('<input>').attr({
-                        'type': 'hidden',
-                        'name': 'lat',
-                        'value': lat
-                    }).appendTo(form);
-            
-                    $('<input>').attr({
-                        'type': 'hidden',
-                        'name': 'lon',
-                        'value': lon
-                    }).appendTo(form);
-                    
-                    $('<input>').attr({
-                        'type': 'hidden',
-                        'name': form.prop("name"),
-                        'value': ""
-                    }).appendTo(form);
-                    form.submit();
-                    remove_loading();
-                    
+                    var data ={
+                        lat : address.coords.latitude,
+                        lon : address.coords.longitude,
+                    }
+                    submit_loc(data,form);
                 }
 
                 function errorCallback(error) {
-                    remove_loading();
                     console.error('位置情報の送信に失敗しました:', error.message);
                 }
                 navigator.geolocation.getCurrentPosition(

@@ -2,3 +2,9 @@
 	background: rgba(0, 0, 0, .5);
 	z-index: 10000;
 }
+
+#loading-container {
+    background-color: rgba(255, 255, 255, 0.8); /* 半透明の白背景 */
+    z-index: 1050; /* 他の要素よりも前面に表示するための高い値 */
+    pointer-events: none; /* この要素を操作不可にする */
+}
