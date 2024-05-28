@@ -20,7 +20,14 @@ beautifulsoup4 = "^4.12.3"
 xlrd = "^2.0.1"
 pydantic = "^2.7.1"
 js2py = "^0.74"
+django-cors-headers = "^4.3.1"
+django-environ = "^0.11.2"
+django-ratelimit = "^4.1.0"
+ratelimit = "^2.2.1"
 
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.4"
 
 [build-system]
 requires = ["poetry-core"]

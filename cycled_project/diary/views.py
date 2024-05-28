@@ -3,14 +3,18 @@ from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponse,JsonResponse
 from django.views import generic,View
 from django.urls import reverse_lazy
-from django.core.paginator import Paginator,PageNotAnInteger,EmptyPage
+from django.conf import settings
+
+from django_ratelimit.decorators import ratelimit
+
 from django.shortcuts import render
+from django.templatetags.static import static
 
 from django.contrib.auth.views import LoginView,LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .diary_weather_report import DiaryWeatherReport
-from subs.get_location.get_location import geocode_gsi,regeocode_gsi
+from subs.get_location.get_location import geocode_gsi,geocode_yahoo,regeocode_gsi,ResponseEmptyError
+from subs.weather_report.weather_report import get_weather
 
 from .forms import *
 
@@ -21,7 +25,7 @@ class BaseView(generic.TemplateView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["user"]=request.user
-        context["home"] = request.user.home
+        # context["home"] = request.user.home
         return context
 
 class TopView(generic.TemplateView):
@@ -37,17 +41,18 @@ def ajax_location2weather(request):
         # print(request.POST)
         latitude = float(request.POST.get('latitude',None))
         longitude = float(request.POST.get('longitude',None))
-        weather=DiaryWeatherReport(latitude,longitude)
+        # weather=DiaryWeatherReport(latitude,longitude)
+        img_path = static('diary_weather_report/img/')
+        
+        data = get_weather(latitude,longitude,dir_name = img_path,time_range=48)
         
         # 位置情報を含むレスポンスを作成
         response = {
             'message': 'Location data received successfully.',
-            "current": weather.current,
-            "today":weather.today,
-            "tomorrow":weather.tomorrow,
+            "weather": data.model_dump(),
             # "location":weather.location_params,
         }
-        
+
         return JsonResponse(response)
     else:
         return JsonResponse({'error': 'Invalid request method.'}, status=400)
@@ -70,6 +75,25 @@ class SignupView(generic.CreateView):
 signup=SignupView.as_view()
 
 """______Address関係______"""
+@ratelimit(key='user', rate='100/d', method='POST')
+def address_search(request,form):
+    keyword = form.cleaned_data.get('keyword')
+    try:
+        geocode_data_list = geocode_gsi(keyword)
+    except ResponseEmptyError:
+        try:
+            geocode_data_list = geocode_yahoo(keyword,settings.CLIANT_ID_YAHOO)
+        except :
+            raise
+    except Exception as e:
+        print(f"その他のエラーが発生しました: {e}")
+        raise
+
+    response = {
+        "data_list": geocode_data_list.model_dump(),
+    }
+    return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
+
 class AddressView(LoginRequiredMixin,generic.FormView):
     template_name = "diary/address.html"
     form_class = AddressSearchForm
@@ -92,11 +116,12 @@ class AddressView(LoginRequiredMixin,generic.FormView):
         return super().get_success_url()
 
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        # print(request.POST)
         if "address-search-form" in request.POST:
             form = AddressSearchForm(request.POST)
             if form.is_valid():
                 if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                    return self.address_search(form)
+                    return address_search(request,form)
                 return self.form_valid(form)
             return self.form_invalid(form)
             
@@ -105,6 +130,8 @@ class AddressView(LoginRequiredMixin,generic.FormView):
             if form.is_valid():
                 loc = form.save(commit=False)
                 loc.save()
+                if request.user.home:
+                    request.user.home.delete()
                 request.user.home = loc
                 request.user.save()
             else:
@@ -114,11 +141,15 @@ class AddressView(LoginRequiredMixin,generic.FormView):
             form = LocationCoordForm(request.POST)
             if form.is_valid():
                 loc = form.save(commit=False)
+                
                 lat = form.cleaned_data["lat"]
                 lon = form.cleaned_data["lon"]
                 geo = regeocode_gsi(lat,lon)
                 loc.state = geo.address.state
                 loc.display = geo.address.display
+                
+                if request.user.home:
+                    request.user.home.delete()
 
                 loc.save()
                 request.user.home = loc
@@ -129,15 +160,6 @@ class AddressView(LoginRequiredMixin,generic.FormView):
         # else:
         #     form = self.get_form(self.form_class)
         return self.form_valid(form)
-        
-    def address_search(self,form):
-        keyword = form.cleaned_data.get('keyword')
-        geocode_data_list = geocode_gsi(keyword,to_json=True)
-
-        response = {
-            "data_list": geocode_data_list,
-        }
-        return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
 
 address = AddressView.as_view()
 
@@ -147,29 +169,28 @@ class UserProfileView(LoginRequiredMixin,generic.DetailView):
     form_class=UserForm
 user_profile=UserProfileView.as_view()
 
-class UserEditView(generic.UpdateView):
+class UserEditView(LoginRequiredMixin,generic.UpdateView):
     pass
 user_edit=UserEditView.as_view()
 
 """______Diary関係______"""
-class DiaryView(generic.TemplateView):
-
+class DiaryView(LoginRequiredMixin,generic.TemplateView):
     pass
 diary=DiaryView.as_view()
 
-class DiaryNew(generic.CreateView):
+class DiaryNew(LoginRequiredMixin,generic.CreateView):
     pass
 diary_new=DiaryNew.as_view()
 
-class DiaryEdit(generic.UpdateView):
+class DiaryEdit(LoginRequiredMixin,generic.UpdateView):
     pass
 diary_edit=DiaryEdit.as_view()
 
-class DiaryDelete(generic.DeleteView):
+class DiaryDelete(LoginRequiredMixin,generic.DeleteView):
     pass
 diary_delete=DiaryDelete.as_view()
 
-class CalendarView(generic.TemplateView):
+class CalendarView(LoginRequiredMixin,generic.TemplateView):
     pass
 calendar=CalendarView.as_view()
 
