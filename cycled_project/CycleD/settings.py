@@ -66,6 +66,7 @@ MIDDLEWARE = [
     
     "debug_toolbar.middleware.DebugToolbarMiddleware",#Debug-toolbar
 	'corsheaders.middleware.CorsMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',#session機能
 ]
 
 ROOT_URLCONF = "CycleD.urls"
