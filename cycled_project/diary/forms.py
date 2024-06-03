@@ -1,6 +1,7 @@
 from typing import Any, Mapping
 from django.forms import ModelForm,CharField,PasswordInput,ValidationError
-from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserCreationForm,UserChangeForm,AuthenticationForm
 from django.contrib.auth.hashers import make_password,check_password
 from django import forms
 from django.forms.renderers import BaseRenderer
@@ -10,8 +11,13 @@ from diary.models import *
 
 class SignupForm(UserCreationForm):
     '''     定義文      '''
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].widget.attrs={"placeholder":"ユーザー名入力欄"}
+        self.fields["email"].widget.attrs={"placeholder":"メールアドレス入力欄"}
+
     class Meta:
-        model=User
+        model = get_user_model()
         fields=["username","email","password1",]
         widgets={"password1":PasswordInput(attrs={"placeholder":"パスワード入力欄"})}
     password2=CharField(
@@ -20,11 +26,7 @@ class SignupForm(UserCreationForm):
         strip=False,
         widget=PasswordInput(attrs={"placeholder":"確認用パスワード入力欄"})
         )
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["username"].widget.attrs={"placeholder":"ユーザー名入力欄"}
-        self.fields["email"].widget.attrs={"placeholder":"メールアドレス入力欄"}
-        
+
     '''     以下検証       '''
     def clean_username(self):
         value = self.cleaned_data['username']
@@ -51,9 +53,10 @@ class SignupForm(UserCreationForm):
 class SigninForm(AuthenticationForm):
     # username_or_email = CharField(label='ユーザー名またはメールアドレス')
     class Meta:
-        model=User
+        model = get_user_model()
         fields=["username","password",]
 
+"""___Address関連___"""
 class AddressSearchForm(forms.Form):
     keyword = forms.CharField(
                         label="",
@@ -71,10 +74,21 @@ class LocationCoordForm(ModelForm):
         model = Location
         fields = ["lat","lon",]
     
-class UserForm(ModelForm):
+"""___User関連___"""
+class UserEditForm(UserChangeForm):
     class Meta:
-        model=User
-        fields=["username","email","password",]
+        model = get_user_model()
+        fields = ["username","email","password"]
+        labels = {
+            "username": "ユーザー名",
+            "email": "メールアドレス",
+            "password": "パスワード",
+        }
+        help_texts = {
+            "username": "",
+            "email": "",
+            "password": "",
+        }
 
 class DiaryForm(ModelForm):
     class Meta:
