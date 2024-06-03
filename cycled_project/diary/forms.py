@@ -15,11 +15,23 @@ class SignupForm(UserCreationForm):
         super().__init__(*args, **kwargs)
         self.fields["username"].widget.attrs={"placeholder":"ユーザー名入力欄"}
         self.fields["email"].widget.attrs={"placeholder":"メールアドレス入力欄"}
+        self.fields['email'].required = True
 
     class Meta:
         model = get_user_model()
         fields=["username","email","password1",]
+        labels = {
+            "username": "ユーザー名",
+            "email": "mailアドレス",
+            "password1": "パスワード",
+        }
+        help_texts = {
+            "username": "",
+            "email": "",
+            "password1": "",
+        }
         widgets={"password1":PasswordInput(attrs={"placeholder":"パスワード入力欄"})}
+
     password2=CharField(
         label="パスワード再入力欄",
         required=True,
