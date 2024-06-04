@@ -13,31 +13,30 @@ class SignupForm(UserCreationForm):
     '''     定義文      '''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["username"].widget.attrs={"placeholder":"ユーザー名入力欄"}
-        self.fields["email"].widget.attrs={"placeholder":"メールアドレス入力欄"}
+        self.fields["username"].widget.attrs={"placeholder":"ユーザー名を入力"}
+        self.fields["email"].widget.attrs={"placeholder":"メールアドレスを入力"}
+        self.fields["password1"].widget.attrs={"placeholder":"パスワードを入力"}
+        self.fields["password2"].widget.attrs={"placeholder":"パスワードを再入力"}
+
+        self.fields['password1'].label = 'パスワード'
+        self.fields['password2'].label = '確認用パスワード'
+
+        self.fields['password1'].help_text = ''
+        self.fields['password2'].help_text = ''
+
         self.fields['email'].required = True
 
     class Meta:
         model = get_user_model()
-        fields=["username","email","password1",]
+        fields=["username","email","password1","password2"]
         labels = {
             "username": "ユーザー名",
-            "email": "mailアドレス",
-            "password1": "パスワード",
+            "email": "メールアドレス",
         }
         help_texts = {
             "username": "",
             "email": "",
-            "password1": "",
         }
-        widgets={"password1":PasswordInput(attrs={"placeholder":"パスワード入力欄"})}
-
-    password2=CharField(
-        label="パスワード再入力欄",
-        required=True,
-        strip=False,
-        widget=PasswordInput(attrs={"placeholder":"確認用パスワード入力欄"})
-        )
 
     '''     以下検証       '''
     def clean_username(self):
@@ -59,7 +58,7 @@ class SignupForm(UserCreationForm):
         password = self.cleaned_data['password1']
         password2 = self.cleaned_data['password2']
         if password != password2:
-            raise ValidationError("パスワードと確認用パスワードが合致しません")
+            self.add_error('password2', 'パスワードと確認用パスワードが一致しません。')
         super().clean()
     
 class SigninForm(AuthenticationForm):
