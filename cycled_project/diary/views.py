@@ -180,9 +180,9 @@ class AddressView(LoginRequiredMixin,generic.FormView):
 address = AddressView.as_view()
 
 """______User関係______"""
-class UserProfileView(LoginRequiredMixin,generic.DetailView):
+class UserProfileView(LoginRequiredMixin,generic.UpdateView):
     template_name="diary/user_profile.html"
-    form_class=UserForm
+    form_class = UserEditForm
 user_profile=UserProfileView.as_view()
 
 class UserEditView(LoginRequiredMixin,generic.UpdateView):
