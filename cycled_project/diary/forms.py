@@ -104,5 +104,5 @@ class UserEditForm(UserChangeForm):
 class DiaryForm(ModelForm):
     class Meta:
         model=Diary
-        fields=["date","name_place","image","is_publish","comment",]
+        fields=["date","image","is_publish","comment","locations"]
         
