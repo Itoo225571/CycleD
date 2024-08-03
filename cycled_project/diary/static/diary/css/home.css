@@ -25,3 +25,13 @@
     background-color: rgb(205, 205, 205);
     border: none;
 }
+
+/* 現在天気の画像に関するクラス */
+#currentWeather img {
+    display: block;
+    height: 60px;
+    width: auto;
+    object-fit: cover;
+    margin: 5px;
+    padding: 10px;
+}

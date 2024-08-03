@@ -27,11 +27,14 @@
                     <a href="{% url 'diary:address_home' %}">住所を変更する</a>
                 </div>
             </div>
-            <div class="col-4 justify-content-md-center text-center">
-                <div id="getTodayWeather"></div>
+            {% comment %} <div class="col-4 justify-content-md-center text-center">
+                <div id="todayWeather"></div>
             </div>
             <div class="col-4 justify-content-md-center text-center">
-                <div id="getTomorrowWeather"></div>
+                <div id="tomorrowWeather"></div>
+            </div> {% endcomment %}
+            <div class="col-auto justify-content-md-center text-center">
+                <div id="currentWeather"></div>
             </div>
         </div>
 
@@ -102,19 +105,24 @@
                 };
                 var windImageSrc = getWindImage(data.current.wind_speed_10m);
                 var current = `
-                    <div class="col">
-                        <img src="${data.current.img_file_path}" alt="tomorrow_weather" width="100px" height="100px" class="ms-auto">
-                    </div>
-                    <div class="col">
-                        <div class="row"><h5>${data.current.temperature_2m}℃</h5></div>
-                        <div class="row">
-                            <img src="${windImageSrc}" alt="wind"  style="transform:rotate(${data.current.wind_direction_10m}deg);">
+                    <div class="row mx-auto">
+                        <div class="col">
+                            <div class="row d-flex justify-content-center"><img src="${data.current.img_file_path}" alt="tomorrow_weather"></div>
+                            <div class="row"><p>${data.current.temperature_2m}℃</ｐ></div>
                         </div>
-                        <div class="row"><p>${data.current.wind_speed_10m}m/s</p></div>
+                        <div class="col">
+                            <div class="row d-flex justify-content-center">
+                                <img src="${windImageSrc}" alt="wind" style="transform:rotate(${data.current.wind_direction_10m}deg);">
+                            </div>
+                            <div class="row"><p>${data.current.wind_speed_10m}m/s</p></div>
+                        </div>
+                        <div class="col">
+                            <div class="row"><p>${data.current.time.hour}:${data.current.time.minute}時点</p></div>
+                        </div>
                     </div>
                 `;
-                $('#getTodayWeather').append(today);
-                $('#getTomorrowWeather').append(tomorrow);
+                $('#todayWeather').append(today);
+                $('#tomorrowWeather').append(tomorrow);
                 $('#currentWeather').append(current);
                 $('#weather_table_hourly').html(template(data.hourly))
             })

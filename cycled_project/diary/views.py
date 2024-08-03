@@ -46,10 +46,12 @@ def ajax_location2weather(request):
         longitude = float(request.POST.get('longitude',None))
         latlon = str(latitude) + str(longitude)
 
+        # セッションの中にデータがあった場合の処理 : 
+        # 〜時間までの時刻が現在時刻と一致してたらセッションのデータを使う
         if session_data:
             datetime_1 = session_data.get('time')
             #str -> datetime型
-            session_dt = datetime.strptime(datetime_1, '%Y-%m-%d %H:%M:%S')
+            session_dt = datetime.strptime(datetime_1, '%Y-%m-%dT%H:%M:%S.%f')
             time_bool = bool(dt.year==session_dt.year) and bool(dt.month==session_dt.month) and bool(dt.day==session_dt.day) and bool(dt.hour==session_dt.hour) 
             latlon_bool = bool(session_data.get('latlon') == latlon)
 
@@ -60,12 +62,12 @@ def ajax_location2weather(request):
             
             weather_json = get_weather(latitude,longitude,dir_name = img_path,time_range=48)
             weather = weather_json.model_dump()
-        
+            
         # 位置情報を含むレスポンスを作成
         response = {
             'message': 'Location data received successfully.',
             "weather": weather,
-            'time': f'{dt:%Y-%m-%d %H:%M:%S}',
+            'time': dt.isoformat(),
             'latlon': latlon,
         }
         request.session['weather_data'] = response
