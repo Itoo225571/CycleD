@@ -27,11 +27,17 @@
 }
 
 /* 現在天気の画像に関するクラス */
-#currentWeather img {
+/* #currentWeather img {
     display: block;
     height: 60px;
     width: auto;
     object-fit: cover;
     margin: 5px;
     padding: 10px;
+} */
+
+#currentWeather img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: contain;
 }

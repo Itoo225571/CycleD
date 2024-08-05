@@ -1,0 +1,97 @@
+from typing import Any
+from django.http import HttpRequest, HttpResponse,JsonResponse
+from django.views import generic
+from django.urls import reverse_lazy
+from django.conf import settings
+from django_ratelimit.decorators import ratelimit
+from django.contrib.auth.mixins import LoginRequiredMixin
+from ..forms import *
+
+from subs.get_location.get_location import geocode_gsi,geocode_yahoo,regeocode_gsi,ResponseEmptyError
+
+"""______Address関係______"""
+@ratelimit(key='user', rate='100/d', method='POST')
+def address_search(request,form):
+    keyword = form.cleaned_data.get('keyword')
+    try:
+        geocode_data_list = geocode_gsi(keyword)
+    except ResponseEmptyError:
+        try:
+            geocode_data_list = geocode_yahoo(keyword,settings.CLIANT_ID_YAHOO)
+        except :
+            raise
+    except Exception as e:
+        print(f"その他のエラーが発生しました: {e}")
+        raise
+
+    response = {
+        "data_list": geocode_data_list.model_dump(),
+    }
+    return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
+
+class AddressView(LoginRequiredMixin,generic.FormView):
+    template_name = "diary/address.html"
+    form_class = AddressSearchForm
+    success_url = reverse_lazy('diary:address')
+
+    def get_form_class(self) -> type:
+        if "address-search-form" in self.request.POST:
+            return AddressSearchForm
+        elif "address-select-form" in self.request.POST:
+            return LocationForm
+        elif "get-current-address-form" in self.request.POST:
+            return LocationCoordForm
+        return super().get_form_class()
+
+    def get_success_url(self) -> str:
+        if "address-search-form" in self.request.POST:
+            return reverse_lazy('diary:address')
+        elif "address-select-form" in self.request.POST or "get-current-address-form" in self.request.POST:
+            return reverse_lazy('diary:home')
+        return super().get_success_url()
+
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        # print(request.POST)
+        if "address-search-form" in request.POST:
+            form = AddressSearchForm(request.POST)
+            if form.is_valid():
+                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return address_search(request,form)
+                return self.form_valid(form)
+            return self.form_invalid(form)
+            
+        elif "address-select-form" in request.POST:
+            form = LocationForm(request.POST)
+            if form.is_valid():
+                loc = form.save(commit=False)
+                loc.save()
+                if request.user.home:
+                    request.user.home.delete()
+                request.user.home = loc
+                request.user.save()
+            else:
+                return self.form_invalid(form)
+        
+        elif "get-current-address-form" in self.request.POST:
+            form = LocationCoordForm(request.POST)
+            if form.is_valid():
+                loc = form.save(commit=False)
+                
+                lat = form.cleaned_data["lat"]
+                lon = form.cleaned_data["lon"]
+                geo = regeocode_gsi(lat,lon)
+                loc.state = geo.address.state
+                loc.display = geo.address.display
+                
+                if request.user.home:
+                    request.user.home.delete()
+
+                loc.save()
+                request.user.home = loc
+                request.user.save()
+            else:
+                return self.form_invalid(form)
+
+        # else:
+        #     form = self.get_form(self.form_class)
+        return self.form_valid(form)
