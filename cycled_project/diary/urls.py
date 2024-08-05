@@ -1,28 +1,29 @@
 from django.urls import path
-
 from . import views
 
 app_name="diary"
 
 urlpatterns = [
-    path("",views.top,name="top"),
-    path("home/",views.home,name="home"),
-    path("home/location2weather/",views.ajax_location2weather,name="ajax_location2weather"),
-	path("home/address/",views.address,name= "address_home"),
+    path("",views.TopView.as_view(),name="top"),
+    path("home/",views.HomeView.as_view(),name="home"),
+	path("home/address/",views.AddressView.as_view(),name= "address_home"),
     
-    path("signin/",views.signin,name="signin"),
-    path("signup/",views.signup,name="signup"),
-    path("signout/",views.signout,name="signout"),
+    path("signin/",views.SigninView.as_view(),name="signin"),
+    path("signup/",views.SignupView.as_view(),name="signup"),
+    path("signout/",views.SignoutView.as_view(),name="signout"),
     
-    path("user/",views.user_profile,name="user_profile"),
-    path("user/edit/",views.user_edit,name="user_edit"),
+    path("user/",views.UserProfileView.as_view(),name="user_profile"),
+    path("user/edit/",views.UserEditView.as_view(),name="user_edit"),
     
-    path("diary/",views.diary,name="diary"),
-    path("diary/new/",views.diary_new,name="diary_new"),
-    path("diary/edit/<int:diary_id>",views.diary_edit,name="diary_edit"),
-    path("diary/delete/<int:diary_id>",views.diary_delete,name="diary_delete"),
-    path("diary/address/",views.address,name="address_dairy" ),
+    path("diary/",views.DiaryView.as_view(),name="diary"),
+    path("diary/new/",views.DiaryNew.as_view(),name="diary_new"),
+    path("diary/edit/<int:diary_id>",views.DiaryEdit.as_view(),name="diary_edit"),
+    path("diary/delete/<int:diary_id>",views.DiaryDelete.as_view(),name="diary_delete"),
+
+    path("diary/address/",views.AddressView.as_view(),name="address_dairy" ),
     
-    path("calendar/",views.calendar,name="calendar"),    
+    # path("calendar/",views.calendar,name="calendar"),   
+
+    path("home/location2weather/",views.ajax_location2weather,name="ajax_location2weather"), 
 ]
 

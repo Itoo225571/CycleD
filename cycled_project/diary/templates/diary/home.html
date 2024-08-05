@@ -33,12 +33,12 @@
             <div class="col-4 justify-content-md-center text-center">
                 <div id="tomorrowWeather"></div>
             </div> {% endcomment %}
-            <div class="col-auto justify-content-md-center text-center">
+            <div class="col justify-content-md-center text-center">
                 <div id="currentWeather"></div>
             </div>
         </div>
 
-        <div class="weather-table-hourly table-responsive row justify-content-md-center mt-3">
+        <div class="weather-table-hourly table-responsive row justify-content-md-center mt-5">
             <div class="col-md-auto">
                 <table class="table text-center" id="weather_table_hourly"></table>
             </div>
@@ -104,20 +104,26 @@
                     return windImageMap['error'];
                 };
                 var windImageSrc = getWindImage(data.current.wind_speed_10m);
+                if(Number(data.current.time.minute)<10){
+                    data.current.time.minute = "0" + data.current.time.minute
+                }
                 var current = `
-                    <div class="row mx-auto">
-                        <div class="col">
-                            <div class="row d-flex justify-content-center"><img src="${data.current.img_file_path}" alt="tomorrow_weather"></div>
-                            <div class="row"><p>${data.current.temperature_2m}℃</ｐ></div>
-                        </div>
-                        <div class="col">
+                    <div class="row">
+                        <div class="col-auto ms-5 mx-2">
                             <div class="row d-flex justify-content-center">
-                                <img src="${windImageSrc}" alt="wind" style="transform:rotate(${data.current.wind_direction_10m}deg);">
+                                <img src="${data.current.img_file_path}" alt="tomorrow_weather" width="60" height="60">
                             </div>
-                            <div class="row"><p>${data.current.wind_speed_10m}m/s</p></div>
+                            <div class="row my-1">気温: ${data.current.temperature_2m}℃</div>
+                            <div class="row my-1">湿度: ${data.current.relative_humidity_2m}%</div>
                         </div>
-                        <div class="col">
-                            <div class="row"><p>${data.current.time.hour}:${data.current.time.minute}時点</p></div>
+                        <div class="col-auto mx-2">
+                            <div class="row d-flex justify-content-center py-3">
+                                <img src="${windImageSrc}" alt="wind" width="30" height="30" style="transform:rotate(${data.current.wind_direction_10m}deg);">
+                            </div>
+                            <div class="row my-1">風速: ${data.current.wind_speed_10m}m/s</div>
+                        </div>
+                        <div class="col-auto mx-2">
+                            <div class="row"><p>${data.current.time.hour}:${data.current.time.minute} 時点</p></div>
                         </div>
                     </div>
                 `;
