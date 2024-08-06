@@ -38,3 +38,7 @@ https://zenn.dev/gdtypk/articles/pydantic-merit-and-thoughts
 ## 2024/5/17
 <h3>YahooジオコーディングAPI</h3>
 https://developer.yahoo.co.jp/webapi/map/openlocalplatform/v1/geocoder.html
+
+## 2024/8/6
+<h3>ボタンスタイル(css)</h3>
+https://excellent.ne.jp/homepage/6562/
