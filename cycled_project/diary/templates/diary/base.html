@@ -29,7 +29,7 @@
 
     <div class="wrapper" style=" min-height: 100vh; position: relative;">
       <header class="sticky-top ">
-        <nav class="navbar bd-navbar navbar-expand-lg navbar-light bg-light p-3 ">
+        <nav class="navbar bd-navbar navbar-expand-md navbar-light bg-light p-3 ">
           <div class="container-fluid d-flex flex-row">
 
             {% if user and user.is_authenticated %}
@@ -48,19 +48,19 @@
 
             <div class="collapse navbar-collapse" id="navbarMenu">
               <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
+                <li class="nav-item mx-2">
+                    <a class="nav-link" href="{% url 'diary:diary' %}">
                       <img src="{% static 'diary/img/diary.png' %}" alt="diary" width="30" height="35" class="d-inline-block align-text-bottom"> 
                       日記
                     </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item mx-2">
                     <a class="nav-link" href="#">
                       <img src="{% static 'diary/img/calendar.png' %}" alt="calendar" width="30" height="35" class="d-inline-block align-text-bottom">
                       カレンダー
                     </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item mx-2">
                     <a class="nav-link" href="#">
                       <img src="{% static 'diary/img/gacha.png' %}" alt="gacha" width="30" height="35" class="d-inline-block align-text-bottom">
                       ガチャ
