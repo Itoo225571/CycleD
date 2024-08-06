@@ -4,6 +4,7 @@ from ..forms import *
 
 """______Diary関係______"""
 class DiaryView(LoginRequiredMixin,generic.TemplateView):
+    template_name = "diary/diary.html"
     pass
 
 class DiaryNew(LoginRequiredMixin,generic.CreateView):
