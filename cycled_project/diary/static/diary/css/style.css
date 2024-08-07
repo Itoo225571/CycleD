@@ -8,3 +8,37 @@
     z-index: 1050; /* 他の要素よりも前面に表示するための高い値 */
     pointer-events: none; /* この要素を操作不可にする */
 }
+
+/* アウトラインボタン(画像を左につけることも可) */
+.button_inverse {
+    display: inline-block;
+    position: relative;
+    border-radius: 0.5em;
+    overflow: hidden;
+    padding: 1em;
+
+    border:0.1em solid #007bff;
+    background-color: rgba(147,162,0,.0);
+    color:  #007bff;
+
+    transition: .4s ease;
+  }
+.button_inverse:hover {
+    border:0.1em solid #007bff;
+    background-color: #007bff;
+    color: #fff;
+}
+.button_inverse::before {
+    content: "";
+    background-size: contain;
+
+    width: 3em; /* 画像の幅を設定 */
+    height: 3em; /* 画像の高さを設定 */
+    
+    position: absolute;
+    transition: .6s ease;
+    
+    top: 50%;
+    left: 1em; 
+    transform: translateY(-50%); /* 垂直方向に中央揃え */
+}

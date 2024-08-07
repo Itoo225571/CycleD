@@ -10,16 +10,16 @@
     <h2>キーワードから地域を探す</h2>
     <div class="get-current-address-form">
         <form method="post" id="get-current-address-form" name="get-current-address-form">
-            <button type="button" class="get-current-address-button btn btn-outline-primary m-1 p-2" id="get-current-address-button" >現在地から地域を取得する</button>
+            <button type="button" class="get-current-address-button button_inverse m-1 p-2" id="get-current-address-button" >現在地から地域を取得する</button>
         </form>
     </div>
     
-    <div class="search-wrapper">
+    <div class="search-wrapper my-3">
         <div class="address-search-form">
             <form method="post" id="address-search-form" name="address-search-form">
                 {% csrf_token %}
                 {{ form.keyword }}
-                <button class="btn btn-primary m-3" type="submit">検索</button>
+                <button class="btn btn-primary mx-3" type="submit">検索</button>
             </form>
         </div>
     </div>

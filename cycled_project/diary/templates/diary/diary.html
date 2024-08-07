@@ -16,16 +16,16 @@
             <h2>日記メニュー</h2>
 
             <div class="my-md-3 my-2">
-                {% comment %} <button class="button_inverse" onclick="location.href='{% url "diary:diary_new" %}'"> {% endcomment %}
-                <button class="button_inverse" id="ico_new" onclick="location.href='#'">
+                <button class="button_inverse" id="ico_new" onclick="location.href='{% url "diary:diary_new" %}'">
+                {% comment %} <button class="button_inverse" id="ico_new" onclick="location.href='#'"> {% endcomment %}
                     新規作成
                 </button>
             </div>
 
             <div class="my-md-3 my-2">
-                {% comment %} <button class="button_inverse" onclick="location.href='{% url "diary:diary_edit" %}'"> {% endcomment %}
+                {% comment %} <button class="button_inverse" onclick="location.href='{% url "diary:diary_list" %}'"> {% endcomment %}
                 <button class="button_inverse" id="ico_edit" onclick="location.href='#'">
-                    編集
+                    編集・削除
                 </button>
             </div>
         </div>

@@ -1,36 +1,13 @@
 .button_inverse {
-    font-size: 4vmin;
-    display: inline-block;
-    position: relative;
-    width: 60vw;
-    border-radius: 0.5em;
-    aspect-ratio: 5 / 1;
-    overflow: hidden;
-
-    border:0.1em solid rgb(58, 171, 210);
-    background-color: rgba(147,162,0,.0);
-    color:  rgba(58, 172, 210);
-
-    transition: .6s ease;
-  }
-.button_inverse:hover {
-    border:0.1em solid rgb(58, 171, 210);
-    background-color: rgb(58, 171, 210);
-    color: #fff;
+  font-size: 4vmin;
+  width: 60vw;
+  
+  border:0.1em solid rgb(58, 171, 210);
+  color:  rgba(58, 171, 210);
 }
-.button_inverse::before {
-    content: "";
-    background-size: contain;
-
-    width: 3em; /* 画像の幅を設定 */
-    height: 3em; /* 画像の高さを設定 */
-    
-    position: absolute;
-    transition: .6s ease;
-    
-    top: 50%;
-    left: 1em; 
-    transform: translateY(-50%); /* 垂直方向に中央揃え */
+.button_inverse:hover {
+  border:0.1em solid rgb(58, 171, 210);
+  background-color: rgb(58, 171, 210);
 }
 
 #ico_new::before {

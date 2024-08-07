@@ -16,9 +16,10 @@ urlpatterns = [
     path("user/edit/",views.UserEditView.as_view(),name="user_edit"),
     
     path("diary/",views.DiaryView.as_view(),name="diary"),
-    path("diary/new/",views.DiaryNew.as_view(),name="diary_new"),
-    path("diary/edit/",views.DiaryEdit.as_view(),name="diary_edit"),
-    path("diary/delete/<int:diary_id>",views.DiaryDelete.as_view(),name="diary_delete"),
+    path("diary/new/",views.DiaryNewView.as_view(),name="diary_new"),
+    path("diary/new/",views.DiaryListView.as_view(),name="diary_list"),
+    path("diary/edit/<int:diary_id>",views.DiaryEditView.as_view(),name="diary_edit"),
+    path("diary/delete/<int:diary_id>",views.DiaryDeleteView.as_view(),name="diary_delete"),
 
     path("diary/address/",views.AddressView.as_view(),name="address_dairy" ),
     
