@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "debug_toolbar",#Debug-toolbar追加
 	# "subs",
 	'ratelimit', #APIリクエスト制限
+    'widget_tweaks', #HTMLの見た目調節
 ]
 
 MIDDLEWARE = [

@@ -1,31 +1,3 @@
-.button_inverse {
-    border: none;
-    box-sizing:border-box;
-    display: inline-block;
-    font-size: 100%;
-    position: relative;
-    cursor: pointer;
-    border-radius: 10px;
-    aspect-ratio: 3 / 1;
-    padding: 0px 8px 0px 8px;
-
-    border:1px solid #27acd9;
-    background-color: rgba(147,162,0,.0);
-    color:  #27acd9;
-
-    transition: .3s all;
-  }
-
-.button_inverse:hover {
-    border:1px solid #27acd9;
-    background-color: #27acd9;
-    color: #fff;
-}
-.button_inverse::before,
-.button_inverse::after {
-    box-sizing:border-box;
-}
-
 .weather-table-hourly table {
     overflow-x: auto;
     white-space: nowrap;

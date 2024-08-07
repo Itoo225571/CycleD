@@ -1,7 +1,8 @@
 {% extends "diary/base.html" %}
 {% load django_bootstrap5 %}
 {% load static %}
-{% load form_tags %}
+{% comment %} フォームの見た目を変更するadd_classを使うにはこれをロード {% endcomment %}
+{% load widget_tweaks %}
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'diary/css/signup.css' %}" type="text/css" >

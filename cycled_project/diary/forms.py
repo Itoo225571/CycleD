@@ -101,7 +101,8 @@ class UserEditForm(UserChangeForm):
             "password": "",
         }
 
-class DiaryForm(ModelForm):
+"""___Diary関連___"""
+class DiaryNewForm(ModelForm):
     class Meta:
         model=Diary
         fields=["date","image","is_publish","comment","locations"]
