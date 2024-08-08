@@ -16,7 +16,7 @@
         <div>
             <p>住所が登録されていません</p>
             <p>住所を登録することで天気を見ることができます</p>
-            <a href="{% url 'diary:address_home' %}">新しく登録する</a>
+            <button class="button_inverse" onclick="location.href='{% url "diary:address_home" %}'">新しく登録する</button>
         </div>
         
         {% else %}

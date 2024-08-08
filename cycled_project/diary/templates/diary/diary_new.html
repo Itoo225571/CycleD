@@ -1,6 +1,7 @@
 {% extends "diary/base.html" %}
 {% load django_bootstrap5 %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block title %}
     しんきさくせい
@@ -17,21 +18,30 @@
 
             <form method="post">
                 {% csrf_token %}
-                {% for field in form %}
-                    <div class="mb-3 col-md-4">
-                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                            {{ field }}
-                        {% if field.help_text %}
-                            <small class="form-text text-muted">{{ field.help_text }}</small>
-                        {% endif %}
-                        {% if field.errors %}
-                            <div class="invalid-feedback">
-                                {{ field.errors }}
-                            </div>
-                        {% endif %}
+                <div class="row my-3">
+                    <div class="col">
+                        <button class="button_inverse" onclick="location.href='{% url "diary:address_diary_new" %}'">サイクリング先を選択する</button>
                     </div>
-                {% endfor %}
-                <button type="submit" class="btn btn-primary">送信</button>
+                    {% for field in form %}
+                        <div class="row my-3">
+                            <div class="col">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                    {{ field }}
+                                {% if field.help_text %}
+                                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                                {% endif %}
+                                {% if field.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ field.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary">送信</button>
+                    </div>
+                </div>
             </form>
         </div>
     </div>

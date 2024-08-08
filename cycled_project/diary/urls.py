@@ -6,7 +6,7 @@ app_name="diary"
 urlpatterns = [
     path("",views.TopView.as_view(),name="top"),
     path("home/",views.HomeView.as_view(),name="home"),
-	path("home/address/",views.AddressView.as_view(),name= "address_home"),
+	path("home/address/",views.AddressHomeView.as_view(),name= "address_home"),
     
     path("signin/",views.SigninView.as_view(),name="signin"),
     path("signup/",views.SignupView.as_view(),name="signup"),
@@ -17,11 +17,13 @@ urlpatterns = [
     
     path("diary/",views.DiaryView.as_view(),name="diary"),
     path("diary/new/",views.DiaryNewView.as_view(),name="diary_new"),
-    path("diary/new/",views.DiaryListView.as_view(),name="diary_list"),
+    path("diary/list/",views.DiaryListView.as_view(),name="diary_list"),
     path("diary/edit/<int:diary_id>",views.DiaryEditView.as_view(),name="diary_edit"),
     path("diary/delete/<int:diary_id>",views.DiaryDeleteView.as_view(),name="diary_delete"),
 
-    path("diary/address/",views.AddressView.as_view(),name="address_dairy" ),
+    # path("diary/address/",views.AddressHomeView.as_view(),name="address_diary" ),
+    path("diary/new/address",views.AddressDiaryNewView.as_view(),name="address_diary_new" ),
+    path("diary/edit/<int:diary_id>/address",views.AddressDiaryEditView.as_view(),name="address_diary_edit" ),
     
     # path("calendar/",views.calendar,name="calendar"),   
 

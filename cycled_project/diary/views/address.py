@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 from django.conf import settings
 from django_ratelimit.decorators import ratelimit
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms.models import model_to_dict
 from ..forms import *
 
 from subs.get_location.get_location import geocode_gsi,geocode_yahoo,regeocode_gsi,ResponseEmptyError
@@ -29,8 +30,9 @@ def address_search(request,form):
     }
     return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
 
-class AddressView(LoginRequiredMixin,generic.FormView):
+class AddressHomeView(LoginRequiredMixin,generic.FormView):
     template_name = "diary/address.html"
+    # ↓二つは後で変える
     form_class = AddressSearchForm
     success_url = reverse_lazy('diary:address')
 
@@ -52,6 +54,7 @@ class AddressView(LoginRequiredMixin,generic.FormView):
 
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         # print(request.POST)
+        # 検索した場合
         if "address-search-form" in request.POST:
             form = AddressSearchForm(request.POST)
             if form.is_valid():
@@ -60,6 +63,7 @@ class AddressView(LoginRequiredMixin,generic.FormView):
                 return self.form_valid(form)
             return self.form_invalid(form)
             
+        # 検索結果を選択した場合
         elif "address-select-form" in request.POST:
             form = LocationForm(request.POST)
             if form.is_valid():
@@ -72,6 +76,7 @@ class AddressView(LoginRequiredMixin,generic.FormView):
             else:
                 return self.form_invalid(form)
         
+        # 現在位置を取得した場合
         elif "get-current-address-form" in self.request.POST:
             form = LocationCoordForm(request.POST)
             if form.is_valid():
@@ -94,4 +99,69 @@ class AddressView(LoginRequiredMixin,generic.FormView):
 
         # else:
         #     form = self.get_form(self.form_class)
+
         return self.form_valid(form)
+    
+class AddressDiaryNewView(AddressHomeView):
+    success_url = reverse_lazy('diary:diary_new')
+
+    def get_success_url(self) -> str:
+        if "address-search-form" in self.request.POST:
+            return reverse_lazy('diary:address_diary_new')
+        elif "address-select-form" in self.request.POST or "get-current-address-form" in self.request.POST:
+            return reverse_lazy('diary:diary_new')
+        return super().get_success_url()
+
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        if "address-search-form" in request.POST:
+            form = AddressSearchForm(request.POST)
+            if form.is_valid():
+                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return address_search(request,form)
+                return self.form_valid(form)
+            return self.form_invalid(form)
+            
+        elif "address-select-form" in request.POST:
+            form = LocationForm(request.POST)
+            if form.is_valid():
+                loc = form.save(commit=False)
+                loc.save()
+                
+                # loc_json = model_to_dict(loc)
+                # loc_json['image'] = None
+                loc_json = loc.id
+                request.session['diary_location'] = loc_json
+            else:
+                return self.form_invalid(form)
+        
+        elif "get-current-address-form" in self.request.POST:
+            form = LocationCoordForm(request.POST)
+            if form.is_valid():
+                loc = form.save(commit=False)
+                
+                lat = form.cleaned_data["lat"]
+                lon = form.cleaned_data["lon"]
+                geo = regeocode_gsi(lat,lon)
+                loc.state = geo.address.state
+                loc.display = geo.address.display
+                loc.save()
+                
+                # loc_json = model_to_dict(loc)
+                # loc_json['image'] = None
+                loc_json = loc.id
+                request.session['diary_location'] = loc_json
+            else:
+                return self.form_invalid(form)
+
+        # else:
+        #     form = self.get_form(self.form_class)
+        return self.form_valid(form)
+    
+class AddressDiaryEditView(AddressDiaryNewView):
+    success_url = reverse_lazy('diary:diary_edit')
+    def get_success_url(self) -> str:
+        if "address-search-form" in self.request.POST:
+            return reverse_lazy('diary:address_diary_edit')
+        elif "address-select-form" in self.request.POST or "get-current-address-form" in self.request.POST:
+            return reverse_lazy('diary:diary_edit')
+        return super().get_success_url()
