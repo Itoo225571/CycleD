@@ -10,7 +10,7 @@
     <h2>キーワードから地域を探す</h2>
     <div class="get-current-address-form">
         <form method="post" id="get-current-address-form" name="get-current-address-form">
-            <button type="button" class="get-current-address-button button_inverse m-1 p-2" id="get-current-address-button" >現在地から地域を取得する</button>
+            <button type="button" class="get-current-address-button button_inverse m-1 p-2">現在地から地域を取得する</button>
         </form>
     </div>
     
@@ -158,8 +158,10 @@
             
             $(".get-current-address-button").on('click', function(){
                 var form = $(this).parents('form');
+                start_loading(false);
 
                 function successCallback(address) {
+                    remove_loading();
                     var data ={
                         lat : address.coords.latitude,
                         lon : address.coords.longitude,
@@ -168,6 +170,7 @@
                 }
 
                 function errorCallback(error) {
+                    remove_loading();
                     console.error('位置情報の送信に失敗しました:', error.message);
                 }
                 navigator.geolocation.getCurrentPosition(

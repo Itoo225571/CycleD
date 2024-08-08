@@ -1,8 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from .models import User,Diary
+from .models import User,Diary,Location
 
+# インラインの設定
+# これをしないと、子要素の編集が同時にできないゾ
 class DiaryInline(admin.TabularInline):
     model=Diary
     extra=1
@@ -26,5 +28,12 @@ class UserAdmin(BaseUserAdmin):
     filter_horizontal =()
     list_filter = ()
     
+class LocationInline(admin.TabularInline):
+    model = Location
+    extra = 1
+    
+class DiaryAdmin(admin.ModelAdmin):
+    inlines = [LocationInline,]
+
 admin.site.register(User,UserAdmin)
-# admin.site.register(Diary)
+admin.site.register(Diary,DiaryAdmin)

@@ -1,5 +1,3 @@
-from typing import Any, Mapping
-from django.forms import ModelForm,CharField,PasswordInput,ValidationError
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm,UserChangeForm,AuthenticationForm
 from django.contrib.auth.hashers import make_password,check_password
@@ -43,7 +41,7 @@ class SignupForm(UserCreationForm):
         value = self.cleaned_data['username']
         min_length=3
         if len(value) < min_length:
-            raise ValidationError('%(min_length)s文字以上で入力してください', params={'min_length':min_length})
+            raise forms.ValidationError('%(min_length)s文字以上で入力してください', params={'min_length':min_length})
         return value
     #email
     def clean_email(self):
@@ -75,12 +73,12 @@ class AddressSearchForm(forms.Form):
                         widget=forms.TextInput(attrs={"placeholder":" 地名・施設名・駅名など"})
                         )
     
-class LocationForm(ModelForm):
+class LocationForm(forms.ModelForm):
     class Meta:
         model = Location
         fields = ["lat","lon","state","display",]
 
-class LocationCoordForm(ModelForm):
+class LocationCoordForm(forms.ModelForm):
     class Meta:
         model = Location
         fields = ["lat","lon",]
@@ -102,8 +100,15 @@ class UserEditForm(UserChangeForm):
         }
 
 """___Diary関連___"""
-class DiaryNewForm(ModelForm):
+class DiaryNewForm(forms.ModelForm):
     class Meta:
         model=Diary
-        fields=["date","image","is_publish","comment","locations"]
-        
+        fields=["date","comment"]
+        labels = {
+            "date": "サイクリング日時",
+            "comment": "コメント",
+        }
+        help_texts = {
+            "date": "",
+            "comment": "",
+        }

@@ -15,14 +15,14 @@
     position: relative;
     border-radius: 0.5em;
     overflow: hidden;
-    padding: 1em;
+    padding: 0.5em 1em 0.5em 1em;
 
     border:0.1em solid #007bff;
     background-color: rgba(147,162,0,.0);
     color:  #007bff;
 
     transition: .4s ease;
-  }
+}
 .button_inverse:hover {
     border:0.1em solid #007bff;
     background-color: #007bff;

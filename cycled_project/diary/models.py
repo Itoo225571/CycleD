@@ -6,18 +6,24 @@ class Location(models.Model):
     lat = models.FloatField()
     lon = models.FloatField()
     # 市区町村
-    state = models.CharField(max_length=128,blank=True)
+    state = models.CharField(max_length=128,blank=True,verbose_name="市区町村")
     # 表示名
-    display = models.CharField(max_length=128,blank=True)
+    display = models.CharField(max_length=128,blank=True,verbose_name="表示名")
+    # 画像(日記作成の時につける)
+    image = models.ImageField(upload_to="images/",blank=True,null=True)
+    diary = models.ForeignKey('Diary',on_delete=models.CASCADE,null=True)
+    
+    def __str__(self) -> str:
+        return self.display
 
 class User(AbstractUser):
     # username=models.CharField(max_length=128,verbose_name="user   name")
     # email=None
     first_name = None
     last_name = None
-    groups = None
-    icon = models.ImageField(upload_to="images/",blank=True,null=True)
-    home = models.OneToOneField(Location,on_delete=models.CASCADE,blank=True,null=True)
+    # groups = None
+    icon = models.ImageField(upload_to="images/",blank=True,null=True,verbose_name="アイコン")
+    home = models.OneToOneField(Location,on_delete=models.CASCADE,blank=True,null=True,verbose_name="お気に入りの場所")
     # password=models.CharField(max_length=128,verbose_name="password")
     # date_created=models.DateField(verbose_name="creation date",auto_now_add=True,null=True)
     # date_last_login=models.DateField(verbose_name="last login date",auto_now=True,null=True)
@@ -34,18 +40,20 @@ class User(AbstractUser):
         return self.username
     
 class Diary(models.Model):
-    date = models.DateField(verbose_name="diary date",null=True)
+    date = models.DateField(verbose_name="日記の日時",null=True)
+    # 詳しい時間
+    # datetime = models.DateTimeField("time detail",blank=True)
     # name_place = models.CharField(max_length=128,verbose_name="place name",null=True)
-    image = models.ImageField(upload_to="images/",blank=True,null=True)
-    date_created = models.DateField(verbose_name="creation date",auto_now_add=True,null=True)
-    date_last_updated = models.DateField(verbose_name="last updated date",auto_now=True,null=True)
-    is_publish = models.BooleanField(verbose_name="is publish",default=False)
-    comment = models.TextField(blank=True)
-    datetime = models.DateTimeField("time detail",blank=True)
-
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
-    locations = models.ManyToManyField('Location', blank=True)
+    
+    date_created = models.DateField(verbose_name="作成日",auto_now_add=True,null=True)
+    date_last_updated = models.DateField(verbose_name="最終更新日",auto_now=True,null=True)
+    # is_publish = models.BooleanField(verbose_name="is publish",default=False)
+    comment = models.TextField(blank=True,verbose_name="コメント")
+    
+    # locations = models.ManyToManyField('Location', blank=True, verbose_name="場所情報")
+    user = models.ForeignKey(User,on_delete=models.CASCADE,)
     
     # def __str__(self):
     #     return self.name_place
 
+    
