@@ -78,11 +78,11 @@
                 var data = data_raw.weather
                 var today = `
                     <h4>${data.today.time.month}/${data.today.time.day}</h4>
-                    <img src="${data.today.img_file_path}" alt="today_weather" width="100px" height="100px" class="ms-auto">
+                    <img src="${data.today.img_file_path_day}" alt="today_weather" width="100px" height="100px" class="ms-auto">
                 `;
                 var tomorrow =  `
                     <h4>${data.tomorrow.time.month}/${data.tomorrow.time.day}</h4>
-                    <img src="${data.tomorrow.img_file_path}" alt="tomorrow_weather" width="100px" height="100px" class="ms-auto">
+                    <img src="${data.tomorrow.img_file_path_day}" alt="tomorrow_weather" width="100px" height="100px" class="ms-auto">
                 `;
                 var windImageMap = {
                     0: "{% static 'diary/img/arrow0.png' %}",
@@ -101,6 +101,13 @@
                 var windImageSrc = getWindImage(data.current.wind_speed_10m);
                 if(Number(data.current.time.minute)<10){
                     data.current.time.minute = "0" + data.current.time.minute
+                }
+                console.log(data.current.is_day)
+                if(data.current.is_day){
+                    data.current.img_file_path = data.current.img_file_path_day
+                }
+                else{
+                    data.current.img_file_path = data.current.img_file_path_night
                 }
                 var current = `
                     <div class="row">
@@ -181,9 +188,15 @@
                 };
                 
                 var windImageSrc = getWindImage(data.wind_speed_10m);
+                if(data.is_day){
+                    data.img_file_path = data.img_file_path_day
+                }
+                else{
+                    data.img_file_path = data.img_file_path_night
+                }
                 
                 var elements = [
-                    { id: '#time', content: `<th scope="col" class=${colClass}>${data.time.hour}</th>` },
+                    { id: '#time', content: `<th scope="col" class="${colClass}">${data.time.hour}</th>` },
                     { id: '#img-and-day', content: `<td scope="row" class=${colClass}><img src="${data.img_file_path}" alt="weather" width="40px" height="40px" class="ms-auto"></td>` },
                     { id: '#tempareture', content: `<td scope="row" class=${colClass}>${data.temperature_2m}℃</td>` },
                     { id: '#precipitation', content: `<td scope="row" class=${colClass}>${data.precipitation === 0 ? 'ー' : `${data.precipitation}mm`}</td>` },
