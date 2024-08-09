@@ -1,258 +1,642 @@
 {
     "0": {
-        "description": "Clear",
-        "img": "Clear.png"
+        "day": {
+            "description": "Clear",
+            "image": "Clear.png"
+        },
+        "night": {
+            "description": "Clear night",
+            "image": "Clear_night.png"
+        }
     },
     "1": {
-        "description": "Mainly Sunny",
-        "img": "Mainly_Sunny.png"
+        "day": {
+            "description": "Mainly Clear",
+            "image": "Mainly_Clear.png"
+        },
+        "night": {
+            "description": "Mainly Clear night",
+            "image": "Mainly_Clear_night.png"
+        }
     },
     "2": {
-        "description": "Partly Cloudy",
-        "img": "Partly_Cloudy.png"
+        "day": {
+            "description": "Partly Cloudy",
+            "image": "Partly_Cloudy.png"
+        },
+        "night": {
+            "description": "Partly Cloudy night",
+            "image": "Partly_Cloudy_night.png"
+        }
     },
     "3": {
-        "description": "Cloudy",
-        "img": "Cloudy.png"
+        "day": {
+            "description": "Cloudy",
+            "image": "Cloudy.png"
+        },
+        "night": {
+            "description": "Cloudy",
+            "image": "Cloudy.png"
+        }
     },
     "40": {
-        "description": "Mist",
-        "img": "Mist.png"
+        "day": {
+            "description": "Mist",
+            "image": "Mist.png"
+        },
+        "night": {
+            "description": "Mist",
+            "image": "Mist.png"
+        }
     },
     "41": {
-        "description": "Mist",
-        "img": "Mist.png"
+        "day": {
+            "description": "Mist",
+            "image": "Mist.png"
+        },
+        "night": {
+            "description": "Mist",
+            "image": "Mist.png"
+        }
     },
     "42": {
-        "description": "Mist",
-        "img": "Mist.png"
+        "day": {
+            "description": "Mist",
+            "image": "Mist.png"
+        },
+        "night": {
+            "description": "Mist",
+            "image": "Mist.png"
+        }
     },
     "43": {
-        "description": "Mist",
-        "img": "Mist.png"
+        "day": {
+            "description": "Mist",
+            "image": "Mist.png"
+        },
+        "night": {
+            "description": "Mist",
+            "image": "Mist.png"
+        }
     },
     "44": {
-        "description": "Mist",
-        "img": "Mist.png"
+        "day": {
+            "description": "Mist",
+            "image": "Mist.png"
+        },
+        "night": {
+            "description": "Mist",
+            "image": "Mist.png"
+        }
     },
     "45": {
-        "description": "Mist",
-        "img": "Mist.png"
+        "day": {
+            "description": "Mist",
+            "image": "Mist.png"
+        },
+        "night": {
+            "description": "Mist",
+            "image": "Mist.png"
+        }
     },
     "46": {
-        "description": "Mist",
-        "img": "Mist.png"
+        "day": {
+            "description": "Mist",
+            "image": "Mist.png"
+        },
+        "night": {
+            "description": "Mist",
+            "image": "Mist.png"
+        }
     },
     "47": {
-        "description": "Mist",
-        "img": "Mist.png"
+        "day": {
+            "description": "Mist",
+            "image": "Mist.png"
+        },
+        "night": {
+            "description": "Mist",
+            "image": "Mist.png"
+        }
     },
     "48": {
-        "description": "Mist",
-        "img": "Mist.png"
+        "day": {
+            "description": "Mist",
+            "image": "Mist.png"
+        },
+        "night": {
+            "description": "Mist",
+            "image": "Mist.png"
+        }
     },
     "49": {
-        "description": "Mist",
-        "img": "Mist.png"
+        "day": {
+            "description": "Mist",
+            "image": "Mist.png"
+        },
+        "night": {
+            "description": "Mist",
+            "image": "Mist.png"
+        }
     },
     "50": {
-        "description": "Light Rain",
-        "img": "Light_Rain.png"
+        "day": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        },
+        "night": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        }
     },
     "51": {
-        "description": "Light Rain",
-        "img": "Light_Rain.png"
+        "day": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        },
+        "night": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        }
     },
     "52": {
-        "description": "Light Rain",
-        "img": "Light_Rain.png"
+        "day": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        },
+        "night": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        }
     },
     "53": {
-        "description": "Light Rain",
-        "img": "Light_Rain.png"
+        "day": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        },
+        "night": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        }
     },
     "54": {
-        "description": "Light Rain",
-        "img": "Light_Rain.png"
+        "day": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        },
+        "night": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        }
     },
     "55": {
-        "description": "Light Rain",
-        "img": "Light_Rain.png"
+        "day": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        },
+        "night": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        }
     },
     "56": {
-        "description": "Light Rain",
-        "img": "Light_Rain.png"
+        "day": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        },
+        "night": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        }
     },
     "57": {
-        "description": "Light Rain",
-        "img": "Light_Rain.png"
+        "day": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        },
+        "night": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        }
     },
     "58": {
-        "description": "Light Rain",
-        "img": "Light_Rain.png"
+        "day": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        },
+        "night": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        }
     },
     "59": {
-        "description": "Light Rain",
-        "img": "Light_Rain.png"
+        "day": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        },
+        "night": {
+            "description": "Light Rain",
+            "image": "Light_Rain.png"
+        }
     },
     "60": {
-        "description": "Rain",
-        "img": "Rain.png"
+        "day": {
+            "description": "Rain",
+            "image": "Rain.png"
+        },
+        "night": {
+            "description": "Rain",
+            "image": "Rain.png"
+        }
     },
     "61": {
-        "description": "Rain",
-        "img": "Rain.png"
+        "day": {
+            "description": "Rain",
+            "image": "Rain.png"
+        },
+        "night": {
+            "description": "Rain",
+            "image": "Rain.png"
+        }
     },
     "62": {
-        "description": "Rain",
-        "img": "Rain.png"
+        "day": {
+            "description": "Rain",
+            "image": "Rain.png"
+        },
+        "night": {
+            "description": "Rain",
+            "image": "Rain.png"
+        }
     },
     "63": {
-        "description": "Rain",
-        "img": "Rain.png"
+        "day": {
+            "description": "Rain",
+            "image": "Rain.png"
+        },
+        "night": {
+            "description": "Rain",
+            "image": "Rain.png"
+        }
     },
     "64": {
-        "description": "Rain",
-        "img": "Rain.png"
+        "day": {
+            "description": "Rain",
+            "image": "Rain.png"
+        },
+        "night": {
+            "description": "Rain",
+            "image": "Rain.png"
+        }
     },
     "65": {
-        "description": "Rain",
-        "img": "Rain.png"
+        "day": {
+            "description": "Rain",
+            "image": "Rain.png"
+        },
+        "night": {
+            "description": "Rain",
+            "image": "Rain.png"
+        }
     },
     "66": {
-        "description": "Rain",
-        "img": "Rain.png"
+        "day": {
+            "description": "Rain",
+            "image": "Rain.png"
+        },
+        "night": {
+            "description": "Rain",
+            "image": "Rain.png"
+        }
     },
     "67": {
-        "description": "Rain",
-        "img": "Rain.png"
+        "day": {
+            "description": "Rain",
+            "image": "Rain.png"
+        },
+        "night": {
+            "description": "Rain",
+            "image": "Rain.png"
+        }
     },
     "68": {
-        "description": "Rain",
-        "img": "Rain.png"
+        "day": {
+            "description": "Rain",
+            "image": "Rain.png"
+        },
+        "night": {
+            "description": "Rain",
+            "image": "Rain.png"
+        }
     },
     "69": {
-        "description": "Rain",
-        "img": "Rain.png"
+        "day": {
+            "description": "Rain",
+            "image": "Rain.png"
+        },
+        "night": {
+            "description": "Rain",
+            "image": "Rain.png"
+        }
     },
     "70": {
-        "description": "Snow",
-        "img": "Snow.png"
+        "day": {
+            "description": "Snow",
+            "image": "Snow.png"
+        },
+        "night": {
+            "description": "Snow",
+            "image": "Snow.png"
+        }
     },
     "71": {
-        "description": "Snow",
-        "img": "Snow.png"
+        "day": {
+            "description": "Snow",
+            "image": "Snow.png"
+        },
+        "night": {
+            "description": "Snow",
+            "image": "Snow.png"
+        }
     },
     "72": {
-        "description": "Snow",
-        "img": "Snow.png"
+        "day": {
+            "description": "Snow",
+            "image": "Snow.png"
+        },
+        "night": {
+            "description": "Snow",
+            "image": "Snow.png"
+        }
     },
     "73": {
-        "description": "Snow",
-        "img": "Snow.png"
+        "day": {
+            "description": "Snow",
+            "image": "Snow.png"
+        },
+        "night": {
+            "description": "Snow",
+            "image": "Snow.png"
+        }
     },
     "74": {
-        "description": "Snow",
-        "img": "Snow.png"
+        "day": {
+            "description": "Snow",
+            "image": "Snow.png"
+        },
+        "night": {
+            "description": "Snow",
+            "image": "Snow.png"
+        }
     },
     "75": {
-        "description": "Snow",
-        "img": "Snow.png"
+        "day": {
+            "description": "Snow",
+            "image": "Snow.png"
+        },
+        "night": {
+            "description": "Snow",
+            "image": "Snow.png"
+        }
     },
     "76": {
-        "description": "Snow",
-        "img": "Snow.png"
+        "day": {
+            "description": "Snow",
+            "image": "Snow.png"
+        },
+        "night": {
+            "description": "Snow",
+            "image": "Snow.png"
+        }
     },
     "77": {
-        "description": "Snow",
-        "img": "Snow.png"
+        "day": {
+            "description": "Snow",
+            "image": "Snow.png"
+        },
+        "night": {
+            "description": "Snow",
+            "image": "Snow.png"
+        }
     },
     "78": {
-        "description": "Snow",
-        "img": "Snow.png"
+        "day": {
+            "description": "Snow",
+            "image": "Snow.png"
+        },
+        "night": {
+            "description": "Snow",
+            "image": "Snow.png"
+        }
     },
     "79": {
-        "description": "Snow",
-        "img": "Snow.png"
+        "day": {
+            "description": "Snow",
+            "image": "Snow.png"
+        },
+        "night": {
+            "description": "Snow",
+            "image": "Snow.png"
+        }
     },
     "80": {
-        "description": "Showers",
-        "img": "Showers.png"
+        "day": {
+            "description": "Showers",
+            "image": "Showers.png"
+        },
+        "night": {
+            "description": "Showers",
+            "image": "Showers.png"
+        }
     },
     "81": {
-        "description": "Showers",
-        "img": "Showers.png"
+        "day": {
+            "description": "Showers",
+            "image": "Showers.png"
+        },
+        "night": {
+            "description": "Showers",
+            "image": "Showers.png"
+        }
     },
     "82": {
-        "description": "Showers",
-        "img": "Showers.png"
+        "day": {
+            "description": "Showers",
+            "image": "Showers.png"
+        },
+        "night": {
+            "description": "Showers",
+            "image": "Showers.png"
+        }
     },
     "83": {
-        "description": "Showers",
-        "img": "Showers.png"
+        "day": {
+            "description": "Showers",
+            "image": "Showers.png"
+        },
+        "night": {
+            "description": "Showers",
+            "image": "Showers.png"
+        }
     },
     "84": {
-        "description": "Showers",
-        "img": "Showers.png"
+        "day": {
+            "description": "Showers",
+            "image": "Showers.png"
+        },
+        "night": {
+            "description": "Showers",
+            "image": "Showers.png"
+        }
     },
     "85": {
-        "description": "Snow Showers",
-        "img": "Snow_Showers.png"
+        "day": {
+            "description": "Snow Showers",
+            "image": "Snow_Showers.png"
+        },
+        "night": {
+            "description": "Snow Showers",
+            "image": "Snow_Showers.png"
+        }
     },
     "86": {
-        "description": "Snow Showers",
-        "img": "Snow_Showers.png"
+        "day": {
+            "description": "Snow Showers",
+            "image": "Snow_Showers.png"
+        },
+        "night": {
+            "description": "Snow Showers",
+            "image": "Snow_Showers.png"
+        }
     },
     "87": {
-        "description": "Snow Showers",
-        "img": "Snow_Showers.png"
+        "day": {
+            "description": "Snow Showers",
+            "image": "Snow_Showers.png"
+        },
+        "night": {
+            "description": "Snow Showers",
+            "image": "Snow_Showers.png"
+        }
     },
     "88": {
-        "description": "Snow Showers",
-        "img": "Snow_Showers.png"
+        "day": {
+            "description": "Snow Showers",
+            "image": "Snow_Showers.png"
+        },
+        "night": {
+            "description": "Snow Showers",
+            "image": "Snow_Showers.png"
+        }
     },
     "89": {
-        "description": "Snow Showers",
-        "img": "Snow_Showers.png"
+        "day": {
+            "description": "Snow Showers",
+            "image": "Snow_Showers.png"
+        },
+        "night": {
+            "description": "Snow Showers",
+            "image": "Snow_Showers.png"
+        }
     },
     "90": {
-        "description": "Thunderstorm",
-        "img": "Thunderstorm.png"
+        "day": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        },
+        "night": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        }
     },
     "91": {
-        "description": "Thunderstorm",
-        "img": "Thunderstorm.png"
+        "day": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        },
+        "night": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        }
     },
     "92": {
-        "description": "Thunderstorm",
-        "img": "Thunderstorm.png"
+        "day": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        },
+        "night": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        }
     },
     "93": {
-        "description": "Thunderstorm",
-        "img": "Thunderstorm.png"
+        "day": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        },
+        "night": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        }
     },
     "94": {
-        "description": "Thunderstorm",
-        "img": "Thunderstorm.png"
+        "day": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        },
+        "night": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        }
     },
     "95": {
-        "description": "Thunderstorm",
-        "img": "Thunderstorm.png"
+        "day": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        },
+        "night": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        }
     },
     "96": {
-        "description": "Thunderstorm",
-        "img": "Thunderstorm.png"
+        "day": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        },
+        "night": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        }
     },
     "97": {
-        "description": "Thunderstorm",
-        "img": "Thunderstorm.png"
+        "day": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        },
+        "night": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        }
     },
     "98": {
-        "description": "Thunderstorm",
-        "img": "Thunderstorm.png"
+        "day": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        },
+        "night": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        }
     },
     "99": {
-        "description": "Thunderstorm",
-        "img": "Thunderstorm.png"
+        "day": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        },
+        "night": {
+            "description": "Thunderstorm",
+            "image": "Thunderstorm.png"
+        }
     }
 }

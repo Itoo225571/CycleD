@@ -24,19 +24,30 @@ class WeatherDataBase(BaseModel):
     time: datetime
     weather_code: int
     """___上から導く項目____"""
-    weather: str = ""
-    img_file_name: str = ""
-    img_file_path: str = ""
+    weather_day: str = ""
+    weather_night: str = ""
+    img_file_name_day: str = ""
+    img_file_name_night: str = ""
+    img_file_path_day: str = ""
+    img_file_path_night: str = ""
     
     def __init__(self,dir_name=None,*args,**data):
         super().__init__(**data) 
         data = _weather_category.get(str(self.weather_code))
-        self.weather = data.get("description")
-        self.img_file_name =  data.get("img")
-        if dir_name != None and isinstance(dir_name,str):
-            self.img_file_path = (Path(dir_name) / self.img_file_name).as_posix()
+        data_day = data.get("day")
+        data_night = data.get("night")
+        
+        self.weather_day = data_day.get("description")
+        self.weather_night = data_night.get("description")
+
+        self.img_file_name_day =  data_day.get("image")
+        self.img_file_name_night =  data_night.get("image")
+        if dir_name and isinstance(dir_name,str):
+            self.img_file_path_day = (Path(dir_name) / self.img_file_name_day).as_posix()
+            self.img_file_path_night = (Path(dir_name) / self.img_file_name_night).as_posix()
         else:
-            self.img_file_path = (Path(__file__).parent / Path('./img') / self.img_file_name).as_posix()
+            self.img_file_path_day = (Path(__file__).parent / Path('./img') / self.img_file_name_day).as_posix()
+            self.img_file_path_night = (Path(__file__).parent / Path('./img') / self.img_file_name_night).as_posix()
 
     @field_serializer("time")
     def serialize_time(self, value: datetime) -> dict:
@@ -58,11 +69,13 @@ class WeatherDataHourly(WeatherDataBase):
     precipitation_probability: int      #降水確率
     wind_speed_10m: int 
     wind_direction_10m: int
+    is_day: bool
 
     def __init__(self,*args, **kwargs):
         kwargs['temperature_2m'] = int(kwargs['temperature_2m'])
         kwargs['apparent_temperature'] = int(kwargs['apparent_temperature'])
         kwargs['wind_speed_10m'] = int(kwargs['wind_speed_10m']/3.6)
+        kwargs['is_day'] = bool(kwargs['is_day'])
         super().__init__(*args,**kwargs)
 
 class WeatherDataDaily(WeatherDataBase):
@@ -120,6 +133,7 @@ class WeatherDataCurrent(WeatherDataBase):
         kwargs['temperature_2m'] = int(kwargs['temperature_2m'])
         kwargs['apparent_temperature'] = int(kwargs['apparent_temperature'])
         kwargs['wind_speed_10m'] = int(kwargs['wind_speed_10m']/3.6)
+        kwargs['is_day'] = bool(kwargs['is_day'])
         super().__init__(*args,**kwargs)
 
 class WeatherData(BaseModel):
@@ -134,7 +148,7 @@ def get_weather(lat,lon,dir_name= None,time_range=24*2):
     params = {
         "latitude": lat,
         "longitude": lon,
-        "hourly": ["temperature_2m", "relative_humidity_2m", "apparent_temperature", "precipitation_probability", "precipitation", "rain", "showers", "snowfall", "weather_code", "wind_speed_10m", "wind_speed_80m", "wind_speed_120m", "wind_speed_180m", "wind_direction_10m", "wind_direction_80m", "wind_direction_120m", "wind_direction_180m", "wind_gusts_10m", "temperature_80m", "temperature_120m", "temperature_180m"],
+        "hourly": ["temperature_2m", "relative_humidity_2m", "apparent_temperature", "is_day", "precipitation_probability", "precipitation", "rain", "showers", "snowfall", "weather_code", "wind_speed_10m", "wind_speed_80m", "wind_speed_120m", "wind_speed_180m", "wind_direction_10m", "wind_direction_80m", "wind_direction_120m", "wind_direction_180m", "wind_gusts_10m", "temperature_80m", "temperature_120m", "temperature_180m"],
         "daily": ["weather_code", "temperature_2m_max", "temperature_2m_min", "apparent_temperature_max", "apparent_temperature_min", "sunrise", "sunset", "wind_speed_10m_max", "wind_gusts_10m_max", "wind_direction_10m_dominant"],
         "current": ["temperature_2m", "relative_humidity_2m", "apparent_temperature", "is_day", "precipitation", "weather_code", "wind_speed_10m", "wind_direction_10m"],
         "timezone": "Asia/Tokyo",
@@ -148,8 +162,9 @@ def get_weather(lat,lon,dir_name= None,time_range=24*2):
     data_json = response.json()
     
     df_hourly = pd.DataFrame(data=data_json["hourly"])
+    
     hourly_list = []
-    for index, row in df_hourly.iterrows():
+    for _, row in df_hourly.iterrows():
         row_dict = row.to_dict()
         row_dict['time_range'] = time_range
         wData = WeatherDataHourly(dir_name,**row_dict)
@@ -177,8 +192,9 @@ def get_weather(lat,lon,dir_name= None,time_range=24*2):
         "tomorrow": tomorrow,
         "current": current,
     }
+    
     return WeatherData(**weather_data_param)
 
 if __name__ == "__main__":
     data = get_weather(35.7247316,139.5812637)
-    date = datetime.now()
+

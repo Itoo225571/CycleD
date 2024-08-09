@@ -49,7 +49,7 @@ class WeatherReport():
 			codes=[codes]
 		for code in codes:
 			weather=self.weather_categories.get(code, None)
-			descriptions.append(weather["description"])
+			descriptions.append(weather["day"]["description"])
 			p = weather["img"]
 			imgs.append(p)
 		return descriptions,imgs
