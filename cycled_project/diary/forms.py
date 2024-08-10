@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import make_password,check_password
 from django import forms
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList
+from django.forms.models import inlineformset_factory
 
 from diary.models import *
 
@@ -112,3 +113,14 @@ class DiaryNewForm(forms.ModelForm):
             "date": "",
             "comment": "",
         }
+        widgets = {
+            "date": forms.DateInput(attrs={"type": "date"}),
+        }
+LocationAndDiaryFormSet = inlineformset_factory(
+    parent_model = Diary,
+    model = Location,
+    form = LocationForm,
+    extra=1,
+    min_num=1,
+    validate_min=True,
+)

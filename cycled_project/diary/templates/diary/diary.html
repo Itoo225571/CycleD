@@ -16,9 +16,18 @@
             <h2>日記メニュー</h2>
 
             <div class="my-md-3 my-2">
-                <button class="button_inverse" id="ico_new" onclick="location.href='{% url "diary:diary_new" %}'">
+                <button class="button_inverse" id="ico_new_picture" onclick="location.href='{% url "diary:diary_new" %}'">
                 {% comment %} <button class="button_inverse" id="ico_new" onclick="location.href='#'"> {% endcomment %}
-                    新規作成
+                    写真あり
+                </button>
+                <div>
+                    ※写真ありで書く場合，日時や場所は自動で入力されます
+                </div>
+            </div>
+
+            <div class="my-md-3 my-2">
+                <button class="button_inverse" id="ico_new" onclick="location.href='{% url "diary:diary_new" %}'">
+                    写真なし
                 </button>
             </div>
 
