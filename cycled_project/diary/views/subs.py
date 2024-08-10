@@ -38,7 +38,6 @@ def ajax_location2weather(request):
             'latlon': latlon,
         }
         request.session['weather_data'] = response
-        print(weather['hourly'][0])
         return JsonResponse(response)
     else:
         return JsonResponse({'error': 'Invalid request method.'}, status=400)

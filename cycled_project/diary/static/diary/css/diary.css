@@ -17,6 +17,12 @@
 #ico_new:hover::before {
   background-image: url("../img/diary_new2.png"); /* ここに画像のURLを指定 */
 }
+#ico_new_picture::before {
+  background-image: url("../img/diary_new_picture1.png"); /* ここに画像のURLを指定 */
+}
+#ico_new_picture:hover::before {
+  background-image: url("../img/diary_new_picture2.png"); /* ここに画像のURLを指定 */
+}
 #ico_edit::before {
   background-image: url("../img/diary_edit1.png"); /* ここに画像のURLを指定 */
 }

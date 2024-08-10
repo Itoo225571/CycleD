@@ -1,0 +1,58 @@
+{% extends "diary/base.html" %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}
+    しんきさくせい
+{% endblock title %}
+
+{% block extra_css %}
+
+{% endblock extra_css %}
+
+{% block content %}
+    <div class="container">
+        <div class="row"> 
+            <h2>日記 新規作成</h2>
+            <div class="col">
+                <button class="button_inverse" onclick="location.href='{% url "diary:address_diary_new" %}'">サイクリング先を選択する</button>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="row my-3">
+                    <div class="row my-3">
+                        <div class="col">
+                            <label for="{{ form.date.id_for_label }}">{{ form.date.label }}</label>
+                                {{ form.date }}
+                                {% if form.date.errors %}
+                                    <div class="error">{{ form.date.errors }}</div>
+                                {% endif %}
+                        </div>
+                    </div>
+                    <div class="row my-3">
+                        <div class="col">
+                        <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }}</label>
+                            {{ form.comment }}
+                            {% if form.comment.errors %}
+                                <div class="error">{{ form.comment.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary">作成</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block extra_js %}
+    <script src="{% static 'diary/js/getCookie.js' %}"></script>
+    <script src="{% static 'diary/js/loading_overlay.js' %}"></script>
+    
+    
+{% endblock %}

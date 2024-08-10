@@ -3,6 +3,8 @@ from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect
+from django.db import transaction
+
 from ..forms import *
 
 """______Diary関係______"""
