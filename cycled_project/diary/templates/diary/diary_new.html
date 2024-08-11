@@ -39,6 +39,15 @@
                         {% endif %}
                     </div>
                 </div>
+
+                <!-- Formset fields -->
+                {{ form.formset.management_form }} <!-- 管理フォーム -->
+                {% for formset_form in form.formset %}
+                    <div>
+                        {{ formset_form.as_p }} <!-- as_pでパラグラフ形式で出力 -->
+                    </div>
+                {% endfor %}
+
                 <div class="row">
                     <div class="col">
                         <button type="submit" class="btn btn-primary">作成</button>
