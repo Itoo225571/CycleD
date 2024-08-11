@@ -4,9 +4,25 @@ from django.contrib.auth.hashers import make_password,check_password
 from django import forms
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList
-from django.forms.models import inlineformset_factory
 
 from diary.models import *
+
+# フォームの中で，他のフォームの追加・編集を可能にするやつ
+class ModelFormWithFormSetMixin:
+    def __init__(self, *args, **kwargs):
+        super(ModelFormWithFormSetMixin, self).__init__(*args, **kwargs)
+        self.formset = self.formset_class(
+            instance=self.instance,
+            data=self.data if self.is_bound else None,
+        )
+
+    def is_valid(self):
+        return super(ModelFormWithFormSetMixin, self).is_valid() and self.formset.is_valid()
+
+    def save(self, commit=True):
+        saved_instance = super(ModelFormWithFormSetMixin, self).save(commit)
+        self.formset.save(commit)
+        return saved_instance
 
 class SignupForm(UserCreationForm):
     '''     定義文      '''
@@ -100,8 +116,18 @@ class UserEditForm(UserChangeForm):
             "password": "",
         }
 
+LocationAndDiaryFormSet = forms.inlineformset_factory(
+    parent_model = Diary,
+    model = Location,
+    form = LocationForm,
+    extra = 0,
+    min_num = 1,
+    can_delete = True
+)
+
 """___Diary関連___"""
-class DiaryNewForm(forms.ModelForm):
+class DiaryNewForm(ModelFormWithFormSetMixin, forms.ModelForm):
+    formset_class = LocationAndDiaryFormSet
     class Meta:
         model=Diary
         fields=["date","comment"]
@@ -116,11 +142,3 @@ class DiaryNewForm(forms.ModelForm):
         widgets = {
             "date": forms.DateInput(attrs={"type": "date"}),
         }
-LocationAndDiaryFormSet = inlineformset_factory(
-    parent_model = Diary,
-    model = Location,
-    form = LocationForm,
-    extra=1,
-    min_num=1,
-    validate_min=True,
-)
