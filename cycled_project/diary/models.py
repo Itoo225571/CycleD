@@ -9,9 +9,12 @@ class Location(models.Model):
     state = models.CharField(max_length=128,blank=True,verbose_name="市区町村")
     # 表示名
     display = models.CharField(max_length=128,blank=True,verbose_name="表示名")
+    label = models.CharField(max_length=128,blank=True,verbose_name="ラベル")
     # 画像(日記作成の時につける)
     image = models.ImageField(upload_to="images/",blank=True,null=True)
-    diary = models.ForeignKey('Diary',on_delete=models.CASCADE,null=True)
+    diary = models.ForeignKey('Diary',on_delete=models.CASCADE,null=True,related_name="locations")
+    # homeか否か
+    is_home = models.BooleanField(default=False, verbose_name="登録地域か否か")
     
     def __str__(self) -> str:
         return self.display
@@ -40,7 +43,7 @@ class User(AbstractUser):
         return self.username
     
 class Diary(models.Model):
-    date = models.DateField(verbose_name="日記の日時",null=True)
+    date = models.DateField(verbose_name="日記の日時", null=True)
     # 詳しい時間
     # datetime = models.DateTimeField("time detail",blank=True)
     # name_place = models.CharField(max_length=128,verbose_name="place name",null=True)
@@ -50,10 +53,16 @@ class Diary(models.Model):
     # is_publish = models.BooleanField(verbose_name="is publish",default=False)
     comment = models.TextField(blank=True,verbose_name="コメント")
     
-    # locations = models.ManyToManyField('Location', blank=True, verbose_name="場所情報")
+    # locations = models.ManyToManyField('Location', verbose_name="場所情報", related_name="diaries")
     user = models.ForeignKey(User,on_delete=models.CASCADE,)
     
-    # def __str__(self):
-    #     return self.name_place
-
+    def __str__(self):
+        return str(self.date)
     
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "date"],
+                name="diary_date_unique"
+            ),
+        ]

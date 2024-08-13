@@ -12,6 +12,8 @@
 {% endblock extra_css %}
 
 {% block content %}
+    {{ form.certifications.errors }}
+    
     <div class="container">
         <div class="row"> 
             <h2>日記 新規作成</h2>
@@ -21,28 +23,27 @@
             <form method="post">
                 {% csrf_token %}
                 <div class="row my-3">
-                    <div class="row my-3">
-                        <div class="col">
-                            <label for="{{ form.date.id_for_label }}">{{ form.date.label }}</label>
-                                {{ form.date }}
-                                {% if form.date.errors %}
-                                    <div class="error">{{ form.date.errors }}</div>
-                                {% endif %}
-                        </div>
-                    </div>
-                    <div class="row my-3">
-                        <div class="col">
-                        <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }}</label>
-                            {{ form.comment }}
-                            {% if form.comment.errors %}
-                                <div class="error">{{ form.comment.errors }}</div>
+                    <div class="col">
+                        <label for="{{ form.date.id_for_label }}">{{ form.date.label }}</label>
+                            {{ form.date }}
+                            {% if form.date.errors %}
+                                <div class="error">{{ form.date.errors }}</div>
                             {% endif %}
-                        </div>
                     </div>
-                    <div class="row">
-                        <div class="col">
-                            <button type="submit" class="btn btn-primary">作成</button>
-                        </div>
+                </div>
+                <div class="row my-3">
+                    <div class="col">
+                    <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }}</label>
+                        {{ form.comment }}
+                        {% if form.comment.errors %}
+                            <div class="error">{{ form.comment.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <button type="submit" class="btn btn-primary">作成</button>
                     </div>
                 </div>
             </form>

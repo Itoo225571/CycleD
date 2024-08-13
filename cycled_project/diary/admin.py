@@ -33,7 +33,8 @@ class LocationInline(admin.TabularInline):
     extra = 1
     
 class DiaryAdmin(admin.ModelAdmin):
-    inlines = [LocationInline,]
+    # inlines = [LocationInline,]
+    pass
 
 admin.site.register(User,UserAdmin)
 admin.site.register(Diary,DiaryAdmin)

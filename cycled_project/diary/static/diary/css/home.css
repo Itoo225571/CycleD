@@ -1,7 +1,12 @@
+/* テーブルがx軸方向にはみ出るようにする */
 .weather-table-hourly table {
     overflow-x: auto;
     white-space: nowrap;
     -webkit-overflow-scrolling: touch;
+}
+/* スクロールバーを非表示にする */
+.weather-table-hourly::-webkit-scrollbar {
+    display: none;
 }
 
 /* .weather-table-hourly img {
@@ -10,15 +15,12 @@
     object-fit: cover; 
 }  */
 
-/* スクロールバーを非表示にする */
-.weather-table-hourly::-webkit-scrollbar {
-    display: none;
-}
 .weather-table-hourly {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
 }
 
+/* 最初の要素を固定して見えるようにする */
 .weather-table-hourly th:first-child,
 .weather-table-hourly td:first-child {
     position: sticky;
@@ -27,6 +29,7 @@
     background-color: #fff;
 }
 
+/* 日にち区切り */
 .weather-table-hourly .daily-column {
     background-color: rgb(205, 205, 205);
     border: none;
@@ -47,3 +50,8 @@
     aspect-ratio: 1;
     object-fit: contain;
 }
+
+/* .weather-table-hourly th,
+.weather-table-hourly td {
+    padding: .5em .8em;
+} */

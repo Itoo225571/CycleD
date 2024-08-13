@@ -6,6 +6,9 @@ from django.conf import settings
 from django_ratelimit.decorators import ratelimit
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.models import model_to_dict
+from django.shortcuts import redirect
+
+
 from ..forms import *
 
 from subs.get_location.get_location import geocode_gsi,geocode_yahoo,regeocode_gsi,ResponseEmptyError
@@ -68,6 +71,8 @@ class AddressHomeView(LoginRequiredMixin,generic.FormView):
             form = LocationForm(request.POST)
             if form.is_valid():
                 loc = form.save(commit=False)
+                # Homeの場合Trueにする
+                loc.is_home = True
                 loc.save()
                 if request.user.home:
                     request.user.home.delete()
@@ -87,11 +92,12 @@ class AddressHomeView(LoginRequiredMixin,generic.FormView):
                 geo = regeocode_gsi(lat,lon)
                 loc.state = geo.address.state
                 loc.display = geo.address.display
+                # Homeの場合Trueにする
+                loc.is_home = True
+                loc.save()
                 
                 if request.user.home:
                     request.user.home.delete()
-
-                loc.save()
                 request.user.home = loc
                 request.user.save()
             else:
@@ -126,11 +132,6 @@ class AddressDiaryNewView(AddressHomeView):
             if form.is_valid():
                 loc = form.save(commit=False)
                 loc.save()
-                
-                # loc_json = model_to_dict(loc)
-                # loc_json['image'] = None
-                loc_json = loc.id
-                request.session['diary_location'] = loc_json
             else:
                 return self.form_invalid(form)
         
@@ -142,14 +143,12 @@ class AddressDiaryNewView(AddressHomeView):
                 lat = form.cleaned_data["lat"]
                 lon = form.cleaned_data["lon"]
                 geo = regeocode_gsi(lat,lon)
+                print(geo)
                 loc.state = geo.address.state
                 loc.display = geo.address.display
+                loc.label = geo.address.label
                 loc.save()
                 
-                # loc_json = model_to_dict(loc)
-                # loc_json['image'] = None
-                loc_json = loc.id
-                request.session['diary_location'] = loc_json
             else:
                 return self.form_invalid(form)
 
