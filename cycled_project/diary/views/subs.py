@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.templatetags.static import static
+from django.shortcuts import redirect
 
 from subs.weather_report.weather_report import get_weather
 from datetime import datetime

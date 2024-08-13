@@ -12,12 +12,11 @@
 {% endblock extra_css %}
 
 {% block content %}
+    {{ form.certifications.errors }}
     <div class="container">
         <div class="row"> 
             <h2 class="mb-3">日記 新規作成</h2>
-            <div class="col">
-                <button class="button_inverse" onclick="location.href='{% url "diary:address_diary_new" %}'">サイクリング先を選択する</button>
-            </div>
+            
             <form method="post">
                 {% csrf_token %}
                 <div class="row my-3">
@@ -38,15 +37,37 @@
                             <div class="error">{{ form.comment.errors }}</div>
                         {% endif %}
                     </div>
-                </div>
+                </div>        
 
-                <!-- Formset fields -->
-                {{ form.formset.management_form }} <!-- 管理フォーム -->
-                {% for formset_form in form.formset %}
-                    <div>
-                        {{ formset_form.as_p }} <!-- as_pでパラグラフ形式で出力 -->
+                <div class="row my-3">
+                    <div class="col">
+                    <label for="{{ form.locations.id_for_label }}">{{ form.locations.label }}</label>
+                    <table class="table table-bordered" id="location-table">
+                        <thead>
+                            <tr>
+                                <th>地域</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in form.locations %}
+                            <tr>
+                                <td>
+                                    {{ item }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <tr><td>
+                                <a href='{% url "diary:address_diary_new" %}'>
+                                    <img src="{% static 'diary/img/plus.png' %}" alt="add_location" width="35" height="35" class="d-inline-block align-text-bottom">
+                                </a>
+                            </td></tr>
+                        </tbody>
+                    </table>
+                    {% if form.locations.errors %}
+                        <div class="error">{{ form.locations.errors }}</div>
+                    {% endif %}
                     </div>
-                {% endfor %}
+                </div> 
 
                 <div class="row">
                     <div class="col">
@@ -56,6 +77,7 @@
             </form>
         </div>
     </div>
+
 {% endblock content %}
 
 {% block extra_js %}

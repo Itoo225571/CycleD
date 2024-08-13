@@ -7,23 +7,6 @@ from django.forms.utils import ErrorList
 
 from diary.models import *
 
-# フォームの中で，他のフォームの追加・編集を可能にするやつ
-class ModelFormWithFormSetMixin:
-    def __init__(self, *args, **kwargs):
-        super(ModelFormWithFormSetMixin, self).__init__(*args, **kwargs)
-        self.formset = self.formset_class(
-            instance=self.instance,
-            data=self.data if self.is_bound else None,
-        )
-
-    def is_valid(self):
-        return super(ModelFormWithFormSetMixin, self).is_valid() and self.formset.is_valid()
-
-    def save(self, commit=True):
-        saved_instance = super(ModelFormWithFormSetMixin, self).save(commit)
-        self.formset.save(commit)
-        return saved_instance
-
 class SignupForm(UserCreationForm):
     '''     定義文      '''
     def __init__(self, *args, **kwargs):
@@ -93,7 +76,7 @@ class AddressSearchForm(forms.Form):
 class LocationForm(forms.ModelForm):
     class Meta:
         model = Location
-        fields = ["lat","lon","state","display",]
+        fields = ["lat","lon","state","display","label"]
 
 class LocationCoordForm(forms.ModelForm):
     class Meta:
@@ -116,21 +99,25 @@ class UserEditForm(UserChangeForm):
             "password": "",
         }
 
-LocationAndDiaryFormSet = forms.inlineformset_factory(
-    parent_model = Diary,
-    model = Location,
-    form = LocationForm,
-    extra = 0,
-    min_num = 1,
-    can_delete = True
-)
-
 """___Diary関連___"""
-class DiaryNewForm(ModelFormWithFormSetMixin, forms.ModelForm):
-    formset_class = LocationAndDiaryFormSet
+class DiaryForm(forms.ModelForm):
+    # formset_class = LocationInDiaryFormSet
+    locations = forms.ModelMultipleChoiceField(
+        queryset = Location.objects.filter(
+            diary__isnull=True,
+            is_home=False,
+        ).distinct(),
+        widget=forms.CheckboxSelectMultiple,  # または別のウィジェット
+        required = True,
+    )
+    
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+
     class Meta:
         model=Diary
-        fields=["date","comment"]
+        fields=["date","comment","locations"]
         labels = {
             "date": "サイクリング日時",
             "comment": "コメント",
@@ -142,3 +129,18 @@ class DiaryNewForm(ModelFormWithFormSetMixin, forms.ModelForm):
         widgets = {
             "date": forms.DateInput(attrs={"type": "date"}),
         }
+
+    def clean_date(self):
+        date = self.cleaned_data["date"]
+        user = self.request.user
+        # フォームのインスタンスが新規作成か更新かを判定
+        if self.instance.pk:
+            # 更新の場合は他のインスタンスの重複をチェック
+            if Diary.objects.filter(date=date, user=user).exclude(pk=self.instance.pk).exists():
+                self.add_error('date',"この日時のサイクリングはすでに存在します。")
+        else:
+            # 新規作成の場合はすべてのインスタンスの重複をチェック
+            if Diary.objects.filter(date=date, user=user).exists():
+                self.add_error('date',"この日時のサイクリングはすでに存在します。")
+        return date
+    
