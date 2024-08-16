@@ -109,6 +109,7 @@ class DiaryForm(forms.ModelForm):
         ).distinct(),
         widget=forms.CheckboxSelectMultiple,  # または別のウィジェット
         label = "場所",
+        help_text = "",
         required = True,
     )
     
