@@ -35,6 +35,12 @@
     border: none;
 }
 
+/* 風向きの高さを一定に */
+.weather-table-hourly .wind-img {
+    height: 40px;
+    object-fit: cover;
+}
+
 /* 現在天気の画像に関するクラス */
 /* #currentWeather img {
     display: block;
