@@ -17,7 +17,7 @@ class Location(models.Model):
     is_home = models.BooleanField(default=False, verbose_name="登録地域か否か")
     
     def __str__(self) -> str:
-        return self.display
+        return self.label
 
 class User(AbstractUser):
     # username=models.CharField(max_length=128,verbose_name="user   name")

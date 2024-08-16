@@ -5,8 +5,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
-
 from ..forms import *
+
+from datetime import datetime,timedelta
 
 """______Diary関係______"""
 class DiaryView(LoginRequiredMixin,generic.TemplateView):
@@ -32,6 +33,7 @@ class DiaryMixin(object):
             location.diary = diary
             location.save()
         return response
+    
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         # ユーザーをフォームに渡す

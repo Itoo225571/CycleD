@@ -107,14 +107,24 @@ class DiaryForm(forms.ModelForm):
             diary__isnull=True,
             is_home=False,
         ).distinct(),
-        widget=forms.CheckboxSelectMultiple,  # または別のウィジェット
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'hidden-checkbox'}),
         label = "場所",
         help_text = "",
         required = True,
     )
     
     def __init__(self, *args, **kwargs):
+        # viewsでrequestを使用可能にする
         self.request = kwargs.pop('request', None)
+        # デフォルトで全て選択されるようにする
+        loc_data = Location.objects.filter(
+            diary__isnull=True,
+            is_home=False,
+        ).distinct()
+        initial = kwargs.get('initial', {})
+        initial['locations'] = loc_data
+
+        kwargs['initial'] = initial
         super().__init__(*args, **kwargs)
 
     class Meta:
@@ -139,10 +149,10 @@ class DiaryForm(forms.ModelForm):
         if self.instance.pk:
             # 更新の場合は他のインスタンスの重複をチェック
             if Diary.objects.filter(date=date, user=user).exclude(pk=self.instance.pk).exists():
-                self.add_error('date',"この日時のサイクリングはすでに存在します。")
+                self.add_error('date',"この日時のサイクリング日記はすでに存在します。")
         else:
             # 新規作成の場合はすべてのインスタンスの重複をチェック
             if Diary.objects.filter(date=date, user=user).exists():
-                self.add_error('date',"この日時のサイクリングはすでに存在します。")
+                self.add_error('date',"この日時のサイクリング日記はすでに存在します。")
         return date
     
