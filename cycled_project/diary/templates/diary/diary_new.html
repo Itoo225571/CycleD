@@ -19,6 +19,7 @@
             
             <form method="post">
                 {% csrf_token %}
+                
                 <div class="row my-3">
                     <div class="col">
                         <label for="{{ form.date.id_for_label }}">{{ form.date.label }}</label>
@@ -57,9 +58,7 @@
                             </tr>
                             {% endfor %}
                             <tr><td>
-                                <a href='{% url "diary:address_diary_new" %}'>
-                                    <img src="{% static 'diary/img/plus.png' %}" alt="add_location" width="35" height="35" class="d-inline-block align-text-bottom">
-                                </a>
+                                <a href='{% url "diary:address_diary_new" %}'>地域を追加</a>
                             </td></tr>
                         </tbody>
                     </table>
@@ -75,6 +74,7 @@
                     </div>
                 </div>
             </form>
+            
         </div>
     </div>
 
