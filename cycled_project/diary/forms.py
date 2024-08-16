@@ -101,13 +101,14 @@ class UserEditForm(UserChangeForm):
 
 """___Diary関連___"""
 class DiaryForm(forms.ModelForm):
-    # formset_class = LocationInDiaryFormSet
+    # Locationsの設定はここでする
     locations = forms.ModelMultipleChoiceField(
         queryset = Location.objects.filter(
             diary__isnull=True,
             is_home=False,
         ).distinct(),
         widget=forms.CheckboxSelectMultiple,  # または別のウィジェット
+        label = "場所",
         required = True,
     )
     
@@ -123,7 +124,7 @@ class DiaryForm(forms.ModelForm):
             "comment": "コメント",
         }
         help_texts = {
-            "date": "",
+            "date": "サイクリングに行った日を入力",
             "comment": "",
         }
         widgets = {
