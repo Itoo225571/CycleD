@@ -4,9 +4,14 @@
     white-space: nowrap;
     -webkit-overflow-scrolling: touch;
 }
-/* スクロールバーを非表示にする */
-.weather-table-hourly::-webkit-scrollbar {
-    display: none;
+/* 通常時はスクロールバーを非表示に */
+.weather-table-hourly {
+    overflow: hidden; /* スクロールバーを隠す */
+}
+/* カーソルが要素に乗ったときだけスクロールバーを表示 */
+.weather-table-hourly:hover {
+    overflow-y: auto; /* 縦方向にスクロールバーを表示 */
+    overflow-x: auto; /* 横方向にスクロールバーを表示 */
 }
 
 /* .weather-table-hourly img {
@@ -15,10 +20,10 @@
     object-fit: cover; 
 }  */
 
-.weather-table-hourly {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-}
+/* .weather-table-hourly {
+    -ms-overflow-style: none;
+    scrollbar-width: none;  
+} */
 
 /* 最初の要素を固定して見えるようにする */
 .weather-table-hourly th:first-child,
