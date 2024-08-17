@@ -8,12 +8,16 @@
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'diary/css/diary.css' %}" type="text/css" >
+    <link rel="stylesheet" href="{% static 'diary/css/mycalendar.css' %}" type="text/css" >
 {% endblock extra_css %}
 
 {% block content %}
     <div class="container text-center">
         <div class="row justify-content-md-center"> 
             <h2>日記メニュー</h2>
+            <div class="my-md-3 my-2"> 
+                <div id="mycalendar"></div>
+            </div>
 
             <div class="my-md-3 my-2">
                 <button class="button_inverse" id="ico_new_picture" onclick="location.href='{% url "diary:diary_new" %}'">
@@ -44,6 +48,7 @@
 {% block extra_js %}
     <script src="{% static 'diary/js/getCookie.js' %}"></script>
     <script src="{% static 'diary/js/loading_overlay.js' %}"></script>
-    
-    
+    {% comment %} fullカレンダー {% endcomment %}
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+    <script src="{% static 'diary/js/mycalendar.js' %}"></script>
 {% endblock %}

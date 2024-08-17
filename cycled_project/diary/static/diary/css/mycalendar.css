@@ -1,0 +1,32 @@
+/* カレンダー中のaの下線+青文字を消す */
+.fc a {
+    color: inherit; /* 親要素の色を継承 */
+    text-decoration: none; /* 下線を削除 */
+}
+.fc-daygrid-day-number {
+    color: black; /* 日付の色を黒に戻す */
+    text-decoration: none; /* 下線を削除 */
+}
+/* 幅 */
+.fc-header-toolbar,
+.fc-view-harness,
+.fc-col-header, .fc-daygrid-body, .fc-scrollgrid-sync-table{
+	width: 100%;
+	max-width: 1000px;
+}
+
+#mycalendar{
+	align-items : center;
+}
+
+/* 土日の背景色 */
+#mycalendar td.fc-day-sun {
+    background-color: #ffebee; 
+}
+#mycalendar td.fc-day-sat {
+    background-color: #e0f7fa; 
+}
+/* 今日 */
+#mycalendar td.fc-day-today {
+    background-color: #ffffcc; 
+}

@@ -5,14 +5,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
+from django.http import JsonResponse
 from ..forms import *
-
-from datetime import datetime,timedelta
 
 """______Diary関係______"""
 class DiaryView(LoginRequiredMixin,generic.TemplateView):
     template_name = "diary/diary.html"
-    pass
 
 class DiaryListView(LoginRequiredMixin,generic.ListView):
     template_name = "diary/diary_list.html"

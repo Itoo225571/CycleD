@@ -10,7 +10,6 @@ from django.shortcuts import redirect
 
 from ..forms import *
 
-from datetime import datetime
 from subs.get_location.get_location import geocode_gsi,geocode_yahoo,regeocode_gsi,ResponseEmptyError
 
 """______Address関係______"""
@@ -132,12 +131,6 @@ class AddressDiaryNewView(AddressHomeView):
             if form.is_valid():
                 loc = form.save(commit=False)
                 loc.save()
-                # locの保存を一時的にする
-                # セッションから既存のlocデータを取得
-                loc_data = request.session.get('loc_data', [])
-                # locのIDと保存時のタイムスタンプを追加
-                loc_data.append({'id': loc.id, 'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
-                request.session['loc_data'] = loc_data
             else:
                 return self.form_invalid(form)
         
@@ -153,15 +146,8 @@ class AddressDiaryNewView(AddressHomeView):
                 loc.display = geo.address.display
                 loc.label = geo.address.label
                 loc.save()
-
-                loc_data = request.session.get('loc_data', [])
-                loc_data.append({'id': loc.id, 'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
-                request.session['loc_data'] = loc_data
             else:
                 return self.form_invalid(form)
-
-        # else:
-        #     form = self.get_form(self.form_class)
         return self.form_valid(form)
     
 class AddressDiaryEditView(AddressDiaryNewView):
