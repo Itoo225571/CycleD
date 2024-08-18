@@ -8,81 +8,99 @@
 {% endblock title %}
 
 {% block extra_css %}
-
+<link rel="stylesheet" href="{% static 'diary/css/mycalendar.css' %}" type="text/css" >
 {% endblock extra_css %}
 
 {% block content %}
-    {{ form.certifications.errors }}
     <div class="container">
-        <div class="row"> 
-            <h2 class="mb-3">日記 新規作成</h2>
-            
-            <form method="post">
-                {% csrf_token %}
-                
-                <div class="row my-3">
-                    <div class="col">
-                        <label for="{{ form.date.id_for_label }}">{{ form.date.label }}</label>
-                            {{ form.date }}
-                            {% if form.date.errors %}
-                                <div class="error">{{ form.date.errors }}</div>
-                            {% endif %}
-                    </div>
-                </div>
-                
-                <div class="row my-3">
-                    <div class="col">
-                    <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }}</label>
-                        {{ form.comment }}
-                        {% if form.comment.errors %}
-                            <div class="error">{{ form.comment.errors }}</div>
-                        {% endif %}
-                    </div>
-                </div>        
-
-                <div class="row my-3">
-                    <div class="col">
-                    <label for="{{ form.locations.id_for_label }}">{{ form.locations.label }}</label>
-                    <table class="table table-bordered" id="location-table">
-                        <thead>
-                            <tr>
-                                <th>地域</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in form.locations %}
-                            <tr>
-                                <td>
-                                    {{ item }}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            <tr><td>
-                                <a href='{% url "diary:address_diary_new" %}'>地域を追加</a>
-                            </td></tr>
-                        </tbody>
-                    </table>
-                    {% if form.locations.errors %}
-                        <div class="error">{{ form.locations.errors }}</div>
-                    {% endif %}
-                    </div>
-                </div> 
-
-                <div class="row">
-                    <div class="col">
-                        <button type="submit" class="btn btn-primary">作成</button>
-                    </div>
-                </div>
-            </form>
-            
+        <div class="row justify-content-md-center text-center"> 
+            <h2>日記メニュー</h2>
+            <div class="my-md-3 my-2"> 
+                <div id="mycalendar"></div>
+            </div>
         </div>
-    </div>
+        <!-- モーダルウィンドウのHTML -->
+        <div class="modal fade" id="diaryModal" tabindex="-1" aria-labelledby="diaryModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    {{ form.certifications.errors }}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="diaryModalLabel">
+                            日記の作成 - <span id="selectedDate"></span>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" id="diaryForm">
+                            {% csrf_token %}
+                            
+                            <div style="display: none;">
+                                <label for="{{ form.date.id_for_label }}">{{ form.date.label }}</label>
+                                    {{ form.date }}
+                                    {% if form.date.errors %}
+                                        <div class="error" id="date-error">{{ form.date.errors }}</div>
+                                    {% endif %}
+                            </div>
+                            
+                            {% comment %} <div class="row my-3">
+                                <div class="col">
+                                <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }}</label>
+                                    {{ form.comment }}
+                                    {% if form.comment.errors %}
+                                        <div class="error" id="comment-error">{{ form.comment.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>         {% endcomment %}
+            
+                            <div class="row">
+                                <div class="col">
+                                    <label for="{{ form.locations.id_for_label }}">{{ form.locations.label }}</label>
+                                    <table class="table table-bordered my-1" id="location-table">
+                                        <thead>
+                                            <tr>
+                                                <th>地域</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in form.locations %}
+                                            <tr>
+                                                <td>
+                                                    {{ item }}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                            <tr><td>
+                                                <a href='{% url "diary:address_diary_new" %}'>地域を追加</a>
+                                            </td></tr>
+                                        </tbody>
+                                    </table>
+                                {% if form.locations.errors %}
+                                    <div class="error" id="locations-error">{{ form.locations.errors }}</div>
+                                {% endif %}
+                                </div>
+                            </div> 
+            
+                            <div class="row">
+                                <div class="col">
+                                    <button type="submit" class="btn btn-primary">作成</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+    </div>
 {% endblock content %}
 
 {% block extra_js %}
+    <script>
+        window.hasFormErrors = {% if form_errors %}true{% else %}false{% endif %};
+    </script>
     <script src="{% static 'diary/js/getCookie.js' %}"></script>
     <script src="{% static 'diary/js/loading_overlay.js' %}"></script>
-    
-    
+    {% comment %} fullカレンダー {% endcomment %}
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+    <script src="{% static 'diary/js/mycalendar.js' %}"></script>
 {% endblock %}
