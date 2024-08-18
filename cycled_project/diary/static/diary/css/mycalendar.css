@@ -19,13 +19,26 @@
 	align-items : center;
 }
 
-/* 土日の背景色 */
+/* 日曜日 */
 #mycalendar td.fc-day-sun {
-    background-color: #ffebee; 
+    color: crimson;
 }
+/*祝日のセル*/
+#mycalendar td.fc-daygrid-day:has(.holiday){
+	color: crimson;
+}
+#mycalendar .holiday{
+    color: crimson; /* 祝日タイトルの色 */
+    font-weight: bold; /* 太字 */
+    font-size: 0.8em;
+    white-space: pre-line; /* 改行文字を反映させる */
+    background-color: transparent; /* 背景を透明にする */
+}
+/* 土曜日 */
 #mycalendar td.fc-day-sat {
-    background-color: #e0f7fa; 
+    color: blue;
 }
+
 /* 今日 */
 #mycalendar td.fc-day-today {
     background-color: #ffffcc; 
