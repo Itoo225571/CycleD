@@ -139,7 +139,7 @@ class DiaryForm(forms.ModelForm):
             "comment": "",
         }
         widgets = {
-            "date": forms.DateInput(attrs={"type": "date"}),
+            "date": forms.DateInput(attrs={"id": "id_date_field",}), 
         }
 
     def clean_date(self):

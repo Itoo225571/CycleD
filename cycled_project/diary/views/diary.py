@@ -31,12 +31,15 @@ class DiaryMixin(object):
             location.diary = diary
             location.save()
         return response
+    # エラーがあったことを知らせるやつ
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form, form_errors=True))
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         # ユーザーをフォームに渡す
         kwargs['request'] = self.request
-        return kwargs
+        return kwargs    
 
 class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
     template_name = "diary/diary_new.html"
