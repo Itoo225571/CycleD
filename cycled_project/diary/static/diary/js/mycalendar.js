@@ -34,15 +34,17 @@ function formatDateJapanese(dateStr) {
 
 // 読み込まれたら実行する関数
 document.addEventListener('DOMContentLoaded', function() {
+	var diaryModal = document.getElementById('diaryModal');
 	if (window.hasFormErrors) {
-        // モーダルを開く
-        var modal = new bootstrap.Modal(document.getElementById('diaryModal'));
-        modal.show();
-    }
+		// モーダルを開く
+		var modal = new bootstrap.Modal(document.getElementById('diaryModal'));
+		document.getElementById('modalForm-errors').style.display = 'block';
+		document.getElementById('modalForm-normal').style.display = 'none';
+		modal.show();
+	}
 	// 祝日データを取得してからカレンダーを初期化
 	addHolidaysToCalendar().then(holidayEvents => {
 		const calendarEl = document.getElementById('mycalendar');
-
 		// カレンダーの初期設定
 		const calendar = new FullCalendar.Calendar(calendarEl, {
 			// カレンダーの種類
@@ -137,4 +139,9 @@ document.addEventListener('DOMContentLoaded', function() {
             event.preventDefault(); // フォームの送信をキャンセルする
         }
     });
+
+	diaryModal.addEventListener('hidden.bs.modal', function () {
+		document.getElementById('modalForm-errors').style.display = 'none';
+		document.getElementById('modalForm-normal').style.display = 'block';
+	});
 });

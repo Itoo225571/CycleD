@@ -1,5 +1,8 @@
 from django.db import models
+from django.forms.models import model_to_dict
 from django.contrib.auth.models import AbstractUser
+
+import json
 
 class Location(models.Model):
     # user = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -18,6 +21,10 @@ class Location(models.Model):
     
     def __str__(self) -> str:
         return self.label
+    
+    def to_json(self):
+        location_dict = model_to_dict(self)
+        return json.dumps(location_dict)
 
 class User(AbstractUser):
     # username=models.CharField(max_length=128,verbose_name="user   name")
