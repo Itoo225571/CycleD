@@ -15,8 +15,8 @@ urlpatterns = [
     path("user/",views.UserProfileView.as_view(),name="user_profile"),
     path("user/edit/",views.UserEditView.as_view(),name="user_edit"),
     
-    path("diary/",views.DiaryView.as_view(),name="diary"),
-    path("diary/new/",views.DiaryNewView.as_view(),name="diary_new"),
+    # path("diary/",views.DiaryView.as_view(),name="diary"),
+    path("diary/",views.DiaryNewView.as_view(),name="diary"),
     path("diary/list/",views.DiaryListView.as_view(),name="diary_list"),
     path("diary/edit/<int:diary_id>",views.DiaryEditView.as_view(),name="diary_edit"),
     path("diary/delete/<int:diary_id>",views.DiaryDeleteView.as_view(),name="diary_delete"),

@@ -54,8 +54,7 @@
             start_loading(false);
         
             // ここからAjaxリクエストの処理
-            var csrftoken = getCookie('csrftoken');
-            
+            var csrftoken = getCookie('csrftoken');    
             $.ajax({
                 method: "POST",
                 url: "{% url 'diary:ajax_location2weather' %}",

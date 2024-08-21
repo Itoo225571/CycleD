@@ -159,8 +159,10 @@
             $(".get-current-address-button").on('click', function(){
                 var form = $(this).parents('form');
                 start_loading(false);
+                var watchId;
 
                 function successCallback(address) {
+                    navigator.geolocation.clearWatch(watchId);
                     remove_loading();
                     var data ={
                         lat : address.coords.latitude,
@@ -170,16 +172,20 @@
                 }
 
                 function errorCallback(error) {
+                    navigator.geolocation.clearWatch(watchId);
                     remove_loading();
                     console.error('位置情報の送信に失敗しました:', error.message);
                 }
-                navigator.geolocation.getCurrentPosition(
+                watchId = navigator.geolocation.watchPosition(
                     successCallback,
                     errorCallback,
                     {
-                        enableHighAccuracy: true,
-                        timeout : 5000
-                    });
+                        maximumAge : 5000 ,
+                        timeout : 10000 ,
+                        enableHighAccuracy : true
+                    }
+                );
+                
             });
 
         });
