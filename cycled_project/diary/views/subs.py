@@ -22,13 +22,13 @@ def ajax_location2weather(request):
             #str -> datetime型
             session_dt = datetime.fromisoformat(datetime_1)
             time_bool = bool(dt.year==session_dt.year) and bool(dt.month==session_dt.month) and bool(dt.day==session_dt.day) and bool(dt.hour==session_dt.hour) 
+            minute_bool = bool(abs(dt.minute-session_dt.minute) < 30)
             latlon_bool = bool(session_data.get('latlon') == latlon)
 
-        if session_data and time_bool and latlon_bool:
+        if session_data and time_bool and minute_bool and latlon_bool:
             weather = session_data.get('weather')
         else:
             img_path = static('diary_weather_report/img/')
-            
             weather_json = get_weather(latitude,longitude,dir_name = img_path,time_range=48)
             weather = weather_json.model_dump()
         # 位置情報を含むレスポンスを作成
