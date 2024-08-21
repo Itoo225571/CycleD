@@ -131,7 +131,7 @@
                 $('#todayWeather').append(today);
                 $('#tomorrowWeather').append(tomorrow);
                 $('#currentWeather').append(current);
-                $('#weather_table_hourly').html(template(data.hourly))
+                $('#weather_table_hourly').html(template(data.hourly,data.current))
             })
         
             .fail(function(jqXHR, textStatus, errorThrown) {
@@ -143,7 +143,7 @@
         
         };
 
-        function template(dataArray){
+        function template(dataArray,dataCurrent){
             var table = `
                 <thead>
                     <tr id="time"><th scope="col">時刻</th></tr>
@@ -159,7 +159,6 @@
             var tObject = $(table);
 
             dataArray.map(function(data,index){
-                
                 if(data.time.hour == 0){
                     var colClass = `daily-column`;
                     var elements = [
@@ -170,6 +169,7 @@
                         tObject.find(id).append(content);
                     });
                 } 
+                var iconCurrent = '';
                 var colClass = `hourly-column`
                 var windImageMap = {
                     0: "{% static 'diary/img/arrow0.png' %}",
@@ -193,13 +193,17 @@
                 else{
                     data.img_file_path = data.img_file_path_night
                 }
+                // 現在時刻を示す印
+                if(data.time.day===dataCurrent.time.day && data.time.hour===dataCurrent.time.hour){
+                    iconCurrent = '<i class="fa-solid fa-sort-down fa-bounce fa-2xl" style="color: #ff0000;"></i>'
+                }
                 
                 var elements = [
-                    { id: '#time', content: `<th scope="col" class="${colClass}">${data.time.hour}</th>` },
-                    { id: '#img-and-day', content: `<td scope="row" class=${colClass}><img src="${data.img_file_path}" alt="weather" width="40px" height="40px" class="ms-auto"></td>` },
-                    { id: '#tempareture', content: `<td scope="row" class=${colClass}>${data.temperature_2m}℃</td>` },
-                    { id: '#precipitation', content: `<td scope="row" class=${colClass}>${data.precipitation === 0 ? 'ー' : `${data.precipitation}mm`}</td>` },
-                    { id: '#precipitation_probability', content: `<td scope="row" class=${colClass}>${data.precipitation_probability}%</td>` },
+                    { id: '#time', content: `<th scope="col" class="${colClass}">${iconCurrent}<br>${data.time.hour}</th>` },
+                    { id: '#img-and-day', content: `<td scope="row" class="${colClass}"><img src="${data.img_file_path}" alt="weather" width="40px" height="40px" class="ms-auto"></td>` },
+                    { id: '#tempareture', content: `<td scope="row" class="${colClass}">${data.temperature_2m}℃</td>` },
+                    { id: '#precipitation', content: `<td scope="row" class="${colClass}">${data.precipitation === 0 ? 'ー' : `${data.precipitation}mm`}</td>` },
+                    { id: '#precipitation_probability', content: `<td scope="row" class="${colClass}">${data.precipitation_probability}%</td>` },
                     { 
                         id: '#wind', 
                         content: `

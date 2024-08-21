@@ -19,14 +19,15 @@ class DiaryMixin(object):
     def form_valid(self, form):
         form.instance.user = self.request.user
         response = super().form_valid(form)
-        location_ids = self.request.POST.getlist('locations')
-        diary = self.object
-        for location_id in location_ids:
-            # Locationオブジェクトを取得
-            location = get_object_or_404(Location, id=location_id)
-            # DiaryオブジェクトをLocationに関連づける
-            location.diary = diary
-            location.save()
+        # LocationFormSetの処理
+        # formset = self.get_form_kwargs().get('formset')
+        # if formset:
+        #     for location_form in formset:
+        #         if location_form.cleaned_data:
+        #             # 新規作成または変更されたLocationオブジェクトを取得
+        #             location = location_form.save(commit=False)
+        #             location.diary = self.object
+        #             location.save()
         return response
     # エラーがあったことを知らせるやつ
     def form_invalid(self, form):

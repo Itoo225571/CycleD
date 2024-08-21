@@ -85,31 +85,50 @@
                 
                                 <div class="row">
                                     <div class="col">
-                                        <label for="{{ form.locations.id_for_label }}">{{ form.locations.label }}</label>
-                                        <table class="table table-bordered my-1" id="location-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>地域</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for item in form.locations %}
-                                                <tr>
-                                                    <td>
-                                                        {{ item }}
-                                                    </td>
-                                                </tr>
-                                                {% endfor %}
-                                                <tr><td>
-                                                    <a href='{% url "diary:address_diary_new" %}'>地域を追加</a>
-                                                </td></tr>
-                                            </tbody>
-                                        </table>
-                                    {% if form.locations.errors %}
-                                        <div class="error" id="locations-error">{{ form.locations.errors }}</div>
-                                    {% endif %}
+                                        <!-- フォームセット全体を表示 -->
+                                        {% for loc_form in form.formset %}
+                                            <table class="table table-bordered my-1" id="location-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>地域</th>
+                                                        {% if formset.can_delete %}
+                                                            <th>削除</th>
+                                                        {% endif %}
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <!-- 各フォームのフィールドを表示 -->
+                                                            {{ loc_form.as_p }}
+                                                        </td>
+                                                        {% if formset.can_delete %}
+                                                            <td>
+                                                                <!-- 削除ボックスを表示 -->
+                                                                {{ loc_form.DELETE }}
+                                                            </td>
+                                                        {% endif %}
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        {% endfor %}
+                                
+                                        <!-- フォームセットのエラーメッセージを表示 -->
+                                        {% if form.formset.errors %}
+                                            <div class="error">
+                                                <ul>
+                                                    {% for error in form.formset.errors %}
+                                                        <li>{{ error }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        {% endif %}
+                                
+                                        <!-- 地域を追加するリンク -->
+                                        <a href='{% url "diary:address_diary_new" %}'>地域を追加</a>
                                     </div>
-                                </div> 
+                                </div>
+                                
 
                                 <div class="row">
                                     <div class="col">
