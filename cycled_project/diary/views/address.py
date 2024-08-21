@@ -108,13 +108,13 @@ class AddressHomeView(LoginRequiredMixin,generic.FormView):
         return self.form_valid(form)
     
 class AddressDiaryNewView(AddressHomeView):
-    success_url = reverse_lazy('diary:diary_new')
+    success_url = reverse_lazy('diary:diary')
 
     def get_success_url(self) -> str:
         if "address-search-form" in self.request.POST:
             return reverse_lazy('diary:address_diary_new')
         elif "address-select-form" in self.request.POST or "get-current-address-form" in self.request.POST:
-            return reverse_lazy('diary:diary_new')
+            return reverse_lazy('diary:diary')
         return super().get_success_url()
 
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:

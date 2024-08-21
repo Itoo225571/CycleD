@@ -1,80 +1,135 @@
 {% extends "diary/base.html" %}
 {% load django_bootstrap5 %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block title %}
-    にっき
+    しんきさくせい
 {% endblock title %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'diary/css/diary.css' %}" type="text/css" >
     <link rel="stylesheet" href="{% static 'diary/css/mycalendar.css' %}" type="text/css" >
 {% endblock extra_css %}
 
 {% block content %}
-    <div class="container text-center">
-        <div class="row justify-content-md-center"> 
+    <div class="container">
+        <div class="row justify-content-md-center text-center"> 
             <h2>日記メニュー</h2>
             <div class="my-md-3 my-2"> 
                 <div id="mycalendar"></div>
-            </div>
-
-            <div class="my-md-3 my-2">
-                <button class="button_inverse" id="ico_new_picture" onclick="location.href='{% url "diary:diary_new" %}'">
-                {% comment %} <button class="button_inverse" id="ico_new" onclick="location.href='#'"> {% endcomment %}
-                    写真あり
-                </button>
-                <div>
-                    ※写真ありで書く場合，日時や場所は自動で入力されます
-                </div>
-            </div>
-
-            <div class="my-md-3 my-2">
-                <button class="button_inverse" id="ico_new" onclick="location.href='{% url "diary:diary_new" %}'">
-                    写真なし
-                </button>
-            </div>
-
-            <div class="my-md-3 my-2">
-                <button class="button_inverse" id="ico_edit" onclick="location.href='{% url "diary:diary_list" %}'">
-                {% comment %} <button class="button_inverse" id="ico_edit" onclick="location.href='#'"> {% endcomment %}
-                    編集・削除
-                </button>
             </div>
         </div>
         <!-- モーダルウィンドウのHTML -->
         <div class="modal fade" id="diaryModal" tabindex="-1" aria-labelledby="diaryModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="diaryModalLabel">日記の作成</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div id="modalForm-errors">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="diaryModalLabel">
+                                ERROR
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">  
+                            {% if form.non_field_errors %}
+                            <div class="errorlist">
+                                <ul>
+                                    {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            {% for field in form %}
+                                {% if field.errors %}
+                                    <div class="errorlist">
+                                        <ul>
+                                            {% for error in field.errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
                     </div>
-                    <div class="modal-body">
-                        <form id="diaryForm">
-                            <!-- ここにフォームの内容を記述 -->
-                            <div class="mb-3">
-                                <label for="date" class="form-label">日付</label>
-                                <input type="text" class="form-control" id="date" name="date" readonly>
-                            </div>
-                            <!-- 他のフォームフィールド -->
-                            <div class="mb-3">
-                                <label for="content" class="form-label">内容</label>
-                                <textarea class="form-control" id="content" name="content"></textarea>
-                            </div>
-                            <!-- フォーム送信ボタン -->
-                            <button type="submit" class="btn btn-primary">保存</button>
-                        </form>
+
+                    <div id="modalForm-normal">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="diaryModalLabel">
+                                日記の作成 - <span id="selectedDate"></span>
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">  
+                            <form method="post" id="diaryForm">
+                                {% csrf_token %}
+                                
+                                <div style="display: none;">
+                                    <label for="{{ form.date.id_for_label }}">{{ form.date.label }}</label>
+                                        {{ form.date }}
+                                        {% if form.date.errors %}
+                                            <div class="error" id="date-error">{{ form.date.errors }}</div>
+                                        {% endif %}
+                                </div>
+                                
+                                {% comment %} <div class="row my-3">
+                                    <div class="col">
+                                    <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }}</label>
+                                        {{ form.comment }}
+                                        {% if form.comment.errors %}
+                                            <div class="error" id="comment-error">{{ form.comment.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>         {% endcomment %}
+                
+                                <div class="row">
+                                    <div class="col">
+                                        <label for="{{ form.locations.id_for_label }}">{{ form.locations.label }}</label>
+                                        <table class="table table-bordered my-1" id="location-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>地域</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for item in form.locations %}
+                                                <tr>
+                                                    <td>
+                                                        {{ item }}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                                <tr><td>
+                                                    <a href='{% url "diary:address_diary_new" %}'>地域を追加</a>
+                                                </td></tr>
+                                            </tbody>
+                                        </table>
+                                    {% if form.locations.errors %}
+                                        <div class="error" id="locations-error">{{ form.locations.errors }}</div>
+                                    {% endif %}
+                                    </div>
+                                </div> 
+
+                                <div class="row">
+                                    <div class="col">
+                                        <button type="submit" class="btn btn-primary">作成</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-  
-          
+
     </div>
 {% endblock content %}
 
 {% block extra_js %}
+    <script>
+        window.hasFormErrors = {% if form_errors %}true{% else %}false{% endif %};
+    </script>
     <script src="{% static 'diary/js/getCookie.js' %}"></script>
     <script src="{% static 'diary/js/loading_overlay.js' %}"></script>
     {% comment %} fullカレンダー {% endcomment %}

@@ -43,3 +43,8 @@
 #mycalendar td.fc-day-today {
     background-color: #ffffcc; 
 }
+
+/* モーダルウィンドウ */
+#diaryModal #modalForm-errors{
+    display: none;
+}

@@ -9,9 +9,6 @@ from django.http import JsonResponse
 from ..forms import *
 
 """______Diary関係______"""
-class DiaryView(LoginRequiredMixin,generic.TemplateView):
-    template_name = "diary/diary.html"
-
 class DiaryListView(LoginRequiredMixin,generic.ListView):
     template_name = "diary/diary_list.html"
     model = Diary
@@ -42,7 +39,7 @@ class DiaryMixin(object):
         return kwargs    
 
 class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
-    template_name = "diary/diary_new.html"
+    template_name = "diary/diary.html"
     form_class = DiaryForm
     # formset_class = LocationInDiaryFormSet
     success_url = reverse_lazy("diary:home")
@@ -50,7 +47,7 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
 
 class DiaryEditView(LoginRequiredMixin,DiaryMixin,generic.UpdateView):
     is_update_view = True
-    template_name = "diary/diary_new.html"
+    template_name = "diary/diary.html"
     form_class = DiaryForm
     # formset_class = LocationInDiaryFormSet
     success_url = reverse_lazy("diary:home")
