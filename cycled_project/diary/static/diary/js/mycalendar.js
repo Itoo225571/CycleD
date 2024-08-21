@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				const lastYear = new Date();
 				const nextYear = new Date();
 				lastYear.setFullYear(today.getFullYear() - 1, 0, 1); 
-				nextYear.setFullYear(today.getFullYear() + 2, 0, 1); 
+				nextYear.setMonth(today.getMonth() + 3); 
 				// 日付をYYYY-MM-DD形式に変換
 				const formatDate = (date) => date.toISOString().split('T')[0];
 				return {

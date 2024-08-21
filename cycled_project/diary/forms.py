@@ -1,3 +1,4 @@
+from typing import Any
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm,UserChangeForm,AuthenticationForm
 from django.contrib.auth.hashers import make_password,check_password
@@ -6,6 +7,23 @@ from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList
 
 from diary.models import *
+
+"""___FormSet用のMixin"""
+class ModelFormWithFormSetMixin:
+    def __init__(self, *args, **kwargs):
+        super(ModelFormWithFormSetMixin, self).__init__(*args, **kwargs)
+        self.formset = self.formset_class(
+            instance=self.instance,
+            data=self.data if self.is_bound else None,
+        )
+
+    def is_valid(self):
+        return super(ModelFormWithFormSetMixin, self).is_valid() and self.formset.is_valid()
+
+    def save(self, commit=True):
+        saved_instance = super(ModelFormWithFormSetMixin, self).save(commit)
+        self.formset.save(commit)
+        return saved_instance
 
 class SignupForm(UserCreationForm):
     '''     定義文      '''
@@ -78,6 +96,18 @@ class LocationForm(forms.ModelForm):
         model = Location
         fields = ["lat","lon","state","display","label"]
 
+LocationFormSet = forms.inlineformset_factory(
+        Diary,
+        Location,
+        form=LocationForm,
+        extra=0,
+        can_delete=True,
+        max_num=5,
+        validate_max=True,
+        min_num=1,
+        validate_min=True
+)
+
 class LocationCoordForm(forms.ModelForm):
     class Meta:
         model = Location
@@ -100,36 +130,16 @@ class UserEditForm(UserChangeForm):
         }
 
 """___Diary関連___"""
-class DiaryForm(forms.ModelForm):
-    # Locationsの設定はここでする
-    locations = forms.ModelMultipleChoiceField(
-        queryset = Location.objects.filter(
-            diary__isnull=True,
-            is_home=False,
-        ).distinct(),
-        widget=forms.CheckboxSelectMultiple(attrs={'class': 'hidden-checkbox'}),
-        label = "場所",
-        help_text = "",
-        required = True,
-    )
-    
+class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
+    formset_class = LocationFormSet
     def __init__(self, *args, **kwargs):
         # viewsでrequestを使用可能にする
         self.request = kwargs.pop('request', None)
-        # デフォルトで全て選択されるようにする
-        loc_data = Location.objects.filter(
-            diary__isnull=True,
-            is_home=False,
-        ).distinct()
-        initial = kwargs.get('initial', {})
-        initial['locations'] = loc_data
-
-        kwargs['initial'] = initial
         super().__init__(*args, **kwargs)
 
     class Meta:
         model=Diary
-        fields=["date","comment","locations"]
+        fields=["date","comment"]
         labels = {
             "date": "サイクリング日時",
             "comment": "コメント",
@@ -155,4 +165,3 @@ class DiaryForm(forms.ModelForm):
             if Diary.objects.filter(date=date, user=user).exists():
                 self.add_error('date',"この日時のサイクリング日記はすでに存在します。")
         return date
-    
