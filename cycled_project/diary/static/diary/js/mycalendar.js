@@ -23,6 +23,52 @@ function addHolidaysToCalendar() {
 			return []; // 失敗時は空の配列を返す
 		});
 }
+
+// Diaryデータを取得してカレンダーに加える関数
+function addDiariesToCalendar() {
+	return fetch(url_sendDiaries)
+        .then(response => response.json())
+        .then(data => {
+            var events = [];
+            // 取得した日記データをFullCalendarのイベント形式に変換
+            data.forEach(diary => {
+				console.log(diary)
+				// 最初の地名をタイトルとする
+				let description;
+				if (diary.locations.length > 0){
+					description = diary.locations[0].label
+				}
+                // Diaryのデータをイベントに追加
+                events.push({
+                    title: '',
+					description: description,
+                    start: diary.date,                     // 日記の日付
+                    allDay: true,                          // 終日イベントとして設定
+                    className: "diary-event",
+					backgroundColor: 'rgba(255, 255, 255, 0)',  // 背景色を指定
+					borderColor: 'rgba(255, 255, 255, 0)',      // 枠線の色も同じにする場合
+					iconHtml: '<span class="material-icons icon-bike">directions_bike</span>',  // カスタムプロパティとしてアイコンを設定
+                });
+            });
+            return events;
+        })
+        .catch(error => {
+            console.error('データの取得に失敗しました:', error);
+            return []; // 失敗時は空の配列を返す
+        });
+}
+
+// カレンダーにイベントを追加する関数
+function addEventsToCalendar() {
+    // 非同期関数を実行し、すべてのプロミスが解決されるのを待つ
+    return Promise.all([addHolidaysToCalendar(), addDiariesToCalendar()])
+        .then(([holidayEvents, diaryEvents]) => {
+            // イベントを統合
+            const events = [...holidayEvents, ...diaryEvents];
+            return events;
+        });
+}
+
 // 日本の年月日に変換する関数
 function formatDateJapanese(dateStr) {
     const date = new Date(dateStr);
@@ -30,6 +76,20 @@ function formatDateJapanese(dateStr) {
     const month = String(date.getMonth() + 1).padStart(2, '0'); // 月は0始まりなので+1
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}年${month}月${day}日`;
+}
+
+// モーダル表示の共通処理(新規作成)
+function showDiaryModalNew(dateStr) {
+	var modal = new bootstrap.Modal(document.getElementById('diaryModal'));
+	modal.show();
+
+	// 選択された日付をフォームにセットする
+	const dateField = document.querySelector('#id_date_field');
+	dateField.value = dateStr;
+	dateField.setAttribute('readonly', 'true'); // 読み取り専用に設定
+
+	// タイトル用
+	document.getElementById('selectedDate').textContent = formatDateJapanese(dateStr);
 }
 
 // 読み込まれたら実行する関数
@@ -43,14 +103,14 @@ document.addEventListener('DOMContentLoaded', function() {
 		modal.show();
 	}
 	// 祝日データを取得してからカレンダーを初期化
-	addHolidaysToCalendar().then(holidayEvents => {
+	addEventsToCalendar().then(allEvents => {
 		const calendarEl = document.getElementById('mycalendar');
 		// カレンダーの初期設定
 		const calendar = new FullCalendar.Calendar(calendarEl, {
 			// カレンダーの種類
 			initialView: "dayGridMonth",
 			// 祝日イベントを追加
-			events: holidayEvents,
+			events: allEvents,
 			// 日本語化
 			locale: 'ja',
 			// 「日」削除
@@ -78,34 +138,49 @@ document.addEventListener('DOMContentLoaded', function() {
 					end: formatDate(nextYear)
 				};
 			},
+			dayMaxEvents: true, // trueにすると月表示の際のイベントの数が曜日セルの高さに制限されイベントが多い場合は+more表記でpopoverで表示される 5未満にしたい場合は数値を指定する
+			showNonCurrentDates: true, // 月表示で先月や来月の日にち表示
 			// 日付マスのクリック
 			dateClick: function(info) {
 				if (info.dayEl.classList.contains("fc-day-future")) {
 					alert("選択できません。");
 					return;
 				} else {
-					var modal = new bootstrap.Modal(document.getElementById('diaryModal'));
-					modal.show();
-					// 選択された日付をフォームにセットする
-					const selectedDate = info.dateStr;
-					const dateField = document.querySelector('#id_date_field');
-					dateField.value = selectedDate;
-					dateField.setAttribute('readonly', 'true'); // 読み取り専用に設定
-					// タイトル用
-					document.getElementById('selectedDate').textContent = formatDateJapanese(selectedDate);
+					// その日付にイベントがあるかチェック
+					const calendarEvents = info.view.calendar.getEvents();
+					const eventsOnDate = calendarEvents.filter(event => {
+						// イベントの日付とクリックされた日付を比較
+						return event.startStr === info.dateStr;
+					});
+					// if (eventsOnDate.length > 0) {
+					// 	alert("この日にはすでにイベントがあります。");
+					// 	// イベントがある場合、モーダルを開かないようにする
+					// 	return;
+					// }
+					showDiaryModalNew(info.dateStr);
 				}
 			},
+
 			// イベントのクリック
-			eventClick: (e) => {
-				console.log("eventClick:", e.event.title);
+			eventClick: function(info) {
+				const eventDate = info.event.startStr;  // イベントの日付を取得
+				showDiaryModalNew(eventDate);
 			},
 			// カレンダーに配置された時のイベント
 			// TippyでTooltipを設定する
 			eventDidMount: (e) => { 
-				tippy(e.el, { 
-					content: e.event.title,
-				});
+				const description = e.event.extendedProps.description;
+				if (description) {  // contentが空でないか確認
+					tippy(e.el, { 
+						content: description,
+					});
+				}
+				// 自転車アイコンを追加
+				if (e.event.extendedProps.iconHtml) {
+					e.el.querySelector('.fc-event-title').innerHTML = e.event.extendedProps.iconHtml;
+				}
 			},
+			
 		});
 		// カレンダーを表示
 		calendar.render();

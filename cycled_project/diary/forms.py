@@ -18,6 +18,15 @@ class ModelFormWithFormSetMixin:
         )
 
     def is_valid(self):
+        if self.formset.is_valid():
+            print("Formset is valid")
+        else:
+            print(self.formset)
+            for form in self.formset:
+                if form.is_valid():
+                    print('success')
+                else:
+                    print('OUT')
         return super(ModelFormWithFormSetMixin, self).is_valid() and self.formset.is_valid()
 
     def save(self, commit=True):
@@ -165,3 +174,4 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
             if Diary.objects.filter(date=date, user=user).exists():
                 self.add_error('date',"この日時のサイクリング日記はすでに存在します。")
         return date
+    
