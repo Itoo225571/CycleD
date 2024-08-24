@@ -141,6 +141,11 @@ class UserEditForm(UserChangeForm):
 """___Diary関連___"""
 class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
     formset_class = LocationFormSet
+    keyword = forms.CharField(
+                    label="",
+                    max_length=64,
+                    widget=forms.TextInput(attrs={"placeholder":" 地名・施設名・駅名など"})
+                    )
     def __init__(self, *args, **kwargs):
         # viewsでrequestを使用可能にする
         self.request = kwargs.pop('request', None)

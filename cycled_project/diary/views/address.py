@@ -112,7 +112,7 @@ class AddressDiaryNewView(AddressHomeView):
 
     def get_success_url(self) -> str:
         if "address-search-form" in self.request.POST:
-            return reverse_lazy('diary:address_diary_new')
+            return reverse_lazy('diary:diary')
         elif "address-select-form" in self.request.POST or "get-current-address-form" in self.request.POST:
             return reverse_lazy('diary:diary')
         return super().get_success_url()

@@ -8,8 +8,10 @@ from django.db import transaction
 from django.http import JsonResponse
 from django.utils.timezone import now
 from ..forms import *
+from .address import address_search
 
 from datetime import timedelta
+from subs.get_location.get_location import regeocode_gsi
 
 """______Diary関係______"""
 class DiaryListView(LoginRequiredMixin,generic.ListView):
@@ -58,15 +60,6 @@ class DiaryMixin(object):
     def form_valid(self, form):
         form.instance.user = self.request.user
         response = super().form_valid(form)
-        # LocationFormSetの処理
-        # formset = self.get_form_kwargs().get('formset')
-        # if formset:
-        #     for location_form in formset:
-        #         if location_form.cleaned_data:
-        #             # 新規作成または変更されたLocationオブジェクトを取得
-        #             location = location_form.save(commit=False)
-        #             location.diary = self.object
-        #             location.save()
         return response
     # エラーがあったことを知らせるやつ
     def form_invalid(self, form):
@@ -77,6 +70,41 @@ class DiaryMixin(object):
         # ユーザーをフォームに渡す
         kwargs['request'] = self.request
         return kwargs        
+
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        form = None
+        if "address-search-form" in request.POST:
+            form = AddressSearchForm(request.POST)
+            if form.is_valid():
+                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                    return address_search(request,form)
+                return self.form_valid(form)
+            return self.form_invalid(form)
+            
+        elif "address-select-form" in request.POST:
+            form = LocationForm(request.POST)
+            if not form.is_valid():
+                return self.form_invalid(form)
+        
+        elif "get-current-address-form" in self.request.POST:
+            form = LocationCoordForm(request.POST)
+            if form.is_valid():
+                loc = form.save(commit=False)
+                lat = form.cleaned_data["lat"]
+                lon = form.cleaned_data["lon"]
+                geo = regeocode_gsi(lat,lon)
+                loc.state = geo.address.state
+                loc.display = geo.address.display
+                loc.label = geo.address.label
+                form = LocationForm(loc)
+            else:
+                return self.form_invalid(form)
+        
+        elif "diary-new-form" in self.request.POST:
+            form = DiaryForm(request.POST)
+            if not form.is_valid():
+                return self.form_invalid(form)
+        return self.form_valid(form)
 
 class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
     template_name = "diary/diary.html"
