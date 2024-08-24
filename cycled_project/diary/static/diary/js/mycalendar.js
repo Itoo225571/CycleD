@@ -78,28 +78,14 @@ function formatDateJapanese(dateStr) {
     return `${year}年${month}月${day}日`;
 }
 
-// モーダル表示の共通処理(新規作成)
-function showDiaryModalNew(dateStr) {
-	var modal = new bootstrap.Modal(document.getElementById('diaryModal'));
-	modal.show();
-
-	// 選択された日付をフォームにセットする
-	const dateField = document.querySelector('#id_date_field');
-	dateField.value = dateStr;
-	dateField.setAttribute('readonly', 'true'); // 読み取り専用に設定
-
-	// タイトル用
-	document.getElementById('selectedDate').textContent = formatDateJapanese(dateStr);
-}
-
 // 読み込まれたら実行する関数
 document.addEventListener('DOMContentLoaded', function() {
 	var diaryModal = document.getElementById('diaryModal');
 	if (window.hasFormErrors) {
 		// モーダルを開く
 		var modal = new bootstrap.Modal(document.getElementById('diaryModal'));
-		document.getElementById('modalForm-errors').style.display = 'block';
-		document.getElementById('modalForm-normal').style.display = 'none';
+		$('.modal-errors').css('display', 'block');
+		$('.modal-normal').css('display', 'none');
 		modal.show();
 	}
 	// 祝日データを取得してからカレンダーを初期化
@@ -152,12 +138,12 @@ document.addEventListener('DOMContentLoaded', function() {
 						// イベントの日付とクリックされた日付を比較
 						return event.startStr === info.dateStr;
 					});
-					// if (eventsOnDate.length > 0) {
-					// 	alert("この日にはすでにイベントがあります。");
-					// 	// イベントがある場合、モーダルを開かないようにする
-					// 	return;
-					// }
-					showDiaryModalNew(info.dateStr);
+					if (eventsOnDate.length > 0) {
+						showDiaryModalEdit(info.dateStr);
+					}
+					else { 
+						showDiaryModalNew(info.dateStr);
+					}
 				}
 			},
 
@@ -182,6 +168,29 @@ document.addEventListener('DOMContentLoaded', function() {
 			},
 			
 		});
+		// モーダル表示の共通処理(新規作成)
+		function showDiaryModalNew(dateStr) {
+			var modal = new bootstrap.Modal(document.getElementById('diaryModal'));
+			modal.show();
+			// 選択された日付をフォームにセットする
+			const dateField = document.querySelector('#id_date_field');
+			dateField.value = dateStr;
+			dateField.setAttribute('readonly', 'true'); // 読み取り専用に設定
+			// タイトル用
+			document.getElementById('selectedDate').textContent = formatDateJapanese(dateStr);
+		}
+		// モーダル表示の共通処理(編集)
+		function showDiaryModalEdit(dateStr) {
+			var modal = new bootstrap.Modal(document.getElementById('diaryModal'));
+			modal.show();
+			// フォームにセットする
+			const dateField = document.querySelector('#id_date_field');
+			dateField.value = dateStr;
+			dateField.setAttribute('readonly', 'true'); // 読み取り専用に設定
+			const titleField = document.querySelector('#id_date_field');
+			// タイトル用
+			document.getElementById('selectedDate').textContent = formatDateJapanese(dateStr);
+		}
 		// カレンダーを表示
 		calendar.render();
 	});
@@ -216,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 	diaryModal.addEventListener('hidden.bs.modal', function () {
-		document.getElementById('modalForm-errors').style.display = 'none';
-		document.getElementById('modalForm-normal').style.display = 'block';
+		$('.modal-errors').css('display', 'none');
+		$('.modal-normal').css('display', 'block');
 	});
 });
