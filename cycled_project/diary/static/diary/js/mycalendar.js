@@ -32,7 +32,7 @@ function addDiariesToCalendar() {
             var events = [];
             // 取得した日記データをFullCalendarのイベント形式に変換
             data.forEach(diary => {
-				console.log(diary)
+				// console.log(diary)
 				// 最初の地名をタイトルとする
 				let description;
 				if (diary.locations.length > 0){
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			const dateField = document.querySelector('#id_date_field');
 			dateField.value = dateStr;
 			dateField.setAttribute('readonly', 'true'); // 読み取り専用に設定
-			const titleField = document.querySelector('#id_date_field');
+			// const titleField = document.querySelector('#id_date_field');
 			// タイトル用
 			document.getElementById('selectedDate').textContent = formatDateJapanese(dateStr);
 		}

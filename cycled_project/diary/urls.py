@@ -22,8 +22,8 @@ urlpatterns = [
     path("diary/delete/<int:diary_id>",views.DiaryDeleteView.as_view(),name="diary_delete"),
 
     # path("diary/address/",views.AddressHomeView.as_view(),name="address_diary" ),
-    path("diary/new/address",views.AddressDiaryNewView.as_view(),name="address_diary_new" ),
-    path("diary/edit/<int:diary_id>/address",views.AddressDiaryEditView.as_view(),name="address_diary_edit" ),
+    # path("diary/new/address",views.AddressDiaryNewView.as_view(),name="address_diary_new" ),
+    # path("diary/edit/<int:diary_id>/address",views.AddressDiaryEditView.as_view(),name="address_diary_edit" ),
     
     # path("calendar/",views.calendar,name="calendar"),   
 

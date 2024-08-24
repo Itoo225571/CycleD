@@ -9,6 +9,7 @@
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'diary/css/mycalendar.css' %}" type="text/css" >
+    <link rel="stylesheet" href="{% static 'diary/css/address.css' %}" type="text/css" >
 {% endblock extra_css %}
 
 {% block content %}
@@ -55,7 +56,7 @@
                         {% endfor %}
                     </div>
                     <div class="modal-body modal-normal">
-                        <form method="post" id="diaryForm">
+                        <form method="post" id="diaryForm" name="diary-new-form">
                             {% csrf_token %}
                             
                             <div style="display: none;">
@@ -80,42 +81,71 @@
                                 <div class="col">
                                     <!-- フォームセット全体を表示 -->
                                     {{ form.formset.management_form }}
-                                    {% for loc_form in form.formset %}
-                                        <table class="table table-bordered my-1" id="location-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>地域</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
+                                    <table class="table table-bordered my-1" id="location-table">
+                                        <thead>
+                                            <tr>
+                                                <th>地域</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="formset-body">
+                                            {% for loc_form in form.formset %}
+                                                <tr class="form-row" data-form-index="{{ forloop.counter0 }}">
                                                     <td>
-                                                        <!-- 各フォームのフィールドを表示 -->
                                                         {{ loc_form.as_p }}
                                                     </td>
                                                     {% if formset.can_delete %}
                                                         <td>
-                                                            <!-- 削除ボックスを表示 -->
                                                             {{ loc_form.DELETE }}
                                                         </td>
                                                     {% endif %}
                                                 </tr>
-                                            </tbody>
-                                        </table>
-                                    {% endfor %}
-                            
-                                    <!-- 地域を追加するリンク -->
-                                    <a href='{% url "diary:address_diary_new" %}'>地域を追加</a>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    {% comment %} 追加用フォームを作るためのempty {% endcomment %}
+                                    <div id="empty-form" style="display: none;">
+                                        <tr class="form-row">
+                                            <td>
+                                                {{ form.formset.empty_form.as_p }}
+                                            </td>
+                                            {% if formset.can_delete %}
+                                                <td>
+                                                    {{ form.formset.empty_form.DELETE }}
+                                                </td>
+                                            {% endif %}
+                                        </tr>
+                                    </div>
                                 </div>
-                            </div>
-                            
-
+                            </div> 
                             <div class="row">
                                 <div class="col">
                                     <button type="submit" class="btn btn-primary">作成</button>
                                 </div>
                             </div>
                         </form>
+                        <button type="button" id="add-form-btn" class="btn btn-primary">フォームを追加</button>
+                    </div>
+                    <div class="modal-body address-form-content">
+                        <h2>キーワードから地域を探す</h2>
+                        <div class="get-current-address-form">
+                            <form method="post" id="get-current-address-form" name="get-current-address-form">
+                                <button type="button" class="get-current-address-button button_inverse m-1 p-2">現在地から地域を取得する</button>
+                            </form>
+                        </div>
+                        <div class="search-wrapper my-3">
+                            <div class="address-search-form">
+                                <form method="post" id="address-search-form" name="address-search-form">
+                                    {% csrf_token %}
+                                    {{ form.keyword }}
+                                    <button class="btn btn-primary mx-3" type="submit">検索</button>
+                                </form>
+                            </div>
+                        </div>
+                        <ul id="address-list-all-contents" class="p-0">
+                            <div id="address-list"></div>
+                        </ul>
+                
+                        <div class="pager" id="address-list-pager"></div>
                     </div>
                 </div>
             </div>
@@ -129,6 +159,7 @@
         window.hasFormErrors = {% if form_errors %}true{% else %}false{% endif %};
     </script>
     <script src="{% static 'diary/js/getCookie.js' %}"></script>
+    <script src="{% static 'diary/js/pagination.js' %}"></script>
     <script src="{% static 'diary/js/loading_overlay.js' %}"></script>
     {% comment %} fullカレンダー {% endcomment %}
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
@@ -137,4 +168,5 @@
         const url_sendDiaries = "{% url 'diary:sendDiaries' %}";
     </script>
     <script src="{% static 'diary/js/mycalendar.js' %}"></script>
+    <script src="{% static 'diary/js/address_diary.js' %}"></script>
 {% endblock %}

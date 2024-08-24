@@ -17,9 +17,6 @@
     <div class="container">
         <div class="row"> 
             <h2>日記 新規作成</h2>
-            <div class="col">
-                <button class="button_inverse" onclick="location.href='{% url "diary:address_diary_new" %}'">サイクリング先を選択する</button>
-            </div>
             <form method="post">
                 {% csrf_token %}
                 <div class="row my-3">
