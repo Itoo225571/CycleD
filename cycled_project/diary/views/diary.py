@@ -6,6 +6,8 @@ from django.urls import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from django.http import JsonResponse
+from django.core import serializers
+from django.contrib import messages
 from ..forms import *
 
 """______Diary関係______"""
@@ -13,6 +15,36 @@ class DiaryListView(LoginRequiredMixin,generic.ListView):
     template_name = "diary/diary_list.html"
     model = Diary
     context_object_name = 'diaries'  # テンプレートで使用するコンテキスト変数の名前
+
+# ajaxでDiary日情報を送る用の関数
+def sendDairies(request):
+    if request.method == 'GET':
+        # Diaryをコンテキストに含める
+        # すべてのDiaryと関連するLocationを一度に取得
+        diaries = Diary.objects.prefetch_related('locations').all()
+        # カスタムシリアル化
+        diaries_data = []
+        for diary in diaries:
+            diary_data = {
+                "id": diary.id,
+                "date": diary.date.isoformat(),
+                "comment": diary.comment,
+                "locations": []
+            }
+            for location in diary.locations.all():
+                location_data = {
+                    "id": location.id,
+                    "lat": location.lat,
+                    "lon": location.lon,
+                    "state": location.state,
+                    "display": location.display,
+                    "label": location.label,
+                }
+                diary_data["locations"].append(location_data)
+            diaries_data.append(diary_data)
+        return JsonResponse(diaries_data, safe=False)
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=400)
 
 # 日記作成・編集共通のクラス
 class DiaryMixin(object):
@@ -37,7 +69,7 @@ class DiaryMixin(object):
         kwargs = super().get_form_kwargs()
         # ユーザーをフォームに渡す
         kwargs['request'] = self.request
-        return kwargs    
+        return kwargs        
 
 class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
     template_name = "diary/diary.html"

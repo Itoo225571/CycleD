@@ -28,5 +28,6 @@ urlpatterns = [
     # path("calendar/",views.calendar,name="calendar"),   
 
     path("home/location2weather/",views.ajax_location2weather,name="ajax_location2weather"), 
+    path("diary/sendDiaries",views.sendDairies,name="sendDiaries"),
 ]
 

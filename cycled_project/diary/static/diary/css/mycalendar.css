@@ -18,6 +18,9 @@
 #mycalendar{
 	align-items : center;
 }
+#mycalendar td.fc-daygrid-day:not(.fc-day-future) {
+    cursor: pointer; /* カーソルをポインタに設定 */
+}
 
 /* 日曜日 */
 #mycalendar td.fc-day-sun {
@@ -38,10 +41,20 @@
 #mycalendar td.fc-day-sat {
     color: blue;
 }
-
 /* 今日 */
 #mycalendar td.fc-day-today {
     background-color: #ffffcc; 
+}
+/* サイクル日 */
+#mycalendar .diary-event {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer; /* カーソルをポインタに設定 */
+}
+#mycalendar .diary-event .icon-bike{
+    color: #74C0FC;
+    font-size: 2.5em;
 }
 
 /* モーダルウィンドウ */

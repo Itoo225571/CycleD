@@ -86,14 +86,12 @@
                                 <div class="row">
                                     <div class="col">
                                         <!-- フォームセット全体を表示 -->
+                                        {{ form.formset.management_form }}
                                         {% for loc_form in form.formset %}
                                             <table class="table table-bordered my-1" id="location-table">
                                                 <thead>
                                                     <tr>
                                                         <th>地域</th>
-                                                        {% if formset.can_delete %}
-                                                            <th>削除</th>
-                                                        {% endif %}
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -153,5 +151,9 @@
     <script src="{% static 'diary/js/loading_overlay.js' %}"></script>
     {% comment %} fullカレンダー {% endcomment %}
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+    <script>
+        // DjangoテンプレートタグでURLを埋め込む
+        const url_sendDiaries = "{% url 'diary:sendDiaries' %}";
+    </script>
     <script src="{% static 'diary/js/mycalendar.js' %}"></script>
 {% endblock %}
