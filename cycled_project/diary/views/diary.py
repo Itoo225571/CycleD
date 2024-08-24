@@ -6,9 +6,10 @@ from django.urls import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from django.http import JsonResponse
-from django.core import serializers
-from django.contrib import messages
+from django.utils.timezone import now
 from ..forms import *
+
+from datetime import timedelta
 
 """______Diary関係______"""
 class DiaryListView(LoginRequiredMixin,generic.ListView):
@@ -21,23 +22,29 @@ def sendDairies(request):
     if request.method == 'GET':
         # Diaryをコンテキストに含める
         # すべてのDiaryと関連するLocationを一度に取得
-        diaries = Diary.objects.prefetch_related('locations').all()
+        current_date = now().date()
+        one_year_ago = current_date - timedelta(days=365)
+        diaries = Diary.objects.prefetch_related('locations').filter(
+            date__gte=one_year_ago,
+            date__lte=current_date,
+            user=request.user,
+        )
         # カスタムシリアル化
         diaries_data = []
         for diary in diaries:
             diary_data = {
-                "id": diary.id,
+                # "id": diary.id,
                 "date": diary.date.isoformat(),
                 "comment": diary.comment,
                 "locations": []
             }
             for location in diary.locations.all():
                 location_data = {
-                    "id": location.id,
+                    # "id": location.id,
                     "lat": location.lat,
                     "lon": location.lon,
-                    "state": location.state,
-                    "display": location.display,
+                    # "state": location.state,
+                    # "display": location.display,
                     "label": location.label,
                 }
                 diary_data["locations"].append(location_data)

@@ -23,118 +23,99 @@
         <div class="modal fade" id="diaryModal" tabindex="-1" aria-labelledby="diaryModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div id="modalForm-errors">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="diaryModalLabel">
-                                ERROR
-                            </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">  
-                            {% if form.non_field_errors %}
-                            <div class="errorlist">
-                                <ul>
-                                    {% for error in form.non_field_errors %}
-                                        <li>{{ error }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                            {% endif %}
-                            {% for field in form %}
-                                {% if field.errors %}
-                                    <div class="errorlist">
-                                        <ul>
-                                            {% for error in field.errors %}
-                                                <li>{{ error }}</li>
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
+                    <div class="modal-header">
+                        <h5 class="modal-normal modal-title" id="diaryModalLabel">
+                            日記の作成 - <span id="selectedDate"></span>
+                        </h5>
+                        <h5 class="modal-errors modal-title">
+                            Error
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-
-                    <div id="modalForm-normal">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="diaryModalLabel">
-                                日記の作成 - <span id="selectedDate"></span>
-                            </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="modal-body modal-errors">
+                        {% if form.non_field_errors %}
+                        <div class="errorlist">
+                            <ul>
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
                         </div>
-                        <div class="modal-body">  
-                            <form method="post" id="diaryForm">
-                                {% csrf_token %}
-                                
-                                <div style="display: none;">
-                                    <label for="{{ form.date.id_for_label }}">{{ form.date.label }}</label>
-                                        {{ form.date }}
-                                        {% if form.date.errors %}
-                                            <div class="error" id="date-error">{{ form.date.errors }}</div>
-                                        {% endif %}
-                                </div>
-                                
-                                {% comment %} <div class="row my-3">
-                                    <div class="col">
-                                    <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }}</label>
-                                        {{ form.comment }}
-                                        {% if form.comment.errors %}
-                                            <div class="error" id="comment-error">{{ form.comment.errors }}</div>
-                                        {% endif %}
-                                    </div>
-                                </div>         {% endcomment %}
-                
-                                <div class="row">
-                                    <div class="col">
-                                        <!-- フォームセット全体を表示 -->
-                                        {{ form.formset.management_form }}
-                                        {% for loc_form in form.formset %}
-                                            <table class="table table-bordered my-1" id="location-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>地域</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>
-                                                            <!-- 各フォームのフィールドを表示 -->
-                                                            {{ loc_form.as_p }}
-                                                        </td>
-                                                        {% if formset.can_delete %}
-                                                            <td>
-                                                                <!-- 削除ボックスを表示 -->
-                                                                {{ loc_form.DELETE }}
-                                                            </td>
-                                                        {% endif %}
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                        {% endif %}
+                        {% for field in form %}
+                            {% if field.errors %}
+                                <div class="errorlist">
+                                    <ul>
+                                        {% for error in field.errors %}
+                                            <li>{{ error }}</li>
                                         {% endfor %}
-                                
-                                        <!-- フォームセットのエラーメッセージを表示 -->
-                                        {% if form.formset.errors %}
-                                            <div class="error">
-                                                <ul>
-                                                    {% for error in form.formset.errors %}
-                                                        <li>{{ error }}</li>
-                                                    {% endfor %}
-                                                </ul>
-                                            </div>
-                                        {% endif %}
-                                
-                                        <!-- 地域を追加するリンク -->
-                                        <a href='{% url "diary:address_diary_new" %}'>地域を追加</a>
-                                    </div>
+                                    </ul>
                                 </div>
-                                
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="modal-body modal-normal">
+                        <form method="post" id="diaryForm">
+                            {% csrf_token %}
+                            
+                            <div style="display: none;">
+                                <label for="{{ form.date.id_for_label }}">{{ form.date.label }}</label>
+                                    {{ form.date }}
+                                    {% if form.date.errors %}
+                                        <div class="error" id="date-error">{{ form.date.errors }}</div>
+                                    {% endif %}
+                            </div>
+                            
+                            {% comment %} <div class="row my-3">
+                                <div class="col">
+                                <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }}</label>
+                                    {{ form.comment }}
+                                    {% if form.comment.errors %}
+                                        <div class="error" id="comment-error">{{ form.comment.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>         {% endcomment %}
+            
+                            <div class="row">
+                                <div class="col">
+                                    <!-- フォームセット全体を表示 -->
+                                    {{ form.formset.management_form }}
+                                    {% for loc_form in form.formset %}
+                                        <table class="table table-bordered my-1" id="location-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>地域</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>
+                                                        <!-- 各フォームのフィールドを表示 -->
+                                                        {{ loc_form.as_p }}
+                                                    </td>
+                                                    {% if formset.can_delete %}
+                                                        <td>
+                                                            <!-- 削除ボックスを表示 -->
+                                                            {{ loc_form.DELETE }}
+                                                        </td>
+                                                    {% endif %}
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    {% endfor %}
+                            
+                                    <!-- 地域を追加するリンク -->
+                                    <a href='{% url "diary:address_diary_new" %}'>地域を追加</a>
+                                </div>
+                            </div>
+                            
 
-                                <div class="row">
-                                    <div class="col">
-                                        <button type="submit" class="btn btn-primary">作成</button>
-                                    </div>
+                            <div class="row">
+                                <div class="col">
+                                    <button type="submit" class="btn btn-primary">作成</button>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

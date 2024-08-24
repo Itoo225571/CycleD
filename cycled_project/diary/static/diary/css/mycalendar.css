@@ -58,6 +58,6 @@
 }
 
 /* モーダルウィンドウ */
-#diaryModal #modalForm-errors{
+#diaryModal .modal-errors{
     display: none;
 }
