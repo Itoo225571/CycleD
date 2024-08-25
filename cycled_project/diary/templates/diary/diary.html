@@ -35,7 +35,7 @@
                     </div>
                     <div class="modal-body modal-errors">
                         {% if form.non_field_errors %}
-                        <div class="errorlist">
+                        <div id="error-form">
                             <ul>
                                 {% for error in form.non_field_errors %}
                                     <li>{{ error }}</li>
@@ -45,7 +45,7 @@
                         {% endif %}
                         {% for field in form %}
                             {% if field.errors %}
-                                <div class="errorlist">
+                                <div id="error-field">
                                     <ul>
                                         {% for error in field.errors %}
                                             <li>{{ error }}</li>
@@ -56,7 +56,8 @@
                         {% endfor %}
                     </div>
                     <div class="modal-body modal-normal">
-                        <form method="post" id="diaryForm" name="diary-new-form">
+                        <div id="error-normal"></div>
+                        <form method="post" id="diaryForm">
                             {% csrf_token %}
                             
                             <div style="display: none;">
@@ -81,6 +82,11 @@
                                 <div class="col">
                                     <!-- フォームセット全体を表示 -->
                                     {{ form.formset.management_form }}
+                                    {% comment %} 追加用フォームを作るためのempty {% endcomment %}
+                                    <div id="empty-form" style="display:none;">
+                                            {{ form.formset.empty_form.label.value }}
+                                            {{ form.formset.empty_form.as_p }}
+                                    </div>
                                     <table class="table table-bordered my-1" id="location-table">
                                         <thead>
                                             <tr>
@@ -88,42 +94,23 @@
                                             </tr>
                                         </thead>
                                         <tbody id="formset-body">
-                                            {% for loc_form in form.formset %}
-                                                <tr class="form-row" data-form-index="{{ forloop.counter0 }}">
-                                                    <td>
-                                                        {{ loc_form.as_p }}
-                                                    </td>
-                                                    {% if formset.can_delete %}
-                                                        <td>
-                                                            {{ loc_form.DELETE }}
-                                                        </td>
-                                                    {% endif %}
-                                                </tr>
+                                            {% comment %} <tr><th>
+                                            {% for form_address in form.formset %}
+                                                {{ form_address.label.value}}
+                                                {{ form_address.as_p}}
                                             {% endfor %}
+                                            </th></tr> {% endcomment %}
                                         </tbody>
                                     </table>
-                                    {% comment %} 追加用フォームを作るためのempty {% endcomment %}
-                                    <div id="empty-form" style="display: none;">
-                                        <tr class="form-row">
-                                            <td>
-                                                {{ form.formset.empty_form.as_p }}
-                                            </td>
-                                            {% if formset.can_delete %}
-                                                <td>
-                                                    {{ form.formset.empty_form.DELETE }}
-                                                </td>
-                                            {% endif %}
-                                        </tr>
-                                    </div>
                                 </div>
                             </div> 
                             <div class="row">
                                 <div class="col">
-                                    <button type="submit" class="btn btn-primary">作成</button>
+                                    <button type="submit" class="btn btn-primary" name="diary-new-form">作成</button>
                                 </div>
                             </div>
                         </form>
-                        <button type="button" id="add-form-btn" class="btn btn-primary">フォームを追加</button>
+                        <button type="button" id="add-form-btn" class="btn btn-primary">地域を追加</button>
                     </div>
                     <div class="modal-body address-form-content">
                         <h2>キーワードから地域を探す</h2>

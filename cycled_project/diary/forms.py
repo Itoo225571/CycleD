@@ -18,10 +18,10 @@ class ModelFormWithFormSetMixin:
         )
 
     def is_valid(self):
-        if self.formset.is_valid():
-            print("Formset is valid")
-        else:
-            print(self.formset)
+        if not super(ModelFormWithFormSetMixin, self).is_valid():
+            print("Form is not valid")
+        if not self.formset.is_valid():
+            print("Formset is not valid")
             for form in self.formset:
                 if form.is_valid():
                     print('success')
@@ -113,7 +113,7 @@ LocationFormSet = forms.inlineformset_factory(
         can_delete=True,
         max_num=5,
         validate_max=True,
-        min_num=1,
+        min_num=0,
         validate_min=True
 )
 
@@ -144,6 +144,7 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
     keyword = forms.CharField(
                     label="",
                     max_length=64,
+                    required=False,
                     widget=forms.TextInput(attrs={"placeholder":" 地名・施設名・駅名など"})
                     )
     def __init__(self, *args, **kwargs):
@@ -179,4 +180,16 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
             if Diary.objects.filter(date=date, user=user).exists():
                 self.add_error('date',"この日時のサイクリング日記はすでに存在します。")
         return date
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        # フォームセットのバリデーションを実行
+        if not self.formset.is_valid():
+            # フォームセットのエラーをフォームに追加する
+            for form in self.formset.forms:
+                for error in form.non_field_errors():
+                    self.add_error(None, error)
+        if not any(form.cleaned_data for form in self.formset.forms if form.cleaned_data):
+            self.add_error(None, "少なくとも1つのロケーションを追加してください。")
+        return cleaned_data
     
