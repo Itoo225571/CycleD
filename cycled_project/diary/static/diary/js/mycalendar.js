@@ -195,35 +195,6 @@ document.addEventListener('DOMContentLoaded', function() {
 		calendar.render();
 	});
 
-	// フォームの確認
-	const form = document.getElementById('diaryForm');
-    const dateInput = form.querySelector('[name="date"]');
-    const locationsInput = form.querySelector('[name="locations"]');
-
-    form.addEventListener('submit', function (event) {
-        let hasError = false;
-		document.getElementById('date-error').textContent = '';
-        // document.getElementById('comment-error').textContent = '';
-        document.getElementById('locations-error').textContent = '';
-        // フィールドのバリデーション
-        if (!dateInput.value) {
-            hasError = true;
-			document.getElementById('date-error').textContent = 'サイクリング日時は必須です。';
-        }
-		if (!locationsInput) {
-            hasError = true;
-			document.getElementById('locations-error').textContent = '地域は必須です。';
-		}
-        else if (!locationsInput.value) {
-            hasError = true;
-			document.getElementById('locations-error').textContent = '地域は必須です。';
-        }
-        // エラーがある場合はフォーム送信をキャンセル
-        if (hasError) {
-            event.preventDefault(); // フォームの送信をキャンセルする
-        }
-    });
-
 	diaryModal.addEventListener('hidden.bs.modal', function () {
 		$('.modal-errors').css('display', 'none');
 		$('.modal-normal').css('display', 'block');

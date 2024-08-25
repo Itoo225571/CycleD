@@ -102,9 +102,6 @@ class AddressHomeView(LoginRequiredMixin,generic.FormView):
             else:
                 return self.form_invalid(form)
 
-        # else:
-        #     form = self.get_form(self.form_class)
-
         return self.form_valid(form)
     
 class AddressDiaryNewView(AddressHomeView):

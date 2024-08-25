@@ -63,13 +63,15 @@ class DiaryMixin(object):
         return response
     # エラーがあったことを知らせるやつ
     def form_invalid(self, form):
+        self.object = None
+        # print(self.get_context_data(form=form, form_errors=True))
         return self.render_to_response(self.get_context_data(form=form, form_errors=True))
-    
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         # ユーザーをフォームに渡す
         kwargs['request'] = self.request
-        return kwargs        
+        return kwargs       
 
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         form = None
@@ -101,9 +103,20 @@ class DiaryMixin(object):
                 return self.form_invalid(form)
         
         elif "diary-new-form" in self.request.POST:
-            form = DiaryForm(request.POST)
-            if not form.is_valid():
+            form = DiaryForm(request.POST,request=request)
+            if form.is_valid():
+                return self.form_valid(form)
+            else:
                 return self.form_invalid(form)
+        
+        # いずれのフォームでもなかった場合
+        if form is None:
+            print("Unexpected form data:", request.POST)
+            return self.form_invalid(form)
+        # フォームが無効な場合の処理
+        if not form.is_valid():
+            return self.form_invalid(form)
+        # フォームが有効な場合の処理
         return self.form_valid(form)
 
 class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
