@@ -84,8 +84,14 @@
                                     {{ form.formset.management_form }}
                                     {% comment %} 追加用フォームを作るためのempty {% endcomment %}
                                     <div id="empty-form" style="display:none;">
-                                            {{ form.formset.empty_form.label.value }}
-                                            {{ form.formset.empty_form.as_p }}
+                                        {% comment %} fieldsに含まれる要素のみ取り出す {% endcomment %}
+                                        <div class="label-value"></div>
+                                        {% for field in form.formset.empty_form.visible_fields %}
+                                            <p>
+                                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                                {{ field }}
+                                            </p>
+                                        {% endfor %}
                                     </div>
                                     <table class="table table-bordered my-1" id="location-table">
                                         <thead>
@@ -93,13 +99,8 @@
                                                 <th>地域</th>
                                             </tr>
                                         </thead>
+                                        {% comment %} 後から追加する部分 {% endcomment %}
                                         <tbody id="formset-body">
-                                            {% comment %} <tr><th>
-                                            {% for form_address in form.formset %}
-                                                {{ form_address.label.value}}
-                                                {{ form_address.as_p}}
-                                            {% endfor %}
-                                            </th></tr> {% endcomment %}
                                         </tbody>
                                     </table>
                                 </div>
@@ -110,7 +111,6 @@
                                 </div>
                             </div>
                         </form>
-                        <button type="button" id="add-form-btn" class="btn btn-primary">地域を追加</button>
                     </div>
                     <div class="modal-body address-form-content">
                         <h2>キーワードから地域を探す</h2>
