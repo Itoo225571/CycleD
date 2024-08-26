@@ -16,42 +16,6 @@ function template(dataArray){
     })
 }
 
-function submit_loc(data,form){
-    var csrftoken = getCookie('csrftoken');
-    $('<input>').attr({
-        'type': 'hidden',
-        'name': 'csrfmiddlewaretoken', // CSRFトークンの名前は 'csrfmiddlewaretoken' である必要があります
-        'value': csrftoken
-    }).appendTo(form);
-
-    $('<input>').attr({
-        'type': 'hidden',
-        'name': form.prop("name"),
-        'value': ""
-    }).appendTo(form);
-    
-    appendObject(data,form);
-
-    //console.log(form);
-    form.submit();
-}
-
-function appendObject(data, form) {
-    $.each(data, function(key, value) {
-        if (typeof value === 'object' && value !== null) {
-            // オブジェクトの場合、そのプロパティを再帰的に処理
-            appendObject(value, form);
-        } else {
-            // プリミティブ型の場合、そのままフォームに追加
-            $('<input>').attr({
-                'type': 'hidden',
-                'name': key,
-                'value': value
-            }).appendTo(form);
-        }
-    });
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     // 検索した時の動き
     $('#address-search-form').submit(function(event) {  
@@ -100,10 +64,11 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             $(".address-select-button").on('click', function(){
-                var form = $(this).parents('form');
+                // var form = $(this).parents('form');
                 var num = $(this).attr('name');
                 var data = formDataArray[num];
-                submit_loc(data,form)
+                // submit_loc(data,form)
+                set_location(data);
             });
         })
 
@@ -128,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 lat : address.coords.latitude,
                 lon : address.coords.longitude,
             }
-            submit_loc(data,form);
+            // submit_loc(data,form);
         }
 
         function errorCallback(error) {
@@ -173,6 +138,64 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    function set_location(data){
+        // 現在のフォームの総数を取得
+        const formsetBody = $('#formset-body');
+        const formCount = formsetBody.children().length;
+    
+        const formMax = parseInt(maxnumForms.val());
+        if (formCount < formMax){
+            // empty-form の HTML を取得し、__prefix__ を現在のフォーム数で置換
+            let newFormHtml = $('#empty-form').html().replace(/__prefix__/g, formCount);
+            let $newFormHtml = $('<tr>').append($('<td>').html(newFormHtml));
+            let prefix = `locations-${formCount}-`;
+            
+            // フォームの内容を変更
+            $newFormHtml.find('input').each(function() {
+                let $input = $(this);
+                let name = $input.attr('name');
+                name = name.replace(prefix, '');
+                const value = searchObject(data,name);
+                // data オブジェクトから値を取得して設定する
+                if (value) {
+                    $input.val(value);
+                }
+            });
+            
+            // const latField = document.querySelector(`#id_locations-${formCount}-lat`);
+            // latField.value = 11;
+            // latField.setAttribute('readonly', 'true'); // 読み取り専用に設定
+    
+            // 新しいフォームをフォームセットのリストに追加
+            // formsetBody.append('<tr><td>' + $newFormHtml.html() + '</td></tr>');
+            formsetBody.append($newFormHtml);
+        }
+        else{
+            alert(`サイクリング場所は${formMax}個まで追加できます`)
+            return
+        }    
+        function searchObject(obj, keyToFind) {
+            let result = undefined;
+            function search(o) {
+                for (const key in o) {
+                    if (o.hasOwnProperty(key)) {
+                        if (key === keyToFind) {
+                            result = o[key];
+                            return; // 結果が見つかった場合、検索を終了
+                        }
+                        if (typeof o[key] === 'object' && o[key] !== null) {
+                            search(o[key]);
+                            if (result !== undefined) return; // 結果が見つかった場合、早期リターン
+                        }
+                    }
+                }
+            }
+    
+            search(obj);
+            return result;
+        }
+    }
+
     // 検索した時の動き
     $('#diaryForm').submit(function(event) {  
         // フォーム数を更新
@@ -183,12 +206,23 @@ document.addEventListener('DOMContentLoaded', function() {
         // フィールドのバリデーション
         let hasError = false;
         let error_normal_field = document.getElementById('error-normal');
+        error_normal_field.innerHTML = '';
         if (!$('#id_date_field').length) {
             addErrorMessage('サイクリング日時は必須です。');
         }
         if (!currentFormCount) {
             addErrorMessage('地域は必須です。');
         }
+        // formsetの値が空だった場合
+        $('#formset-body input').each(function() {
+            if (!$(this).val()){
+                let label = $('label[for="' + $(this).attr('id') + '"]').text(); // ラベルのテキストを取得
+                // required以外はラベルが空になる
+                if (label){
+                    addErrorMessage(`${label}が入力されていません`);
+                }
+            }
+        });    
         // エラーがある場合はフォーム送信をキャンセル
         if (hasError) {
             event.preventDefault(); // フォームの送信をキャンセルする
@@ -202,5 +236,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // ul要素にli要素を追加
             error_normal_field.appendChild(newErrorItem);
         }
+        // event.preventDefault();
     });
 });
