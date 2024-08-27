@@ -124,7 +124,7 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
     template_name = "diary/diary.html"
     form_class = DiaryForm
     # formset_class = LocationInDiaryFormSet
-    success_url = reverse_lazy("diary:home")
+    success_url = reverse_lazy("diary:diary")
     model = Diary
 
 class DiaryEditView(LoginRequiredMixin,DiaryMixin,generic.UpdateView):

@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
     
         .done(function(data) {
+            var numofData = 6;
             //Loadingアイコン削除
             remove_loading();
         
@@ -67,22 +68,22 @@ document.addEventListener('DOMContentLoaded', function() {
             
             $('#address-list-pager').pagination({
                 dataSource: formDataArray,
-                pageSize: 6,
+                pageSize: numofData,
                 pageRange: 0,
                 ellipsisText: '...',
                 prevText: 'Prev',
                 nextText: 'Next',
-                callback: function(data2,pagination){
+                callback: function(data2, pagination) {
                     $('#address-list').html(template(data2));
+    
+                    // ページネーションで生成された新しいボタンにイベントリスナーを再設定
+                    $(".address-select-button").off('click').on('click', function(e) {
+                        var pageNum = $('.paginationjs-page.active').data('num');
+                        var num = parseInt($(this).attr('name')) + numofData * (pageNum - 1);
+                        var data = formDataArray[num];
+                        set_location(data);
+                    });
                 }
-            });
-
-            $(".address-select-button").on('click', function(){
-                // var form = $(this).parents('form');
-                var num = $(this).attr('name');
-                var data = formDataArray[num];
-                // submit_loc(data,form)
-                set_location(data);
             });
         })
 
