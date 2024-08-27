@@ -42,3 +42,7 @@ https://developer.yahoo.co.jp/webapi/map/openlocalplatform/v1/geocoder.html
 ## 2024/8/6
 <h3>ボタンスタイル(css)</h3>
 https://excellent.ne.jp/homepage/6562/
+
+## 2024/8/27
+<h3>新ジオコーディングAPI</h3>
+https://geoapi.heartrails.com/api.html#geolocation
