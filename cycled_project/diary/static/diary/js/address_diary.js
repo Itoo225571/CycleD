@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (formCount < formMax){
             // empty-form の HTML を取得し、__prefix__ を現在のフォーム数で置換
             let newFormHtml = $('#empty-form').html().replace(/__prefix__/g, formCount);
-            let $newFormHtml = $('<tr>').append($('<td>').html(newFormHtml));
+            let $newFormHtml = $(`<tr id="locations-${formCount}">`).append($('<td>').html(newFormHtml));
             let prefix = `locations-${formCount}-`;
             
             // フォームの内容を変更
@@ -205,8 +205,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 $input.attr('type', 'hidden');
             });
+
             // 削除ボタンにクリックイベントを設定
             $newFormHtml.find('.delete-location').on('click', function() {
+                var num = $(this).closest('tr').attr('id');
+                num = parseInt(num.replace('locations-', ''));
+                // var newformBody = $('#formset-body');
+                var newformCount = formsetBody.children().length;
+                // 後ろから順番にIDを更新
+                for (let i = newformCount - 1; i > num; i--) {
+                    $(`#formset-body [id *= 'locations-${i}']`).each(function() {
+                        let $element = $(this);
+                        // ID更新
+                        let currentId = $element.attr('id');
+                        let newId = currentId.replace(`locations-${i}`, `locations-${i-1}`);
+                        $element.attr('id', newId);
+                        // nameも更新
+                        let currentName = $element.attr('name');
+                        if (currentName) {
+                            let newName = currentName.replace(`locations-${i}`, `locations-${i-1}`);
+                            $element.attr('name', newName);
+                        }
+                    });
+                }
                 $(this).closest('tr').remove(); // 親の<tr>要素を削除
             });
             formsetBody.append($newFormHtml);
