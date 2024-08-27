@@ -64,8 +64,9 @@ class DiaryMixin(object):
     # エラーがあったことを知らせるやつ
     def form_invalid(self, form):
         self.object = None
-        # print(self.get_context_data(form=form, form_errors=True))
-        return self.render_to_response(self.get_context_data(form=form, form_errors=True))
+        context = self.get_context_data()
+        context['form_errors'] = True
+        return self.render_to_response(context)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

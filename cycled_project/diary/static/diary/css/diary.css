@@ -1,3 +1,4 @@
+/* 
 .button_inverse {
   padding: 1em;
   font-size: 4vmin;
@@ -9,7 +10,7 @@
 .button_inverse:hover {
   border:0.1em solid rgb(58, 171, 210);
   background-color: rgb(58, 171, 210);
-}
+} */
 
 #ico_new::before {
   background-image: url("../img/diary_new1.png"); /* ここに画像のURLを指定 */
@@ -29,3 +30,4 @@
 #ico_edit:hover::before {
   background-image: url("../img/diary_edit2.png"); /* ここに画像のURLを指定 */
 }
+

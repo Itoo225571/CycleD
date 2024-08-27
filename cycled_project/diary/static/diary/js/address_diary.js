@@ -16,7 +16,21 @@ function template(dataArray){
     })
 }
 
+// 距離を計算する関数
+function distance(lat1, lng1, lat2, lng2) {
+    const R = Math.PI / 180;
+    lat1 *= R;
+    lng1 *= R;
+    lat2 *= R;
+    lng2 *= R;
+    return 6371 * Math.acos(Math.cos(lat1) * Math.cos(lat2) * Math.cos(lng2 - lng1) + Math.sin(lat1) * Math.sin(lat2));
+}
+
+
 document.addEventListener('DOMContentLoaded', function() {
+    const totalForms = $('#id_locations-TOTAL_FORMS');
+    const maxnumForms = $('#id_locations-MAX_NUM_FORMS');
+
     // 検索した時の動き
     $('#address-search-form').submit(function(event) {  
         // フォームのデフォルトの動作をキャンセル
@@ -112,91 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
         );
     });
 
-    const totalForms = $('#id_locations-TOTAL_FORMS');
-    const maxnumForms = $('#id_locations-MAX_NUM_FORMS');
-
-    $('#add-form-btn').click(function(e) {
-        // 現在のフォームの総数を取得
-        const formsetBody = $('#formset-body');
-        const formCount = formsetBody.children().length;
-
-        const formMax = parseInt(maxnumForms.val());
-        if (formCount < formMax){
-            // empty-form の HTML を取得し、__prefix__ を現在のフォーム数で置換
-            let newFormHtml = $('#empty-form').html().replace(/__prefix__/g, formCount);
-            // 新しいフォームをフォームセットのリストに追加
-            formsetBody.append('<tr><td>' + newFormHtml + '</td></tr>');
-
-            // フォームの内容を変更
-            const latField = document.querySelector(`#id_locations-${formCount}-lat`);
-            latField.value = 11;
-            latField.setAttribute('readonly', 'true'); // 読み取り専用に設定
-        }
-        else{
-            alert(`サイクリング場所は${formMax}個まで追加できます`)
-            return
-        }
-    });
-
-    function set_location(data){
-        // 現在のフォームの総数を取得
-        const formsetBody = $('#formset-body');
-        const formCount = formsetBody.children().length;
-    
-        const formMax = parseInt(maxnumForms.val());
-        if (formCount < formMax){
-            // empty-form の HTML を取得し、__prefix__ を現在のフォーム数で置換
-            let newFormHtml = $('#empty-form').html().replace(/__prefix__/g, formCount);
-            let $newFormHtml = $('<tr>').append($('<td>').html(newFormHtml));
-            let prefix = `locations-${formCount}-`;
-            
-            // フォームの内容を変更
-            $newFormHtml.find('input').each(function() {
-                let $input = $(this);
-                let name = $input.attr('name');
-                name = name.replace(prefix, '');
-                const value = searchObject(data,name);
-                // data オブジェクトから値を取得して設定する
-                if (value) {
-                    $input.val(value);
-                }
-            });
-            
-            // const latField = document.querySelector(`#id_locations-${formCount}-lat`);
-            // latField.value = 11;
-            // latField.setAttribute('readonly', 'true'); // 読み取り専用に設定
-    
-            // 新しいフォームをフォームセットのリストに追加
-            // formsetBody.append('<tr><td>' + $newFormHtml.html() + '</td></tr>');
-            formsetBody.append($newFormHtml);
-        }
-        else{
-            alert(`サイクリング場所は${formMax}個まで追加できます`)
-            return
-        }    
-        function searchObject(obj, keyToFind) {
-            let result = undefined;
-            function search(o) {
-                for (const key in o) {
-                    if (o.hasOwnProperty(key)) {
-                        if (key === keyToFind) {
-                            result = o[key];
-                            return; // 結果が見つかった場合、検索を終了
-                        }
-                        if (typeof o[key] === 'object' && o[key] !== null) {
-                            search(o[key]);
-                            if (result !== undefined) return; // 結果が見つかった場合、早期リターン
-                        }
-                    }
-                }
-            }
-    
-            search(obj);
-            return result;
-        }
-    }
-
-    // 検索した時の動き
+    // Diaryを作成した時の動き
     $('#diaryForm').submit(function(event) {  
         // フォーム数を更新
         const formsetBodynow = $('#formset-body');
@@ -238,4 +168,71 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         // event.preventDefault();
     });
+
+    // ______関数______
+    function set_location(data){
+        // 現在のフォームの総数を取得
+        const formsetBody = $('#formset-body');
+        const formCount = formsetBody.children().length;
+    
+        const formMax = parseInt(maxnumForms.val());
+        if (formCount < formMax){
+            // empty-form の HTML を取得し、__prefix__ を現在のフォーム数で置換
+            let newFormHtml = $('#empty-form').html().replace(/__prefix__/g, formCount);
+            let $newFormHtml = $('<tr>').append($('<td>').html(newFormHtml));
+            let prefix = `locations-${formCount}-`;
+            
+            // フォームの内容を変更
+            $newFormHtml.find('input').each(function() {
+                let $input = $(this);
+                let name = $input.attr('name');
+                name = name.replace(prefix, '');
+                const value = searchObject(data,name);
+                // data オブジェクトから値を取得して設定する
+                if (value) {
+                    $input.val(value);
+                    if (name == "label") {
+                        var label_HTML = 
+                        `<span class="fa-stack fa-lg">
+                            <i class="fa-solid fa-circle fa-stack-2x" style="color: #cdcdcd;"></i>
+                            <i class="fa-solid fa-location-dot fa-stack-1x" ></i>
+                        </span>
+                        ${value}
+                        <button type="button" class="bi bi-trash delete-location" style="color: red;"></button>
+                        `;
+                        $newFormHtml.find('.label-display').html(label_HTML);
+                    }
+                }
+                $input.attr('type', 'hidden');
+            });
+            // 削除ボタンにクリックイベントを設定
+            $newFormHtml.find('.delete-location').on('click', function() {
+                $(this).closest('tr').remove(); // 親の<tr>要素を削除
+            });
+            formsetBody.append($newFormHtml);
+        }
+        else{
+            alert(`サイクリング場所は${formMax}個まで追加できます`)
+            return
+        }    
+        function searchObject(obj, keyToFind) {
+            let result = undefined;
+            function search(o) {
+                for (const key in o) {
+                    if (o.hasOwnProperty(key)) {
+                        if (key === keyToFind) {
+                            result = o[key];
+                            return; // 結果が見つかった場合、検索を終了
+                        }
+                        if (typeof o[key] === 'object' && o[key] !== null) {
+                            search(o[key]);
+                            if (result !== undefined) return; // 結果が見つかった場合、早期リターン
+                        }
+                    }
+                }
+            }
+            search(obj);
+            return result;
+        }
+    }
 });
