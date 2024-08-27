@@ -10,6 +10,7 @@
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'diary/css/mycalendar.css' %}" type="text/css" >
     <link rel="stylesheet" href="{% static 'diary/css/address.css' %}" type="text/css" >
+    <link rel="stylesheet" href="{% static 'diary/css/diary.css' %}" type="text/css" >
 {% endblock extra_css %}
 
 {% block content %}
@@ -85,12 +86,9 @@
                                     {% comment %} 追加用フォームを作るためのempty {% endcomment %}
                                     <div id="empty-form" style="display:none;">
                                         {% comment %} fieldsに含まれる要素のみ取り出す {% endcomment %}
-                                        <div class="label-value"></div>
+                                        <div class="label-display"></div>
                                         {% for field in form.formset.empty_form.visible_fields %}
-                                            <p>
-                                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                                                {{ field }}
-                                            </p>
+                                            {{ field }}
                                         {% endfor %}
                                     </div>
                                     <table class="table table-bordered my-1" id="location-table">
@@ -111,33 +109,30 @@
                                 </div>
                             </div>
                         </form>
-                    </div>
-                    <div class="modal-body address-form-content">
-                        <h2>キーワードから地域を探す</h2>
-                        <div class="get-current-address-form">
-                            <form method="post" id="get-current-address-form" name="get-current-address-form">
-                                <button type="button" class="get-current-address-button button_inverse m-1 p-2">現在地から地域を取得する</button>
-                            </form>
-                        </div>
-                        <div class="search-wrapper my-3">
-                            <div class="address-search-form">
-                                <form method="post" id="address-search-form" name="address-search-form">
-                                    {% csrf_token %}
-                                    {{ form.keyword }}
-                                    <button class="btn btn-primary mx-3" type="submit">検索</button>
+                        <div class="modal-body address-form-content">
+                            <div class="get-current-address-form">
+                                <form method="post" id="get-current-address-form" name="get-current-address-form">
+                                    <button type="button" class="get-current-address-button button_inverse m-1 p-2">現在地から地域を取得する</button>
                                 </form>
                             </div>
+                            <div class="search-wrapper my-3">
+                                <div class="address-search-form">
+                                    <form method="post" id="address-search-form" name="address-search-form">
+                                        {% csrf_token %}
+                                        {{ form.keyword }}
+                                        <button class="btn btn-primary mx-3" type="submit">検索</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <ul id="address-list-all-contents" class="p-0">
+                                <div id="address-list"></div>
+                            </ul>
+                            <div class="pager" id="address-list-pager"></div>
                         </div>
-                        <ul id="address-list-all-contents" class="p-0">
-                            <div id="address-list"></div>
-                        </ul>
-                
-                        <div class="pager" id="address-list-pager"></div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 {% endblock content %}
 

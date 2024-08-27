@@ -18,14 +18,12 @@ def address_search(request,form):
     keyword = form.cleaned_data.get('keyword')
     try:
         geocode_data_list = geocode_gsi(keyword)
-    except ResponseEmptyError:
+    except Exception as e:
         try:
             geocode_data_list = geocode_yahoo(keyword,settings.CLIANT_ID_YAHOO)
-        except :
+        except Exception as e:
+            print(f"その他のエラーが発生しました: {e}")
             raise
-    except Exception as e:
-        print(f"その他のエラーが発生しました: {e}")
-        raise
 
     response = {
         "data_list": geocode_data_list.model_dump(),
