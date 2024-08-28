@@ -1,9 +1,14 @@
-function start_loading(overlay=true) {
-	if(overlay){
-		$('#loading-overlay').removeClass('d-none');
+function start_loading(overlay=true,loadingObject=null) {
+	if (loadingObject) {
+		loadingObject.removeClass('d-none');
 	}
-	else{
-		$('#loading-container').removeClass('d-none');
+	else {
+		if(overlay){
+			$('#loading-overlay').removeClass('d-none');
+		}
+		else{
+			$('#loading-container').removeClass('d-none');
+		}
 	}
 }
 

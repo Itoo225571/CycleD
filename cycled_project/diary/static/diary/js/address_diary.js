@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
         $('#address-list').children().remove();
         $('#address-list-pager').children().remove();
         //Loadingアイコン表示
-        start_loading(false);
+        start_loading(true);
         // ここからAjaxリクエストの処理
         var csrftoken = getCookie('csrftoken');
         var form = $(this);

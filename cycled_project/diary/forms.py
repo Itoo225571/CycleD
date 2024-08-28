@@ -110,11 +110,11 @@ LocationFormSet = forms.inlineformset_factory(
         Location,
         form=LocationForm,
         extra=0,
-        can_delete=True,
+        # can_delete=True,
         max_num=5,
         validate_max=True,
         min_num=0,
-        validate_min=True
+        # validate_min=True
 )
 
 class LocationCoordForm(forms.ModelForm):
