@@ -152,6 +152,6 @@
         // DjangoテンプレートタグでURLを埋め込む
         const url_sendDiaries = "{% url 'diary:sendDiaries' %}";
     </script>
-    <script src="{% static 'diary/js/mycalendar.js' %}"></script>
-    <script src="{% static 'diary/js/address_diary.js' %}"></script>
+    <script src="{% static 'diary/js/mycalendar.js' %}" type="module"></script>
+    <script src="{% static 'diary/js/address_diary.js' %}" type="module"></script>
 {% endblock %}

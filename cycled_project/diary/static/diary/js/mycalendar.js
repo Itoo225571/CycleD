@@ -1,3 +1,5 @@
+import { set_location } from './set_location.js';
+
 // 祝日データを取得してカレンダーに追加する関数
 function addHolidaysToCalendar() {
 	return fetch('https://holidays-jp.github.io/api/v1/date.json')
@@ -32,7 +34,6 @@ function addDiariesToCalendar() {
             var events = [];
             // 取得した日記データをFullCalendarのイベント形式に変換
             data.forEach(diary => {
-				// console.log(diary)
 				// 最初の地名をタイトルとする
 				let description;
 				if (diary.locations.length > 0){
@@ -40,6 +41,7 @@ function addDiariesToCalendar() {
 				}
                 // Diaryのデータをイベントに追加
                 events.push({
+					diary: diary,
                     title: '',
 					description: description,
                     start: diary.date,                     // 日記の日付
@@ -139,7 +141,8 @@ document.addEventListener('DOMContentLoaded', function() {
 						return event.startStr === info.dateStr;
 					});
 					if (eventsOnDate.length > 0) {
-						showDiaryModalEdit(info.dateStr);
+						let event = eventsOnDate[0]
+						showDiaryModalEdit(event);
 					}
 					else { 
 						showDiaryModalNew(info.dateStr);
@@ -149,8 +152,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 			// イベントのクリック
 			eventClick: function(info) {
-				const eventDate = info.event.startStr;  // イベントの日付を取得
-				showDiaryModalNew(eventDate);
+				const event = info.event;  // イベントの日付を取得
+				// console.log(event.extendedProps.diary)
+				showDiaryModalEdit(event);
 			},
 			// カレンダーに配置された時のイベント
 			// TippyでTooltipを設定する
@@ -180,15 +184,22 @@ document.addEventListener('DOMContentLoaded', function() {
 			document.getElementById('selectedDate').textContent = formatDateJapanese(dateStr);
 		}
 		// モーダル表示の共通処理(編集)
-		function showDiaryModalEdit(dateStr) {
+		function showDiaryModalEdit(event) {
+			var diary = event.extendedProps.diary
+			console.log(diary)
 			var modal = new bootstrap.Modal(document.getElementById('diaryModal'));
 			modal.show();
 			// フォームにセットする
 			const dateField = document.querySelector('#id_date_field');
-			dateField.value = dateStr;
+			dateField.value = diary.date;
 			dateField.setAttribute('readonly', 'true'); // 読み取り専用に設定
+			// const commentField = document.querySelector('#id_comment_field');
+			// dateField.value = diary.comment;
+			diary.locations.forEach(item => {
+				set_location(item);
+			});
 			// タイトル用
-			document.getElementById('selectedDate').textContent = formatDateJapanese(dateStr);
+			document.getElementById('selectedDate').textContent = formatDateJapanese(diary.date);
 			// const titleField = document.querySelector('#id_date_field');
 		}
 		// カレンダーを表示
