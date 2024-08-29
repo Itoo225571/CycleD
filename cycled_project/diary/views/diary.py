@@ -35,18 +35,18 @@ def sendDairies(request):
         diaries_data = []
         for diary in diaries:
             diary_data = {
-                # "id": diary.id,
+                "id": diary.id,
                 "date": diary.date.isoformat(),
                 "comment": diary.comment,
                 "locations": []
             }
             for location in diary.locations.all():
                 location_data = {
-                    # "id": location.id,
+                    "id": location.id,
                     "lat": location.lat,
                     "lon": location.lon,
-                    # "state": location.state,
-                    # "display": location.display,
+                    "state": location.state,
+                    "display": location.display,
                     "label": location.label,
                 }
                 diary_data["locations"].append(location_data)
