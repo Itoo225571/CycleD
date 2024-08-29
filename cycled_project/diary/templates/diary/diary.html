@@ -112,7 +112,10 @@
                         <div class="modal-body address-form-content">
                             <div class="get-current-address-form">
                                 <form method="post" id="get-current-address-form" name="get-current-address-form">
-                                    <button type="button" class="get-current-address-button button_inverse m-1 p-2">現在地から地域を取得する</button>
+                                    {% csrf_token %}
+                                    <button type="submit" class="button_inverse m-1 p-2" value="submit">
+                                        現在地から地域を取得する
+                                    </button>
                                 </form>
                             </div>
                             <div class="search-wrapper my-3">
