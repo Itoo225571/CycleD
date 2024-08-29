@@ -60,16 +60,18 @@
                         <div id="error-normal"></div>
                         <form method="post" id="diaryForm">
                             {% csrf_token %}
-                            
+
                             <div style="display: none;">
                                 <label for="{{ form.date.id_for_label }}">{{ form.date.label }}</label>
                                     {{ form.date }}
                                     {% if form.date.errors %}
                                         <div class="error" id="date-error">{{ form.date.errors }}</div>
                                     {% endif %}
+                                <input type="hidden" name="pk" id="id_diary_pk" >
                             </div>
                             
-                            {% comment %} <div class="row my-3">
+                            {% comment %} 
+                            <div class="row my-3">
                                 <div class="col">
                                 <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }}</label>
                                     {{ form.comment }}
@@ -77,7 +79,8 @@
                                         <div class="error" id="comment-error">{{ form.comment.errors }}</div>
                                     {% endif %}
                                 </div>
-                            </div>         {% endcomment %}
+                            </div>         
+                            {% endcomment %}
             
                             <div class="row">
                                 <div class="col">
@@ -106,6 +109,7 @@
                             <div class="row">
                                 <div class="col">
                                     <button type="submit" class="btn btn-primary" name="diary-new-form">作成</button>
+                                    <button type="submit" class="btn btn-primary" name="diary-edit-form">変更</button>
                                 </div>
                             </div>
                         </form>

@@ -91,6 +91,8 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
             return self.handle_get_current_address(request)
         elif "diary-new-form" in request.POST:
             return self.handle_diary_new(request)
+        elif "diary-edit-form" in request.POST:
+            return self.handle_diary_edit(request)
         else:
             print(f"post name error: {request.POST}")
             return self.form_invalid(None)
@@ -129,6 +131,14 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
             return self.form_invalid(form)
 
     def handle_diary_new(self, request):
+        # print(request.POST)
+        form = DiaryForm(request.POST, request=request)
+        if form.is_valid():
+            return self.form_valid(form)
+        return self.form_invalid(form)
+    
+    def handle_diary_edit(self, request):
+        print(request.POST)
         form = DiaryForm(request.POST, request=request)
         if form.is_valid():
             return self.form_valid(form)

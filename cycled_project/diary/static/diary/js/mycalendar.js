@@ -135,14 +135,16 @@ document.addEventListener('DOMContentLoaded', function() {
 					return;
 				} else {
 					// その日付にイベントがあるかチェック
-					const calendarEvents = info.view.calendar.getEvents();
-					const eventsOnDate = calendarEvents.filter(event => {
+					const allEvents = info.view.calendar.getEvents();
+					// 日記に限定
+					const diaryEvents = allEvents.filter(event => event.classNames.includes('diary-event'));
+					const eventsOnDate = diaryEvents.filter(event => {
 						// イベントの日付とクリックされた日付を比較
 						return event.startStr === info.dateStr;
 					});
 					if (eventsOnDate.length > 0) {
-						let event = eventsOnDate[0]
-						showDiaryModalEdit(event);
+							let event = eventsOnDate[0]
+							showDiaryModalEdit(event);
 					}
 					else { 
 						showDiaryModalNew(info.dateStr);
@@ -152,9 +154,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 			// イベントのクリック
 			eventClick: function(info) {
-				const event = info.event;  // イベントの日付を取得
-				// console.log(event.extendedProps.diary)
-				showDiaryModalEdit(event);
+				const event = info.event;
+				if (event.classNames.includes('diary-event')) {
+					showDiaryModalEdit(event);
+				} else {
+					showDiaryModalNew(info.dateStr);
+				}
 			},
 			// カレンダーに配置された時のイベント
 			// TippyでTooltipを設定する
@@ -186,15 +191,18 @@ document.addEventListener('DOMContentLoaded', function() {
 		// モーダル表示の共通処理(編集)
 		function showDiaryModalEdit(event) {
 			var diary = event.extendedProps.diary
-			console.log(diary)
 			var modal = new bootstrap.Modal(document.getElementById('diaryModal'));
 			modal.show();
 			// フォームにセットする
 			const dateField = document.querySelector('#id_date_field');
 			dateField.value = diary.date;
 			dateField.setAttribute('readonly', 'true'); // 読み取り専用に設定
+			const pkField = document.querySelector('#id_diary_pk');
+			pkField.value = diary.id;
+			pkField.setAttribute('readonly', 'true'); // 読み取り専用に設定
 			// const commentField = document.querySelector('#id_comment_field');
 			// dateField.value = diary.comment;
+			$('#formset-body').html(''); // リセット
 			diary.locations.forEach(item => {
 				set_location(item);
 			});
@@ -209,5 +217,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	diaryModal.addEventListener('hidden.bs.modal', function () {
 		$('.modal-errors').css('display', 'none');
 		$('.modal-normal').css('display', 'block');
+		// フォームをリセット
+		// const diaryForm = document.getElementById('diaryForm'); // フォームのIDを使って取得
+		// diaryForm.reset();
 	});
 });

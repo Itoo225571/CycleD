@@ -30,8 +30,6 @@ function distance(lat1, lng1, lat2, lng2) {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-    const totalForms = $('#id_locations-TOTAL_FORMS');
-
     // 検索した時の動き
     $('#address-search-form').submit(function(event) {  
         // フォームのデフォルトの動作をキャンセル
@@ -106,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
         function successCallback(address) {
             navigator.geolocation.clearWatch(watchId);
             remove_loading();
-            var data ={
+            var data = {
                 lat : address.coords.latitude,
                 lon : address.coords.longitude,
                 [form.attr("name")] : "", //nameをくっつける
@@ -151,6 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
     $('#diaryForm').submit(function(event) {  
         // フォーム数を更新
         const formsetBodynow = $('#formset-body');
+        const totalForms = $('#id_locations-TOTAL_FORMS');
         const currentFormCount = formsetBodynow.children().length;
         totalForms.val(currentFormCount);
 
@@ -188,5 +187,18 @@ document.addEventListener('DOMContentLoaded', function() {
             error_normal_field.appendChild(newErrorItem);
         }
         // event.preventDefault();
+
+        // Editの時の処理
+        const submitButton = $(event.originalEvent.submitter); // クリックされたボタンを取得
+        const buttonName = submitButton.attr('name');
+        if (buttonName === 'diary-edit-form') {
+            const confirmMessage = '既にある日記を上書きしますか？';
+            const userConfirmed = confirm(confirmMessage);
+            if (!userConfirmed) {
+                event.preventDefault(); // ユーザーがキャンセルした場合、フォームの送信をキャンセルする
+                return;
+            }
+            
+        }
     });
 });
