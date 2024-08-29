@@ -86,19 +86,21 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
             return self.handle_address_search(request)
         elif "address-select-form" in request.POST:
             return self.handle_address_select(request)
+            # return self.form_invalid(None)
         elif "get-current-address-form" in request.POST:
             return self.handle_get_current_address(request)
         elif "diary-new-form" in request.POST:
             return self.handle_diary_new(request)
         else:
+            print(f"post name error: {request.POST}")
             return self.form_invalid(None)
 
     def handle_address_search(self, request):
         form = AddressSearchForm(request.POST)
         if form.is_valid():
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return address_search(request, form)
-            return self.form_valid(form)
+                return address_search(request,form)
+            # return self.form_valid(form)
         return self.form_invalid(form)
 
     def handle_address_select(self, request):
@@ -113,13 +115,18 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
             loc = form.save(commit=False)
             lat = form.cleaned_data["lat"]
             lon = form.cleaned_data["lon"]
+            # 住所情報の取得
             geo = regeocode_gsi(lat, lon)
             loc.state = geo.address.state
             loc.display = geo.address.display
             loc.label = geo.address.label
-            form = LocationForm(loc)
-            return self.form_valid(form)
-        return self.form_invalid(form)
+            response = {
+                "data": loc.to_dict(),
+            }
+            return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
+        else:
+            # 最初のフォームが無効な場合
+            return self.form_invalid(form)
 
     def handle_diary_new(self, request):
         form = DiaryForm(request.POST, request=request)

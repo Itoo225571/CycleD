@@ -2,8 +2,6 @@ from django.db import models
 from django.forms.models import model_to_dict
 from django.contrib.auth.models import AbstractUser
 
-import json
-
 class Location(models.Model):
     # user = models.ForeignKey(User,on_delete=models.CASCADE)
     lat = models.FloatField()
@@ -22,9 +20,11 @@ class Location(models.Model):
     def __str__(self) -> str:
         return self.label
     
-    def to_json(self):
+    def to_dict(self):
         location_dict = model_to_dict(self)
-        return json.dumps(location_dict)
+        # 画像フィールドを URL に変換
+        location_dict['image'] = self.image.url if self.image else None
+        return location_dict
 
 class User(AbstractUser):
     # username=models.CharField(max_length=128,verbose_name="user   name")

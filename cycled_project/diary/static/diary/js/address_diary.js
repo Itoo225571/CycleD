@@ -41,18 +41,18 @@ document.addEventListener('DOMContentLoaded', function() {
         //Loadingアイコン表示
         start_loading(true);
         // ここからAjaxリクエストの処理
-        var csrftoken = getCookie('csrftoken');
         var form = $(this);
+        var csrftoken = getCookie('csrftoken');
         
         $.ajax({
             method: form.prop("method"),
             url: form.prop("action"),
-            headers: {
-                "X-CSRFToken": csrftoken  // CSRFトークンも必要な場合
-            },
             data: form.serialize() + "&" + form.attr("name"), //nameをくっつける
             dataType: 'json',
             timeout:60000,
+            headers: {
+                "X-CSRFToken": csrftoken  // CSRFトークンも必要な場合
+            },
         })
     
         .done(function(data) {
@@ -96,9 +96,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     });
     
-    $(".get-current-address-button").on('click', function(){
-        var form = $(this).parents('form');
-        start_loading(false);
+    $("#get-current-address-form").submit(function(event) {  
+        event.preventDefault();
+        var form = $(this);
+        start_loading(true);
         var watchId;
 
         function successCallback(address) {
@@ -107,8 +108,26 @@ document.addEventListener('DOMContentLoaded', function() {
             var data ={
                 lat : address.coords.latitude,
                 lon : address.coords.longitude,
+                [form.attr("name")] : "", //nameをくっつける
             }
-            // submit_loc(data,form);
+            var csrftoken = getCookie('csrftoken');
+            $.ajax({
+                url: form.prop("action"),
+                method: form.prop("method"),
+                headers: {
+                    "X-CSRFToken": csrftoken  // CSRFトークンも必要な場合
+                },
+                dataType: 'json',
+                data: data,
+                timeout:60000,  
+                success: function (response) {
+                    console.log("Response:", response.data);
+                    set_location(response.data)
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error:", status, error);
+                }
+            });
         }
 
         function errorCallback(error) {
@@ -237,6 +256,8 @@ document.addEventListener('DOMContentLoaded', function() {
             alert(`サイクリング場所は${formMax}個まで追加できます`)
             return
         }    
+
+        // キーを探す関数
         function searchObject(obj, keyToFind) {
             let result = undefined;
             function search(o) {
