@@ -74,58 +74,58 @@ class DiaryMixin(object):
         kwargs['request'] = self.request
         return kwargs       
 
-    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
-        form = None
-        if "address-search-form" in request.POST:
-            form = AddressSearchForm(request.POST)
-            if form.is_valid():
-                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                    return address_search(request,form)
-                return self.form_valid(form)
-            return self.form_invalid(form)
-            
-        elif "address-select-form" in request.POST:
-            form = LocationForm(request.POST)
-            if not form.is_valid():
-                return self.form_invalid(form)
-        
-        elif "get-current-address-form" in self.request.POST:
-            form = LocationCoordForm(request.POST)
-            if form.is_valid():
-                loc = form.save(commit=False)
-                lat = form.cleaned_data["lat"]
-                lon = form.cleaned_data["lon"]
-                geo = regeocode_gsi(lat,lon)
-                loc.state = geo.address.state
-                loc.display = geo.address.display
-                loc.label = geo.address.label
-                form = LocationForm(loc)
-            else:
-                return self.form_invalid(form)
-        
-        elif "diary-new-form" in self.request.POST:
-            form = DiaryForm(request.POST,request=request)
-            if form.is_valid():
-                return self.form_valid(form)
-            else:
-                return self.form_invalid(form)
-        
-        # いずれのフォームでもなかった場合
-        if form is None:
-            print("Unexpected form data:", request.POST)
-            return self.form_invalid(form)
-        # フォームが無効な場合の処理
-        if not form.is_valid():
-            return self.form_invalid(form)
-        # フォームが有効な場合の処理
-        return self.form_valid(form)
-
 class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
     template_name = "diary/diary.html"
     form_class = DiaryForm
     # formset_class = LocationInDiaryFormSet
     success_url = reverse_lazy("diary:diary")
     model = Diary
+
+    def post(self, request, *args: str, **kwargs: Any) -> HttpResponse:
+        if "address-search-form" in request.POST:
+            return self.handle_address_search(request)
+        elif "address-select-form" in request.POST:
+            return self.handle_address_select(request)
+        elif "get-current-address-form" in request.POST:
+            return self.handle_get_current_address(request)
+        elif "diary-new-form" in request.POST:
+            return self.handle_diary_new(request)
+        else:
+            return self.form_invalid(None)
+
+    def handle_address_search(self, request):
+        form = AddressSearchForm(request.POST)
+        if form.is_valid():
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return address_search(request, form)
+            return self.form_valid(form)
+        return self.form_invalid(form)
+
+    def handle_address_select(self, request):
+        form = LocationForm(request.POST)
+        if form.is_valid():
+            return self.form_valid(form)
+        return self.form_invalid(form)
+
+    def handle_get_current_address(self, request):
+        form = LocationCoordForm(request.POST)
+        if form.is_valid():
+            loc = form.save(commit=False)
+            lat = form.cleaned_data["lat"]
+            lon = form.cleaned_data["lon"]
+            geo = regeocode_gsi(lat, lon)
+            loc.state = geo.address.state
+            loc.display = geo.address.display
+            loc.label = geo.address.label
+            form = LocationForm(loc)
+            return self.form_valid(form)
+        return self.form_invalid(form)
+
+    def handle_diary_new(self, request):
+        form = DiaryForm(request.POST, request=request)
+        if form.is_valid():
+            return self.form_valid(form)
+        return self.form_invalid(form)
 
 class DiaryEditView(LoginRequiredMixin,DiaryMixin,generic.UpdateView):
     is_update_view = True
