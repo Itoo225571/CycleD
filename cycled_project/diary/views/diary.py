@@ -8,10 +8,9 @@ from django.db import transaction
 from django.http import JsonResponse
 from django.utils.timezone import now
 from ..forms import *
-from .address import address_search
+from .address import address_search,regeocode
 
 from datetime import timedelta
-from subs.get_location.get_location import regeocode_gsi
 
 """______Diary関係______"""
 class DiaryListView(LoginRequiredMixin,generic.ListView):
@@ -118,7 +117,7 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
             lat = form.cleaned_data["lat"]
             lon = form.cleaned_data["lon"]
             # 住所情報の取得
-            geo = regeocode_gsi(lat, lon)
+            geo = regeocode(lat, lon)
             loc.state = geo.address.state
             loc.display = geo.address.display
             loc.label = geo.address.label

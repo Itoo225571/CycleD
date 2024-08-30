@@ -10,7 +10,7 @@ from django.shortcuts import redirect
 
 from ..forms import *
 
-from subs.get_location.get_location import geocode_gsi,geocode_yahoo,regeocode_gsi,ResponseEmptyError
+from subs.get_location.get_location import geocode_gsi,geocode_yahoo,regeocode_gsi,regeocode_HeartTails,ResponseEmptyError
 
 """______Address関係______"""
 @ratelimit(key='user', rate='100/d', method='POST')
@@ -29,6 +29,17 @@ def address_search(request,form):
         "data_list": geocode_data_list.model_dump(),
     }
     return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
+
+def regeocode(lat,lon):
+    try:
+        geocode_data = regeocode_gsi(lat,lon)
+    except Exception as e:
+        try:
+            geocode_data = regeocode_HeartTails(lat,lon)
+        except Exception as e:
+            print(f"その他のエラーが発生しました: {e}")
+            raise
+    return geocode_data
 
 class AddressHomeView(LoginRequiredMixin,generic.FormView):
     template_name = "diary/address.html"
@@ -86,7 +97,7 @@ class AddressHomeView(LoginRequiredMixin,generic.FormView):
                 
                 lat = form.cleaned_data["lat"]
                 lon = form.cleaned_data["lon"]
-                geo = regeocode_gsi(lat,lon)
+                geo = regeocode(lat,lon)
                 loc.state = geo.address.state
                 loc.display = geo.address.display
                 # Homeの場合Trueにする
@@ -137,7 +148,7 @@ class AddressDiaryNewView(AddressHomeView):
                 
                 lat = form.cleaned_data["lat"]
                 lon = form.cleaned_data["lon"]
-                geo = regeocode_gsi(lat,lon)
+                geo = regeocode(lat,lon)
                 loc.state = geo.address.state
                 loc.display = geo.address.display
                 loc.label = geo.address.label

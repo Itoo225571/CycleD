@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 data: data,
                 timeout:60000,  
                 success: function (response) {
-                    console.log("Response:", response.data);
+                    // console.log("Response:", response.data);
                     set_location(response.data)
                 },
                 error: function (xhr, status, error) {
