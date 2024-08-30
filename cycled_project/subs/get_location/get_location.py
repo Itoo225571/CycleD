@@ -182,6 +182,7 @@ def _get_muniCode():
 class ResponseEmptyError(ValueError):
     pass
 
+# リクエストを送ってその返事をもらう関数
 def _fetch_data(url,params,timeout=5.0):
 	sleep(1)
 	try:
@@ -232,7 +233,7 @@ class AddressData(BaseModel):
 				if self.city in self.name:
 					self.label = self.name
 				else:
-					self.label = self.name + f"({self.state} {self.city})"
+					self.label = f"{self.name} ({self.state} {self.city})"
 				self.display = self.city
 
 		elif self.geotype == "gsi":
@@ -245,7 +246,7 @@ class AddressData(BaseModel):
 						self.city = place.get("city","")
 					if self.city is None:
 						self.city = ""
-				self.label = self.name + f" ({self.state} {self.city}) "
+				self.label = f"{self.name} ({self.state} {self.city})"
 				self.fulladdress = self.country + self.state + self.city + self.locality + self.street + self.name
 				if self.search == "":
 					self.display = self.city
@@ -261,8 +262,14 @@ class AddressData(BaseModel):
 				self.label = self.name
 				self.fulladdress = self.country + self.name
 				self.display = self.city
-			
 			self.priority = _assign_prefecture_number(self.label)
+
+		elif self.geotype == "HeartRails":
+			if self.city in self.name:
+				self.label = self.name
+			else:
+				self.label = f"{self.name} ({self.state} {self.city})"
+			self.display = self.city
 
 class LocationData(BaseModel):
     address: AddressData
@@ -400,6 +407,39 @@ def regeocode_gsi(lat:float,lon:float) -> LocationData:
 		raise Exception(f"Error data is empty")
 	return loc
 
+def regeocode_HeartTails(lat:float,lon:float) -> LocationData:
+	url = f"https://geoapi.heartrails.com/api/json?method=searchByGeoLocation"
+	params = {
+		"y": lat,
+		"x": lon,
+	}
+	try:
+		data = _fetch_data(url,params)
+	except Exception as e:
+		print(f"エラーが発生しました: {e}")
+		raise 
+	# return data
+	if data:
+		result = data.get("response")
+		result = result.get("location")[0]
+		address = {
+			"geotype": 'HeartRails',
+			"name": result.get('town'),
+			"state": result.get('prefecture'),
+			"city": result.get('city'),
+			"locality": result.get('town'),
+			"postcode": result.get('postal'),
+		}
+		location = {
+			"lat": lat,
+			"lon": lon,
+			"address": address,
+		}
+		loc = LocationData(**location)
+	else:
+		raise Exception(f"Error data is empty")
+	return loc
+
 if __name__=="__main__":
 	# import string
 	# import random
@@ -410,5 +450,6 @@ if __name__=="__main__":
 	# 	print(result)
 	# 	geo = geocode_gsi(result)
 	# geo = regeocode_gsi(35.7247454,139.5812729)
+	geo = regeocode_HeartTails(35.7247454,139.5812729)
 	# print(geo)
-	pass
+	

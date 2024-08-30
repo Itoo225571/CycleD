@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			pkField.setAttribute('readonly', 'true'); // 読み取り専用に設定
 			// const commentField = document.querySelector('#id_comment_field');
 			// dateField.value = diary.comment;
-			$('#formset-body').html(''); // リセット
+			
 			diary.locations.forEach(item => {
 				set_location(item);
 			});
@@ -220,5 +220,17 @@ document.addEventListener('DOMContentLoaded', function() {
 		// フォームをリセット
 		// const diaryForm = document.getElementById('diaryForm'); // フォームのIDを使って取得
 		// diaryForm.reset();
+		$('#formset-body').html(''); // リセット
+
+		// 強制的にモーダルを閉じる
+		var backdrop = document.querySelector('.modal-backdrop');
+		if (backdrop) {
+			backdrop.remove(); // バックドロップを削除
+		}
+		document.body.classList.remove('modal-open'); // モーダルのオープンクラスを削除
+		document.body.style.paddingRight = ''; // 余分なスタイルをリセット
+		document.body.style.overflow = ''; // 直接スクロールスタイルをリセットする
 	});
 });
+
+
