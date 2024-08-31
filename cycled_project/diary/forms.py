@@ -18,16 +18,23 @@ class ModelFormWithFormSetMixin:
         )
 
     def is_valid(self):
-        if not super(ModelFormWithFormSetMixin, self).is_valid():
+        valid = super(ModelFormWithFormSetMixin, self).is_valid()
+        if not valid:
             print("Form is not valid")
-        if not self.formset.is_valid():
+            # フォームのエラーを表示
+            print(self.errors)  # フォーム全体のエラー
+            for field, errors in self.errors.items():
+                print(f"Errors in {field}: {errors}")
+        formset_valid = self.formset.is_valid()
+        if not formset_valid:
             print("Formset is not valid")
+            # フォームセットのエラーを表示
             for form in self.formset:
-                if form.is_valid():
-                    print('success')
-                else:
-                    print('OUT')
-        return super(ModelFormWithFormSetMixin, self).is_valid() and self.formset.is_valid()
+                print(form.errors)  # 各フォームのエラー
+                for field, errors in form.errors.items():
+                    print(f"Errors in form {form.prefix}, field {field}: {errors}")
+        
+        return valid and formset_valid
 
     def save(self, commit=True):
         saved_instance = super(ModelFormWithFormSetMixin, self).save(commit)

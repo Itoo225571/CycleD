@@ -1,4 +1,5 @@
 import { set_location } from './set_location.js';
+import { MyDiary } from './address_diary.js';
 
 // 祝日データを取得してカレンダーに追加する関数
 function addHolidaysToCalendar() {
@@ -179,6 +180,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 		// モーダル表示の共通処理(新規作成)
 		function showDiaryModalNew(dateStr) {
+			// リセット
+			$('#id_locations-INITIAL_FORMS').val(0);
 			var modal = new bootstrap.Modal(document.getElementById('diaryModal'));
 			modal.show();
 			// 選択された日付をフォームにセットする
@@ -186,10 +189,13 @@ document.addEventListener('DOMContentLoaded', function() {
 			dateField.value = dateStr;
 			dateField.setAttribute('readonly', 'true'); // 読み取り専用に設定
 			// タイトル用
-			document.getElementById('selectedDate').textContent = formatDateJapanese(dateStr);
+			var title = document.getElementById('diaryModalLabel');
+			title.innerHTML = `日記の作成 - <span id="selectedDate">${formatDateJapanese(dateStr)}</span>`
 		}
 		// モーダル表示の共通処理(編集)
 		function showDiaryModalEdit(event) {
+			// リセット
+			$('#id_locations-INITIAL_FORMS').val(0);
 			var diary = event.extendedProps.diary
 			var modal = new bootstrap.Modal(document.getElementById('diaryModal'));
 			modal.show();
@@ -197,18 +203,23 @@ document.addEventListener('DOMContentLoaded', function() {
 			const dateField = document.querySelector('#id_date_field');
 			dateField.value = diary.date;
 			dateField.setAttribute('readonly', 'true'); // 読み取り専用に設定
-			const pkField = document.querySelector('#id_diary_pk');
-			pkField.value = diary.id;
-			pkField.setAttribute('readonly', 'true'); // 読み取り専用に設定
 			// const commentField = document.querySelector('#id_comment_field');
 			// dateField.value = diary.comment;
+			var initialFormCount = 0;
 			
 			diary.locations.forEach(item => {
 				set_location(item);
+				initialFormCount += 1;
 			});
+			// Form初期の数は最初に記述
+			$('#id_locations-INITIAL_FORMS').val(initialFormCount);
+			MyDiary.setPk(diary.diary_id);
+
 			// タイトル用
-			document.getElementById('selectedDate').textContent = formatDateJapanese(diary.date);
+			var title = document.getElementById('diaryModalLabel');
+			title.innerHTML = `日記の編集 - <span id="selectedDate">${formatDateJapanese(diary.date)}</span>`
 			// const titleField = document.querySelector('#id_date_field');
+
 		}
 		// カレンダーを表示
 		calendar.render();
@@ -220,7 +231,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		// フォームをリセット
 		// const diaryForm = document.getElementById('diaryForm'); // フォームのIDを使って取得
 		// diaryForm.reset();
-		$('#formset-body').html(''); // リセット
+		$('#formset-body').html(''); // formsetリセット
+		MyDiary.resetPk(); //setしたpkをリセット
 
 		// 強制的にモーダルを閉じる
 		var backdrop = document.querySelector('.modal-backdrop');

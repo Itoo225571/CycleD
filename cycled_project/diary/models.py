@@ -2,7 +2,10 @@ from django.db import models
 from django.forms.models import model_to_dict
 from django.contrib.auth.models import AbstractUser
 
+import uuid
+
 class Location(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     # user = models.ForeignKey(User,on_delete=models.CASCADE)
     lat = models.FloatField()
     lon = models.FloatField()
@@ -27,6 +30,7 @@ class Location(models.Model):
         return location_dict
 
 class User(AbstractUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     # username=models.CharField(max_length=128,verbose_name="user   name")
     # email=None
     first_name = None
@@ -50,6 +54,7 @@ class User(AbstractUser):
         return self.username
     
 class Diary(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     date = models.DateField(verbose_name="日記の日時", null=True)
     # 詳しい時間
     # datetime = models.DateTimeField("time detail",blank=True)

@@ -1,4 +1,16 @@
 import { set_location } from './set_location.js';
+export const MyDiary = {
+    pk: '',
+    setPk: function(newPk) {
+        this.pk = newPk;
+    },
+    getPk: function() {
+        return this.pk;
+    },
+    resetPk: function() {
+        return this.pk = '';
+    }
+};
 
 function template(dataArray){
     return dataArray.map(function(data,index){
@@ -30,6 +42,7 @@ function distance(lat1, lng1, lat2, lng2) {
 
 
 document.addEventListener('DOMContentLoaded', function() {
+    const initialActionUrl = $('#diaryForm').prop('action');
     // 検索した時の動き
     $('#address-search-form').submit(function(event) {  
         // フォームのデフォルトの動作をキャンセル
@@ -147,6 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Diaryを作成した時の動き
     $('#diaryForm').submit(function(event) {  
+        event.preventDefault();
         // フォーム数を更新
         const formsetBodynow = $('#formset-body');
         const totalForms = $('#id_locations-TOTAL_FORMS');
@@ -175,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });    
         // エラーがある場合はフォーム送信をキャンセル
         if (hasError) {
-            event.preventDefault(); // フォームの送信をキャンセルする
+            return; // フォームの送信をキャンセルする
         }
         // 新しいエラーメッセージを追加する関数
         function addErrorMessage(message) {
@@ -186,19 +200,28 @@ document.addEventListener('DOMContentLoaded', function() {
             // ul要素にli要素を追加
             error_normal_field.appendChild(newErrorItem);
         }
-        // event.preventDefault();
 
         // Editの時の処理
         const submitButton = $(event.originalEvent.submitter); // クリックされたボタンを取得
         const buttonName = submitButton.attr('name');
+        $('<input>').attr({
+            type: 'hidden',
+            name: buttonName,
+            value: '',
+        }).appendTo(this);
         if (buttonName === 'diary-edit-form') {
             const confirmMessage = '既にある日記を上書きしますか？';
-            const userConfirmed = confirm(confirmMessage);
-            if (!userConfirmed) {
-                event.preventDefault(); // ユーザーがキャンセルした場合、フォームの送信をキャンセルする
-                return;
+            // const userConfirmed = confirm(confirmMessage);
+            // if (!userConfirmed) {
+            //     return; // ユーザーがキャンセルした場合、フォームの送信をキャンセルする
+            // }
+            if(MyDiary.getPk()){
+                const newActionUrl = `${initialActionUrl}${MyDiary.getPk()}/edit`;
+                $(this).prop('action', newActionUrl);
             }
-            
         }
+        this.submit();
+        // フォームの action をリセット
+        $('#diaryForm').prop('action', initialActionUrl);
     });
 });
