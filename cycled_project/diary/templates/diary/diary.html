@@ -105,6 +105,7 @@
                         <div id="empty-form" style="display:none;">
                             {% comment %} fieldsに含まれる要素のみ取り出す {% endcomment %}
                             <div class="label-display"></div>
+                            {% comment %} {% for field in form.formset.empty_form.visible_fields %} {% endcomment %}
                             {% for field in form.formset.empty_form %}
                                 {{ field }}
                             {% endfor %}

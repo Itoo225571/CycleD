@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			var initialFormCount = 0;
 			
 			diary.locations.forEach(item => {
-				set_location(item);
+				set_location(item,true);
 				initialFormCount += 1;
 			});
 			// Form初期の数は最初に記述
