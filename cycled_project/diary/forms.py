@@ -117,8 +117,8 @@ LocationFormSet = forms.inlineformset_factory(
         Location,
         form=LocationForm,
         extra=0,
-        # can_delete=True,
-        max_num=5,
+        can_delete=True,
+        max_num=5*2,
         validate_max=True,
         min_num=0,
         # validate_min=True

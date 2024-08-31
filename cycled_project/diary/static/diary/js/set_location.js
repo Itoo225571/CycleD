@@ -1,19 +1,20 @@
-export function set_location(data){
+export function set_location(data,is_exist=false){
     // 現在のフォームの総数を取得
     const formsetBody = $('#formset-body');
-    const formCount = formsetBody.children().length;
+    const formCountReal = formsetBody.children().length;
+    const formCountVisible = formCountReal - $(".formset_fields_deleted").length;
     const maxnumForms = $('#id_locations-MAX_NUM_FORMS');
 
-    const formMax = parseInt(maxnumForms.val());
-    if (formCount < formMax){
-        var formsetClassName = "formset_fields";
-        // if(is_exist) {
-        //     formsetClassName = "formset_fields formset_fields_exist";
-        // }
+    const formMax = parseInt(maxnumForms.val()/2) ;
+    if (formCountVisible < formMax){
+        var formsetClassName = "formset_fields formset_fields_new";
+        if(is_exist) {
+            formsetClassName = "formset_fields formset_fields_exist";
+        }
         // empty-form の HTML を取得し、__prefix__ を現在のフォーム数で置換
-        let newFormHtml = $('#empty-form').html().replace(/__prefix__/g, formCount);
-        let $newFormHtml = $(`<tr id="locations-${formCount}" class="${formsetClassName}">`).append($('<td>').html(newFormHtml));
-        let prefix = `locations-${formCount}-`;
+        let newFormHtml = $('#empty-form').html().replace(/__prefix__/g, formCountReal);
+        let $newFormHtml = $(`<tr id="locations-${formCountReal}" class="${formsetClassName}">`).append($('<td>').html(newFormHtml));
+        let prefix = `locations-${formCountReal}-`;
         
         // フォームの内容を変更
         $newFormHtml.find('input').each(function() {
@@ -44,27 +45,35 @@ export function set_location(data){
 
         // 削除ボタンにクリックイベントを設定
         $newFormHtml.find('.delete-location').on('click', function() {
-            var num = $(this).closest('tr').attr('id');
+            var parent = $(this).closest('tr');
+            var num = parent.attr('id');
             num = parseInt(num.replace('locations-', ''));
-            // var newformBody = $('#formset-body');
             var newformCount = formsetBody.children().length;
-            // 後ろから順番にIDを更新
-            for (let i = newformCount - 1; i > num; i--) {
-                $(`#formset-body [id *= 'locations-${i}']`).each(function() {
-                    let $element = $(this);
-                    // ID更新
-                    let currentId = $element.attr('id');
-                    let newId = currentId.replace(`locations-${i}`, `locations-${i-1}`);
-                    $element.attr('id', newId);
-                    // nameも更新
-                    let currentName = $element.attr('name');
-                    if (currentName) {
-                        let newName = currentName.replace(`locations-${i}`, `locations-${i-1}`);
-                        $element.attr('name', newName);
-                    }
-                });
+            if (parent.hasClass('formset_fields_new')) {
+                // 後ろから順番にIDを更新
+                for (let i = newformCount - 1; i > num; i--) {
+                    $(`#formset-body [id *= 'locations-${i}']`).each(function() {
+                        let $element = $(this);
+                        // ID更新
+                        let currentId = $element.attr('id');
+                        let newId = currentId.replace(`locations-${i}`, `locations-${i-1}`);
+                        $element.attr('id', newId);
+                        // nameも更新
+                        let currentName = $element.attr('name');
+                        if (currentName) {
+                            let newName = currentName.replace(`locations-${i}`, `locations-${i-1}`);
+                            $element.attr('name', newName);
+                        }
+                    });
+                }
+                parent.remove(); // 親の<tr>要素を削除
+            } else {
+                var $deleteInput = parent.find(`input#id_locations-${num}-DELETE`);
+                // $deleteInput.prop('checked', true);
+                $deleteInput.val(true);
+                parent.addClass('formset_fields_deleted'); // 削除されたことにするクラス
+                parent.hide(); //削除しない
             }
-            $(this).closest('tr').remove(); // 親の<tr>要素を削除
         });
         formsetBody.append($newFormHtml);
     }
