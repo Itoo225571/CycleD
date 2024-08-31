@@ -6,9 +6,13 @@ export function set_location(data){
 
     const formMax = parseInt(maxnumForms.val());
     if (formCount < formMax){
+        var formsetClassName = "formset_fields";
+        // if(is_exist) {
+        //     formsetClassName = "formset_fields formset_fields_exist";
+        // }
         // empty-form の HTML を取得し、__prefix__ を現在のフォーム数で置換
         let newFormHtml = $('#empty-form').html().replace(/__prefix__/g, formCount);
-        let $newFormHtml = $(`<tr id="locations-${formCount}">`).append($('<td>').html(newFormHtml));
+        let $newFormHtml = $(`<tr id="locations-${formCount}" class="${formsetClassName}">`).append($('<td>').html(newFormHtml));
         let prefix = `locations-${formCount}-`;
         
         // フォームの内容を変更
@@ -16,19 +20,22 @@ export function set_location(data){
             let $input = $(this);
             let name = $input.attr('name');
             name = name.replace(prefix, '');
-            const value = searchObject(data,name);
+            if (name=="id"){
+                name = "location_id"
+            }
+            const value = searchKeys(data,name);
             // data オブジェクトから値を取得して設定する
             if (value) {
                 $input.val(value);
                 if (name == "label") {
                     var label_HTML = 
-                    `<span class="fa-stack fa-lg">
-                        <i class="fa-solid fa-circle fa-stack-2x" style="color: #cdcdcd;"></i>
-                        <i class="fa-solid fa-location-dot fa-stack-1x" ></i>
-                    </span>
-                    ${value}
-                    <button type="button" class="bi bi-trash delete-location" style="color: red;"></button>
-                    `;
+                        `<span class="fa-stack fa-lg">
+                            <i class="fa-solid fa-circle fa-stack-2x" style="color: #cdcdcd;"></i>
+                            <i class="fa-solid fa-location-dot fa-stack-1x" ></i>
+                        </span>
+                        ${value}
+                        <button type="button" class="bi bi-trash delete-location" style="color: red;"></button>
+                        `;
                     $newFormHtml.find('.label-display').html(label_HTML);
                 }
             }
@@ -67,7 +74,7 @@ export function set_location(data){
     }    
 
     // キーを探す関数
-    function searchObject(obj, keyToFind) {
+    function searchKeys(obj, keyToFind) {
         let result = undefined;
         function search(o) {
             for (const key in o) {

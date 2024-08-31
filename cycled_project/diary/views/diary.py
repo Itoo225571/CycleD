@@ -1,5 +1,5 @@
 from django.db.models.query import QuerySet
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
@@ -34,14 +34,14 @@ def sendDairies(request):
         diaries_data = []
         for diary in diaries:
             diary_data = {
-                "id": diary.id,
+                "diary_id": diary.id,
                 "date": diary.date.isoformat(),
                 "comment": diary.comment,
                 "locations": []
             }
             for location in diary.locations.all():
                 location_data = {
-                    "id": location.id,
+                    "location_id": location.id,
                     "lat": location.lat,
                     "lon": location.lon,
                     "state": location.state,
@@ -66,7 +66,6 @@ class DiaryMixin(object):
         context = self.get_context_data()
         context['form_errors'] = True
         return self.render_to_response(context)
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         # ユーザーをフォームに渡す
@@ -91,7 +90,8 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
         elif "diary-new-form" in request.POST:
             return self.handle_diary_new(request)
         elif "diary-edit-form" in request.POST:
-            return self.handle_diary_edit(request)
+            # return self.handle_diary_edit(request)
+            pass
         else:
             print(f"post name error: {request.POST}")
             return self.form_invalid(None)
@@ -135,21 +135,44 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
         if form.is_valid():
             return self.form_valid(form)
         return self.form_invalid(form)
-    
-    def handle_diary_edit(self, request):
-        print(request.POST)
-        form = DiaryForm(request.POST, request=request)
-        if form.is_valid():
-            return self.form_valid(form)
-        return self.form_invalid(form)
 
 class DiaryEditView(LoginRequiredMixin,DiaryMixin,generic.UpdateView):
     is_update_view = True
     template_name = "diary/diary.html"
     form_class = DiaryForm
     # formset_class = LocationInDiaryFormSet
-    success_url = reverse_lazy("diary:home")
+    success_url = reverse_lazy("diary:diary")
     model = Diary
+
+    def post(self, request, pk):
+        print(request.POST)
+        diary = get_object_or_404(Diary, pk=pk)
+        form = DiaryForm(request.POST, instance=diary, request=request)
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+# class DiaryEditView(LoginRequiredMixin,generic.View):
+#     success_url = reverse_lazy("diary:diary")
+#     def post(self, request, pk):
+#         # print(request.POST)
+#         # Diary インスタンスを取得
+#         diary = get_object_or_404(Diary, pk=pk)
+#         form = DiaryForm(request.POST, instance=diary, request=request)
+#         if form.is_valid():
+#             # フォームが有効な場合、データを保存
+#             form.save()
+#             return HttpResponseRedirect(self.get_success_url())
+#         else:
+#             # フォームが無効な場合
+#             return self.form_invalid(form)
+#     def get_success_url(self):
+#         return self.success_url
+#     def form_invalid(self, form):
+#         context = self.get_context_data()
+#         context['form_errors'] = True
+#         return self.render_to_response(context)
 
 class DiaryDeleteView(LoginRequiredMixin,generic.DeleteView):
     pass

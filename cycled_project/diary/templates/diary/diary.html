@@ -60,17 +60,16 @@
                         <div id="error-normal"></div>
                         <form method="post" id="diaryForm">
                             {% csrf_token %}
-
+                            <!-- フォームセット全体を表示 -->
+                            {{ form.formset.management_form }}
                             <div style="display: none;">
                                 <label for="{{ form.date.id_for_label }}">{{ form.date.label }}</label>
                                     {{ form.date }}
                                     {% if form.date.errors %}
                                         <div class="error" id="date-error">{{ form.date.errors }}</div>
                                     {% endif %}
-                                <input type="hidden" name="pk" id="id_diary_pk" >
                             </div>
-                            
-                            {% comment %} 
+                            {% comment %}                             
                             <div class="row my-3">
                                 <div class="col">
                                 <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }}</label>
@@ -81,19 +80,8 @@
                                 </div>
                             </div>         
                             {% endcomment %}
-            
                             <div class="row">
                                 <div class="col">
-                                    <!-- フォームセット全体を表示 -->
-                                    {{ form.formset.management_form }}
-                                    {% comment %} 追加用フォームを作るためのempty {% endcomment %}
-                                    <div id="empty-form" style="display:none;">
-                                        {% comment %} fieldsに含まれる要素のみ取り出す {% endcomment %}
-                                        <div class="label-display"></div>
-                                        {% for field in form.formset.empty_form.visible_fields %}
-                                            {{ field }}
-                                        {% endfor %}
-                                    </div>
                                     <table class="table table-bordered my-1" id="location-table">
                                         <thead>
                                             <tr>
@@ -113,6 +101,14 @@
                                 </div>
                             </div>
                         </form>
+                        {% comment %} 追加用フォームを作るためのempty {% endcomment %}
+                        <div id="empty-form" style="display:none;">
+                            {% comment %} fieldsに含まれる要素のみ取り出す {% endcomment %}
+                            <div class="label-display"></div>
+                            {% for field in form.formset.empty_form %}
+                                {{ field }}
+                            {% endfor %}
+                        </div>
                         <div class="modal-body address-form-content">
                             <div class="get-current-address-form">
                                 <form method="post" id="get-current-address-form" name="get-current-address-form">
