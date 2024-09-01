@@ -9,7 +9,7 @@ export const MyDiary = {
     },
     resetPk: function() {
         return this.pk = '';
-    }
+    },
 };
 
 function template(dataArray){

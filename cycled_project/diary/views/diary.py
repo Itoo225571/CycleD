@@ -144,14 +144,13 @@ class DiaryEditView(LoginRequiredMixin,DiaryMixin,generic.UpdateView):
     success_url = reverse_lazy("diary:diary")
     model = Diary
 
-    def post(self, request, pk):
-        print(request.POST)
-        diary = get_object_or_404(Diary, pk=pk)
-        form = DiaryForm(request.POST, instance=diary, request=request)
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
+    # def post(self, request, pk):
+    #     diary = get_object_or_404(Diary, pk=pk)
+    #     form = DiaryForm(request.POST, instance=diary, request=request)
+    #     if form.is_valid():
+    #         return self.form_valid(form)
+    #     else:
+    #         return self.form_invalid(form)
 
 # class DiaryEditView(LoginRequiredMixin,generic.View):
 #     success_url = reverse_lazy("diary:diary")
