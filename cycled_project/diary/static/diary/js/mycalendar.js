@@ -96,6 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		const calendarEl = document.getElementById('mycalendar');
 		// カレンダーの初期設定
 		const calendar = new FullCalendar.Calendar(calendarEl, {
+			initialDate: sessionStorage.getItem('diaryDate') || null,
 			// カレンダーの種類
 			initialView: "dayGridMonth",
 			// 祝日イベントを追加
@@ -178,8 +179,8 @@ document.addEventListener('DOMContentLoaded', function() {
 			},
 			
 		});
-		// モーダル表示の共通処理(新規作成)
-		function showDiaryModalNew(dateStr) {
+		// モーダル表示の共通処理
+		function showDiaryModalBase(dateStr){
 			// リセット
 			$('#id_locations-INITIAL_FORMS').val(0);
 			var modal = new bootstrap.Modal(document.getElementById('diaryModal'));
@@ -188,25 +189,23 @@ document.addEventListener('DOMContentLoaded', function() {
 			const dateField = document.querySelector('#id_date_field');
 			dateField.value = dateStr;
 			dateField.setAttribute('readonly', 'true'); // 読み取り専用に設定
+			sessionStorage.setItem('diaryDate', dateStr);  // sessionStorageに保存
+		}
+		// 新規作成
+		function showDiaryModalNew(dateStr) {
+			showDiaryModalBase(dateStr);
 			// タイトル用
 			var title = document.getElementById('diaryModalLabel');
 			title.innerHTML = `日記の作成 - <span id="selectedDate">${formatDateJapanese(dateStr)}</span>`
 		}
-		// モーダル表示の共通処理(編集)
+		// 編集
 		function showDiaryModalEdit(event) {
-			// リセット
-			$('#id_locations-INITIAL_FORMS').val(0);
+			const formatDate = (date) => date.toISOString().split('T')[0];
+			showDiaryModalBase(formatDate(event.start));
 			var diary = event.extendedProps.diary
-			var modal = new bootstrap.Modal(document.getElementById('diaryModal'));
-			modal.show();
-			// フォームにセットする
-			const dateField = document.querySelector('#id_date_field');
-			dateField.value = diary.date;
-			dateField.setAttribute('readonly', 'true'); // 読み取り専用に設定
 			// const commentField = document.querySelector('#id_comment_field');
 			// dateField.value = diary.comment;
 			var initialFormCount = 0;
-			
 			diary.locations.forEach(item => {
 				set_location(item,true);
 				initialFormCount += 1;
@@ -214,12 +213,10 @@ document.addEventListener('DOMContentLoaded', function() {
 			// Form初期の数は最初に記述
 			$('#id_locations-INITIAL_FORMS').val(initialFormCount);
 			MyDiary.setPk(diary.diary_id);
-
 			// タイトル用
 			var title = document.getElementById('diaryModalLabel');
 			title.innerHTML = `日記の編集 - <span id="selectedDate">${formatDateJapanese(diary.date)}</span>`
 			// const titleField = document.querySelector('#id_date_field');
-
 		}
 		// カレンダーを表示
 		calendar.render();
