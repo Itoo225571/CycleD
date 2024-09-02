@@ -11,6 +11,8 @@ from ..forms import *
 from .address import address_search,regeocode
 
 from datetime import timedelta
+import json
+
 
 """______Diary関係______"""
 class DiaryListView(LoginRequiredMixin,generic.ListView):
@@ -58,19 +60,22 @@ def sendDairies(request):
 class DiaryMixin(object):
     def form_valid(self, form):
         form.instance.user = self.request.user
-        response = super().form_valid(form)
-        return response
+        return  super().form_valid(form)
     # エラーがあったことを知らせるやつ
     def form_invalid(self, form):
-        self.object = None
-        context = self.get_context_data()
-        context['form_errors'] = True
-        return self.render_to_response(context)
+        # self.object = None
+        # context = self.get_context_data()
+        # context['form_errors'] = True
+        # エラー情報をセッションに保存
+        self.request.session['form_errors'] = form.errors.as_json()
+        redirect_url = reverse_lazy('diary:diary')
+        return HttpResponseRedirect(redirect_url)
+    
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         # ユーザーをフォームに渡す
         kwargs['request'] = self.request
-        return kwargs       
+        return kwargs
 
 class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
     template_name = "diary/diary.html"
@@ -95,6 +100,15 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
         else:
             print(f"post name error: {request.POST}")
             return self.form_invalid(None)
+        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # セッションからエラー情報を取得
+        form_errors = self.request.session.pop('form_errors', None)
+        if form_errors:
+            # エラー情報を辞書形式に変換してコンテキストに追加
+            context['form_errors'] = json.loads(form_errors)
+        return context
 
     def handle_address_search(self, request):
         form = AddressSearchForm(request.POST)
@@ -140,17 +154,19 @@ class DiaryEditView(LoginRequiredMixin,DiaryMixin,generic.UpdateView):
     is_update_view = True
     template_name = "diary/diary.html"
     form_class = DiaryForm
-    # formset_class = LocationInDiaryFormSet
     success_url = reverse_lazy("diary:diary")
     model = Diary
+    
+    def get(self, request, *args, **kwargs):
+        return redirect(reverse_lazy('diary:diary'))
 
-    # def post(self, request, pk):
-    #     diary = get_object_or_404(Diary, pk=pk)
-    #     form = DiaryForm(request.POST, instance=diary, request=request)
-    #     if form.is_valid():
-    #         return self.form_valid(form)
-    #     else:
-    #         return self.form_invalid(form)
+    def post(self, request, pk):
+        diary = get_object_or_404(Diary, pk=pk)
+        form = DiaryForm(request.POST, instance=diary, request=request)
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
 
 # class DiaryEditView(LoginRequiredMixin,generic.View):
 #     success_url = reverse_lazy("diary:diary")
@@ -174,4 +190,12 @@ class DiaryEditView(LoginRequiredMixin,DiaryMixin,generic.UpdateView):
 #         return self.render_to_response(context)
 
 class DiaryDeleteView(LoginRequiredMixin,generic.DeleteView):
-    pass
+    template_name = "diary/diary.html"
+    success_url = reverse_lazy("diary:diary")
+    model = Diary
+    def get(self, request, *args, **kwargs):
+        return redirect(reverse_lazy('diary:diary'))
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        print(f"Deleted object with ID: {self.kwargs['pk']}")
+        return response

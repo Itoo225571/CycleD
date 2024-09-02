@@ -55,7 +55,7 @@ class User(AbstractUser):
     
 class Diary(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-    date = models.DateField(verbose_name="日記の日時", null=True)
+    date = models.DateField(verbose_name="日記の日時", null=True, unique=True)
     # 詳しい時間
     # datetime = models.DateTimeField("time detail",blank=True)
     # name_place = models.CharField(max_length=128,verbose_name="place name",null=True)

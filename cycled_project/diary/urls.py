@@ -18,9 +18,10 @@ urlpatterns = [
     # path("diary/",views.DiaryView.as_view(),name="diary"),
     path("diary/",views.DiaryNewView.as_view(),name="diary"),
     path("diary/<uuid:pk>/edit",views.DiaryEditView.as_view(),name="diary_edit"),
+    path("diary/<uuid:pk>/delete",views.DiaryDeleteView.as_view(),name="diary_delete"),    
     path("diary/list/",views.DiaryListView.as_view(),name="diary_list"),
     # path("diary/edit/<int:pk>",views.DiaryEditView.as_view(),name="diary_edit"),
-    path("diary/delete/<int:pk>",views.DiaryDeleteView.as_view(),name="diary_delete"),
+    # path("diary/delete/<int:pk>",views.DiaryDeleteView.as_view(),name="diary_delete"),
 
     # path("diary/address/",views.AddressHomeView.as_view(),name="address_diary" ),
     # path("diary/new/address",views.AddressDiaryNewView.as_view(),name="address_diary_new" ),
