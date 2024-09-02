@@ -35,6 +35,15 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body modal-errors">
+                        {% for field, errors in form_errors.items %}
+                            {% if field == '__all__' %}
+                                <ul>
+                                {% for error in errors %}
+                                    <li>{{ error.message }}</li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
+                        {% endfor %}
                         {% if form.non_field_errors %}
                         <div id="error-form">
                             <ul>
@@ -96,8 +105,9 @@
                             </div> 
                             <div class="row">
                                 <div class="col">
-                                    <button type="submit" class="btn btn-primary" name="diary-new-form">作成</button>
-                                    <button type="submit" class="btn btn-primary" name="diary-edit-form">変更</button>
+                                    <button type="submit" id="id-diary-new-button" class="btn btn-primary" name="diary-new-form">作成</button>
+                                    <button type="submit" id="id-diary-edit-button" class="btn btn-primary" name="diary-edit-form">変更</button>
+                                    <button type="submit" id="id-diary-delete-button" class="btn btn-danger" name="diary-delete-form">削除</button>
                                 </div>
                             </div>
                         </form>

@@ -210,13 +210,24 @@ document.addEventListener('DOMContentLoaded', function() {
             value: '',
         }).appendTo(this);
         if (buttonName === 'diary-edit-form') {
-            const confirmMessage = '既にある日記を上書きしますか？';
-            // const userConfirmed = confirm(confirmMessage);
-            // if (!userConfirmed) {
-            //     return; // ユーザーがキャンセルした場合、フォームの送信をキャンセルする
-            // }
+            const confirmMessage = '日記を上書きします';
+            const userConfirmed = confirm(confirmMessage);
+            if (!userConfirmed) {
+                return; // ユーザーがキャンセルした場合、フォームの送信をキャンセルする
+            }
             if(MyDiary.getPk()){
                 const newActionUrl = `${initialActionUrl}${MyDiary.getPk()}/edit`;
+                $(this).prop('action', newActionUrl);
+            }
+        }
+        if (buttonName === 'diary-delete-form') {
+            const confirmMessage = 'この日記を削除します';
+            const userConfirmed = confirm(confirmMessage);
+            if (!userConfirmed) {
+                return; // ユーザーがキャンセルした場合、フォームの送信をキャンセルする
+            }
+            if(MyDiary.getPk()){
+                const newActionUrl = `${initialActionUrl}${MyDiary.getPk()}/delete`;
                 $(this).prop('action', newActionUrl);
             }
         }

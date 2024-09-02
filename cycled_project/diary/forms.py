@@ -28,12 +28,17 @@ class ModelFormWithFormSetMixin:
         formset_valid = self.formset.is_valid()
         if not formset_valid:
             print("Formset is not valid")
+            # フォームセット全体のエラーを表示
+            non_form_errors = self.formset.non_form_errors()
+            if non_form_errors:
+                
+                print("Formset non-form errors:")
+                for error in non_form_errors:
+                    print(f"  {error}")
             # フォームセットのエラーを表示
             for form in self.formset:
-                print(form.errors)  # 各フォームのエラー
                 for field, errors in form.errors.items():
                     print(f"Errors in form {form.prefix}, field {field}: {errors}")
-        
         return valid and formset_valid
 
     def save(self, commit=True):
@@ -120,8 +125,8 @@ LocationFormSet = forms.inlineformset_factory(
         can_delete=True,
         max_num=5*2,
         validate_max=True,
-        min_num=0,
-        # validate_min=True
+        min_num=1,
+        validate_min=True,
 )
 
 class LocationCoordForm(forms.ModelForm):
@@ -191,12 +196,19 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         # フォームセットのバリデーションを実行
-        if not self.formset.is_valid():
-            # フォームセットのエラーをフォームに追加する
-            for form in self.formset.forms:
+        formset_valid = self.formset.is_valid()
+        # フォームセットのエラーをフォームに追加する
+        if not formset_valid:
+            non_form_errors = self.formset.non_form_errors()
+            if non_form_errors:
+                for error in non_form_errors:
+                    self.add_error(None, error)
+            for form in self.formset:
                 for error in form.non_field_errors():
                     self.add_error(None, error)
-        if not any(form.cleaned_data for form in self.formset.forms if form.cleaned_data):
+        # 少なくとも1つのフォームが有効であることを確認
+        has_valid_data = any(form.cleaned_data for form in self.formset)
+        if not has_valid_data:
             self.add_error(None, "少なくとも1つのロケーションを追加してください。")
         return cleaned_data
     

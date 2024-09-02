@@ -7,7 +7,6 @@ function addHolidaysToCalendar() {
 		.then(response => response.json())
 		.then(data => {
 			var events = [];
-
 			// 取得した祝日データをFullCalendarのイベント形式に変換
 			for (const date in data) {
 				events.push({
@@ -122,7 +121,12 @@ document.addEventListener('DOMContentLoaded', function() {
 				lastYear.setFullYear(today.getFullYear() - 1, 0, 1); 
 				nextYear.setMonth(today.getMonth() + 3); 
 				// 日付をYYYY-MM-DD形式に変換
-				const formatDate = (date) => date.toISOString().split('T')[0];
+				const formatDate = (date) => {
+					// タイムゾーンのオフセットを考慮して日付を調整
+					const offset = date.getTimezoneOffset();
+					const adjustedDate = new Date(date.getTime() - offset * 60000);
+					return adjustedDate.toISOString().split('T')[0];
+				};
 				return {
 					start: formatDate(lastYear),
 					end: formatDate(nextYear)
@@ -197,10 +201,19 @@ document.addEventListener('DOMContentLoaded', function() {
 			// タイトル用
 			var title = document.getElementById('diaryModalLabel');
 			title.innerHTML = `日記の作成 - <span id="selectedDate">${formatDateJapanese(dateStr)}</span>`
+			// ボタン表示非表示
+			$("#id-diary-new-button").show();
+			$("#id-diary-edit-button").hide();
+			$("#id-diary-delete-button").hide();
 		}
 		// 編集
 		function showDiaryModalEdit(event) {
-			const formatDate = (date) => date.toISOString().split('T')[0];
+			const formatDate = (date) => {
+				// タイムゾーンのオフセットを考慮して日付を調整
+				const offset = date.getTimezoneOffset();
+				const adjustedDate = new Date(date.getTime() - offset * 60000);
+				return adjustedDate.toISOString().split('T')[0];
+			};
 			showDiaryModalBase(formatDate(event.start));
 			var diary = event.extendedProps.diary
 			// const commentField = document.querySelector('#id_comment_field');
@@ -217,6 +230,10 @@ document.addEventListener('DOMContentLoaded', function() {
 			var title = document.getElementById('diaryModalLabel');
 			title.innerHTML = `日記の編集 - <span id="selectedDate">${formatDateJapanese(diary.date)}</span>`
 			// const titleField = document.querySelector('#id_date_field');
+			// ボタン表示非表示
+			$("#id-diary-new-button").hide();
+			$("#id-diary-edit-button").show();
+			$("#id-diary-delete-button").show();
 		}
 		// カレンダーを表示
 		calendar.render();
