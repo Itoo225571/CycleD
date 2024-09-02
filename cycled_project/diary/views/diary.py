@@ -199,3 +199,16 @@ class DiaryDeleteView(LoginRequiredMixin,generic.DeleteView):
         response = super().post(request, *args, **kwargs)
         print(f"Deleted object with ID: {self.kwargs['pk']}")
         return response
+    
+class DiaryPhotoView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
+    template_name ="diary/diary_photo.html"
+    success_url = reverse_lazy("diary:diary")
+    model = Diary
+# 写真データから位置情報を取り出して送る
+def photos2Locations(request):
+    pass
+#     if request.method == 'POST':
+#         session_data = request.session.get('photo', False)
+#         return JsonResponse(location_list, safe=False)
+#     else:
+#         return JsonResponse({'error': 'Invalid request method.'}, status=400)
