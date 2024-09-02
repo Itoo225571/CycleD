@@ -20,6 +20,7 @@ urlpatterns = [
     path("diary/<uuid:pk>/edit",views.DiaryEditView.as_view(),name="diary_edit"),
     path("diary/<uuid:pk>/delete",views.DiaryDeleteView.as_view(),name="diary_delete"),    
     path("diary/list/",views.DiaryListView.as_view(),name="diary_list"),
+    path("diary/photo/",views.DiaryPhotoView.as_view(),name="diary_photo"),
     # path("diary/edit/<int:pk>",views.DiaryEditView.as_view(),name="diary_edit"),
     # path("diary/delete/<int:pk>",views.DiaryDeleteView.as_view(),name="diary_delete"),
 
@@ -31,5 +32,6 @@ urlpatterns = [
 
     path("home/location2weather/",views.ajax_location2weather,name="ajax_location2weather"), 
     path("diary/sendDiaries",views.sendDairies,name="sendDiaries"),
+    path("diary/photos2Locations",views.photos2Locations,name="photos2Locations"),
 ]
 
