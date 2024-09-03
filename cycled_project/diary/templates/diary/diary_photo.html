@@ -19,23 +19,45 @@
             <h2>日記 新規作成</h2>
             <form method="post">
                 {% csrf_token %}
-                <div class="row my-3">
-                    <div class="col">
-                        <label for="{{ form.date.id_for_label }}">{{ form.date.label }}</label>
-                            {{ form.date }}
-                            {% if form.date.errors %}
-                                <div class="error">{{ form.date.errors }}</div>
-                            {% endif %}
-                    </div>
+                <div id="location_form">
+                    {{ location_formset.management_form }}
+                    {% for location_form in location_formset %}
+                        {% for field in location_form %}
+                        <div class="row my-3">
+                            <div class="col">
+                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="error">{{ field.errors }}</div>
+                                    {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endfor %}
                 </div>
-                <div class="row my-3">
-                    <div class="col">
-                    <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }}</label>
-                        {{ form.comment }}
-                        {% if form.comment.errors %}
-                            <div class="error">{{ form.comment.errors }}</div>
-                        {% endif %}
-                    </div>
+
+                <div id="diary_form">
+                    {{ diary_formset.management_form }}
+                    {% for diary_form in diary_formset %}
+                        <div class="row my-3">
+                            <div class="col">
+                                <label for="{{ diary_form.date.id_for_label }}">{{ diary_form.date.label }}</label>
+                                    {{ diary_form.date }}
+                                    {% if diary_form.date.errors %}
+                                        <div class="error">{{ diary_form.date.errors }}</div>
+                                    {% endif %}
+                            </div>
+                        </div>
+                        <div class="row my-3">
+                            <div class="col">
+                            <label for="{{ diary_form.comment.id_for_label }}">{{ diary_form.comment.label }}</label>
+                                {{ diary_form.comment }}
+                                {% if diary_form.comment.errors %}
+                                    <div class="error">{{ diary_form.comment.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
 
                 <div class="row">
