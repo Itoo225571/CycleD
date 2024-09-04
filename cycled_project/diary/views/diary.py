@@ -200,10 +200,19 @@ class DiaryDeleteView(LoginRequiredMixin,generic.DeleteView):
         print(f"Deleted object with ID: {self.kwargs['pk']}")
         return response
     
-class DiaryPhotoView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
+class DiaryPhotoView(LoginRequiredMixin,DiaryMixin,generic.View):
     template_name ="diary/diary_photo.html"
     success_url = reverse_lazy("diary:diary")
-    model = Diary
+
+    def get(self, request, *args, **kwargs):
+        photo_form = PhotoForm()
+        location_formset = LocationFormSet(queryset=Location.objects.none())
+        diary_formset = DiaryFormSet(queryset=Diary.objects.none())
+        return render(request, 
+                      self.template_name, 
+                      {'form': photo_form, 'location_formset': location_formset, 'diary_formset': diary_formset}
+                      )
+
 # 写真データから位置情報を取り出して送る
 def photos2Locations(request):
     pass

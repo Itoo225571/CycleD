@@ -212,15 +212,16 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
             self.add_error(None, "少なくとも1つのロケーションを追加してください。")
         return cleaned_data
 
-# DiaryFormSet = forms.modelformset_factory(
-#         Diary,
-#         extra=0,
-#         # can_delete=True,
-#         max_num=10,
-#         validate_max=True,
-#         min_num=1,
-#         validate_min=True,
-# )
+DiaryFormSet = forms.modelformset_factory(
+        Diary,
+        DiaryForm,
+        extra=0,
+        # can_delete=True,
+        max_num=10,
+        validate_max=True,
+        min_num=1,
+        validate_min=True,
+)
 
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
@@ -238,11 +239,12 @@ class MultipleFileField(forms.FileField):
             result = single_file_clean(data, initial)
         return result
     
-class PhotoForm(ModelFormWithFormSetMixin, forms.ModelForm):
-    image = MultipleFileField(label='Select files')
+class PhotoForm(forms.ModelForm):
+    image = MultipleFileField(label='Select files',required=False)
     def __init__(self, *args, **kwargs):
         # viewsでrequestを使用可能にする
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
     class Meta:
-        fields = ["image",]
+        model = Location
+        fields = ["image"]
