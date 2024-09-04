@@ -176,7 +176,8 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
             "comment": "",
         }
         widgets = {
-            "date": forms.DateInput(attrs={"id": "id_date_field","type": "hidden"}), 
+            # "date": forms.DateInput(attrs={"id": "id_date_field","type": "hidden"}), 
+            "date": forms.DateInput(attrs={"id": "id_date_field"}), 
         }
 
     def clean_date(self):
