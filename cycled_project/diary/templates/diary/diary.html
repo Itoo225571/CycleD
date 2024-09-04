@@ -44,7 +44,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body modal-errors">
-                        {% for field, errors in form_errors.items %}
+                        {% for field, errors in diary_form_errors.items %}
                             {% if field == '__all__' %}
                                 <ul>
                                 {% for error in errors %}
@@ -161,7 +161,7 @@
 
 {% block extra_js %}
     <script>
-        window.hasFormErrors = {% if form_errors %}true{% else %}false{% endif %};
+        window.hasFormErrors = {% if diary_form_errors %}true{% else %}false{% endif %};
     </script>
     <script src="{% static 'diary/js/getCookie.js' %}"></script>
     <script src="{% static 'diary/js/pagination.js' %}"></script>

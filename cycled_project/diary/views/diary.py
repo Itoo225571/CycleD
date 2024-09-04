@@ -65,9 +65,9 @@ class DiaryMixin(object):
     def form_invalid(self, form):
         # self.object = None
         # context = self.get_context_data()
-        # context['form_errors'] = True
+        # context['diary_form_errors'] = True
         # エラー情報をセッションに保存
-        self.request.session['form_errors'] = form.errors.as_json()
+        self.request.session['diary_form_errors'] = form.errors.as_json()
         redirect_url = reverse_lazy('diary:diary')
         return HttpResponseRedirect(redirect_url)
     
@@ -104,10 +104,10 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # セッションからエラー情報を取得
-        form_errors = self.request.session.pop('form_errors', None)
+        form_errors = self.request.session.pop('diary_form_errors', None)
         if form_errors:
             # エラー情報を辞書形式に変換してコンテキストに追加
-            context['form_errors'] = json.loads(form_errors)
+            context['diary_form_errors'] = json.loads(form_errors)
         return context
 
     def handle_address_search(self, request):
@@ -186,7 +186,7 @@ class DiaryEditView(LoginRequiredMixin,DiaryMixin,generic.UpdateView):
 #         return self.success_url
 #     def form_invalid(self, form):
 #         context = self.get_context_data()
-#         context['form_errors'] = True
+#         context['diary_form_errors'] = True
 #         return self.render_to_response(context)
 
 class DiaryDeleteView(LoginRequiredMixin,generic.DeleteView):
@@ -200,24 +200,61 @@ class DiaryDeleteView(LoginRequiredMixin,generic.DeleteView):
         print(f"Deleted object with ID: {self.kwargs['pk']}")
         return response
     
-class DiaryPhotoView(LoginRequiredMixin,DiaryMixin,generic.View):
+class DiaryPhotoView(LoginRequiredMixin,generic.View):
     template_name ="diary/diary_photo.html"
     success_url = reverse_lazy("diary:diary")
+    redirect_url = reverse_lazy('diary:diary_photo')
 
     def get(self, request, *args, **kwargs):
         photo_form = PhotoForm()
-        location_formset = LocationFormSet(queryset=Location.objects.none())
+        # location_formset = LocationFormSet(queryset=Location.objects.none())
         diary_formset = DiaryFormSet(queryset=Diary.objects.none())
         return render(request, 
-                      self.template_name, 
-                      {'form': photo_form, 'location_formset': location_formset, 'diary_formset': diary_formset}
-                      )
+                    self.template_name, 
+                    {'photo_form': photo_form, 'diary_formset': diary_formset}
+                    )
+    
+    def post(self, request, *args: str, **kwargs: Any) -> HttpResponse:
+        if "diary-new-form" in request.POST:
+            diary_formset = DiaryFormSet(request.POST)
+            # location_formset = LocationFormSet(request.POST)
+            if diary_formset.is_valid():
+                return self.formset_valid(diary_formset)
+            else:
+                return self.formset_invalid(diary_formset)
+        else:
+            print(f"post name error: {request.POST}")
+            return self.formset_invalid(None)
+    
+    def get_success_url(self):
+        return self.success_url
+        
+    def formset_valid(self, diary_formset):
+        diaries = diary_formset.save(commit=False)
+        for diary in diaries:
+            diary.user = self.request.user  # 現在のユーザーを設定
+            diary.save()  # 保存
+        return HttpResponseRedirect(self.get_success_url())
+
+    def formset_invalid(self, diary_formset=None):
+        self.request.session['diaryphoto_form_errors'] = diary_formset.errors.as_json()
+        return HttpResponseRedirect(self.redirect_url)
+    
+    def get_form_kwargs(self):
+        kwargs = {'data': self.request.POST or None, 'files': self.request.FILES or None}
+        kwargs['request'] = self.request
+        return kwargs
+
 
 # 写真データから位置情報を取り出して送る
-def photos2Locations(request):
-    pass
-#     if request.method == 'POST':
-#         session_data = request.session.get('photo', False)
-#         return JsonResponse(location_list, safe=False)
-#     else:
-#         return JsonResponse({'error': 'Invalid request method.'}, status=400)
+def photos2Locations(request,form):
+    if request.method == 'POST':
+        photo_list = form.cleaned_data.get("image")
+        data_list = []
+        for photo in photo_list:
+            photo_data = get_photo_info(photo)
+            data_list.append(photo_data.to_dict())
+
+        return JsonResponse(data_list, safe=False)
+    else:
+        return JsonResponse({'error': 'Invalid request method.'}, status=400)
