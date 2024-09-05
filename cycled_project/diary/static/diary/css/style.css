@@ -9,6 +9,11 @@
     pointer-events: none; /* この要素を操作不可にする */
 }
 
+/* エラーリスト */
+#error-list-container{
+    display: none;
+}
+
 /* アウトラインボタン(画像を左につけることも可) */
 .button_inverse {
     display: inline-block;

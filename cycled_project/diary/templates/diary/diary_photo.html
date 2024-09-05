@@ -17,23 +17,22 @@
     <div class="container">
         <div class="row"> 
             <h2>日記 新規作成</h2>
-            <form method="post">
+            <form method="post" name="photos-form">
                 {% csrf_token %}
                 <div id="photo_form">
-                    {% for field in photo_form %}
                     <div class="row my-3">
                         <div class="col">
-                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                                {{ field }}
+                            <label for="{{ photo_form.image.id_for_label }}">{{ photo_form.image.label }}</label>
+                                {{ photo_form.image }}
                                 {% if field.errors %}
-                                    <div class="error">{{ field.errors }}</div>
+                                    <div class="error">{{ photo_form.image.errors }}</div>
                                 {% endif %}
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
+            </form>
 
-
+            <form method="post" name="diary-new-form">
                 <div id="location_form">
                     {{ location_formset.management_form }}
                     {% for location_form in location_formset %}
@@ -88,6 +87,6 @@
 {% block extra_js %}
     <script src="{% static 'diary/js/getCookie.js' %}"></script>
     <script src="{% static 'diary/js/loading_overlay.js' %}"></script>
-    
+    <script src="{% static 'diary/js/diary_photo.js' %}"></script>
     
 {% endblock %}

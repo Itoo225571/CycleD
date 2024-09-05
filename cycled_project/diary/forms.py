@@ -218,7 +218,7 @@ DiaryFormSet = forms.modelformset_factory(
         DiaryForm,
         extra=0,
         # can_delete=True,
-        max_num=10,
+        max_num=5,
         validate_max=True,
         min_num=1,
         validate_min=True,

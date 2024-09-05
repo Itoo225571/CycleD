@@ -8,7 +8,9 @@ from django.db import transaction
 from django.http import JsonResponse
 from django.utils.timezone import now
 from ..forms import *
+
 from .address import address_search,regeocode
+from subs.photo_info.photo_info import get_photo_info
 
 from datetime import timedelta
 import json
@@ -199,7 +201,7 @@ class DiaryDeleteView(LoginRequiredMixin,generic.DeleteView):
         response = super().post(request, *args, **kwargs)
         print(f"Deleted object with ID: {self.kwargs['pk']}")
         return response
-    
+
 class DiaryPhotoView(LoginRequiredMixin,generic.View):
     template_name ="diary/diary_photo.html"
     success_url = reverse_lazy("diary:diary")
@@ -222,6 +224,8 @@ class DiaryPhotoView(LoginRequiredMixin,generic.View):
                 return self.formset_valid(diary_formset)
             else:
                 return self.formset_invalid(diary_formset)
+        elif "photos-form" in request.POST:
+            return self.photos2LocationsAndDate(request)
         else:
             print(f"post name error: {request.POST}")
             return self.formset_invalid(None)
@@ -244,17 +248,21 @@ class DiaryPhotoView(LoginRequiredMixin,generic.View):
         kwargs = {'data': self.request.POST or None, 'files': self.request.FILES or None}
         kwargs['request'] = self.request
         return kwargs
-
-
-# 写真データから位置情報を取り出して送る
-def photos2Locations(request,form):
-    if request.method == 'POST':
-        photo_list = form.cleaned_data.get("image")
-        data_list = []
-        for photo in photo_list:
-            photo_data = get_photo_info(photo)
-            data_list.append(photo_data.to_dict())
-
-        return JsonResponse(data_list, safe=False)
-    else:
-        return JsonResponse({'error': 'Invalid request method.'}, status=400)
+    
+    # 写真データから位置情報を取り出して送る
+    def photos2LocationsAndDate(self,request):
+        form = DiaryForm(request.POST, request=request)
+        if form.is_valid():
+            photo_list = form.cleaned_data.get("image")
+            data_list = []
+            for photo_path in photo_list:
+                photo_data = get_photo_info(photo_path)
+                if photo_data.error:
+                    print(photo_data.error)
+                    continue
+                geo = regeocode(photo_data.lat,photo_data.lon)
+                date = f"{photo_data.dt.year}-{photo_data.dt.month}-{photo_data.dt.day}"
+                data_list.append({"geo":geo.model_dump(),"date":date})
+            return JsonResponse(data_list, json_dumps_params={'ensure_ascii': False})
+        else:
+            self.formset_invalid()

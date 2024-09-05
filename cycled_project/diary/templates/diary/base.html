@@ -121,6 +121,9 @@
               <div class="spinner-border text-primary" role="status"></div>
           </div>
         </div>
+        <div id="error-list-container" class="py-4">
+          <ul id="error-list" class="list-group"></ul>
+        </div>
         {% block content %}
           {{ content }}
         {% endblock %}
@@ -145,6 +148,8 @@
     {% comment %} tippy {% endcomment %}
     <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
     <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
+    {% comment %} エラー表示用 {% endcomment %}
+    <script src="{% static 'diary/js/append_error.js' %}"></script>
     {% block extra_js %}{% endblock %}
   </body>
 </html>
