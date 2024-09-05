@@ -32,6 +32,6 @@ urlpatterns = [
 
     path("home/location2weather/",views.ajax_location2weather,name="ajax_location2weather"), 
     path("diary/sendDiaries",views.sendDairies,name="sendDiaries"),
-    path("diary/photos2Locations",views.photos2Locations,name="photos2Locations"),
+    # path("diary/photos2Locations",views.photos2Locations,name="photos2Locations"),
 ]
 
