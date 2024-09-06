@@ -87,7 +87,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 nextText: 'Next',
                 callback: function(data2, pagination) {
                     $('#address-list').html(template(data2));
-    
                     // ページネーションで生成された新しいボタンにイベントリスナーを再設定
                     $(".address-select-button").off('click').on('click', function(e) {
                         var pageNum = $('.paginationjs-page.active').data('num');
@@ -171,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let hasError = false;
         let error_normal_field = document.getElementById('error-normal');
         error_normal_field.innerHTML = '';
-        if (!$('#id_date_field').length) {
+        if (!$('#id_date').length) {
             addErrorMessage('サイクリング日時は必須です。');
         }
         if (!currentFormCount) {

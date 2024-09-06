@@ -33,53 +33,34 @@
             </form>
 
             <form method="post" name="diary-new-form">
-                <div id="location_form">
-                    {{ location_formset.management_form }}
-                    {% for location_form in location_formset %}
-                        {% for field in location_form %}
-                        <div class="row my-3">
-                            <div class="col">
-                                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                                    {{ field }}
-                                    {% if field.errors %}
-                                        <div class="error">{{ field.errors }}</div>
-                                    {% endif %}
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% endfor %}
-                </div>
-
+                {% csrf_token %}
                 <div id="diary_form">
                     {{ diary_formset.management_form }}
-                    {% for diary_form in diary_formset %}
-                        <div class="row my-3">
-                            <div class="col">
-                                <label for="{{ diary_form.date.id_for_label }}">{{ diary_form.date.label }}</label>
-                                    {{ diary_form.date }}
-                                    {% if diary_form.date.errors %}
-                                        <div class="error">{{ diary_form.date.errors }}</div>
-                                    {% endif %}
-                            </div>
-                        </div>
-                        <div class="row my-3">
-                            <div class="col">
-                            <label for="{{ diary_form.comment.id_for_label }}">{{ diary_form.comment.label }}</label>
-                                {{ diary_form.comment }}
-                                {% if diary_form.comment.errors %}
-                                    <div class="error">{{ diary_form.comment.errors }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% endfor %}
+                    <div id="diary-formset-body"></div>
                 </div>
 
                 <div class="row">
                     <div class="col">
                         <button type="submit" class="btn btn-primary">作成</button>
                     </div>
+                    <div class="col">
+                        <button type="button" class="btn btn-primary" id="add-diary">追加</button>
+                    </div>
                 </div>
             </form>
+            <div id="empty-form" style="display:none;">
+                <div class="label-display"></div>
+                {{ diary_formset.empty_form.date }}
+                {{ diary_formset.empty_form.comment }}
+                <div id="id_form-__prefix__-locations-formset-body">
+                    <div class="locations-management">
+                        {{ diary_formset.empty_form.formset.management_form }}
+                    </div>
+                    {% for field in diary_formset.empty_form.formset.empty_form %}
+                        {{ field }}
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 {% endblock content %}
