@@ -2,7 +2,7 @@ $(document).ready(function() {
     // const formMaxNum = $('#id_form-MAX_NUM_FORMS').val();
     $('#id_image').on('change', function(event) {
         const files = event.target.files;
-        if (files) {
+        if (!files) {
             append_error(`写真が選択されていません。`)
             return
         }
@@ -12,6 +12,25 @@ $(document).ready(function() {
             console.log('ファイルサイズ:', file.size);
             // 他の処理をここに追加
         });
+    });
+
+    $('#add-diary').on('click', function(event){
+        const formsetBody = $('#diary-formset-body');
+        const diaryNum = formsetBody.children().length;
+        const diaryMaxNum = $('#id_form-MAX_NUM_FORMS').val();
+        const locationNum = 0;
+        let diaryNewFormHtml = $('#empty-form').html().replace(/form-__prefix__/g, `form-${diaryNum}`);
+        diaryNewFormHtml = diaryNewFormHtml.replace(/locations-__prefix__/g, `locations-${diaryNum}-${locationNum}`);
+        let $diaryNewForm = $('<div>').html(diaryNewFormHtml);
+
+        let locationsManagementForm = $diaryNewForm.find('.locations-management').html();
+        locationsManagementForm = locationsManagementForm.replace(/locations-/g, `locations-${diaryNum}-`);
+        // 置換後のHTMLを再度要素にセット
+        $diaryNewForm.find('.locations-management').html(locationsManagementForm);
+
+        // 新しい div で囲む
+        const $wrappedDiv = $('<div>').attr('id', `diary-form-wrapper-${diaryNum}`).append($diaryNewForm);
+        formsetBody.append($wrappedDiv);
     });
 });
 

@@ -175,10 +175,10 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
             "date": "サイクリングに行った日を入力",
             "comment": "",
         }
-        widgets = {
-            # "date": forms.DateInput(attrs={"id": "id_date_field","type": "hidden"}), 
-            "date": forms.DateInput(attrs={"id": "id_date_field"}), 
-        }
+        # widgets = {
+        #     # "date": forms.DateInput(attrs={"id": "id_date_field","type": "hidden"}), 
+        #     "date": forms.DateInput(attrs={"id": "id_date_field"}), 
+        # }
 
     def clean_date(self):
         date = self.cleaned_data["date"]
@@ -214,18 +214,22 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
         return cleaned_data
 
 DiaryFormSet = forms.modelformset_factory(
-        Diary,
-        DiaryForm,
-        extra=0,
-        # can_delete=True,
-        max_num=5,
-        validate_max=True,
-        min_num=1,
-        validate_min=True,
+    Diary,
+    form=DiaryForm,
+    # formset=BaseDiaryFormSet,
+    extra=0,  
+    # can_delete=True,  
+    min_num=1,
+    validate_min=True,
+    max_num=5,
+    validate_max=True,
 )
 
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
+    def __init__(self, attrs=None):
+        attrs = {'accept': 'image/*,image/heic'} if attrs is None else attrs.update({'accept': 'image/*,image/heic'})
+        super().__init__(attrs)
     
 class MultipleFileField(forms.FileField):
     def __init__(self, *args, **kwargs):
@@ -234,14 +238,23 @@ class MultipleFileField(forms.FileField):
 
     def clean(self, data, initial=None):
         single_file_clean = super().clean
+        allowed_mime_types = ['image/jpeg', 'image/png', 'image/gif', 'image/heic',]
         if isinstance(data, (list, tuple)):
-            result = [single_file_clean(d, initial) for d in data]
+            result = []
+            for d in data:
+                file = single_file_clean(d, initial)
+                if file.content_type not in allowed_mime_types:
+                    raise forms.ValidationError(f"{file.name} は許可されていないファイルタイプです。")
+                result.append(file)
         else:
-            result = single_file_clean(data, initial)
+            file = single_file_clean(data, initial)
+            if file.content_type not in allowed_mime_types:
+                raise forms.ValidationError(f"{file.name} は許可されていないファイルタイプです。")
+            result = file
         return result
     
 class PhotoForm(forms.ModelForm):
-    image = MultipleFileField(label='Select files',required=False)
+    image = MultipleFileField(label='写真を選択',required=False, )
     def __init__(self, *args, **kwargs):
         # viewsでrequestを使用可能にする
         self.request = kwargs.pop('request', None)

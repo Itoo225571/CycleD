@@ -209,7 +209,6 @@ class DiaryPhotoView(LoginRequiredMixin,generic.View):
 
     def get(self, request, *args, **kwargs):
         photo_form = PhotoForm()
-        # location_formset = LocationFormSet(queryset=Location.objects.none())
         diary_formset = DiaryFormSet(queryset=Diary.objects.none())
         return render(request, 
                     self.template_name, 

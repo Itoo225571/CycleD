@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			var modal = new bootstrap.Modal(document.getElementById('diaryModal'));
 			modal.show();
 			// 選択された日付をフォームにセットする
-			const dateField = document.querySelector('#id_date_field');
+			const dateField = document.querySelector('#id_date');
 			dateField.value = dateStr;
 			dateField.setAttribute('readonly', 'true'); // 読み取り専用に設定
 			sessionStorage.setItem('diaryDate', dateStr);  // sessionStorageに保存
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			// タイトル用
 			var title = document.getElementById('diaryModalLabel');
 			title.innerHTML = `日記の編集 - <span id="selectedDate">${formatDateJapanese(diary.date)}</span>`
-			// const titleField = document.querySelector('#id_date_field');
+			// const titleField = document.querySelector('#id_date');
 			// ボタン表示非表示
 			$("#id-diary-new-button").hide();
 			$("#id-diary-edit-button").show();
