@@ -12,7 +12,7 @@ class Photo(BaseModel):
     lat: float = None
     lon:float = None
     height:float = None
-    error: str = None
+    errors: list[str] = []
 
     @field_serializer("dt")
     def serialize_sunrise(self, value: datetime) -> dict:
