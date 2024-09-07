@@ -17,15 +17,15 @@
     <div class="container">
         <div class="row"> 
             <h2>日記 新規作成</h2>
-            <form method="post" name="photos-form">
+            <form method="post" name="photos-form" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div id="photo_form">
                     <div class="row my-3">
                         <div class="col">
-                            <label for="{{ photo_form.image.id_for_label }}">{{ photo_form.image.label }}</label>
-                                {{ photo_form.image }}
+                            <label for="{{ photo_form.images.id_for_label }}">{{ photo_form.images.label }}</label>
+                                {{ photo_form.images }}
                                 {% if field.errors %}
-                                    <div class="error">{{ photo_form.image.errors }}</div>
+                                    <div class="error">{{ photo_form.images.errors }}</div>
                                 {% endif %}
                         </div>
                     </div>
@@ -52,10 +52,10 @@
                 <div class="label-display"></div>
                 {{ diary_formset.empty_form.date }}
                 {{ diary_formset.empty_form.comment }}
+                <div class="locations-management">
+                    {{ diary_formset.empty_form.formset.management_form }}
+                </div>
                 <div id="id_form-__prefix__-locations-formset-body">
-                    <div class="locations-management">
-                        {{ diary_formset.empty_form.formset.management_form }}
-                    </div>
                     {% for field in diary_formset.empty_form.formset.empty_form %}
                         {{ field }}
                     {% endfor %}

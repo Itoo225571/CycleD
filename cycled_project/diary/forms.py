@@ -115,7 +115,7 @@ class AddressSearchForm(forms.Form):
 class LocationForm(forms.ModelForm):
     class Meta:
         model = Location
-        fields = ["lat","lon","state","display","label"]
+        fields = ["lat","lon","state","display","label","image"]
 
 LocationFormSet = forms.inlineformset_factory(
         Diary,
@@ -228,7 +228,10 @@ DiaryFormSet = forms.modelformset_factory(
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
     def __init__(self, attrs=None):
-        attrs = {'accept': 'image/*,image/heic'} if attrs is None else attrs.update({'accept': 'image/*,image/heic'})
+        if attrs is None:
+            attrs = {'accept': 'image/*,image/heic'}
+        else:
+            attrs.update({'accept': 'image/*,image/heic'})
         super().__init__(attrs)
     
 class MultipleFileField(forms.FileField):
@@ -253,12 +256,9 @@ class MultipleFileField(forms.FileField):
             result = file
         return result
     
-class PhotoForm(forms.ModelForm):
-    image = MultipleFileField(label='写真を選択',required=False, )
+class PhotoForm(forms.Form):
+    images = MultipleFileField(label='写真を選択', required=False)
     def __init__(self, *args, **kwargs):
         # viewsでrequestを使用可能にする
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
-    class Meta:
-        model = Location
-        fields = ["image"]
