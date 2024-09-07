@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 
 class Photo(BaseModel):
-    path: Path
+    # path: Path
     dt: datetime = None
     lat: float = None
     lon:float = None
@@ -36,20 +36,24 @@ class Photo(BaseModel):
         }
     
 def get_photo_info(infile):
-    pillow_heif.register_heif_opener()
-    error = ""
+    errors = []
     photo_info = {}
+    exif_data = None
+    pillow_heif.register_heif_opener()
+    img = Image.open(infile)
+
     try:
         with open(infile, 'rb') as f:
             exif_data = exifread.process_file(f)
+        # exif_data = img._getexif()
     except Exception as e:
-        error = f"ファイルの読み込みに失敗しました: {infile}, エラー: {str(e)}"
+        errors.append(f"ファイルの読み込みに失敗しました: {infile}")
+        errors.append(f"エラー: {str(e)}")
     if exif_data:
         photo_info = get_values_from_photo(exif_data)
     else:
-        error = "EXIFデータの読み込みに失敗しました。"
-    photo_info["path"] = infile
-    photo_info["error"] = error
+        errors.append("EXIFデータの読み込みに失敗しました。")
+    photo_info["errors"] = errors
     photo = Photo(**photo_info)
     return photo
 
@@ -93,6 +97,7 @@ def get_values_from_photo(exif_data):
         datetime_str = exif_data.get("Image DateTime").printable
         dt = datetime.strptime(datetime_str, '%Y:%m:%d %H:%M:%S')
         photo_info = {"dt":dt,"lat":latitude,"lon":longitude,"height":height}
+
         return photo_info
     except KeyError:
         print("必要なGPS情報が含まれていません。")

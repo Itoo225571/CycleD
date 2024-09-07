@@ -55,6 +55,8 @@ INSTALLED_APPS = [
 	# "subs",
 	'ratelimit', #APIリクエスト制限
     'widget_tweaks', #HTMLの見た目調節
+    'imagekit', #image周り
+    'django_cleanup', #不要なファイルを削除
 ]
 
 MIDDLEWARE = [

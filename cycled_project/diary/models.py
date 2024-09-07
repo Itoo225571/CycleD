@@ -15,7 +15,7 @@ class Location(models.Model):
     display = models.CharField(max_length=128,blank=True,verbose_name="表示名")
     label = models.CharField(max_length=128,blank=True,verbose_name="ラベル")
     # 画像(日記作成の時につける)
-    image = models.ImageField(upload_to="images",blank=True,null=True,verbose_name="サイクリング画像")
+    image = models.ImageField(upload_to="locations/",blank=True,null=True,verbose_name="サイクリング画像")
     diary = models.ForeignKey('Diary',on_delete=models.CASCADE,null=True,related_name="locations")
     # homeか否か
     is_home = models.BooleanField(default=False, verbose_name="登録地域か否か")
