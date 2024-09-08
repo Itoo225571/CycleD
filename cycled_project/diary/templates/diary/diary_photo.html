@@ -48,18 +48,16 @@
                     </div>
                 </div>
             </form>
-            <div id="empty-form" style="display:none;">
-                <div class="label-display"></div>
+            <div id="empty-form-diary" style="display:none;">
                 {{ diary_formset.empty_form.date }}
                 {{ diary_formset.empty_form.comment }}
-                <div class="locations-management">
-                    {{ diary_formset.empty_form.formset.management_form }}
-                </div>
-                <div id="id_form-__prefix__-locations-formset-body">
-                    {% for field in diary_formset.empty_form.formset.empty_form %}
-                        {{ field }}
-                    {% endfor %}
-                </div>
+                {{ diary_formset.empty_form.formset.management_form }}
+                <div id="id_form-__prefix__-location-formset-body"></div>
+            </div>
+            <div id="empty-form-location" style="display:none;">
+                {% for field in diary_formset.empty_form.formset.empty_form %}
+                    {{ field }}
+                {% endfor %}
             </div>
         </div>
     </div>

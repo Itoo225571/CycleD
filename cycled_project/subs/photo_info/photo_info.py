@@ -5,6 +5,7 @@ from fractions import Fraction
 from pydantic import BaseModel,field_serializer
 from datetime import datetime
 from pathlib import Path
+from io import BytesIO
 
 class Photo(BaseModel):
     # path: Path
@@ -54,6 +55,7 @@ def get_photo_info(infile):
     else:
         errors.append("EXIFデータの読み込みに失敗しました。")
     photo_info["errors"] = errors
+    # photo_info["path"] = Path(infile)
     photo = Photo(**photo_info)
     return photo
 
@@ -103,7 +105,16 @@ def get_values_from_photo(exif_data):
         print("必要なGPS情報が含まれていません。")
         return None
     
+def heic2jpeg(heic_file):
+    pillow_heif.register_heif_opener()
+    image = Image.open(heic_file)
+    jpeg_file = BytesIO()
+    image.convert('RGB').save(jpeg_file, format='JPEG')
+    jpeg_file.seek(0)
+    return jpeg_file
+
 if __name__=="__main__":
     file = r"/Users/itoudaiki/Downloads/plus.png"
     file= r"/Users/itoudaiki/Library/CloudStorage/OneDrive-MeijiMail/設計計画/20240905_013804792_iOS.heic"
+
     info = get_photo_info(file)

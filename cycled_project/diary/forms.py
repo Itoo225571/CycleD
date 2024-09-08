@@ -115,7 +115,7 @@ class AddressSearchForm(forms.Form):
 class LocationForm(forms.ModelForm):
     class Meta:
         model = Location
-        fields = ["lat","lon","state","display","label","image"]
+        fields = ["lat","lon","state","display","label","image",]
 
 LocationFormSet = forms.inlineformset_factory(
         Diary,

@@ -7,10 +7,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from django.http import JsonResponse
 from django.utils.timezone import now
+from django.core.files import File
 from ..forms import *
 
 from .address import address_search,regeocode
-from subs.photo_info.photo_info import get_photo_info
+from subs.photo_info.photo_info import get_photo_info,heic2jpeg
 
 from datetime import timedelta
 import json
@@ -171,27 +172,6 @@ class DiaryEditView(LoginRequiredMixin,DiaryMixin,generic.UpdateView):
         else:
             return self.form_invalid(form)
 
-# class DiaryEditView(LoginRequiredMixin,generic.View):
-#     success_url = reverse_lazy("diary:diary")
-#     def post(self, request, pk):
-#         # print(request.POST)
-#         # Diary インスタンスを取得
-#         diary = get_object_or_404(Diary, pk=pk)
-#         form = DiaryForm(request.POST, instance=diary, request=request)
-#         if form.is_valid():
-#             # フォームが有効な場合、データを保存
-#             form.save()
-#             return HttpResponseRedirect(self.get_success_url())
-#         else:
-#             # フォームが無効な場合
-#             return self.form_invalid(form)
-#     def get_success_url(self):
-#         return self.success_url
-#     def form_invalid(self, form):
-#         context = self.get_context_data()
-#         context['diary_form_errors'] = True
-#         return self.render_to_response(context)
-
 class DiaryDeleteView(LoginRequiredMixin,generic.DeleteView):
     template_name = "diary/diary.html"
     success_url = reverse_lazy("diary:diary")
@@ -202,6 +182,20 @@ class DiaryDeleteView(LoginRequiredMixin,generic.DeleteView):
         response = super().post(request, *args, **kwargs)
         print(f"Deleted object with ID: {self.kwargs['pk']}")
         return response
+
+
+def _update_location_from_data(location, data):
+    # モデルのフィールド名を取得
+    model_fields = [field.name for field in location._meta.get_fields()]
+    for key, value in data.items():
+        # ネストされたキーを処理するために親キーをプレフィックスとして使用
+        if isinstance(value, dict):
+            # 再帰的にネストされた辞書を処理
+            _update_location_from_data(location, value)
+        elif key in model_fields:
+            # モデルのフィールド名と一致する場合に値を設定
+            setattr(location, key, value)
+    return location
 
 class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
     template_name ="diary/diary_photo.html"
@@ -247,16 +241,15 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         else:
             return self.form_invalid(form)
 
-    # 写真データから位置情報を取り出して送る
+    # 写真データから位置情報を取り出して送る & Locationを保存する
     def photos2LocationsAndDate(self,request):
         form = PhotoForm(request.POST,request.FILES)
         if form.is_valid():
             files = request.FILES.getlist('location_files')
             data_dict = {}
-            for file in files:
-                # 一時的に保存(withを抜けると削除)してexif情報を読み取る
-                with tempfile.NamedTemporaryFile() as temp_file:
-                    temp_file.write(file.read())
+            for i,img_file in enumerate(files):
+                with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                    temp_file.write(img_file.read())
                     temp_file_path = temp_file.name
                     photo_data = get_photo_info(temp_file_path)
                 if photo_data.errors:
@@ -264,10 +257,13 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                         print(e)
                     continue
                 geo = regeocode(photo_data.lat,photo_data.lon)
+                data = geo.model_dump()
                 date = f"{photo_data.dt.year}-{photo_data.dt.month}-{photo_data.dt.day}"
-                data_dict.setdefault(date,[]).append(geo.model_dump())
+                data["file_order"] = i
+                data_dict.setdefault(date,[]).append(data)
+
             response = {
-                "locations_data": data_dict
+                "photo_data": data_dict,
             }
             return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
         else:
