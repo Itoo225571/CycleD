@@ -3,3 +3,7 @@ function append_error(error_message) {
     $('#error-list').append(newItem);
     $('#error-list-container').show();
 }
+function remove_error() {
+    $('#error-list').empty();
+    $('#error-list-container').hide();
+}
