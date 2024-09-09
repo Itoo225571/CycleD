@@ -52,9 +52,9 @@ $(document).ready(function() {
 
         function set_diary(date){
             const diaryNum = diaryFormsetBody.children().length;
-            let diaryNewFormHtml = $('#empty-form-diary').html().replace(/form-__prefix__/g, `form-${diaryNum}`);
-            diaryNewFormHtml = diaryNewFormHtml.replace(/locations-/g, `locations-${diaryNum}-`);
-            let $diaryNewForm = $(`<div id='diary-form-wrapper-${diaryNum}'>`).html(diaryNewFormHtml);
+            let diaryNewFormHtml = $('#empty-form-diary').html().replace(/__prefix__/g, `${diaryNum}`);
+            // diaryNewFormHtml = diaryNewFormHtml.replace(/locations-/g, `locations-${diaryNum}-`);
+            let $diaryNewForm = $(`<div class='diary-form-wrapper'>`).html(diaryNewFormHtml);
             // dateフィールド入力
             $diaryNewForm.find(`input[id="id_form-${diaryNum}-date"]`).val(date);
             return $diaryNewForm
@@ -63,11 +63,11 @@ $(document).ready(function() {
         function set_locationInDiary($diaryNewForm,location, dt_all) {
             const diaryNum = diaryFormsetBody.children().length;
             const locationsFormsetBody = $diaryNewForm.find(`#id_form-${diaryNum}-location-formset-body`);
-            const locationNum = locationsFormsetBody.children().length;
+            const locationNum = $('div.locations-form-wrapper').length + $diaryNewForm.find('div.locations-form-wrapper').length;
             
-            let locationNewFormHtml = $('#empty-form-location').html().replace(/locations-__prefix__/g, `locations-${diaryNum}-${locationNum}`);
-            let $locationNewForm = $(`<div id="locations-form-wrapper-${diaryNum}-${locationNum}">`).html(locationNewFormHtml);
-            let prefix = `locations-${diaryNum}-${locationNum}-`;
+            let locationNewFormHtml = $('#empty-form-location').html().replace(/__prefix__/g, `${locationNum}`);
+            let $locationNewForm = $(`<div class="locations-form-wrapper">`).html(locationNewFormHtml);
+            let prefix = `locations-${locationNum}-`;
 
             $locationNewForm.find('input').each(function() {
                 let $input = $(this);
@@ -88,6 +88,8 @@ $(document).ready(function() {
             dataTransfer.items.add(dt_all.files[location.file_order]);
             const fileInput = $locationNewForm.find('input[type="file"]')[0];
             fileInput.files = dataTransfer.files
+
+            $locationNewForm.find(`#id_locations-${locationNum}-index_of_Diary`).val(diaryNum);
 
             locationsFormsetBody.append($locationNewForm);
             return
@@ -121,12 +123,9 @@ $(document).ready(function() {
         const diaryNum = diaryFormsetBody.children().length;
         diaryTotalForms.val(diaryNum);
         // Locationの合計数を編集
-        for (let num = 0; num < diaryNum; num++) {
-            let locationTotalForms = $(`#id_locations-${num}-TOTAL_FORMS`);
-            let locationsFormsetBody = $(`#id_form-${num}-location-formset-body`);
-            let locationNum = locationsFormsetBody.children().length;
-            locationTotalForms.val(locationNum);
-        }
+        const locationTotalForms = $('#id_locations-TOTAL_FORMS');
+        const locationNum = $('div.locations-form-wrapper').length;
+        locationTotalForms.val(locationNum);
         
         const submitButton = $(event.originalEvent.submitter); // クリックされたボタンを取得
         const buttonName = submitButton.attr('name');
