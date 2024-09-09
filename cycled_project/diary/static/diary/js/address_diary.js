@@ -160,47 +160,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Diaryを作成した時の動き
     $('#diaryForm').submit(function(event) {  
         event.preventDefault();
-        // フォーム数を更新
-        const formsetBodynow = $('#formset-body');
-        const totalForms = $('#id_locations-TOTAL_FORMS');
-        const currentFormCount = formsetBodynow.children().length;
-        totalForms.val(currentFormCount);
-
-        // フィールドのバリデーション
-        let hasError = false;
-        let error_normal_field = document.getElementById('error-normal');
-        error_normal_field.innerHTML = '';
-        if (!$('#id_date').length) {
-            addErrorMessage('サイクリング日時は必須です。');
-        }
-        if (!currentFormCount) {
-            addErrorMessage('地域は必須です。');
-        }
-        // formsetの値が空だった場合
-        $('#formset-body input').each(function() {
-            if (!$(this).val()){
-                let label = $('label[for="' + $(this).attr('id') + '"]').text(); // ラベルのテキストを取得
-                // required以外はラベルが空になる
-                if (label){
-                    addErrorMessage(`${label}が入力されていません`);
-                }
-            }
-        });    
-        // エラーがある場合はフォーム送信をキャンセル
-        if (hasError) {
-            return; // フォームの送信をキャンセルする
-        }
-        // 新しいエラーメッセージを追加する関数
-        function addErrorMessage(message) {
-            hasError = true
-            // 新しいli要素を作成し、メッセージを設定
-            const newErrorItem = document.createElement('li');
-            newErrorItem.textContent = message;
-            // ul要素にli要素を追加
-            error_normal_field.appendChild(newErrorItem);
-        }
-
-        // Editの時の処理
         const submitButton = $(event.originalEvent.submitter); // クリックされたボタンを取得
         const buttonName = submitButton.attr('name');
         $('<input>').attr({
@@ -208,17 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
             name: buttonName,
             value: '',
         }).appendTo(this);
-        if (buttonName === 'diary-edit-form') {
-            const confirmMessage = '日記を上書きします';
-            const userConfirmed = confirm(confirmMessage);
-            if (!userConfirmed) {
-                return; // ユーザーがキャンセルした場合、フォームの送信をキャンセルする
-            }
-            if(MyDiary.getPk()){
-                const newActionUrl = `${initialActionUrl}${MyDiary.getPk()}/edit`;
-                $(this).prop('action', newActionUrl);
-            }
-        }
+        
         if (buttonName === 'diary-delete-form') {
             const confirmMessage = 'この日記を削除します';
             const userConfirmed = confirm(confirmMessage);
@@ -228,6 +177,61 @@ document.addEventListener('DOMContentLoaded', function() {
             if(MyDiary.getPk()){
                 const newActionUrl = `${initialActionUrl}${MyDiary.getPk()}/delete`;
                 $(this).prop('action', newActionUrl);
+            }
+        }
+
+        else {
+            // フォーム数を更新
+            const formsetBodynow = $('#formset-body');
+            const totalForms = $('#id_locations-TOTAL_FORMS');
+            const currentFormCount = formsetBodynow.children().length;
+            totalForms.val(currentFormCount);
+
+            // フィールドのバリデーション
+            let hasError = false;
+            let error_normal_field = document.getElementById('error-normal');
+            error_normal_field.innerHTML = '';
+            if (!$('#id_date').length) {
+                addErrorMessage('サイクリング日時は必須です。');
+            }
+            if (!currentFormCount) {
+                addErrorMessage('地域は必須です。');
+            }
+            // formsetの値が空だった場合
+            $('#formset-body input').each(function() {
+                if (!$(this).val()){
+                    let label = $('label[for="' + $(this).attr('id') + '"]').text(); // ラベルのテキストを取得
+                    // required以外はラベルが空になる
+                    if (label){
+                        addErrorMessage(`${label}が入力されていません`);
+                    }
+                }
+            });    
+            // エラーがある場合はフォーム送信をキャンセル
+            if (hasError) {
+                return; // フォームの送信をキャンセルする
+            }
+            // 新しいエラーメッセージを追加する関数
+            function addErrorMessage(message) {
+                hasError = true
+                // 新しいli要素を作成し、メッセージを設定
+                const newErrorItem = document.createElement('li');
+                newErrorItem.textContent = message;
+                // ul要素にli要素を追加
+                error_normal_field.appendChild(newErrorItem);
+            }
+
+            // Editの時の処理
+            if (buttonName === 'diary-edit-form') {
+                const confirmMessage = '日記を上書きします';
+                const userConfirmed = confirm(confirmMessage);
+                if (!userConfirmed) {
+                    return; // ユーザーがキャンセルした場合、フォームの送信をキャンセルする
+                }
+                if(MyDiary.getPk()){
+                    const newActionUrl = `${initialActionUrl}${MyDiary.getPk()}/edit`;
+                    $(this).prop('action', newActionUrl);
+                }
             }
         }
         this.submit();

@@ -32,10 +32,11 @@
                 </div>
             </form>
 
-            <form method="post" id="id_diary-new-form">
+            <form method="post" id="id_diary-new-form" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div id="diary_form">
-                    {{ diary_formset.management_form }}
+                    <div id="diary-management">{{ diary_formset.management_form }}</div>
+                    <div id="location-management">{{ diary_formset.empty_form.formset.management_form }}</div>
                     <div id="diary-formset-body"></div>
                 </div>
 
@@ -48,7 +49,6 @@
             <div id="empty-form-diary" style="display:none;">
                 {{ diary_formset.empty_form.date }}
                 {{ diary_formset.empty_form.comment }}
-                {{ diary_formset.empty_form.formset.management_form }}
                 <div id="id_form-__prefix__-location-formset-body"></div>
             </div>
             <div id="empty-form-location" style="display:none;">

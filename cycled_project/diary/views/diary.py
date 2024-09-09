@@ -11,7 +11,7 @@ from django.core.files import File
 from ..forms import *
 
 from .address import address_search,regeocode
-from subs.photo_info.photo_info import get_photo_info,heic2jpeg
+from subs.photo_info.photo_info import get_photo_info
 
 from datetime import timedelta
 import json
@@ -183,20 +183,6 @@ class DiaryDeleteView(LoginRequiredMixin,generic.DeleteView):
         print(f"Deleted object with ID: {self.kwargs['pk']}")
         return response
 
-
-def _update_location_from_data(location, data):
-    # モデルのフィールド名を取得
-    model_fields = [field.name for field in location._meta.get_fields()]
-    for key, value in data.items():
-        # ネストされたキーを処理するために親キーをプレフィックスとして使用
-        if isinstance(value, dict):
-            # 再帰的にネストされた辞書を処理
-            _update_location_from_data(location, value)
-        elif key in model_fields:
-            # モデルのフィールド名と一致する場合に値を設定
-            setattr(location, key, value)
-    return location
-
 class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
     template_name ="diary/diary_photo.html"
     success_url = reverse_lazy("diary:diary")
@@ -218,16 +204,26 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
             print(f"post name error: {request.POST}")
             return self.form_invalid()
         
-    def form_valid(self, diary_formset):
+    def form_valid(self, diary_formset, location_formset):
         diaries = diary_formset.save(commit=False)
         for diary in diaries:
             diary.user = self.request.user  # 現在のユーザーを設定
             diary.save()  # 保存
-        return super().form_valid()
+        for form in location_formset.forms:
+            location = form.save(commit=False)
+            index = form.cleaned_data.get("index_of_Diary")
+            location.diary = diaries[index]
+            location.save()
+        return super().form_valid(diary_formset)
 
-    def form_invalid(self, diary_formset=None):
-        self.request.session['diaryphoto_form_errors'] = diary_formset.errors.as_json()
-        return super().form_invalid()
+    def form_invalid(self, form=None):
+        if form:
+            self.request.session['diaryphoto_form_errors'] = form.errors
+            # フォームのエラーをコンテキストに追加
+            context = self.get_context_data()
+            context['diaryphoto_form_errors'] = form.errors
+            return self.render_to_response(context)
+        return super().form_invalid(form)
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -235,11 +231,12 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         return kwargs
     
     def handle_diary_formset(self, request):
-        form = DiaryFormSet(request.POST)
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
+        diary_formset = DiaryFormSet(request.POST,request=request)
+        location_formset = LocationFormSet(request.POST,request.FILES)
+        if diary_formset.is_valid() and location_formset.is_valid():
+            return self.form_valid(diary_formset,location_formset)
+        else:  
+            return self.form_invalid(diary_formset)
 
     # 写真データから位置情報を取り出して送る & Locationを保存する
     def photos2LocationsAndDate(self,request):
@@ -254,7 +251,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                     photo_data = get_photo_info(temp_file_path)
                 if photo_data.errors:
                     for e in photo_data.errors:
-                        print(e)
+                        print(f"Photo data Eorrors: {e}")
                     continue
                 geo = regeocode(photo_data.lat,photo_data.lon)
                 data = geo.model_dump()
@@ -267,4 +264,4 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
             }
             return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
         else:
-            self.form_invalid()
+            self.form_invalid(form)
