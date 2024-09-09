@@ -22,7 +22,7 @@ class ModelFormWithFormSetMixin:
         if not valid:
             print("Form is not valid")
             # フォームのエラーを表示
-            print(self.errors)  # フォーム全体のエラー
+            # print(self.errors)  # フォーム全体のエラー
             for field, errors in self.errors.items():
                 print(f"Errors in {field}: {errors}")
         formset_valid = self.formset.is_valid()
@@ -213,14 +213,25 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
             self.add_error(None, "少なくとも1つのロケーションを追加してください。")
         return cleaned_data
 
+
+class BaseDiaryFormSet(forms.BaseFormSet):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+
+    def get_form_kwargs(self,index):
+        kwargs = super().get_form_kwargs(index)
+        kwargs['request'] = self.request
+        return kwargs
+
 DiaryFormSet = forms.modelformset_factory(
     Diary,
     form=DiaryForm,
-    # formset=BaseDiaryFormSet,
+    formset=BaseDiaryFormSet,
     extra=0,  
     # can_delete=True,  
     min_num=1,
-    validate_min=True,
+    # validate_min=True,
     max_num=5,
     validate_max=True,
 )

@@ -1,6 +1,7 @@
 $(document).ready(function() {
     const diaryFormsetBody = $('#diary-formset-body');
     const diaryMaxNum = $('#id_form-MAX_NUM_FORMS').val();
+    const locationMaxNum = $('id_locations-MAX_NUM_FORMS').val();
     remove_error();
 
     // const formMaxNum = $('#id_form-MAX_NUM_FORMS').val();
@@ -63,7 +64,7 @@ $(document).ready(function() {
             const diaryNum = diaryFormsetBody.children().length;
             const locationsFormsetBody = $diaryNewForm.find(`#id_form-${diaryNum}-location-formset-body`);
             const locationNum = locationsFormsetBody.children().length;
-
+            
             let locationNewFormHtml = $('#empty-form-location').html().replace(/locations-__prefix__/g, `locations-${diaryNum}-${locationNum}`);
             let $locationNewForm = $(`<div id="locations-form-wrapper-${diaryNum}-${locationNum}">`).html(locationNewFormHtml);
             let prefix = `locations-${diaryNum}-${locationNum}-`;
@@ -111,28 +112,29 @@ $(document).ready(function() {
                 return result;
             }
         }
-
     });
 
-    $('#add-diary').on('click', function(event){
-        const diaryFormsetBody = $('#diary-formset-body');
+    $('#id_diary-new-form').submit(function(event) {  
+        event.preventDefault();
+        // Diaryの合計数を編集
+        const diaryTotalForms = $('#id_form-TOTAL_FORMS');
         const diaryNum = diaryFormsetBody.children().length;
-        const diaryMaxNum = $('#id_form-MAX_NUM_FORMS').val();
-        const locationNum = $(`#id_form-${diaryNum}-locations-formset-body`).children().length;
-
-        let diaryNewFormHtml = $('#empty-form-diary').html().replace(/form-__prefix__/g, `form-${diaryNum}`);
-        diaryNewFormHtml = diaryNewFormHtml.replace(/locations-__prefix__/g, `locations-${diaryNum}-${locationNum}`);
-        let $diaryNewForm = $(`<div id='diary-form-wrapper-${diaryNum}'>`).html(diaryNewFormHtml);
-
-        let locationsManagementForm = $diaryNewForm.find('.locations-management').html();
-        locationsManagementForm = locationsManagementForm.replace(/locations-/g, `locations-${diaryNum}-`);
-        // 置換後のHTMLを再度要素にセット
-        $diaryNewForm.find('.locations-management').html(locationsManagementForm);
-
-        let locationsFormsetBody = $diaryNewForm.find(`#id_form-${diaryNum}-locations-formset-body`).html();
-        let wrappedLocationsFormsetBody = `<div id="locations-form-wrapper-${diaryNum}-${locationNum}">${locationsFormsetBody}</div>`;
-        $diaryNewForm.find(`#id_form-${diaryNum}-locations-formset-body`).html(wrappedLocationsFormsetBody);
-
-        diaryFormsetBody.append($diaryNewForm);
+        diaryTotalForms.val(diaryNum);
+        // Locationの合計数を編集
+        for (let num = 0; num < diaryNum; num++) {
+            let locationTotalForms = $(`#id_locations-${num}-TOTAL_FORMS`);
+            let locationsFormsetBody = $(`#id_form-${num}-location-formset-body`);
+            let locationNum = locationsFormsetBody.children().length;
+            locationTotalForms.val(locationNum);
+        }
+        
+        const submitButton = $(event.originalEvent.submitter); // クリックされたボタンを取得
+        const buttonName = submitButton.attr('name');
+        $('<input>').attr({
+            type: 'hidden',
+            name: buttonName,
+            value: '',
+        }).appendTo(this);
+        this.submit();
     });
 });
