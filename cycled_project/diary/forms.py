@@ -7,6 +7,8 @@ from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList
 
 from diary.models import *
+from subs.photo_info.photo_info import heic2jpeg
+from pathlib import Path
 
 """___FormSet用のMixin"""
 class ModelFormWithFormSetMixin:
@@ -21,10 +23,10 @@ class ModelFormWithFormSetMixin:
         valid = super(ModelFormWithFormSetMixin, self).is_valid()
         if not valid:
             print("Form is not valid")
-            # フォームのエラーを表示
-            # print(self.errors)  # フォーム全体のエラー
             for field, errors in self.errors.items():
-                print(f"Errors in {field}: {errors}")
+                error_messages = ', '.join([str(e) for e in errors])  # エラーメッセージを結合
+                print(f"Field '{field}' has the following errors: {error_messages}")
+
         formset_valid = self.formset.is_valid()
         if not formset_valid:
             print("Formset is not valid")
@@ -113,9 +115,27 @@ class AddressSearchForm(forms.Form):
                         )
     
 class LocationForm(forms.ModelForm):
+    index_of_Diary = forms.IntegerField(required=False, widget=forms.HiddenInput())
     class Meta:
         model = Location
-        fields = ["lat","lon","state","display","label","image",]
+        fields = ["lat","lon","state","display","label","image","index_of_Diary"]
+        widgets = {
+            'image': forms.ClearableFileInput(attrs={'accept': 'image/*, .heic'}),
+        }
+    # heic画像をjpegとして保存する
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        image_file = self.cleaned_data.get('image')
+        if image_file:
+            fname = Path(image_file.name)
+            new_file_name = fname.with_suffix('.jpg')
+            if image_file and image_file.name.lower().endswith('.heic'):
+                # HEIC形式の画像をJPEGに変換
+                jpeg_file = heic2jpeg(image_file)
+                instance.image.save(new_file_name, jpeg_file, save=False)
+        if commit:
+            instance.save()
+        return instance
 
 LocationFormSet = forms.inlineformset_factory(
         Diary,
@@ -214,7 +234,7 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
         return cleaned_data
 
 
-class BaseDiaryFormSet(forms.BaseFormSet):
+class BaseDiaryFormSet(forms.BaseModelFormSet):
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
@@ -231,8 +251,8 @@ DiaryFormSet = forms.modelformset_factory(
     extra=0,  
     # can_delete=True,  
     min_num=1,
-    # validate_min=True,
-    max_num=5,
+    validate_min=True,
+    max_num=10,
     validate_max=True,
 )
 

@@ -1,6 +1,8 @@
 from django.db import models
 from django.forms.models import model_to_dict
 from django.contrib.auth.models import AbstractUser
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 import uuid
 
@@ -28,6 +30,15 @@ class Location(models.Model):
         # 画像フィールドを URL に変換
         location_dict['image'] = self.image.url if self.image else None
         return location_dict
+
+# モデル削除後に`image`を削除する。
+@receiver(post_delete, sender=Location)
+def delete_file(sender, instance, **kwargs):
+    if instance.image:
+        try:
+            instance.image.delete(False)
+        except Exception as e:
+            print(f"Error deleting file {instance.image.name}: {e}")
 
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)

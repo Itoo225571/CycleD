@@ -52,11 +52,14 @@ def get_photo_info(infile):
         errors.append(f"エラー: {str(e)}")
     if exif_data:
         photo_info = get_values_from_photo(exif_data)
+        if not photo_info:
+            errors.append('必要なGPS情報が含まれていません')
     else:
         errors.append("EXIFデータの読み込みに失敗しました。")
     photo_info["errors"] = errors
     # photo_info["path"] = Path(infile)
     photo = Photo(**photo_info)
+    print(f'Photo: {photo.model_dump()}')
     return photo
 
 def dms_to_decimal(dms,ref):
@@ -93,6 +96,9 @@ def get_values_from_photo(exif_data):
         if pre_latitude and pre_longitude:
             latitude = dms_to_decimal(pre_latitude,lat_ref)
             longitude = dms_to_decimal(pre_longitude,lon_ref)
+        else:
+            # print("緯度・軽度の情報がありません。")
+            return {}
         if pre_height:
             height = float(Fraction(pre_height))
         
@@ -102,8 +108,8 @@ def get_values_from_photo(exif_data):
 
         return photo_info
     except KeyError:
-        print("必要なGPS情報が含まれていません。")
-        return None
+        # print("必要なGPS情報が含まれていません。")
+        return {}
     
 def heic2jpeg(heic_file):
     pillow_heif.register_heif_opener()
