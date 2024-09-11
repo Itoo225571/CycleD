@@ -38,44 +38,10 @@
                         <h5 class="modal-normal modal-title" id="diaryModalLabel">
                             日記の作成 - <span id="selectedDate"></span>
                         </h5>
-                        <h5 class="modal-errors modal-title">
-                            Error
-                        </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body modal-errors">
-                        {% for field, errors in diary_form_errors.items %}
-                            {% if field == '__all__' %}
-                                <ul>
-                                {% for error in errors %}
-                                    <li>{{ error.message }}</li>
-                                {% endfor %}
-                                </ul>
-                            {% endif %}
-                        {% endfor %}
-                        {% if form.non_field_errors %}
-                        <div id="error-form">
-                            <ul>
-                                {% for error in form.non_field_errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                        {% endif %}
-                        {% for field in form %}
-                            {% if field.errors %}
-                                <div id="error-field">
-                                    <ul>
-                                        {% for error in field.errors %}
-                                            <li>{{ error }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
                     <div class="modal-body modal-normal">
-                        <div id="error-normal"></div>
+                        <ul id="error-normal" class="list-group"></ul>
                         <form method="post" id="diaryForm">
                             {% csrf_token %}
                             <div style="display: none;">

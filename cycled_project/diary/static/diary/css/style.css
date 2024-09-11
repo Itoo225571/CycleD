@@ -53,3 +53,8 @@
 .append-shadow {
     text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
 }
+
+/* エラー用のモーダルウィンドウ */
+#diaryModal .modal-errors{
+    display: none;
+}

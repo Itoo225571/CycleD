@@ -67,13 +67,9 @@ class DiaryMixin(object):
         return  super().form_valid(form)
     # エラーがあったことを知らせるやつ
     def form_invalid(self, form):
-        # self.object = None
-        # context = self.get_context_data()
-        # context['diary_form_errors'] = True
-        # エラー情報をセッションに保存
-        self.request.session['diary_form_errors'] = form.errors.as_json()
-        redirect_url = reverse_lazy('diary:diary')
-        return HttpResponseRedirect(redirect_url)
+        context = self.get_context_data()
+        context['form_errors'] = form.errors
+        return self.render_to_response(context)
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -219,12 +215,13 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
     def formset_invalid(self, diary_formset=None, location_formset=None):
         # コンテキストを取得
         context = self.get_context_data()
+        context['form_errors'] = []
         # diary_formset が提供されている場合のエラー処理
         if diary_formset:
-            context['diary_formset_errors'] = diary_formset.errors
+            context['form_errors'].extend(diary_formset.errors)
         # location_formset が提供されている場合のエラー処理
         if location_formset:
-            context['location_formset_errors'] = location_formset.errors
+            context['form_errors'].extend(location_formset.errors)
         # コンテキストを使用してレスポンスをレンダリング
         return self.render_to_response(context)
     

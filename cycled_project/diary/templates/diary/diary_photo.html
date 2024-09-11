@@ -11,56 +11,6 @@
 {% endblock extra_css %}
 
 {% block content %}
-    <ul id="error-list-diaryphoto" class="list-group my-3">
-        {% if form.non_field_errors %}
-            {% for error in form.non_field_errors %}
-                <li class="list-group-item list-group-item-danger">{{ error }}</li>
-            {% endfor %}
-        {% endif %}
-        {% for field in form %}
-            {% if field.errors %}
-                {% for error in field.errors %}
-                    <li class="list-group-item list-group-item-danger">{{ error }}</li>
-                {% endfor %}
-            {% endif %}
-        {% endfor %}
-        {% if formset.non_form_errors %}
-            {{ formset.non_form_errors }}
-        {% endif %}
-        {% for form in formset.forms %}
-            {% if form.errors %}
-                {% for error in form.errors %}
-                    <li class="list-group-item list-group-item-danger">{{ error }}</li>
-                {% endfor %}
-            {% endif %}
-        {% endfor %}
-
-        {% for form_errors in diary_formset_errors %}
-            {% if form_errors %}
-                {% for field,errors in form_errors.items %}
-                    {% for error in errors %}
-                        <li class="list-group-item list-group-item-danger">
-                            {{ error }}
-                        </li>
-                    {% endfor %}
-                {% endfor %}
-            {% endif %}
-        {% endfor %}
-        {% for form_errors in location_formset_errors %}
-            {% if form_errors %}
-                {% for field,errors in form_errors.items %}
-                    {% for error in errors %}
-                        <li class="list-group-item list-group-item-danger">
-                            {{ error }}
-                        </li>
-                    {% endfor %}
-                {% endfor %}
-            {% endif %}
-        {% endfor %}
-
-        {{ form.certifications.errors }}
-    </ul>
-
     <div class="container">
         <div class="row"> 
             <h2>日記 新規作成</h2>
