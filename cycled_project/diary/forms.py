@@ -20,12 +20,14 @@ class ModelFormWithFormSetMixin:
         )
 
     def is_valid(self):
+        if hasattr(self, '_validated'):
+            return self._validated  # 二度目以降の検証をスキップ
         valid = super(ModelFormWithFormSetMixin, self).is_valid()
         if not valid:
             print("Form is not valid")
             for field, errors in self.errors.items():
                 error_messages = ', '.join([str(e) for e in errors])  # エラーメッセージを結合
-                print(f"Field '{field}' has the following errors: {error_messages}")
+                self.add_error(field,error_messages)
 
         formset_valid = self.formset.is_valid()
         if not formset_valid:
@@ -33,15 +35,16 @@ class ModelFormWithFormSetMixin:
             # フォームセット全体のエラーを表示
             non_form_errors = self.formset.non_form_errors()
             if non_form_errors:
-                
                 print("Formset non-form errors:")
-                for error in non_form_errors:
-                    print(f"  {error}")
+                for e in non_form_errors:
+                    self.add_error(None,e)
             # フォームセットのエラーを表示
             for form in self.formset:
                 for field, errors in form.errors.items():
-                    print(f"Errors in form {form.prefix}, field {field}: {errors}")
-        return valid and formset_valid
+                    self.add_error(field,errors)
+
+        self._validated = valid and formset_valid
+        return self._validated
 
     def save(self, commit=True):
         saved_instance = super(ModelFormWithFormSetMixin, self).save(commit)
@@ -120,7 +123,7 @@ class LocationForm(forms.ModelForm):
         model = Location
         fields = ["lat","lon","state","display","label","image","index_of_Diary"]
         widgets = {
-            'image': forms.ClearableFileInput(attrs={'accept': 'image/*, .heic'}),
+            'image': forms.ClearableFileInput(attrs={'accept': 'image/*, image/heic'}),
         }
     # heic画像をjpegとして保存する
     def save(self, commit=True):

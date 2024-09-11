@@ -40,13 +40,9 @@ def get_photo_info(infile):
     errors = []
     photo_info = {}
     exif_data = None
-    pillow_heif.register_heif_opener()
-    img = Image.open(infile)
-
     try:
         with open(infile, 'rb') as f:
             exif_data = exifread.process_file(f)
-        # exif_data = img._getexif()
     except Exception as e:
         errors.append(f"ファイルの読み込みに失敗しました: {infile}")
         errors.append(f"エラー: {str(e)}")
@@ -59,7 +55,6 @@ def get_photo_info(infile):
     photo_info["errors"] = errors
     # photo_info["path"] = Path(infile)
     photo = Photo(**photo_info)
-    print(f'Photo: {photo.model_dump()}')
     return photo
 
 def dms_to_decimal(dms,ref):
@@ -113,11 +108,11 @@ def get_values_from_photo(exif_data):
     
 def heic2jpeg(heic_file):
     pillow_heif.register_heif_opener()
-    image = Image.open(heic_file)
-    jpeg_file = BytesIO()
-    image.convert('RGB').save(jpeg_file, format='JPEG')
-    jpeg_file.seek(0)
-    return jpeg_file
+    with Image.open(heic_file) as img:
+        jpeg_io = BytesIO()
+        img.convert('RGB').save(jpeg_io, format='JPEG')
+        jpeg_io.seek(0)  # ファイルポインタを先頭に戻す
+        return jpeg_io
 
 if __name__=="__main__":
     file = r"/Users/itoudaiki/Downloads/plus.png"
