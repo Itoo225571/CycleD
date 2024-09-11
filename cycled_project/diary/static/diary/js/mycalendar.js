@@ -83,13 +83,6 @@ function formatDateJapanese(dateStr) {
 // 読み込まれたら実行する関数
 document.addEventListener('DOMContentLoaded', function() {
 	var diaryModal = document.getElementById('diaryModal');
-	if (window.hasFormErrors) {
-		// モーダルを開く
-		var modal = new bootstrap.Modal(document.getElementById('diaryModal'));
-		$('.modal-errors').css('display', 'block');
-		$('.modal-normal').css('display', 'none');
-		modal.show();
-	}
 	// 祝日データを取得してからカレンダーを初期化
 	addEventsToCalendar().then(allEvents => {
 		const calendarEl = document.getElementById('mycalendar');
@@ -240,13 +233,12 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 
 	diaryModal.addEventListener('hidden.bs.modal', function () {
-		$('.modal-errors').css('display', 'none');
-		$('.modal-normal').css('display', 'block');
 		// フォームをリセット
 		// const diaryForm = document.getElementById('diaryForm'); // フォームのIDを使って取得
 		// diaryForm.reset();
 		$('#formset-body').html(''); // formsetリセット
 		MyDiary.resetPk(); //setしたpkをリセット
+		$('#error-normal').empty(); // エラーをクリア
 
 		// 強制的にモーダルを閉じる
 		var backdrop = document.querySelector('.modal-backdrop');

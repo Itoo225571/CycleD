@@ -189,8 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // フィールドのバリデーション
             let hasError = false;
-            let error_normal_field = document.getElementById('error-normal');
-            error_normal_field.innerHTML = '';
+            
             if (!$('#id_date').length) {
                 addErrorMessage('サイクリング日時は必須です。');
             }
@@ -213,12 +212,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             // 新しいエラーメッセージを追加する関数
             function addErrorMessage(message) {
-                hasError = true
-                // 新しいli要素を作成し、メッセージを設定
-                const newErrorItem = document.createElement('li');
-                newErrorItem.textContent = message;
+                hasError = true;
+                // 新しいli要素を作成し、アイコンとメッセージを設定
+                const newErrorItem = $('<li></li>')
+                    .addClass('list-group-item list-group-item-danger') // Bootstrapのクラスを追加
+                    .html('<i class="bi bi-exclamation-circle me-2"></i>'
+                    + message);
                 // ul要素にli要素を追加
-                error_normal_field.appendChild(newErrorItem);
+                $('#error-normal').append(newErrorItem);
             }
 
             // Editの時の処理

@@ -121,10 +121,64 @@
               <div class="spinner-border text-primary" role="status"></div>
           </div>
         </div>
+
         <div id="error-list-container" class="py-4">
-          <ul id="error-list" class="list-group">
-          </ul>
+          <ul id="error-list" class="list-group"></ul>
         </div>
+        <div id="errorModal" class="modal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="errorModalLabel">ERROR</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <ul id="error-list-modal" class="list-group">
+                  {% if form.non_field_errors %}
+                      {% for error in form.non_field_errors %}
+                          <li class="list-group-item list-group-item-danger">{{ error }}</li>
+                      {% endfor %}
+                  {% endif %}
+                  {% for field in form %}
+                      {% if field.errors %}
+                          {% for error in field.errors %}
+                              <li class="list-group-item list-group-item-danger">{{ error }}</li>
+                          {% endfor %}
+                      {% endif %}
+                  {% endfor %}
+                  {% if formset.non_form_errors %}
+                      {{ formset.non_form_errors }}
+                  {% endif %}
+                  {% for form in formset.forms %}
+                      {% if form.errors %}
+                          {% for error in form.errors %}
+                              <li class="list-group-item list-group-item-danger">{{ error }}</li>
+                          {% endfor %}
+                      {% endif %}
+                  {% endfor %}
+        
+                  {% for form_error in form_errors %}
+                      {% if form_error %}
+                          {% for field,error in form_error.items %}
+                              {% for error_msg in error %}
+                                  <li class="list-group-item list-group-item-danger">
+                                      {{ error_msg }}
+                                  </li>
+                              {% endfor %}
+                          {% endfor %}
+                      {% endif %}
+                  {% endfor %}
+        
+                  {{ form.certifications.errors }}
+                </ul>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+              </div>
+            </div>
+          </div>
+        </div>        
+        
         {% block content %}
           {{ content }}
         {% endblock %}
@@ -150,7 +204,7 @@
     <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
     <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
     {% comment %} エラー表示用 {% endcomment %}
-    <script src="{% static 'diary/js/append_error.js' %}"></script>
+    <script src="{% static 'diary/js/related_error.js' %}"></script>
     {% block extra_js %}{% endblock %}
   </body>
 </html>

@@ -12,3 +12,11 @@ function remove_error() {
     $('#error-list').empty();
     $('#error-list-container').hide();
 }
+
+$(document).ready(function() {
+    if ($('#error-list-modal li').length > 0) {
+        $('#errorModal').modal('show');  // モーダルを表示
+    } else {
+        $('#errorModal').modal('hide');  // モーダルを非表示
+    }    
+});
