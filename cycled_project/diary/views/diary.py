@@ -216,14 +216,17 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
             location.save()
         return super().form_valid(diary_formset)
 
-    def form_invalid(self, form=None):
-        if form:
-            self.request.session['diaryphoto_form_errors'] = form.errors
-            # フォームのエラーをコンテキストに追加
-            context = self.get_context_data()
-            context['diaryphoto_form_errors'] = form.errors
-            return self.render_to_response(context)
-        return super().form_invalid(form)
+    def formset_invalid(self, diary_formset=None, location_formset=None):
+        # コンテキストを取得
+        context = self.get_context_data()
+        # diary_formset が提供されている場合のエラー処理
+        if diary_formset:
+            context['diary_formset_errors'] = diary_formset.errors
+        # location_formset が提供されている場合のエラー処理
+        if location_formset:
+            context['location_formset_errors'] = location_formset.errors
+        # コンテキストを使用してレスポンスをレンダリング
+        return self.render_to_response(context)
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -236,16 +239,16 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         if diary_formset.is_valid() and location_formset.is_valid():
             return self.form_valid(diary_formset,location_formset)
         else:  
-            return self.form_invalid(diary_formset)
+            return self.formset_invalid(diary_formset,location_formset)
 
-    # 写真データから位置情報を取り出して送る & Locationを保存する
+    # 写真データから位置情報を取り出して送る 
     def photos2LocationsAndDate(self,request):
         form = PhotoForm(request.POST,request.FILES)
         if form.is_valid():
             files = request.FILES.getlist('location_files')
             data_dict = {}
             for i,img_file in enumerate(files):
-                with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                with tempfile.NamedTemporaryFile(delete=True) as temp_file:
                     temp_file.write(img_file.read())
                     temp_file_path = temp_file.name
                     photo_data = get_photo_info(temp_file_path)
@@ -258,7 +261,6 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                 date = f"{photo_data.dt.year}-{photo_data.dt.month}-{photo_data.dt.day}"
                 data["file_order"] = i
                 data_dict.setdefault(date,[]).append(data)
-
             response = {
                 "photo_data": data_dict,
             }

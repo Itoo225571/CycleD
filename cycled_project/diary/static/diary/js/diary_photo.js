@@ -4,7 +4,6 @@ $(document).ready(function() {
     const locationMaxNum = $('id_locations-MAX_NUM_FORMS').val();
     remove_error();
 
-    // const formMaxNum = $('#id_form-MAX_NUM_FORMS').val();
     $('#id_images').on('change', function(event) {
         remove_error();
         const form = $(this).closest('form');
