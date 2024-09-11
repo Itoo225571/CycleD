@@ -106,9 +106,9 @@ def get_values_from_photo(exif_data):
         # print("必要なGPS情報が含まれていません。")
         return {}
     
-def heic2jpeg(heic_file):
+def to_jpeg(original_file):
     pillow_heif.register_heif_opener()
-    with Image.open(heic_file) as img:
+    with Image.open(original_file) as img:
         jpeg_io = BytesIO()
         img.convert('RGB').save(jpeg_io, format='JPEG')
         jpeg_io.seek(0)  # ファイルポインタを先頭に戻す

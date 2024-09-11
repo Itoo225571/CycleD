@@ -8,10 +8,11 @@ from django.db import transaction
 from django.http import JsonResponse
 from django.utils.timezone import now
 from django.core.files import File
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from ..forms import *
 
 from .address import address_search,regeocode
-from subs.photo_info.photo_info import get_photo_info
+from subs.photo_info.photo_info import get_photo_info,to_jpeg
 
 from datetime import timedelta
 import json
@@ -65,17 +66,27 @@ class DiaryMixin(object):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return  super().form_valid(form)
-    # エラーがあったことを知らせるやつ
+
     def form_invalid(self, form):
-        context = self.get_context_data()
-        context['form_errors'] = form.errors
-        return self.render_to_response(context)
+        # エラーをセッションに保存(Editでも使えるようにする)
+        self.request.session['diary_form_errors'] = json.dumps(form.errors,ensure_ascii=False)
+        # 新規作成画面にリダイレクト
+        return redirect(reverse_lazy('diary:diary'))
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         # ユーザーをフォームに渡す
         kwargs['request'] = self.request
         return kwargs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # セッションからエラー情報を取得
+        form_errors = self.request.session.pop('diary_form_errors', None)
+        if form_errors:
+            # エラー情報を辞書形式に変換してコンテキストに追加(リストにするのは複数ある他と合わせるため)
+            context['form_errors'] = [json.loads(form_errors)]
+        return context
 
 class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
     template_name = "diary/diary.html"
@@ -100,15 +111,6 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
         else:
             print(f"post name error: {request.POST}")
             return self.form_invalid(None)
-        
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # セッションからエラー情報を取得
-        form_errors = self.request.session.pop('diary_form_errors', None)
-        if form_errors:
-            # エラー情報を辞書形式に変換してコンテキストに追加
-            context['diary_form_errors'] = json.loads(form_errors)
-        return context
 
     def handle_address_search(self, request):
         form = AddressSearchForm(request.POST)
@@ -167,16 +169,17 @@ class DiaryEditView(LoginRequiredMixin,DiaryMixin,generic.UpdateView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
-
-class DiaryDeleteView(LoginRequiredMixin,generic.DeleteView):
+    
+class DiaryDeleteView(LoginRequiredMixin, generic.DeleteView):
     template_name = "diary/diary.html"
     success_url = reverse_lazy("diary:diary")
     model = Diary
+    
     def get(self, request, *args, **kwargs):
         return redirect(reverse_lazy('diary:diary'))
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
-        print(f"Deleted object with ID: {self.kwargs['pk']}")
+        # print(f"Deleted object with ID: {self.kwargs['pk']}")
         return response
 
 class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
@@ -206,6 +209,16 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
             diary.user = self.request.user  # 現在のユーザーを設定
             diary.save()  # 保存
         for form in location_formset.forms:
+            image_file = form.cleaned_data.get("temp_image")
+            if image_file:
+                image_file = to_jpeg(image_file)
+                # 後で変えるので名前はなんでもいい
+                jpeg_file = InMemoryUploadedFile(
+                    image_file, field_name=None, name='temp.jpg' ,content_type='image/jpg',
+                    size=image_file.getbuffer().nbytes, charset=None
+                )
+                form.instance.image = jpeg_file
+
             location = form.save(commit=False)
             index = form.cleaned_data.get("index_of_Diary")
             location.diary = diaries[index]

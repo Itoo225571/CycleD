@@ -6,6 +6,13 @@ from django.dispatch import receiver
 
 import uuid
 
+def upload_to(instance, filename):
+    # 拡張子を取得
+    ext = filename.split(".")[-1]  
+    # ファイル名としてUUIDを生成し、元の拡張子を維持
+    filename = f"{uuid.uuid4()}.{ext}"
+    return f"locations/{filename}"
+
 class Location(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     # user = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -17,7 +24,8 @@ class Location(models.Model):
     display = models.CharField(max_length=128,blank=True,verbose_name="表示名")
     label = models.CharField(max_length=128,blank=True,verbose_name="ラベル")
     # 画像(日記作成の時につける)
-    image = models.ImageField(upload_to="locations/",blank=True,null=True,verbose_name="サイクリング画像")
+    image = models.ImageField(upload_to=upload_to,blank=True,null=True,verbose_name="サイクリング画像")
+    
     diary = models.ForeignKey('Diary',on_delete=models.CASCADE,null=True,related_name="locations")
     # homeか否か
     is_home = models.BooleanField(default=False, verbose_name="登録地域か否か")
