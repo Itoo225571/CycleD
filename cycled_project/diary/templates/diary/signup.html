@@ -11,10 +11,13 @@
 {% block title %}
     新規アカウント作成
 {% endblock title %}
+
+{% block page_title %}
+    <h2>新規アカウント作成</h2>
+{% endblock page_title %}
     
 {% block content %}
     {{ form.certifications.errors }}
-    <h2>新規アカウント作成</h2>
     <form method="post">
         {% csrf_token %}
         {% for field in form %}

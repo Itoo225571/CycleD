@@ -5,10 +5,17 @@ from django.contrib.auth.hashers import make_password,check_password
 from django import forms
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList
+from django.core.exceptions import ValidationError
 
 from diary.models import *
-from subs.photo_info.photo_info import heic2jpeg
 from pathlib import Path
+import os
+
+def validate_file_extension(value):
+    ext = os.path.splitext(value.name)[1]  # 拡張子を取得
+    valid_extensions = ['.jpg', '.jpeg', '.png', '.heic']
+    if not ext.lower() in valid_extensions:
+        raise ValidationError(f'Unsupported file extension. Supported formats are: {", ".join(valid_extensions)}')
 
 """___FormSet用のMixin"""
 class ModelFormWithFormSetMixin:
@@ -20,31 +27,7 @@ class ModelFormWithFormSetMixin:
         )
 
     def is_valid(self):
-        if hasattr(self, '_validated'):
-            return self._validated  # 二度目以降の検証をスキップ
-        valid = super(ModelFormWithFormSetMixin, self).is_valid()
-        if not valid:
-            print("Form is not valid")
-            for field, errors in self.errors.items():
-                error_messages = ', '.join([str(e) for e in errors])  # エラーメッセージを結合
-                self.add_error(field,error_messages)
-
-        formset_valid = self.formset.is_valid()
-        if not formset_valid:
-            print("Formset is not valid")
-            # フォームセット全体のエラーを表示
-            non_form_errors = self.formset.non_form_errors()
-            if non_form_errors:
-                print("Formset non-form errors:")
-                for e in non_form_errors:
-                    self.add_error(None,e)
-            # フォームセットのエラーを表示
-            for form in self.formset:
-                for field, errors in form.errors.items():
-                    self.add_error(field,errors)
-
-        self._validated = valid and formset_valid
-        return self._validated
+        return super(ModelFormWithFormSetMixin, self).is_valid() and self.formset.is_valid()
 
     def save(self, commit=True):
         saved_instance = super(ModelFormWithFormSetMixin, self).save(commit)
@@ -119,27 +102,11 @@ class AddressSearchForm(forms.Form):
     
 class LocationForm(forms.ModelForm):
     index_of_Diary = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    temp_image = forms.FileField(required=False,validators=[validate_file_extension])
     class Meta:
         model = Location
-        fields = ["lat","lon","state","display","label","image","index_of_Diary"]
-        widgets = {
-            'image': forms.ClearableFileInput(attrs={'accept': 'image/*, image/heic'}),
-        }
-    # heic画像をjpegとして保存する
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        image_file = self.cleaned_data.get('image')
-        if image_file:
-            fname = Path(image_file.name)
-            new_file_name = fname.with_suffix('.jpg')
-            if image_file and image_file.name.lower().endswith('.heic'):
-                # HEIC形式の画像をJPEGに変換
-                jpeg_file = heic2jpeg(image_file)
-                instance.image.save(new_file_name, jpeg_file, save=False)
-        if commit:
-            instance.save()
-        return instance
-
+        fields = ["lat","lon","state","display","label","index_of_Diary","temp_image",]
+    
 LocationFormSet = forms.inlineformset_factory(
         Diary,
         Location,
@@ -210,11 +177,11 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
         if self.instance.pk:
             # 更新の場合は他のインスタンスの重複をチェック
             if Diary.objects.filter(date=date, user=user).exclude(pk=self.instance.pk).exists():
-                self.add_error('date',"この日時のサイクリング日記はすでに存在します。")
+                self.add_error('date',"この日時の日記はすでに存在します。")
         else:
             # 新規作成の場合はすべてのインスタンスの重複をチェック
             if Diary.objects.filter(date=date, user=user).exists():
-                self.add_error('date',"この日時のサイクリング日記はすでに存在します。")
+                self.add_error('date',"この日時の日記はすでに存在します。")
         return date
     
     def clean(self):

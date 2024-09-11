@@ -55,6 +55,10 @@
 }
 
 /* エラー用のモーダルウィンドウ */
-#diaryModal .modal-errors{
+#errorModal{
     display: none;
+}
+
+#errorModal .modal-header, .modal-footer {
+    border: none; /* ヘッダーとフッターのボーダーを全て削除 */
 }
