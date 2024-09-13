@@ -31,14 +31,16 @@ $(document).ready(function() {
                 'X-CSRFToken': getCookie('csrftoken') // DjangoのCSRFトークン
             },
             success: function(response) {
-                if (Object.keys(response.photo_data).length === 0){
-                    append_error(`GPS情報を持つ写真が選択されませんでした。`)
+                console.log(response)
+                if (Object.keys(response.diaries).length === 0){
+                    append_error(`GPS情報を持つ写真や新規の写真が選択されませんでした。`)
                     return
                 }
-                $.each(response.photo_data, function(date, oneday_location_list) {
-                    $diaryNewForm = set_diary(date);
+                $.each(response.diaries, function(date, oneday_location_list) {
+                    let newDiary = {date:date,}
+                    let $diaryNewForm = set_diary(newDiary);
                     $.each(oneday_location_list, function(_, location) {
-                        set_locationInDiary($diaryNewForm, location, dt);
+                        $diaryNewForm = set_locationInDiary($diaryNewForm, location, dt);
                     });
                     diaryFormsetBody.append($diaryNewForm);
                 });
@@ -49,17 +51,24 @@ $(document).ready(function() {
             },
         });
 
-        function set_diary(date){
+        function set_diary(diary){
             const diaryNum = diaryFormsetBody.children().length;
             let diaryNewFormHtml = $('#empty-form-diary').html().replace(/__prefix__/g, `${diaryNum}`);
-            // diaryNewFormHtml = diaryNewFormHtml.replace(/locations-/g, `locations-${diaryNum}-`);
             let $diaryNewForm = $(`<div class='diary-form-wrapper'>`).html(diaryNewFormHtml);
-            // dateフィールド入力
-            $diaryNewForm.find(`input[id="id_form-${diaryNum}-date"]`).val(date);
+            // フィールド入力
+            let prefix = `form-${diaryNum}-`;
+            $diaryNewForm.find('input, textarea').each(function() {
+                let inputName = $(this).attr('name'); // inputのname属性を取得
+                inputName = inputName.replace(prefix, '');
+                if (diary.hasOwnProperty(inputName)) {
+                  $(this).val(diary[inputName]); // 対応するデータをinputにセット
+                }
+                $(this).attr('type', 'text');
+            });
             return $diaryNewForm
         }
 
-        function set_locationInDiary($diaryNewForm,location, dt_all) {
+        function set_locationInDiary($diaryNewForm, location, dTransfer_all) {
             const diaryNum = diaryFormsetBody.children().length;
             const locationsFormsetBody = $diaryNewForm.find(`#id_form-${diaryNum}-location-formset-body`);
             const locationNum = $('div.locations-form-wrapper').length + $diaryNewForm.find('div.locations-form-wrapper').length;
@@ -75,23 +84,26 @@ $(document).ready(function() {
                 if (name==="id"){
                     name = "location_id"
                 }
+                if (name==="diary"){
+                    name = "diary_id"
+                }
                 const value = searchKeys(location,name);
                 // 値を取得して設定する
                 if (value) {
                     $input.val(value);
                 }
-                // $input.attr('type', 'hidden');
+                $input.attr('type', 'text');
             });
 
             let dataTransfer = new DataTransfer(); // 新しい DataTransfer オブジェクトを作成
-            dataTransfer.items.add(dt_all.files[location.file_order]);
-            const fileInput = $locationNewForm.find('input[type="file"]')[0];
+            dataTransfer.items.add(dTransfer_all.files[location.file_order]);
+            const fileInput = $locationNewForm.find(`#id_locations-${locationNum}-temp_image`)[0];
             fileInput.files = dataTransfer.files
 
             $locationNewForm.find(`#id_locations-${locationNum}-index_of_Diary`).val(diaryNum);
 
             locationsFormsetBody.append($locationNewForm);
-            return
+            return $diaryNewForm
 
             function searchKeys(obj, keyToFind) {
                 let result = undefined;

@@ -17,7 +17,7 @@ from subs.photo_info.photo_info import get_photo_info,to_jpeg
 from datetime import timedelta
 import json
 import tempfile
-import os
+from pprint import pprint
 
 """______Diary関係______"""
 class DiaryListView(LoginRequiredMixin,generic.ListView):
@@ -163,7 +163,7 @@ class DiaryEditView(LoginRequiredMixin,DiaryMixin,generic.UpdateView):
         return redirect(reverse_lazy('diary:diary'))
 
     def post(self, request, pk):
-        diary = get_object_or_404(Diary, pk=pk)
+        diary = get_object_or_404(Diary, pk=pk, user=request.user)
         form = DiaryForm(request.POST, instance=diary, request=request)
         if form.is_valid():
             return self.form_valid(form)
@@ -256,7 +256,9 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         form = PhotoForm(request.POST,request.FILES)
         if form.is_valid():
             files = request.FILES.getlist('location_files')
-            data_dict = {}
+            diary_dict = {}
+            dates = set()
+            messages = set()
             for i,img_file in enumerate(files):
                 with tempfile.NamedTemporaryFile(delete=True) as temp_file:
                     temp_file.write(img_file.read())
@@ -265,14 +267,57 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                 if photo_data.errors:
                     for e in photo_data.errors:
                         print(f"Photo data Eorrors: {e}")
+                        messages.add(e)
                     continue
+                date = photo_data.dt.strftime('%Y-%m-%d')
+                dates.add(date)
                 geo = regeocode(photo_data.lat,photo_data.lon)
-                data = geo.model_dump()
-                date = f"{photo_data.dt.year}-{photo_data.dt.month}-{photo_data.dt.day}"
-                data["file_order"] = i
-                data_dict.setdefault(date,[]).append(data)
+                geo_data = geo.model_dump()
+
+                # 仮置きフィールドから写真を取り出すための変数
+                geo_data["file_order"] = i
+                diary_dict.setdefault(date,[]).append(geo_data)
+            
+            diary_existed = []
+            location_existed = []
+            diary_existed_query = Diary.objects.filter(date__in=list(dates), user=request.user).prefetch_related('locations')
+            for diary in diary_existed_query:
+                diary_data = {
+                    'id': diary.id,
+                    'date': diary.date.strftime('%Y-%m-%d'),
+                    'comment': diary.comment,
+                }
+                diary_existed.append(diary_data)
+                for location in diary.locations.all():
+                    location_existed.append(location.to_dict())
+
+            # すべての既存ロケーションを (date, lat, lon) のタプルに変換
+            existing_locations = {
+                (diary.date.strftime('%Y-%m-%d'), loc.lat, loc.lon)
+                for diary in diary_existed_query
+                for loc in diary.locations.all()
+            }
+            keys_to_delete = []
+            # diary_dict から既存ロケーションと一致するものを削除
+            for date in list(diary_dict.keys()):  # キーのリストを作成してループ
+                filtered_geo_data = []
+                for geo_data in diary_dict[date]:
+                    if (date, geo_data['lat'], geo_data['lon']) in existing_locations:
+                        messages.add('選択した写真と同じものが既に使用されています。')  
+                    else:
+                        filtered_geo_data.append(geo_data)
+                if filtered_geo_data:
+                    diary_dict[date] = filtered_geo_data
+                else:
+                    keys_to_delete.append(date)
+            for key in keys_to_delete:
+                diary_dict.pop(key, None)
+
             response = {
-                "photo_data": data_dict,
+                "diaries": diary_dict,
+                "diary_existed": diary_existed,
+                "location_existed": location_existed,
+                "message": list(messages),
             }
             return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
         else:

@@ -35,6 +35,8 @@ class Location(models.Model):
     
     def to_dict(self):
         location_dict = model_to_dict(self)
+        if 'id' in location_dict:
+            location_dict['location_id'] = location_dict.pop('id')
         # 画像フィールドを URL に変換
         location_dict['image'] = self.image.url if self.image else None
         return location_dict
