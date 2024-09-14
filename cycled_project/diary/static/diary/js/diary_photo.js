@@ -32,18 +32,23 @@ $(document).ready(function() {
             },
             success: function(response) {
                 console.log(response)
-                if (Object.keys(response.diaries).length === 0){
-                    append_error(`GPS情報を持つ写真や新規の写真が選択されませんでした。`)
+                if (Object.keys(response.location_new).length === 0){
+                    append_error(`GPS情報を持つ写真が選択されませんでした。`)
                     return
                 }
-                $.each(response.diaries, function(date, oneday_location_list) {
-                    let newDiary = {date:date,}
-                    let $diaryNewForm = set_diary(newDiary);
+
+                $.each(response.location_new, function(date, oneday_location_list){
+                    let Diary = response.diary_existed[date] || {date: date};
+                    let $diaryForm = set_diary(Diary);
+                    if (response.location_existed[date]){
+                        oneday_location_list.unshift(response.location_existed[date]);
+                    }
                     $.each(oneday_location_list, function(_, location) {
-                        $diaryNewForm = set_locationInDiary($diaryNewForm, location, dt);
+                        $diaryForm = set_locationInDiary($diaryForm, location, dt);
                     });
-                    diaryFormsetBody.append($diaryNewForm);
+                    diaryFormsetBody.append($diaryForm);
                 });
+
             },
             error: function(xhr, status, error) {
                 console.error('アップロードに失敗しました。', error);
@@ -63,16 +68,15 @@ $(document).ready(function() {
                 if (diary.hasOwnProperty(inputName)) {
                   $(this).val(diary[inputName]); // 対応するデータをinputにセット
                 }
-                $(this).attr('type', 'text');
+                // $(this).attr('type', 'hidden');
             });
             return $diaryNewForm
         }
 
-        function set_locationInDiary($diaryNewForm, location, dTransfer_all) {
+        function set_locationInDiary($diaryNewForm, location, dTransfer_all=null) {
             const diaryNum = diaryFormsetBody.children().length;
             const locationsFormsetBody = $diaryNewForm.find(`#id_form-${diaryNum}-location-formset-body`);
             const locationNum = $('div.locations-form-wrapper').length + $diaryNewForm.find('div.locations-form-wrapper').length;
-            
             let locationNewFormHtml = $('#empty-form-location').html().replace(/__prefix__/g, `${locationNum}`);
             let $locationNewForm = $(`<div class="locations-form-wrapper">`).html(locationNewFormHtml);
             let prefix = `locations-${locationNum}-`;
@@ -92,17 +96,20 @@ $(document).ready(function() {
                 if (value) {
                     $input.val(value);
                 }
-                $input.attr('type', 'text');
+                // $input.attr('type', 'hidden');
             });
 
-            let dataTransfer = new DataTransfer(); // 新しい DataTransfer オブジェクトを作成
-            dataTransfer.items.add(dTransfer_all.files[location.file_order]);
-            const fileInput = $locationNewForm.find(`#id_locations-${locationNum}-temp_image`)[0];
-            fileInput.files = dataTransfer.files
+            if (dTransfer_all && typeof location.file_order !== 'undefined') {   
+                let dataTransfer = new DataTransfer(); // 新しい DataTransfer オブジェクトを作成
+                dataTransfer.items.add(dTransfer_all.files[location.file_order]);
+                const fileInput = $locationNewForm.find(`#id_locations-${locationNum}-temp_image`)[0];
+                fileInput.files = dataTransfer.files
+            }
 
             $locationNewForm.find(`#id_locations-${locationNum}-index_of_Diary`).val(diaryNum);
 
             locationsFormsetBody.append($locationNewForm);
+            
             return $diaryNewForm
 
             function searchKeys(obj, keyToFind) {
