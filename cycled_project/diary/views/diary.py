@@ -256,7 +256,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         form = PhotoForm(request.POST,request.FILES)
         if form.is_valid():
             files = request.FILES.getlist('location_files')
-            diary_dict = {}
+            location_dict = {}
             dates = set()
             messages = set()
             for i,img_file in enumerate(files):
@@ -276,10 +276,10 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
 
                 # 仮置きフィールドから写真を取り出すための変数
                 geo_data["file_order"] = i
-                diary_dict.setdefault(date,[]).append(geo_data)
+                location_dict.setdefault(date,[]).append(geo_data)
             
-            diary_existed = []
-            location_existed = []
+            diary_existed = {}
+            location_existed = {}
             diary_existed_query = Diary.objects.filter(date__in=list(dates), user=request.user).prefetch_related('locations')
             for diary in diary_existed_query:
                 diary_data = {
@@ -287,34 +287,30 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                     'date': diary.date.strftime('%Y-%m-%d'),
                     'comment': diary.comment,
                 }
-                diary_existed.append(diary_data)
+                date = diary.date.strftime('%Y-%m-%d')
+                diary_existed[date] = diary_data
                 for location in diary.locations.all():
-                    location_existed.append(location.to_dict())
+                    location_existed.setdefault(date,[]).append(location.to_dict())
 
-            # すべての既存ロケーションを (date, lat, lon) のタプルに変換
-            existing_locations = {
-                (diary.date.strftime('%Y-%m-%d'), loc.lat, loc.lon)
-                for diary in diary_existed_query
-                for loc in diary.locations.all()
-            }
-            keys_to_delete = []
-            # diary_dict から既存ロケーションと一致するものを削除
-            for date in list(diary_dict.keys()):  # キーのリストを作成してループ
-                filtered_geo_data = []
-                for geo_data in diary_dict[date]:
-                    if (date, geo_data['lat'], geo_data['lon']) in existing_locations:
-                        messages.add('選択した写真と同じものが既に使用されています。')  
-                    else:
-                        filtered_geo_data.append(geo_data)
-                if filtered_geo_data:
-                    diary_dict[date] = filtered_geo_data
-                else:
-                    keys_to_delete.append(date)
-            for key in keys_to_delete:
-                diary_dict.pop(key, None)
+            # # すべての既存ロケーションを (date, lat, lon) のタプルに変換
+            # existing_locations = {
+            #     (diary.date.strftime('%Y-%m-%d'), loc.lat, loc.lon)
+            #     for diary in diary_existed_query
+            #     for loc in diary.locations.all()
+            # }
+
+            # for date in list(diary_dict.keys()):  # キーのリストを作成してループ
+            #     filtered_geo_data = []
+            #     for geo_data in diary_dict[date]:
+            #         if (date, geo_data['lat'], geo_data['lon']) in existing_locations:
+            #             messages.add('選択した写真と同じ場所が既に登録されています。')  
+            #         else:
+            #             geo_data['diary_id'] = diary_existed.get(date, {}).get('id')
+            #             filtered_geo_data.append(geo_data)
+            #     diary_dict[date] = filtered_geo_data
 
             response = {
-                "diaries": diary_dict,
+                "location_new": location_dict,
                 "diary_existed": diary_existed,
                 "location_existed": location_existed,
                 "message": list(messages),
