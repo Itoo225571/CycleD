@@ -5,6 +5,7 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
 import uuid
+import hashlib
 
 def upload_to(instance, filename):
     # 拡張子を取得

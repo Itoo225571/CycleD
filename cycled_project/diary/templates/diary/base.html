@@ -168,13 +168,14 @@
                   {% endfor %}
                   {% for form_error in form_errors %}
                     {% if form_error %}
-                      {% for field,error in form_error.items %}
-                          {% for error_msg in error %}
-                            <li class="list-group-item list-group-item-danger">
+                      <li class="list-group-item list-group-item-danger">
+                        {% for field,error in form_error.items %}
+                          <h5>{{ field }}</h5>
+                            {% for error_msg in error %}
                               {{ error_msg }}
-                            </li>
-                          {% endfor %}
-                      {% endfor %}
+                            {% endfor %}
+                        {% endfor %}
+                      </li>
                     {% endif %}
                   {% endfor %}
         

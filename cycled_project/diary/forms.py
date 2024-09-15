@@ -101,11 +101,12 @@ class AddressSearchForm(forms.Form):
                         )
     
 class LocationForm(forms.ModelForm):
-    index_of_Diary = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    date_of_Diary = forms.DateField(required=False, widget=forms.HiddenInput())
     temp_image = forms.FileField(required=False,validators=[validate_file_extension])
     class Meta:
         model = Location
-        fields = ["lat","lon","state","display","label","index_of_Diary","temp_image",]
+        fields = ["lat","lon","state","display","label","date_of_Diary","temp_image",]
+
     
 LocationFormSet = forms.inlineformset_factory(
         Diary,
@@ -177,7 +178,7 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
         if self.instance.pk:
             # 更新の場合は他のインスタンスの重複をチェック
             if Diary.objects.filter(date=date, user=user).exclude(pk=self.instance.pk).exists():
-                self.add_error('date',"この日時の日記はすでに存在します。")
+                self.add_error('date',f"この日時の日記はすでに存在します。pk={self.instance.pk}")
         else:
             # 新規作成の場合はすべてのインスタンスの重複をチェック
             if Diary.objects.filter(date=date, user=user).exists():
@@ -220,7 +221,7 @@ DiaryFormSet = forms.modelformset_factory(
     formset=BaseDiaryFormSet,
     extra=0,  
     # can_delete=True,  
-    min_num=1,
+    min_num=0,
     validate_min=True,
     max_num=10,
     validate_max=True,
