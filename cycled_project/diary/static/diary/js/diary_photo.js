@@ -2,6 +2,7 @@ $(document).ready(function() {
     const diaryFormsetBody = $('#diary-formset-body');
     const diaryMaxNum = $('#id_form-MAX_NUM_FORMS').val();
     const locationMaxNum = $('id_locations-MAX_NUM_FORMS').val();
+    let diaryEditNum = 0;
     remove_error();
 
     $('#id_images').on('change', function(event) {
@@ -33,16 +34,20 @@ $(document).ready(function() {
             success: function(response) {
                 console.log(response)
                 if (Object.keys(response.location_new).length === 0){
-                    append_error(`GPS情報を持つ写真が選択されませんでした。`)
+                    append_error(`GPS情報を持つ写真や登録されていない写真が選択されませんでした。`)
                     return
                 }
-
+                // 編集するDiaryの数をセット
+                // diaryEditNum += Object.keys(response.diary_existed).length;
                 $.each(response.location_new, function(date, oneday_location_list){
-                    let Diary = response.diary_existed[date] || {date: date};
-                    let $diaryForm = set_diary(Diary);
-                    if (response.location_existed[date]){
-                        oneday_location_list.unshift(response.location_existed[date]);
+                    let Diary = response.diary_existed[date] || {date: date, empty: true };
+                    if (!Diary.empty) {
+                        diaryEditNum += 1;
                     }
+                    let $diaryForm = set_diary(Diary);
+                    // $.each(response.location_existed[date],function(_,location){
+                    //     $diaryForm = set_locationInDiary($diaryForm, location);
+                    // });
                     $.each(oneday_location_list, function(_, location) {
                         $diaryForm = set_locationInDiary($diaryForm, location, dt);
                     });
@@ -57,7 +62,7 @@ $(document).ready(function() {
         });
 
         function set_diary(diary){
-            const diaryNum = diaryFormsetBody.children().length;
+            const diaryNum = $('div.diary-form-wrapper').length;
             let diaryNewFormHtml = $('#empty-form-diary').html().replace(/__prefix__/g, `${diaryNum}`);
             let $diaryNewForm = $(`<div class='diary-form-wrapper'>`).html(diaryNewFormHtml);
             // フィールド入力
@@ -66,15 +71,17 @@ $(document).ready(function() {
                 let inputName = $(this).attr('name'); // inputのname属性を取得
                 inputName = inputName.replace(prefix, '');
                 if (diary.hasOwnProperty(inputName)) {
-                  $(this).val(diary[inputName]); // 対応するデータをinputにセット
+                $(this).val(diary[inputName]); // 対応するデータをinputにセット
                 }
                 // $(this).attr('type', 'hidden');
+                // $(this).attr('type', 'text');
             });
+            
             return $diaryNewForm
         }
 
         function set_locationInDiary($diaryNewForm, location, dTransfer_all=null) {
-            const diaryNum = diaryFormsetBody.children().length;
+            const diaryNum = $('div.diary-form-wrapper').length;
             const locationsFormsetBody = $diaryNewForm.find(`#id_form-${diaryNum}-location-formset-body`);
             const locationNum = $('div.locations-form-wrapper').length + $diaryNewForm.find('div.locations-form-wrapper').length;
             let locationNewFormHtml = $('#empty-form-location').html().replace(/__prefix__/g, `${locationNum}`);
@@ -88,15 +95,13 @@ $(document).ready(function() {
                 if (name==="id"){
                     name = "location_id"
                 }
-                if (name==="diary"){
-                    name = "diary_id"
-                }
                 const value = searchKeys(location,name);
                 // 値を取得して設定する
                 if (value) {
                     $input.val(value);
                 }
                 // $input.attr('type', 'hidden');
+                // $(this).attr('type', 'text');
             });
 
             if (dTransfer_all && typeof location.file_order !== 'undefined') {   
@@ -106,7 +111,10 @@ $(document).ready(function() {
                 fileInput.files = dataTransfer.files
             }
 
-            $locationNewForm.find(`#id_locations-${locationNum}-index_of_Diary`).val(diaryNum);
+            // diaryが既存の場合，そのIDをセット
+            // location.diary = $diaryNewForm.find(`#id_form-${diaryNum}-id`).val();
+            var date = $diaryNewForm.find(`#id_form-${diaryNum}-date`).val();
+            $locationNewForm.find(`#id_locations-${locationNum}-date_of_Diary`).val(date);
 
             locationsFormsetBody.append($locationNewForm);
             
@@ -138,8 +146,10 @@ $(document).ready(function() {
         event.preventDefault();
         // Diaryの合計数を編集
         const diaryTotalForms = $('#id_form-TOTAL_FORMS');
-        const diaryNum = diaryFormsetBody.children().length;
+        const diaryNum = $('div.diary-form-wrapper').length;
         diaryTotalForms.val(diaryNum);
+        const diaryInitialForms = $('#id_form-INITIAL_FORMS');
+        diaryInitialForms.val(diaryEditNum);
         // Locationの合計数を編集
         const locationTotalForms = $('#id_locations-TOTAL_FORMS');
         const locationNum = $('div.locations-form-wrapper').length;
