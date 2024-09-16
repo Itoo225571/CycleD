@@ -105,7 +105,8 @@ class LocationForm(forms.ModelForm):
     temp_image = forms.FileField(required=False,validators=[validate_file_extension])
     class Meta:
         model = Location
-        fields = ["lat","lon","state","display","label","date_of_Diary","temp_image",]
+        fields = ["lat","lon","state","display","label",
+                  "date_of_Diary","temp_image",]
 
     
 LocationFormSet = forms.inlineformset_factory(

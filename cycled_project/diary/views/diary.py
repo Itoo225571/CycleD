@@ -12,7 +12,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from ..forms import *
 
 from .address import address_search,regeocode
-from subs.photo_info.photo_info import get_photo_info,to_jpeg
+from subs.photo_info.photo_info import get_photo_info,to_jpeg,to_base64
 
 from datetime import timedelta
 import json
@@ -201,7 +201,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
             return self.photos2LocationsAndDate(request)
         else:
             print(f"post name error: {request.POST}")
-            return self.form_invalid()
+            return self.form_invalid(None)
         
     def form_valid(self, diary_formset, location_formset):
         diaries = diary_formset.save(commit=False)
@@ -272,6 +272,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                     temp_file.write(img_file.read())
                     temp_file_path = temp_file.name
                     photo_data = get_photo_info(temp_file_path)
+                    photo_review = to_jpeg(temp_file_path,50)
                 if photo_data.errors:
                     for e in photo_data.errors:
                         print(f"Photo data Eorrors: {e}")
@@ -284,6 +285,8 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
 
                 # 仮置きフィールドから写真を取り出すための変数
                 geo_data["file_order"] = i
+
+                geo_data["photo_review"] = to_base64(photo_review)
                 location_dict.setdefault(date,[]).append(geo_data)
             
             diary_existed = {}

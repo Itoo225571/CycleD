@@ -6,6 +6,7 @@ from pydantic import BaseModel,field_serializer
 from datetime import datetime
 from pathlib import Path
 from io import BytesIO
+import base64
 
 class Photo(BaseModel):
     # path: Path
@@ -106,13 +107,18 @@ def get_values_from_photo(exif_data):
         # print("必要なGPS情報が含まれていません。")
         return {}
     
-def to_jpeg(original_file):
+def to_jpeg(original_file, quality=80):
     pillow_heif.register_heif_opener()
     with Image.open(original_file) as img:
         jpeg_io = BytesIO()
-        img.convert('RGB').save(jpeg_io, format='JPEG')
+        img.convert('RGB').save(jpeg_io, format='JPEG', quality=quality) 
         jpeg_io.seek(0)  # ファイルポインタを先頭に戻す
         return jpeg_io
+
+def to_base64(image):
+    image_file = image.read()
+    encoded_image = base64.b64encode(image_file).decode('utf-8')
+    return encoded_image
 
 if __name__=="__main__":
     file = r"/Users/itoudaiki/Downloads/plus.png"
