@@ -37,7 +37,7 @@ function addDiariesToCalendar() {
 				// 最初の地名をタイトルとする
 				let description;
 				if (diary.locations.length > 0){
-					description = diary.locations[0].label
+					description = diary.locations[0].label;
 				}
                 // Diaryのデータをイベントに追加
                 events.push({
@@ -165,8 +165,19 @@ document.addEventListener('DOMContentLoaded', function() {
 			eventDidMount: (e) => { 
 				const description = e.event.extendedProps.description;
 				if (description) {  // contentが空でないか確認
-					tippy(e.el, { 
-						content: description,
+					const tooltip = new bootstrap.Tooltip(e.el, {
+						title: description,
+						html: true, // HTML コンテンツを有効にする場合
+						placement: 'auto', // ツールチップの表示位置
+						// trigger: 'hover',
+					});
+					e.el.addEventListener('click', () => {
+						// ツールチップが表示中の場合は非表示にする
+						if (tooltip._element.getAttribute('aria-describedby')) {
+							tooltip.hide();
+						} else {
+							tooltip.show();
+						}
 					});
 				}
 				// 自転車アイコンを追加
