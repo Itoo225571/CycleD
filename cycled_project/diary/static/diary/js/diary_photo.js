@@ -71,9 +71,12 @@ $(document).ready(function() {
                 let inputName = $(this).attr('name'); // inputのname属性を取得
                 inputName = inputName.replace(prefix, '');
                 if (diary.hasOwnProperty(inputName)) {
-                $(this).val(diary[inputName]); // 対応するデータをinputにセット
+                    $(this).val(diary[inputName]); // 対応するデータをinputにセット
                 }
-                // $(this).attr('type', 'hidden');
+                if (inputName === "date") {
+                    $(this).attr('type', 'hidden');
+                    $(this).prop('readonly', true);
+                }
                 // $(this).attr('type', 'text');
             });
             
@@ -85,7 +88,7 @@ $(document).ready(function() {
             const locationsFormsetBody = $diaryNewForm.find(`#id_form-${diaryNum}-location-formset-body`);
             const locationNum = $('div.locations-form-wrapper').length + $diaryNewForm.find('div.locations-form-wrapper').length;
             let locationNewFormHtml = $('#empty-form-location').html().replace(/__prefix__/g, `${locationNum}`);
-            let $locationNewForm = $(`<div class="locations-form-wrapper">`).html(locationNewFormHtml);
+            let $locationNewForm = $(`<li class="list-group-item locations-form-wrapper">`).html(locationNewFormHtml);
             let prefix = `locations-${locationNum}-`;
 
             $locationNewForm.find('input').each(function() {
@@ -105,47 +108,31 @@ $(document).ready(function() {
                     $input.prop('readonly', true);
                     $input.attr('type', 'hidden');
                 }
-                // $input.attr('type', 'hidden');
-                // $(this).attr('type', 'text');
             });
 
+            // 画像をセット
             if (dTransfer_all && typeof location.file_order !== 'undefined') {   
                 let dataTransfer = new DataTransfer(); // 新しい DataTransfer オブジェクトを作成
                 dataTransfer.items.add(dTransfer_all.files[location.file_order]);
                 const fileInput = $locationNewForm.find(`#id_locations-${locationNum}-temp_image`)[0];
                 fileInput.files = dataTransfer.files
-
-                // let reader = new FileReader();
-                // reader.onload = function(e) {
-                //     $(`#id_locations-${locationNum}-imagePreview`).attr('src', e.target.result);
-                //     $(`#id_locations-${locationNum}-imagePreview`).show();  // プレビューを表示
-                // }
-                // let imgFile = dataTransfer.files[0]
-                // if (imgFile.type === 'image/heic') {
-                //     heic2any({
-                //         blob: imgFile,
-                //         toType: 'image/jpeg'
-                //     }).then(function (jpegBlob) {
-                //         reader.readAsDataURL(jpegBlob);     // 変換された JPEG Blob を FileReader で読み込む
-                //     }).catch(function (error) {
-                //         console.error('HEIC 画像の変換中にエラーが発生しました:', error);
-                //     });
-                // } else {
-                //     reader.readAsDataURL(imgFile);
-                // }
             }
 
-            if (location.photo_review){
-                var src = 'data:image/jpeg;base64,' + location.photo_review;
-                $locationNewForm.find(`#id_locations-${locationNum}-imagePreview`).attr('src', src);
-                $locationNewForm.find(`#id_locations-${locationNum}-imagePreview`).show();  // プレビューを表示
-            }
+            // 画像レビュー
+            var $photoReview = $locationNewForm.find(`#id_locations-${locationNum}-imagePreview`);
+            var src = 'data:image/jpeg;base64,' + location.photo_review;
+            var tooltipContent = `<img src="${src}" class="tooltip-image">`;
+            $photoReview.attr('data-bs-toggle', 'tooltip');
+            $photoReview.attr('data-bs-html', 'true');
+            $photoReview.attr('data-bs-placement', 'top');
+            $photoReview.attr('title', tooltipContent);  // ツールチップの内容を設定
+            var tooltip = new bootstrap.Tooltip($photoReview[0]);  // jQueryからDOM要素を取得
+            $photoReview.show();  // プレビューを表示
 
             // diaryが既存の場合，そのIDをセット
             // location.diary = $diaryNewForm.find(`#id_form-${diaryNum}-id`).val();
             var date = $diaryNewForm.find(`#id_form-${diaryNum}-date`).val();
             $locationNewForm.find(`#id_locations-${locationNum}-date_of_Diary`).val(date);
-
             locationsFormsetBody.append($locationNewForm);
             
             return $diaryNewForm

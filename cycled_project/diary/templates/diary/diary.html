@@ -7,6 +7,10 @@
     しんきさくせい
 {% endblock title %}
 
+{% block page_title %}
+    <h2 class="justify-content-md-center text-center">日記メニュー</h2>
+{% endblock page_title %}
+
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'diary/css/mycalendar.css' %}" type="text/css" >
     <link rel="stylesheet" href="{% static 'diary/css/address.css' %}" type="text/css" >
@@ -16,18 +20,16 @@
 {% block content %}
     <div class="container">
         <div class="justify-content-md-center text-center"> 
-            <div class="row position-relative">
-                <!-- タイトルを中央に配置 -->
-                <div class="col text-center">
-                    <h2 class="position-relative">日記メニュー</h2>
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- ボタンを右端に配置 -->
+                    <div class="col d-flex justify-content-end">
+                        <button class="button_inverse" onclick="location.href='{% url "diary:diary_photo" %}'">写真から作成</button>
+                    </div>
                 </div>
-                <!-- ボタンを右端に配置 -->
-                <div class="col-auto position-absolute top-50 end-0 translate-middle">
-                    <button class="button_inverse" onclick="location.href='{% url "diary:diary_photo" %}'">写真から作成</button>
+                <div class="row my-md-3 my-2"> 
+                    <div id="mycalendar"></div>
                 </div>
-            </div>
-            <div class="my-md-3 my-2"> 
-                <div id="mycalendar"></div>
             </div>
         </div>
         <!-- モーダルウィンドウのHTML -->
