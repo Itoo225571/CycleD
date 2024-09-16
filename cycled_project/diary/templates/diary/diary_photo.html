@@ -50,12 +50,23 @@
                 {{ diary_formset.empty_form.date }}
                 {{ diary_formset.empty_form.comment }}
                 {{ diary_formset.empty_form.id }}
+                <div class="card">
+                    <div class="card-header">
+                        Featured
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Special title treatment</h5>
+                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                    </div>
+                </div>
                 <div id="id_form-__prefix__-location-formset-body"></div>
             </div>
             <div id="empty-form-location" style="display:none;">
                 {% for field in diary_formset.empty_form.formset.empty_form %}
                     {{ field }}
                 {% endfor %}
+                <img id="id_locations-__prefix__-imagePreview" src="" alt="Image Preview" style="display:none;max-width: 300px;"/>
             </div>
         </div>
     </div>

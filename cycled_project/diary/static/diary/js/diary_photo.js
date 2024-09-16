@@ -100,6 +100,11 @@ $(document).ready(function() {
                 if (value) {
                     $input.val(value);
                 }
+                if (name !== "label") {
+                    // $input.prop('disabled', true);
+                    $input.prop('readonly', true);
+                    $input.attr('type', 'hidden');
+                }
                 // $input.attr('type', 'hidden');
                 // $(this).attr('type', 'text');
             });
@@ -109,6 +114,31 @@ $(document).ready(function() {
                 dataTransfer.items.add(dTransfer_all.files[location.file_order]);
                 const fileInput = $locationNewForm.find(`#id_locations-${locationNum}-temp_image`)[0];
                 fileInput.files = dataTransfer.files
+
+                // let reader = new FileReader();
+                // reader.onload = function(e) {
+                //     $(`#id_locations-${locationNum}-imagePreview`).attr('src', e.target.result);
+                //     $(`#id_locations-${locationNum}-imagePreview`).show();  // プレビューを表示
+                // }
+                // let imgFile = dataTransfer.files[0]
+                // if (imgFile.type === 'image/heic') {
+                //     heic2any({
+                //         blob: imgFile,
+                //         toType: 'image/jpeg'
+                //     }).then(function (jpegBlob) {
+                //         reader.readAsDataURL(jpegBlob);     // 変換された JPEG Blob を FileReader で読み込む
+                //     }).catch(function (error) {
+                //         console.error('HEIC 画像の変換中にエラーが発生しました:', error);
+                //     });
+                // } else {
+                //     reader.readAsDataURL(imgFile);
+                // }
+            }
+
+            if (location.photo_review){
+                var src = 'data:image/jpeg;base64,' + location.photo_review;
+                $locationNewForm.find(`#id_locations-${locationNum}-imagePreview`).attr('src', src);
+                $locationNewForm.find(`#id_locations-${locationNum}-imagePreview`).show();  // プレビューを表示
             }
 
             // diaryが既存の場合，そのIDをセット
