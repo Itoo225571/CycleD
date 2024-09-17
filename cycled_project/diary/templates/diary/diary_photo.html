@@ -50,17 +50,19 @@
             <div id="empty-form-diary" style="display:none;">
                 {{ diary_formset.empty_form.date }}
                 {{ diary_formset.empty_form.id }}
-                <div class="card">
+                <div class="card" id="id_form-__prefix__-card">
                     <h5 class="card-header">
-                        Featured
+                        Diary Card Header
                     </h5>
                     <div class="card-body">
-                        <h5 class="card-title">Special title treatment</h5>
-                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                        <ul id="id_form-__prefix__-location-formset-body" class="list-group"></ul>
-                        <div>
-                            <label for="{{ diary_formset.empty_form.comment.id_for_label }}" class="form-label">{{ diary_formset.empty_form.comment.label }}</label>
-                            {{ diary_formset.empty_form.comment }}
+                        <h5 class="card-title col-auto">写真で得られた地域一覧</h5>
+                        <div class="d-flex flex-column-reverse flex-md-row">
+                            <ul id="id_form-__prefix__-location-formset-body" class="list-group col-12 col-md-7"></ul>
+                            <div id="id_form-__prefix__-thumbnail" class="col-auto diary-thumbnail"></div>
+                        </div>
+                        <div class="mt-4">
+                            {% comment %} <label for="{{ diary_formset.empty_form.comment.id_for_label }}" class="form-label">{{ diary_formset.empty_form.comment.label }}</label> {% endcomment %}
+                            {{ diary_formset.empty_form.comment}}
                         </div>
                     </div>
                 </div>
@@ -71,14 +73,20 @@
                         {{ field }}
                     {% endif %}
                 {% endfor %}
-                <small class="helptext">{{ diary_formset.empty_form.formset.empty_form.label.help_text }}</small>
-                <label for="{{ diary_formset.empty_form.formset.empty_form.label.id_for_label }}" class="form-label">{{ diary_formset.empty_form.formset.empty_form.label.label }}</label>
-                {{ diary_formset.empty_form.formset.empty_form.label }}
-                <i id="id_locations-__prefix__-imagePreview" class="bi bi-image icon-image" alt="icon-image"></i>
-                <button type="button" class="btn p-0" onclick="">
-                    <i class="bi bi-trash icon-trash" alt="icon-trash"></i>
-                </button>
-                
+                <div class="input-group d-flex flex-row">
+                    {% comment %}                     
+                    <div class="input-group-prepend">
+                        <span for="{{ diary_formset.empty_form.formset.empty_form.label.id_for_label }}" class="form-label input-group-text mb-0">{{ diary_formset.empty_form.formset.empty_form.label.label }}</span>
+                    </div> 
+                    {% endcomment %}
+                    {{ diary_formset.empty_form.formset.empty_form.label}}
+                </div>
+                <div class="d-flex align-items-center text-sm">
+                    <i id="id_locations-__prefix__-imagePreview" class="bi bi-image icon-image" alt="icon-image"></i>
+                    <button type="button" class="btn p-0" onclick="">
+                        <i class="bi bi-trash icon-trash" alt="icon-trash"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>

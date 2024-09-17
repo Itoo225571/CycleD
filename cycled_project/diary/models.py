@@ -28,8 +28,9 @@ class Location(models.Model):
     image = models.ImageField(upload_to=upload_to,blank=True,null=True,verbose_name="サイクリング画像")
     
     diary = models.ForeignKey('Diary',on_delete=models.CASCADE,null=True,related_name="locations")
-    # homeか否か
-    is_home = models.BooleanField(default=False, verbose_name="登録地域か否か")
+    
+    is_home = models.BooleanField(default=False, verbose_name="登録地域か否か") # homeか否か
+    is_thumbnail = models.BooleanField(default=False, verbose_name="サムネイル")
     
     def __str__(self) -> str:
         return self.label

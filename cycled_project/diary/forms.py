@@ -50,6 +50,8 @@ class SignupForm(UserCreationForm):
         self.fields['password2'].help_text = ''
 
         self.fields['email'].required = True
+        for _, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
 
     class Meta:
         model = get_user_model()
@@ -91,6 +93,10 @@ class SigninForm(AuthenticationForm):
     class Meta:
         model = get_user_model()
         fields=["username","password",]
+    def __init__(self, *args, **kwargs):
+        super(SigninForm, self).__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
 
 """___Address関連___"""
 class AddressSearchForm(forms.Form):
@@ -113,6 +119,10 @@ class LocationForm(forms.ModelForm):
         help_texts = {
             "label": "サイクリング先の名前(編集できます)",
         }
+    def __init__(self, *args, **kwargs):
+        super(LocationForm, self).__init__(*args, **kwargs)
+        # for _, field in self.fields.items():
+        #     field.widget.attrs['class'] = 'form-control'
 
     
 LocationFormSet = forms.inlineformset_factory(
@@ -152,15 +162,18 @@ class UserEditForm(UserChangeForm):
 class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
     formset_class = LocationFormSet
     keyword = forms.CharField(
-                    label="",
-                    max_length=64,
-                    required=False,
-                    widget=forms.TextInput(attrs={"placeholder":" 地名・施設名・駅名など"})
-                    )
+        label="",
+        max_length=64,
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder":" 地名・施設名・駅名など"})
+    )
+
     def __init__(self, *args, **kwargs):
         # viewsでrequestを使用可能にする
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
+        for _, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
 
     class Meta:
         model=Diary
