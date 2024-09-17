@@ -71,11 +71,14 @@
                         {{ field }}
                     {% endif %}
                 {% endfor %}
+                <small class="helptext">{{ diary_formset.empty_form.formset.empty_form.label.help_text }}</small>
+                <label for="{{ diary_formset.empty_form.formset.empty_form.label.id_for_label }}" class="form-label">{{ diary_formset.empty_form.formset.empty_form.label.label }}</label>
                 {{ diary_formset.empty_form.formset.empty_form.label }}
                 <i id="id_locations-__prefix__-imagePreview" class="bi bi-image icon-image" alt="icon-image"></i>
                 <button type="button" class="btn p-0" onclick="">
                     <i class="bi bi-trash icon-trash" alt="icon-trash"></i>
                 </button>
+                
             </div>
         </div>
     </div>
