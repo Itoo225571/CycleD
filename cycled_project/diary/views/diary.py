@@ -223,7 +223,6 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
             date = form.cleaned_data.get("date_of_Diary")
             # location.diary = diaries[index]
             location.diary = get_object_or_404(Diary, user=self.request.user, date=date)
-            print("diary_in_location{location.diary}")
             location.save()
         return super().form_valid(diary_formset)
 

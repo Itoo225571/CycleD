@@ -77,8 +77,13 @@ $(document).ready(function() {
                     $(this).attr('type', 'hidden');
                     $(this).prop('readonly', true);
                 }
-                // $(this).attr('type', 'text');
             });
+
+            // テキスト入力
+            date = new Date(diary['date']);
+            date = date.toLocaleDateString(options = {timeZone: 'UTC'});
+            var cardHeader = $diaryNewForm.find('.card-header').first();
+            cardHeader.text(date);
             
             return $diaryNewForm
         }
@@ -88,7 +93,16 @@ $(document).ready(function() {
             const locationsFormsetBody = $diaryNewForm.find(`#id_form-${diaryNum}-location-formset-body`);
             const locationNum = $('div.locations-form-wrapper').length + $diaryNewForm.find('div.locations-form-wrapper').length;
             let locationNewFormHtml = $('#empty-form-location').html().replace(/__prefix__/g, `${locationNum}`);
-            let $locationNewForm = $(`<li class="list-group-item locations-form-wrapper">`).html(locationNewFormHtml);
+            let $locationNewForm = $(
+                `<div class="locations-form-wrapper">
+                    <li class="list-group-item d-flex justify-content-between border-radius-lg">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="location-radio-group-${diaryNum}">
+                        </div>
+                        ${locationNewFormHtml}
+                    </li>
+                </div>`
+            );
             let prefix = `locations-${locationNum}-`;
 
             $locationNewForm.find('input').each(function() {
@@ -103,15 +117,19 @@ $(document).ready(function() {
                 if (value) {
                     $input.val(value);
                 }
-                if (name !== "label") {
-                    // $input.prop('disabled', true);
+                if (name !== "label" && name !== "temp_image" && name !==`location-radio-group-${diaryNum}`) {
                     $input.prop('readonly', true);
                     $input.attr('type', 'hidden');
+                }
+                // file用の調整
+                if (name === "temp_image") {
+                    $input.attr('disabled', true); 
+                    $input.hide(); 
                 }
             });
 
             // 画像をセット
-            if (dTransfer_all && typeof location.file_order !== 'undefined') {   
+            if (dTransfer_all && typeof location.file_order !== 'undefined') { 
                 let dataTransfer = new DataTransfer(); // 新しい DataTransfer オブジェクトを作成
                 dataTransfer.items.add(dTransfer_all.files[location.file_order]);
                 const fileInput = $locationNewForm.find(`#id_locations-${locationNum}-temp_image`)[0];
@@ -160,7 +178,7 @@ $(document).ready(function() {
     });
 
     $('#id_diary-new-form').submit(function(event) {  
-        event.preventDefault();
+        // event.preventDefault();
         // Diaryの合計数を編集
         const diaryTotalForms = $('#id_form-TOTAL_FORMS');
         const diaryNum = $('div.diary-form-wrapper').length;
@@ -171,7 +189,10 @@ $(document).ready(function() {
         const locationTotalForms = $('#id_locations-TOTAL_FORMS');
         const locationNum = $('div.locations-form-wrapper').length;
         locationTotalForms.val(locationNum);
-        
+
+        // 画像を変更可能にする
+        $('[id*="temp_image"]').prop('disabled', false);
+
         const submitButton = $(event.originalEvent.submitter); // クリックされたボタンを取得
         const buttonName = submitButton.attr('name');
         $('<input>').attr({
@@ -179,6 +200,6 @@ $(document).ready(function() {
             name: buttonName,
             value: '',
         }).appendTo(this);
-        this.submit();
+        // this.submit();
     });
 });
