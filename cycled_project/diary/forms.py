@@ -107,6 +107,12 @@ class LocationForm(forms.ModelForm):
         model = Location
         fields = ["lat","lon","state","display","label",
                   "date_of_Diary","temp_image",]
+        labels = {
+            "label": "表示名",
+        }
+        help_texts = {
+            "label": "サイクリング先の名前(編集できます)",
+        }
 
     
 LocationFormSet = forms.inlineformset_factory(
