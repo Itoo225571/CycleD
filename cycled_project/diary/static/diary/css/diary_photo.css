@@ -13,6 +13,19 @@
     opacity: 1;
 }
 
+.thumbnail-image {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+}
+
+/* ラジオボタンがチェックされている時、対応するリストアイテムの背景色を変更 */
+input[type="radio"].location-radiobutton:checked + .location-list {
+    background-color: #5df0e4; /* お好きな色に変更してください */
+}
+
+/* アイコン */
 .icon-image {
     margin: 0 .5rem 0 1rem;
     font-size: 1.5rem;
