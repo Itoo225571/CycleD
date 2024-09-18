@@ -56,9 +56,9 @@
                     </h5>
                     <div class="card-body">
                         <h5 class="card-title col-auto">写真で得られた地域一覧</h5>
-                        <div class="d-flex flex-column-reverse flex-md-row">
-                            <ul id="id_form-__prefix__-location-formset-body" class="list-group col-12 col-md-7"></ul>
-                            <div id="id_form-__prefix__-thumbnail" class="col-auto diary-thumbnail"></div>
+                        <div class="row">
+                            <div id="id_form-__prefix__-thumbnail" class="col diary-thumbnail order-md-2"></div>
+                            <ul id="id_form-__prefix__-location-formset-body" class="list-group col-12 col-md-7 order-md-1"></ul>
                         </div>
                         <div class="mt-4">
                             {% comment %} <label for="{{ diary_formset.empty_form.comment.id_for_label }}" class="form-label">{{ diary_formset.empty_form.comment.label }}</label> {% endcomment %}

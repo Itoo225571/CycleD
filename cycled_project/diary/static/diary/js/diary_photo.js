@@ -95,12 +95,14 @@ $(document).ready(function() {
             let locationNewFormHtml = $('#empty-form-location').html().replace(/__prefix__/g, `${locationNum}`);
             let $locationNewForm = $(
                 `<div class="locations-form-wrapper">
-                    <li class="list-group-item d-flex justify-content-between border-radius-lg">
+                    <label for="id_location-radiobutton-${diaryNum}-${locationNum}" style="display: block;">
                         <div class="form-check">
-                            <input class="form-check-input" type="radio" name="location-radio-group-${diaryNum}">
+                            <input class="form-check-input location-radiobutton" type="radio" name="location-radiobutton-group-${diaryNum}" id="id_location-radiobutton-${diaryNum}-${locationNum}" checked>
+                            <li class="location-list list-group-item d-flex justify-content-between border-radius-lg">
+                                ${locationNewFormHtml}
+                            </li>
                         </div>
-                        ${locationNewFormHtml}
-                    </li>
+                    </label>
                 </div>`
             );
             let prefix = `locations-${locationNum}-`;
@@ -117,7 +119,7 @@ $(document).ready(function() {
                 if (value) {
                     $input.val(value);
                 }
-                if (name !== "label" && name !== "temp_image" && name !==`location-radio-group-${diaryNum}`) {
+                if (name !== "label" && name !== "temp_image" && name !==`location-radiobutton-group-${diaryNum}`) {
                     $input.prop('readonly', true);
                     $input.attr('type', 'hidden');
                 }
@@ -142,10 +144,15 @@ $(document).ready(function() {
             var tooltipContent = `<img src="${src}" class="tooltip-image">`;
             $photoReview.attr('data-bs-toggle', 'tooltip');
             $photoReview.attr('data-bs-html', 'true');
-            $photoReview.attr('data-bs-placement', 'top');
+            $photoReview.attr('data-bs-placement', 'auto');
             $photoReview.attr('title', tooltipContent);  // ツールチップの内容を設定
             var tooltip = new bootstrap.Tooltip($photoReview[0]);  // jQueryからDOM要素を取得
             $photoReview.show();  // プレビューを表示
+
+            // サムネイル
+            var $photoTthumbnail = $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail`);
+            var thumbnail = `<img src="${src}" class="thumbnail-image">`;
+            $photoTthumbnail.html(thumbnail);
 
             // diaryが既存の場合，そのIDをセット
             // location.diary = $diaryNewForm.find(`#id_form-${diaryNum}-id`).val();
