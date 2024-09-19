@@ -21,8 +21,56 @@
 }
 
 /* ラジオボタンがチェックされている時、対応するリストアイテムの背景色を変更 */
-input[type="radio"].location-radiobutton:checked + .location-list {
-    background-color: #5df0e4; /* お好きな色に変更してください */
+.location-label {
+    margin: .1em; 
+    padding: .7em 1em;
+    font-size: 114%;
+    line-height: 1;
+    position: relative;
+    cursor: pointer;
+    border-radius: .5em;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+
+    padding-left: 30px;
+}
+.location-label:hover {
+    top: 1px;
+    box-shadow: 0 0 rgba(0, 0, 0, 0);
+}
+.location-radiobutton:checked + .location-label {
+    top: 1px;
+    box-shadow: 0 0 rgba(0, 0, 0, 0);
+    border: 1px solid #00bfff;
+} 
+
+.location-label:hover::after,
+.location-radiobutton:checked + .location-label::after {
+    opacity: 1;
+}
+.location-label::before,
+.location-label::after {
+    content: "";
+    display: block; 
+    border-radius: 50%;
+    position: absolute;
+    transform: translateY(-50%);
+    top: 50%;
+}
+.location-label::before {
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    background-color: #fff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    left: 5px;
+}
+.location-label::after {
+    background-color: #00bfff;
+    border-radius: 50%;
+    opacity: 0;
+    width: 10px;
+    height: 10px;
+    left: 10px;
 }
 
 /* アイコン */
@@ -30,7 +78,7 @@ input[type="radio"].location-radiobutton:checked + .location-list {
     margin: 0 .5rem 0 1rem;
     font-size: 1.5rem;
     vertical-align: -.15em;
-    color: blue;
+    color: cornflowerblue;
 }
 .icon-trash {
     margin: 0 .5rem;

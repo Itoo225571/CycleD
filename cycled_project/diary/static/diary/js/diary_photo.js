@@ -95,13 +95,11 @@ $(document).ready(function() {
             let locationNewFormHtml = $('#empty-form-location').html().replace(/__prefix__/g, `${locationNum}`);
             let $locationNewForm = $(
                 `<div class="locations-form-wrapper">
-                    <label for="id_location-radiobutton-${diaryNum}-${locationNum}" style="display: block;">
-                        <div class="form-check">
-                            <input class="form-check-input location-radiobutton" type="radio" name="location-radiobutton-group-${diaryNum}" id="id_location-radiobutton-${diaryNum}-${locationNum}" checked>
-                            <li class="location-list list-group-item d-flex justify-content-between border-radius-lg">
-                                ${locationNewFormHtml}
-                            </li>
-                        </div>
+                    <input class="location-radiobutton visually-hidden" type="radio" name="location-radiobutton-group-${diaryNum}" id="id_location-radiobutton-${diaryNum}-${locationNum}">
+                    <label for="id_location-radiobutton-${diaryNum}-${locationNum}" class="location-label" style="display: block;">
+                        <li class="location-list d-flex justify-content-between border-radius-lg">
+                            ${locationNewFormHtml}
+                        </li>
                     </label>
                 </div>`
             );
