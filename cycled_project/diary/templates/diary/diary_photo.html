@@ -18,7 +18,7 @@
 {% block content %}
     <div class="container">
         <div class="row"> 
-            <form method="post" name="photos-form" enctype="multipart/form-data">
+            <form method="post" id="id_photos-form" name="photos-form" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div id="photo_form">
                     <div class="row my-3">
@@ -33,7 +33,7 @@
                 </div>
             </form>
 
-            <form method="post" id="id_diary-new-form" enctype="multipart/form-data">
+            <form method="post" id="id_diary-new-form" enctype="multipart/form-data" onsubmit="return false;">
                 {% csrf_token %}
                 <div id="diary_form">
                     <div id="diary-management">{{ diary_formset.management_form }}</div>
@@ -43,7 +43,9 @@
 
                 <div class="row">
                     <div class="col">
-                        <button type="submit" class="btn btn-primary" name="diary-new-form">作成</button>
+                        <button type="submit" class="btn btn-primary" name="diary-new-form" style="display: none;">
+                            日記作成
+                        </button>
                     </div>
                 </div>
             </form>
@@ -73,18 +75,17 @@
                         {{ field }}
                     {% endif %}
                 {% endfor %}
-                <div class="input-group d-flex flex-row">
-                    {% comment %}                     
-                    <div class="input-group-prepend">
-                        <span for="{{ diary_formset.empty_form.formset.empty_form.label.id_for_label }}" class="form-label input-group-text mb-0">{{ diary_formset.empty_form.formset.empty_form.label.label }}</span>
-                    </div> 
-                    {% endcomment %}
-                    {{ diary_formset.empty_form.formset.empty_form.label}}
+                <div class="input-group d-flex flex-row align-items-center">
+                    <div class="location-list-label-display w-100"></div>
+                    {{ diary_formset.empty_form.formset.empty_form.label|add_class:"w-100 form-control class_locations-label"}}
                 </div>
-                <div class="d-flex align-items-center text-sm">
-                    <i id="id_locations-__prefix__-imagePreview" class="bi bi-image icon-image" alt="icon-image"></i>
+                <div class="d-flex align-items-center">
+                    <button type="button" class="btn p-0" onclick="edit_location(this)">
+                        <i class="bi bi-pencil-square icon-location"></i>
+                    </button> 
+                    <i id="id_locations-__prefix__-imagePreview" class="bi bi-image icon-location" alt="icon-image" style="color: cornflowerblue;"></i>
                     <button type="button" class="btn p-0" onclick="">
-                        <i class="bi bi-trash icon-trash" alt="icon-trash"></i>
+                        <i class="bi bi-trash icon-location" alt="icon-trash" style="color: crimson;"></i>
                     </button> 
                 </div>
             </div>

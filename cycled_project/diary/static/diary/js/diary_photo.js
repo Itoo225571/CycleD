@@ -7,6 +7,9 @@ $(document).ready(function() {
 
     $('#id_images').on('change', function(event) {
         remove_error();
+        $('#id_photos-form').hide();
+        
+        start_loading(false);
         const form = $(this).closest('form');
         const files = event.target.files;
         if (!files) {
@@ -32,9 +35,12 @@ $(document).ready(function() {
                 'X-CSRFToken': getCookie('csrftoken') // DjangoのCSRFトークン
             },
             success: function(response) {
-                console.log(response)
+                console.log(response);
+                remove_loading();
                 if (Object.keys(response.location_new).length === 0){
-                    append_error(`GPS情報を持つ写真や登録されていない写真が選択されませんでした。`)
+                    append_error(`GPS情報を持つ写真や登録されていない写真が選択されませんでした。`);
+                    remove_loading();
+                    $('#id_photos-form').show();
                     return
                 }
                 // 編集するDiaryの数をセット
@@ -53,11 +59,13 @@ $(document).ready(function() {
                     });
                     diaryFormsetBody.append($diaryForm);
                 });
-
+                $('button[name="diary-new-form"]').show();
             },
             error: function(xhr, status, error) {
                 console.error('アップロードに失敗しました。', error);
                 append_error(`ファイルのアップロードに失敗しました。`);
+                remove_loading();
+                $('#id_photos-form').show();
             },
         });
 
@@ -117,7 +125,12 @@ $(document).ready(function() {
                 if (value) {
                     $input.val(value);
                 }
-                if (name !== "label" && name !== "temp_image" && name !==`location-radiobutton-group-${diaryNum}`) {
+                //最初のtextセット
+                if (name === "label") {
+                    var $display = $locationNewForm.find('.location-list-label-display');
+                    $display.text(value);
+                }
+                if (name !== "temp_image" && name !==`location-radiobutton-group-${diaryNum}`) {
                     $input.prop('readonly', true);
                     $input.attr('type', 'hidden');
                 }
@@ -133,7 +146,7 @@ $(document).ready(function() {
                 let dataTransfer = new DataTransfer(); // 新しい DataTransfer オブジェクトを作成
                 dataTransfer.items.add(dTransfer_all.files[location.file_order]);
                 const fileInput = $locationNewForm.find(`#id_locations-${locationNum}-temp_image`)[0];
-                fileInput.files = dataTransfer.files
+                fileInput.files = dataTransfer.files;
             }
 
             // 画像レビュー
@@ -157,7 +170,22 @@ $(document).ready(function() {
             var date = $diaryNewForm.find(`#id_form-${diaryNum}-date`).val();
             $locationNewForm.find(`#id_locations-${locationNum}-date_of_Diary`).val(date);
             locationsFormsetBody.append($locationNewForm);
-            
+
+            // 値変更の監視
+            $locationNewForm.find('.class_locations-label').on('change', function() {
+                var $display = $(this).closest('.locations-form-wrapper').find('.location-list-label-display');
+                var label = $(this).val();
+                $display.text(label);
+            });            
+            // Enterキーが押されたときのイベントリスナー
+            $locationNewForm.find('.class_locations-label').on('keydown', function(e) {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    e.preventDefault();  // Enterキーのデフォルト動作を無効化
+                    edit_location($(this));     // 関数を実行
+                    $(this).trigger('change');  // changeイベントを手動でトリガー
+                }
+            });
+
             return $diaryNewForm
 
             function searchKeys(obj, keyToFind) {
@@ -205,6 +233,41 @@ $(document).ready(function() {
             name: buttonName,
             value: '',
         }).appendTo(this);
-        // this.submit();
+        this.submit();
     });
+});
+
+function edit_location(button){
+    var $labelDisplay = $(button).closest('.locations-form-wrapper').find('.location-list-label-display');
+    var $labelInput = $(button).closest('.locations-form-wrapper').find('.class_locations-label');
+    var $otherLabelDisplays = $('.location-list-label-display').not($labelDisplay);
+    var $otherLabelInputs = $('.class_locations-label').not($labelInput);
+
+    if ($labelDisplay.is(":visible")) {
+        $labelDisplay.hide();
+        $otherLabelDisplays.show();
+
+        showInput($labelInput);
+        hideInput($otherLabelInputs);
+    }
+    else {
+        $labelDisplay.show();
+        hideInput($labelInput);
+    }
+    function hideInput(input){
+        input.prop('readonly', true);
+        input.attr('type', 'hidden');
+        input.hide();
+    }
+    function showInput(input){
+        input.prop('readonly', false);
+        input.attr('type', 'text');
+        input.show();
+    }
+}
+
+$(document).on('keydown', 'input[type="text"]', function(e) {
+    if (e.key === "Enter" || e.keyCode === 13) {
+        e.preventDefault();  // Enterキーのデフォルト動作（submit）を無効化
+    }
 });
