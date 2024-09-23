@@ -10,6 +10,8 @@ from django.core.exceptions import ValidationError
 from diary.models import *
 from pathlib import Path
 import os
+from PIL import Image
+import imagehash
 
 def validate_file_extension(value):
     ext = os.path.splitext(value.name)[1]  # 拡張子を取得
@@ -108,11 +110,10 @@ class AddressSearchForm(forms.Form):
     
 class LocationForm(forms.ModelForm):
     date_of_Diary = forms.DateField(required=False, widget=forms.HiddenInput())
-    temp_image = forms.FileField(required=False,validators=[validate_file_extension])
     class Meta:
         model = Location
         fields = ["lat","lon","state","display","label",
-                  "date_of_Diary","temp_image",]
+                  "date_of_Diary",]
         labels = {
             "label": "表示名",
         }
@@ -120,10 +121,19 @@ class LocationForm(forms.ModelForm):
             "label": "サイクリング先の名前(編集できます)",
         }
     def __init__(self, *args, **kwargs):
-        super(LocationForm, self).__init__(*args, **kwargs)
+        self.request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
         # for _, field in self.fields.items():
         #     field.widget.attrs['class'] = 'form-control'
 
+    def clean_image(self):
+        data = self.cleaned_data["image"]
+        img = Image.open(data)
+        phash = str(imagehash.phash(img))  # pHashを生成
+        phash_all = Location.objects.filter(diary__user=self.request.user).values_list('image_hash', flat=True)
+        if phash in phash_all:
+            self.add_error("image","同じ画像が既に存在します。")
+        return data
     
 LocationFormSet = forms.inlineformset_factory(
         Diary,
@@ -279,7 +289,7 @@ class MultipleFileField(forms.FileField):
         return result
     
 class PhotoForm(forms.Form):
-    images = MultipleFileField(label='写真を選択', required=False)
+    images = MultipleFileField(label='写真を選択', required=False,)
     def __init__(self, *args, **kwargs):
         # viewsでrequestを使用可能にする
         self.request = kwargs.pop('request', None)
