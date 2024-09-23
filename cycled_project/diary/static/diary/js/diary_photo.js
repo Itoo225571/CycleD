@@ -18,10 +18,8 @@ $(document).ready(function() {
         }
 
         let formData = new FormData();
-        const dt = new DataTransfer();
         $.each(files, function(index, file) {
             formData.append('location_files', file);  // サーバー側で受け取るフィールド名
-            dt.items.add(file);
         });
         formData.append(form.prop("name"),'');
 
@@ -55,7 +53,7 @@ $(document).ready(function() {
                     //     $diaryForm = set_locationInDiary($diaryForm, location);
                     // });
                     $.each(oneday_location_list, function(_, location) {
-                        $diaryForm = set_locationInDiary($diaryForm, location, dt);
+                        $diaryForm = set_locationInDiary($diaryForm, location);
                     });
                     diaryFormsetBody.append($diaryForm);
                 });
@@ -96,14 +94,16 @@ $(document).ready(function() {
             return $diaryNewForm
         }
 
-        function set_locationInDiary($diaryNewForm, location, dTransfer_all=null) {
+        function set_locationInDiary($diaryNewForm, location) {
             const diaryNum = $('div.diary-form-wrapper').length;
             const locationsFormsetBody = $diaryNewForm.find(`#id_form-${diaryNum}-location-formset-body`);
             const locationNum = $('div.locations-form-wrapper').length + $diaryNewForm.find('div.locations-form-wrapper').length;
             let locationNewFormHtml = $('#empty-form-location').html().replace(/__prefix__/g, `${locationNum}`);
             let $locationNewForm = $(
                 `<div class="locations-form-wrapper">
-                    <input class="location-radiobutton visually-hidden" type="radio" name="location-radiobutton-group-${diaryNum}" id="id_location-radiobutton-${diaryNum}-${locationNum}">
+                    <input  class="class_location-radiobutton visually-hidden" 
+                            type="radio" name="location-radiobutton-group-${diaryNum}" 
+                            id="id_location-radiobutton-${diaryNum}-${locationNum}">
                     <label for="id_location-radiobutton-${diaryNum}-${locationNum}" class="location-label" style="display: block;">
                         <li class="location-list d-flex justify-content-between border-radius-lg">
                             ${locationNewFormHtml}
@@ -130,32 +130,15 @@ $(document).ready(function() {
                     var $display = $locationNewForm.find('.location-list-label-display');
                     $display.text(value);
                 }
-                if (name !== "temp_image" && name !==`location-radiobutton-group-${diaryNum}`) {
+                if (name !==`location-radiobutton-group-${diaryNum}`) {
                     $input.prop('readonly', true);
                     $input.attr('type', 'hidden');
                 }
-                // file用の調整
-                if (name === "temp_image") {
-                    $input.attr('disabled', true); 
-                    $input.hide(); 
-                }
             });
-
-            // 画像をセット
-            if (dTransfer_all && typeof location.file_order !== 'undefined' && dTransfer_all.files[location.file_order]) { 
-                let dataTransfer = new DataTransfer(); // 新しい DataTransfer オブジェクトを作成
-                dataTransfer.items.add(dTransfer_all.files[location.file_order]);
-                const fileInput = $locationNewForm.find(`#id_locations-${locationNum}-temp_image`)[0];
-                if (fileInput) {  // fileInput が存在するか確認
-                    fileInput.files = dataTransfer.files;
-                }
-            } else {
-                console.error('ファイルが正しく設定されていません。');
-            }
 
             // 画像レビュー
             var $photoReview = $locationNewForm.find(`#id_locations-${locationNum}-imagePreview`);
-            var src = 'data:image/jpeg;base64,' + location.photo_review;
+            var src = window.location.origin + location.image;
             var tooltipContent = `<img src="${src}" class="tooltip-image">`;
             $photoReview.attr('data-bs-toggle', 'tooltip');
             $photoReview.attr('data-bs-html', 'true');
@@ -227,9 +210,6 @@ $(document).ready(function() {
         const locationNum = $('div.locations-form-wrapper').length;
         locationTotalForms.val(locationNum);
 
-        // 画像を変更可能にする
-        $('[id*="temp_image"]').prop('disabled', false);
-
         const submitButton = $(event.originalEvent.submitter); // クリックされたボタンを取得
         const buttonName = submitButton.attr('name');
         $('<input>').attr({
@@ -268,6 +248,11 @@ function edit_location(button){
         input.attr('type', 'text');
         input.show();
     }
+}
+
+function set_thumbnail() {
+    console.log("EE"); // locationを使った処理を書く
+    // ここにサムネイルを設定する処理を追加
 }
 
 $(document).on('keydown', 'input[type="text"]', function(e) {

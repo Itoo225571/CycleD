@@ -1,4 +1,3 @@
-from django.db.models.query import QuerySet
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -8,11 +7,14 @@ from django.db import transaction
 from django.http import JsonResponse
 from django.utils.timezone import now
 from django.core.files import File
+from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from ..forms import *
+from ..forms import DiaryForm,AddressSearchForm,LocationForm,LocationCoordForm,LocationFormSet,DiaryFormSet,PhotoForm
+from ..models import Diary,Location,TempImage
+from django.core.exceptions import ValidationError
 
 from .address import address_search,regeocode
-from subs.photo_info.photo_info import get_photo_info,to_jpeg,to_base64
+from subs.photo_info.photo_info import get_photo_info,to_jpeg,to_pHash
 
 from datetime import timedelta
 import json
@@ -95,7 +97,7 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
     success_url = reverse_lazy("diary:diary")
     model = Diary
 
-    def post(self, request, *args: str, **kwargs: Any) -> HttpResponse:
+    def post(self, request, *args: str, **kwargs) -> HttpResponse:
         if "address-search-form" in request.POST:
             return self.handle_address_search(request)
         elif "address-select-form" in request.POST:
@@ -169,7 +171,7 @@ class DiaryEditView(LoginRequiredMixin,DiaryMixin,generic.UpdateView):
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
-    
+
 class DiaryDeleteView(LoginRequiredMixin, generic.DeleteView):
     template_name = "diary/diary.html"
     success_url = reverse_lazy("diary:diary")
@@ -194,7 +196,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         context['diary_formset'] = DiaryFormSet(queryset=Diary.objects.none())
         return context
     
-    def post(self, request, *args: str, **kwargs: Any) -> HttpResponse:
+    def post(self, request, *args: str, **kwargs) -> HttpResponse:
         if "diary-new-form" in request.POST:
             return self.handle_diary_formset(request)
         elif "photos-form" in request.POST:
@@ -208,23 +210,35 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         for diary in diaries:
             diary.user = self.request.user  # 現在のユーザーを設定
             diary.save()  # 保存
-        for form in location_formset.forms:
-            image_file = form.cleaned_data.get("temp_image")
-            if image_file:
-                image_file = to_jpeg(image_file)
-                # 後で変えるので名前はなんでもいい
-                jpeg_file = InMemoryUploadedFile(
-                    image_file, field_name=None, name='temp.jpg' ,content_type='image/jpg',
-                    size=image_file.getbuffer().nbytes, charset=None
-                )
-                form.instance.image = jpeg_file
-
-            location = form.save(commit=False)
-            date = form.cleaned_data.get("date_of_Diary")
-            # location.diary = diaries[index]
-            location.diary = get_object_or_404(Diary, user=self.request.user, date=date)
-            location.save()
-        return super().form_valid(diary_formset)
+        try:
+            for form in location_formset.forms:
+                id = form.cleaned_data.get("id_of_image")
+                location = form.save(commit=False)
+                if id:
+                    temp_image = get_object_or_404(TempImage, id=id, user=self.request.user)
+                    image = temp_image.image
+                    if image:
+                        image_file = ContentFile(image.read(), name=image.name)
+                        image = InMemoryUploadedFile(
+                            image_file, field_name=None, name=image.name ,content_type='image/jpg',
+                            size=image.file.size, charset=None
+                        )
+                        form.instance.image = image
+                        # location.image = image
+                        temp_image.delete() 
+                date = form.cleaned_data.get("date_of_Diary")
+                location.diary = get_object_or_404(Diary, user=self.request.user, date=date)
+                location.full_clean()  # バリデーションを実行
+                location.save()
+            return super().form_valid(diary_formset)
+        except Exception as e:
+            for diary in diaries:
+                diary.delete()
+            temp_images = TempImage.objects.filter(user=self.request.user)
+            for image in temp_images:
+                image.delete()
+            print(f"Error occurred: {e}")
+            return self.formset_invalid(diary_formset, location_formset)
 
     def formset_invalid(self, diary_formset=None, location_formset=None):
         # コンテキストを取得
@@ -245,12 +259,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         return kwargs
     
     def handle_diary_formset(self, request):
-        # print(request.POST)
-        diary_ids = [id for id in (request.POST.get(f'form-{i}-id') for i in range(int(request.POST.get('form-TOTAL_FORMS')))) if id]
-        instance = Diary.objects.filter(user=request.user, id__in=diary_ids).first()
-        # diary_queryset = Diary.objects.all()
         diary_formset = DiaryFormSet(request.POST, request=request,)
-        # location_formset = LocationFormSet(request.POST,request.FILES,instance=Diary.objects.none().first())
         location_formset = LocationFormSet(request.POST,request.FILES,)
 
         if diary_formset.is_valid() and location_formset.is_valid():
@@ -261,17 +270,27 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
     # 写真データから位置情報を取り出して送る 
     def photos2LocationsAndDate(self,request):
         form = PhotoForm(request.POST,request.FILES)
+        temp_images = TempImage.objects.filter(user=request.user)
+        for image in temp_images:
+            image.delete()
         if form.is_valid():
             files = request.FILES.getlist('location_files')
+            diaries = Diary.objects.filter(user=request.user).prefetch_related('locations')
+            image_hash_list = [location.image_hash for diary in diaries for location in diary.locations.all() if location.image_hash]
             location_dict = {}
             dates = set()
             messages = {}
-            for i,img_file in enumerate(files):
+            for img_file in files:
                 with tempfile.NamedTemporaryFile(delete=True) as temp_file:
                     temp_file.write(img_file.read())
                     temp_file_path = temp_file.name
                     photo_data = get_photo_info(temp_file_path)
-                    photo_review = to_jpeg(temp_file_path,50)
+                    image_file = to_jpeg(temp_file_path)
+                    jpeg_file = InMemoryUploadedFile(
+                        image_file, field_name=None, name='temp.jpg' ,content_type='image/jpg',
+                        size=image_file.getbuffer().nbytes, charset=None
+                    )
+
                 if photo_data.errors:
                     for e in photo_data.errors:
                         print(f"Photo data Eorrors: {e}")
@@ -279,18 +298,32 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                     continue
                 date = photo_data.dt.strftime('%Y-%m-%d')
                 dates.add(date)
+                photo_hash = to_pHash(jpeg_file)
+                if photo_hash in image_hash_list:
+                    messages[date] = '選択した写真と同じものが既に使用されています。'
+                    continue
                 geo = regeocode(photo_data.lat,photo_data.lon)
                 geo_data = geo.model_dump()
+                temp_image = TempImage()
+                temp_image.image = jpeg_file  # 画像ファイルを設定
+                temp_image.user = request.user
+                try:
+                    temp_image.full_clean()
+                    temp_image.save()  # 保存
+                except ValidationError as e:
+                    print("Validation errors:", e.message_dict)
+                    messages['temp_image'] = e.message_dict.values()
+                    continue
 
-                # 仮置きフィールドから写真を取り出すための変数
-                geo_data["file_order"] = i
+                geo_data['image'] = temp_image.image.url
+                geo_data['id_of_image'] = temp_image.id
 
-                geo_data["photo_review"] = to_base64(photo_review)
+                # geo_data["photo_review"] = to_base64(photo_review)
                 location_dict.setdefault(date,[]).append(geo_data)
             
             diary_existed = {}
             location_existed = {}
-            diary_existed_query = Diary.objects.filter(date__in=list(dates), user=request.user).prefetch_related('locations')
+            diary_existed_query = diaries.filter(date__in=list(dates))
             for diary in diary_existed_query:
                 date = diary.date.strftime('%Y-%m-%d')
                 diary_data = {
@@ -301,23 +334,6 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                 diary_existed[date] = diary_data
                 for location in diary.locations.all():
                     location_existed.setdefault(date,[]).append(location.to_dict())
-            
-            # すべての既存ロケーションを (date, lat, lon) のタプルに変換
-            existing_locations = {
-                (diary.date.strftime('%Y-%m-%d'), loc.lat, loc.lon)
-                for diary in diary_existed_query
-                for loc in diary.locations.all()
-            }
-            # location_dict から既存ロケーションと一致するものを削除
-            for date in list(location_dict.keys()):  # キーのリストを作成してループ
-                filtered_geo_data = []
-                for geo_data in location_dict[date]:
-                    if (date, geo_data['lat'], geo_data['lon']) in existing_locations:
-                        messages[date] = '選択した写真と同じものが既に使用されています。'
-                    else:
-                        filtered_geo_data.append(geo_data)
-                location_dict[date] = filtered_geo_data
-            location_dict = {k: v for k, v in location_dict.items() if v not in [None, '', [], {}]}
 
             response = {
                 "location_new": location_dict,
@@ -327,4 +343,5 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
             }
             return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
         else:
+            print('Photo Form Invalid')
             self.form_invalid(form)

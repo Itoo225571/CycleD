@@ -6,12 +6,11 @@ from django import forms
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList
 from django.core.exceptions import ValidationError
+from diary.models import Location,Diary,TempImage
 
-from diary.models import *
 from pathlib import Path
 import os
-from PIL import Image
-import imagehash
+from subs.photo_info.photo_info import to_pHash
 
 def validate_file_extension(value):
     ext = os.path.splitext(value.name)[1]  # 拡張子を取得
@@ -110,10 +109,11 @@ class AddressSearchForm(forms.Form):
     
 class LocationForm(forms.ModelForm):
     date_of_Diary = forms.DateField(required=False, widget=forms.HiddenInput())
+    id_of_image = forms.UUIDField(required=False, widget=forms.HiddenInput())
     class Meta:
         model = Location
         fields = ["lat","lon","state","display","label",
-                  "date_of_Diary",]
+                  "date_of_Diary","id_of_image"]
         labels = {
             "label": "表示名",
         }
@@ -128,8 +128,7 @@ class LocationForm(forms.ModelForm):
 
     def clean_image(self):
         data = self.cleaned_data["image"]
-        img = Image.open(data)
-        phash = str(imagehash.phash(img))  # pHashを生成
+        phash = to_pHash(data)  # pHashを生成
         phash_all = Location.objects.filter(diary__user=self.request.user).values_list('image_hash', flat=True)
         if phash in phash_all:
             self.add_error("image","同じ画像が既に存在します。")
@@ -294,3 +293,4 @@ class PhotoForm(forms.Form):
         # viewsでrequestを使用可能にする
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
+    
