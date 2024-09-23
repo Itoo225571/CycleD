@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from io import BytesIO
 import base64
+import imagehash
 
 class Photo(BaseModel):
     # path: Path
@@ -119,6 +120,11 @@ def to_base64(image):
     image_file = image.read()
     encoded_image = base64.b64encode(image_file).decode('utf-8')
     return encoded_image
+
+def to_pHash(image):
+    img = Image.open(image)
+    phash = imagehash.phash(img)  # pHashを生成
+    return str(phash)  # ハッシュ値を文字列として返す
 
 if __name__=="__main__":
     file = r"/Users/itoudaiki/Downloads/plus.png"

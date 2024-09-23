@@ -1,3 +1,4 @@
+from typing import Collection
 from django.db import models
 from django.forms.models import model_to_dict
 from django.contrib.auth.models import AbstractUser
@@ -6,20 +7,7 @@ from django.dispatch import receiver
 from django.core.exceptions import ValidationError
 
 import uuid
-import imagehash
-from PIL import Image
-
-def upload_to(instance, filename):
-    # 拡張子を取得
-    ext = filename.split(".")[-1]  
-    # ファイル名としてUUIDを生成し、元の拡張子を維持
-    filename = f"{uuid.uuid4()}.{ext}"
-    return f"locations/{filename}"
-
-def generate_phash(image):
-    img = Image.open(image)
-    phash = imagehash.phash(img)  # pHashを生成
-    return str(phash)  # ハッシュ値を文字列として返す
+from subs.photo_info.photo_info import to_pHash
 
 class Location(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
@@ -32,7 +20,7 @@ class Location(models.Model):
     display = models.CharField(max_length=128,blank=True,verbose_name="表示名")
     label = models.CharField(max_length=128,blank=True,verbose_name="ラベル")
     # 画像(日記作成の時につける)
-    image = models.ImageField(upload_to=upload_to,blank=True,null=True,verbose_name="サイクリング画像")
+    image = models.ImageField(upload_to="locations/",blank=True,null=True,verbose_name="サイクリング画像")
     image_hash = models.CharField(max_length=128,blank=True,null=True)
     
     diary = models.ForeignKey('Diary',on_delete=models.CASCADE,null=True,related_name="locations")
@@ -45,8 +33,6 @@ class Location(models.Model):
     
     def to_dict(self):
         location_dict = model_to_dict(self)
-        # if 'id' in location_dict:
-        #     location_dict['location_id'] = location_dict.pop('id')
         # 画像フィールドを URL に変換
         location_dict['image'] = self.image.url if self.image else None
         location_dict['location_id'] = self.id  # 手動で追加
@@ -54,11 +40,29 @@ class Location(models.Model):
     
     def save(self, *args, **kwargs):
         if self.image and not self.image_hash:
-            self.image_hash = generate_phash(self.image)   # pHashの生成
+            self.image_hash = to_pHash(self.image)   # pHashの生成
         super().save(*args, **kwargs)
-
 # モデル削除後に`image`を削除する。
 @receiver(post_delete, sender=Location)
+def delete_file(sender, instance, **kwargs):
+    if instance.image:
+        try:
+            instance.image.delete(False)
+        except Exception as e:
+            print(f"Error deleting file {instance.image.name}: {e}")
+
+def upload_to(instance, filename):
+    # 拡張子を取得
+    ext = filename.split(".")[-1]  
+    # ファイル名としてUUIDを生成し、元の拡張子を維持
+    filename = f"{uuid.uuid4()}.{ext}"
+    return f"temp/{filename}"
+
+class TempImage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    user = models.ForeignKey('User',on_delete=models.CASCADE,)
+    image = models.ImageField(upload_to=upload_to)
+@receiver(post_delete, sender=TempImage)
 def delete_file(sender, instance, **kwargs):
     if instance.image:
         try:

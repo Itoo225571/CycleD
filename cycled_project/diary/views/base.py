@@ -8,7 +8,7 @@ from datetime import datetime,timedelta
 
 class BaseView(generic.TemplateView):
     template_name="diary/base.html"
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["user"]=request.user # type: ignore
         # context["home"] = request.user.home

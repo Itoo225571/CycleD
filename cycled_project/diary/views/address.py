@@ -63,7 +63,7 @@ class AddressHomeView(LoginRequiredMixin,generic.FormView):
             return reverse_lazy('diary:home')
         return super().get_success_url()
 
-    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+    def post(self, request: HttpRequest, *args: str, **kwargs) -> HttpResponse:
         form = None
         # 検索した場合
         if "address-search-form" in request.POST:
@@ -123,7 +123,7 @@ class AddressDiaryNewView(AddressHomeView):
             return reverse_lazy('diary:diary')
         return super().get_success_url()
 
-    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+    def post(self, request: HttpRequest, *args: str, **kwargs) -> HttpResponse:
         form = None
         if "address-search-form" in request.POST:
             form = AddressSearchForm(request.POST)
