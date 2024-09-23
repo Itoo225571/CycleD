@@ -3,9 +3,11 @@ from django.forms.models import model_to_dict
 from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from django.core.exceptions import ValidationError
 
 import uuid
-import hashlib
+import imagehash
+from PIL import Image
 
 def upload_to(instance, filename):
     # 拡張子を取得
@@ -13,6 +15,11 @@ def upload_to(instance, filename):
     # ファイル名としてUUIDを生成し、元の拡張子を維持
     filename = f"{uuid.uuid4()}.{ext}"
     return f"locations/{filename}"
+
+def generate_phash(image):
+    img = Image.open(image)
+    phash = imagehash.phash(img)  # pHashを生成
+    return str(phash)  # ハッシュ値を文字列として返す
 
 class Location(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
@@ -26,6 +33,7 @@ class Location(models.Model):
     label = models.CharField(max_length=128,blank=True,verbose_name="ラベル")
     # 画像(日記作成の時につける)
     image = models.ImageField(upload_to=upload_to,blank=True,null=True,verbose_name="サイクリング画像")
+    image_hash = models.CharField(max_length=128,blank=True,null=True)
     
     diary = models.ForeignKey('Diary',on_delete=models.CASCADE,null=True,related_name="locations")
     
@@ -37,11 +45,17 @@ class Location(models.Model):
     
     def to_dict(self):
         location_dict = model_to_dict(self)
-        if 'id' in location_dict:
-            location_dict['location_id'] = location_dict.pop('id')
+        # if 'id' in location_dict:
+        #     location_dict['location_id'] = location_dict.pop('id')
         # 画像フィールドを URL に変換
         location_dict['image'] = self.image.url if self.image else None
+        location_dict['location_id'] = self.id  # 手動で追加
         return location_dict
+    
+    def save(self, *args, **kwargs):
+        if self.image and not self.image_hash:
+            self.image_hash = generate_phash(self.image)   # pHashの生成
+        super().save(*args, **kwargs)
 
 # モデル削除後に`image`を削除する。
 @receiver(post_delete, sender=Location)
@@ -101,3 +115,16 @@ class Diary(models.Model):
                 name="diary_date_unique"
             ),
         ]
+    
+    # def clean(self):
+    #     super().clean()  # 親クラスのcleanを呼び出す
+    #     user = self.user
+    #     # フォームのインスタンスが新規作成か更新かを判定
+    #     if self.pk:
+    #         # 更新の場合は他のインスタンスの重複をチェック
+    #         if Diary.objects.filter(date=self.date, user=user).exclude(pk=self.pk).exists():
+    #             raise ValidationError(f"この日時の日記はすでに存在します。pk={self.pk}")
+    #     else:
+    #         # 新規作成の場合はすべてのインスタンスの重複をチェック
+    #         if Diary.objects.filter(date=self.date, user=user).exists():
+    #             raise ValidationError("この日時の日記はすでに存在します。")

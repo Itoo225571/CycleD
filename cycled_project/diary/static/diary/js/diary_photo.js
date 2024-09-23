@@ -142,11 +142,15 @@ $(document).ready(function() {
             });
 
             // 画像をセット
-            if (dTransfer_all && typeof location.file_order !== 'undefined') { 
+            if (dTransfer_all && typeof location.file_order !== 'undefined' && dTransfer_all.files[location.file_order]) { 
                 let dataTransfer = new DataTransfer(); // 新しい DataTransfer オブジェクトを作成
                 dataTransfer.items.add(dTransfer_all.files[location.file_order]);
                 const fileInput = $locationNewForm.find(`#id_locations-${locationNum}-temp_image`)[0];
-                fileInput.files = dataTransfer.files;
+                if (fileInput) {  // fileInput が存在するか確認
+                    fileInput.files = dataTransfer.files;
+                }
+            } else {
+                console.error('ファイルが正しく設定されていません。');
             }
 
             // 画像レビュー
