@@ -102,7 +102,7 @@ $(document).ready(function() {
             let $locationNewForm = $(
                 `<div class="locations-form-wrapper">
                     <input  class="class_location-radiobutton visually-hidden" 
-                            type="radio" name="location-radiobutton-group-${diaryNum}" 
+                            type="radio" name="location-radiobutton-group-${diaryNum}"
                             id="id_location-radiobutton-${diaryNum}-${locationNum}">
                     <label for="id_location-radiobutton-${diaryNum}-${locationNum}" class="location-label" style="display: block;">
                         <li class="location-list d-flex justify-content-between border-radius-lg">
@@ -137,20 +137,25 @@ $(document).ready(function() {
             });
 
             // 画像レビュー
-            var $photoReview = $locationNewForm.find(`#id_locations-${locationNum}-imagePreview`);
-            var src = window.location.origin + location.image;
-            var tooltipContent = `<img src="${src}" class="tooltip-image">`;
-            $photoReview.attr('data-bs-toggle', 'tooltip');
-            $photoReview.attr('data-bs-html', 'true');
-            $photoReview.attr('data-bs-placement', 'auto');
-            $photoReview.attr('title', tooltipContent);  // ツールチップの内容を設定
-            var tooltip = new bootstrap.Tooltip($photoReview[0]);  // jQueryからDOM要素を取得
-            $photoReview.show();  // プレビューを表示
+            // var $photoReview = $locationNewForm.find(`#id_locations-${locationNum}-imagePreview`);
+            // var src = window.location.origin + location.image;
+            // var tooltipContent = `<img src="${src}" class="tooltip-image">`;
+            // $photoReview.attr('data-bs-toggle', 'tooltip');
+            // $photoReview.attr('data-bs-html', 'true');
+            // $photoReview.attr('data-bs-placement', 'auto');
+            // $photoReview.attr('title', tooltipContent);  // ツールチップの内容を設定
+            // var tooltip = new bootstrap.Tooltip($photoReview[0]);  // jQueryからDOM要素を取得
+            // $photoReview.show();  // プレビューを表示
 
             // サムネイル
-            var $photoTthumbnail = $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail`);
-            var thumbnail = `<img src="${src}" class="thumbnail-image">`;
-            $photoTthumbnail.html(thumbnail);
+            var LocationNumInDiaryThis = $diaryNewForm.find(`input[name="location-radiobutton-group-${diaryNum}"]`).length; 
+            if (LocationNumInDiaryThis === 0) {
+                var src = window.location.origin + location.image;
+                var $photoTthumbnail = $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail`);
+                var thumbnail = `<img src="${src}" class="thumbnail-image">`;
+                $photoTthumbnail.html(thumbnail);
+                $locationNewForm.find(`input[name="location-radiobutton-group-${diaryNum}"]`).prop('checked', true);
+            }
 
             // diaryが既存の場合，そのIDをセット
             // location.diary = $diaryNewForm.find(`#id_form-${diaryNum}-id`).val();
@@ -171,6 +176,14 @@ $(document).ready(function() {
                     edit_location($(this));     // 関数を実行
                     $(this).trigger('change');  // changeイベントを手動でトリガー
                 }
+            });
+
+            // 選択されたラジオボタンのlocation.imageを表示
+            $locationNewForm.find('.class_location-radiobutton').on('change', function() {
+                var src = window.location.origin + location.image;
+                var $photoTthumbnail = $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail`);
+                var thumbnail = `<img src="${src}" class="thumbnail-image">`;
+                $photoTthumbnail.html(thumbnail);
             });
 
             return $diaryNewForm
@@ -195,6 +208,10 @@ $(document).ready(function() {
                 return result;
             }
         }
+    });
+
+    $('.class_location-radiobutton').on('change', function() {
+
     });
 
     $('#id_diary-new-form').submit(function(event) {  
@@ -248,11 +265,6 @@ function edit_location(button){
         input.attr('type', 'text');
         input.show();
     }
-}
-
-function set_thumbnail() {
-    console.log("EE"); // locationを使った処理を書く
-    // ここにサムネイルを設定する処理を追加
 }
 
 $(document).on('keydown', 'input[type="text"]', function(e) {
