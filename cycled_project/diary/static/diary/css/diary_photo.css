@@ -153,3 +153,10 @@
     opacity: 1;
     transform: translateX(0); /* 元の位置に移動 */
 }
+
+.explanation {
+    font-size: 0.8em;  /* 小さめのフォントサイズ */
+    color: #888;       /* グレー系の薄い色 */
+    margin: 5px 0;     /* 余白を小さく */
+    line-height: 1.4;  /* 行間を少し広めに */
+}
