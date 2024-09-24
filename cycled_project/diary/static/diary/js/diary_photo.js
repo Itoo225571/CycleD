@@ -136,23 +136,12 @@ $(document).ready(function() {
                 }
             });
 
-            // 画像レビュー
-            // var $photoReview = $locationNewForm.find(`#id_locations-${locationNum}-imagePreview`);
-            // var src = window.location.origin + location.image;
-            // var tooltipContent = `<img src="${src}" class="tooltip-image">`;
-            // $photoReview.attr('data-bs-toggle', 'tooltip');
-            // $photoReview.attr('data-bs-html', 'true');
-            // $photoReview.attr('data-bs-placement', 'auto');
-            // $photoReview.attr('title', tooltipContent);  // ツールチップの内容を設定
-            // var tooltip = new bootstrap.Tooltip($photoReview[0]);  // jQueryからDOM要素を取得
-            // $photoReview.show();  // プレビューを表示
-
-            // サムネイル
+            // サムネイルと選択肢の初期設定
             var LocationNumInDiaryThis = $diaryNewForm.find(`input[name="location-radiobutton-group-${diaryNum}"]`).length; 
             if (LocationNumInDiaryThis === 0) {
                 var src = window.location.origin + location.image;
                 var $photoTthumbnail = $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail`);
-                var thumbnail = `<img src="${src}" class="thumbnail-image">`;
+                var thumbnail = `<img loading="lazy" src="${src}" class="thumbnail-image thumbnail-image-loaded">`;
                 $photoTthumbnail.html(thumbnail);
                 $locationNewForm.find(`input[name="location-radiobutton-group-${diaryNum}"]`).prop('checked', true);
             }
@@ -182,8 +171,17 @@ $(document).ready(function() {
             $locationNewForm.find('.class_location-radiobutton').on('change', function() {
                 var src = window.location.origin + location.image;
                 var $photoTthumbnail = $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail`);
-                var thumbnail = `<img src="${src}" class="thumbnail-image">`;
-                $photoTthumbnail.html(thumbnail);
+                // 新しい Image オブジェクトを作成
+                var img = new Image();
+                img.src = src;  // 画像のソースを設定
+                img.className = 'thumbnail-image';  // 初期状態は非表示
+                // 画像が完全に読み込まれたら、アニメーションを実行
+                img.onload = function() {
+                    $photoTthumbnail.html(img);  // 読み込まれた画像をDOMに挿入
+                    setTimeout(function() {
+                        $(img).addClass('thumbnail-image-loaded');  // クラスを追加してアニメーションをトリガー
+                    }, 10);  // 少し遅延を与えることでアニメーションが確実に適用される
+                };
             });
 
             return $diaryNewForm
@@ -216,6 +214,7 @@ $(document).ready(function() {
 
     $('#id_diary-new-form').submit(function(event) {  
         // event.preventDefault();
+        this.classList.toggle('clicked');
         // Diaryの合計数を編集
         const diaryTotalForms = $('#id_form-TOTAL_FORMS');
         const diaryNum = $('div.diary-form-wrapper').length;
