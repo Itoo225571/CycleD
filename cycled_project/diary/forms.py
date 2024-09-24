@@ -195,10 +195,9 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
             "date": "サイクリングに行った日を入力",
             "comment": "",
         }
-        # widgets = {
-        #     # "date": forms.DateInput(attrs={"id": "id_date_field","type": "hidden"}), 
-        #     "date": forms.DateInput(attrs={"id": "id_date_field"}), 
-        # }
+        widgets = {
+            'comment': forms.Textarea(attrs={'rows': 2}),
+        }
 
     def clean_date(self):
         date = self.cleaned_data["date"]

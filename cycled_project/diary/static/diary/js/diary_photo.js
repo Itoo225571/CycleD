@@ -57,6 +57,7 @@ $(document).ready(function() {
                     });
                     diaryFormsetBody.append($diaryForm);
                 });
+                $('.diary-photo-container').show();
                 $('button[name="diary-new-form"]').show();
             },
             error: function(xhr, status, error) {

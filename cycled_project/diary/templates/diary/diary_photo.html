@@ -33,7 +33,7 @@
                 </div>
             </form>
 
-            <div class="row">
+            <div class="row diary-photo-container" style="display: none;">
                 <form method="post" id="id_diary-new-form" enctype="multipart/form-data" onsubmit="return false;">
                     {% csrf_token %}
                     <div class="row" id="diary_form">
@@ -59,6 +59,9 @@
                     </h5>
                     <div class="card-body">
                         <h5 class="card-title col-auto">写真で得られた地域一覧</h5>
+                        <div class="explanation">
+                            <div>地域を選択すると日記のサムネイルを変更できます。</div>
+                        </div>
                         <div class="row">
                             <div id="id_form-__prefix__-thumbnail" class="col diary-thumbnail order-md-2"></div>
                             <ul id="id_form-__prefix__-location-formset-body" class="list-group col-12 col-md-7 order-md-1"></ul>
