@@ -81,3 +81,75 @@
     margin: 0 .5rem;
     font-size: 1.5rem;
 }
+
+/* 作成ボタン */
+.diary-new-button {
+    position: relative;
+    padding: 10px 30px;
+    font-size: 1.5em;
+    border: 3px solid #3498db;
+    background-color: white;
+    color: #3498db;
+    cursor: pointer;
+    overflow: hidden;
+    width: 75%;
+    height: 3em;
+    min-width: 300px;
+    border-radius: 5px;
+    transition: color 1s ease;
+}
+.diary-new-button:hover {
+    color: white; /* ホバー時の文字色を白に */
+    
+}
+
+.diary-new-button::before {
+    content: "\e52f"; /* Unicode for the icon */
+    font-family: 'Material Icons'; /* Use the Material Icons font */
+    position: absolute;
+    left: 30px; /* 初期位置 */
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.5em;
+    transition: left .01s ease;
+    color: #1B85FB;
+}
+
+.diary-new-button:hover::before {
+    left: calc(100% - 30px - 1.5em); /* ホバー時にアイコンを右端に移動 */
+    transition: left 1s ease;
+}
+
+.diary-new-button::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #1B85FB;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: all 1.2s ease;
+    transition-property: transform;
+}
+.diary-new-button:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+.diary-new-button .text {
+    position: relative;
+    z-index: 1;
+}
+
+/* サムネイル */
+.thumbnail-image {
+    opacity: 0;
+    transform: translateX(-20px); /* 左から少しずれた位置 */
+    transition: opacity 0.5s ease, transform 0.5s ease; /* opacityとtranslateXを同時にアニメーション */
+}
+.thumbnail-image-loaded {
+    opacity: 1;
+    transform: translateX(0); /* 元の位置に移動 */
+}

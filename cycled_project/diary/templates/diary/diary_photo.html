@@ -33,22 +33,23 @@
                 </div>
             </form>
 
-            <form method="post" id="id_diary-new-form" enctype="multipart/form-data" onsubmit="return false;">
-                {% csrf_token %}
-                <div id="diary_form">
-                    <div id="diary-management">{{ diary_formset.management_form }}</div>
-                    <div id="location-management">{{ diary_formset.empty_form.formset.management_form }}</div>
-                    <div id="diary-formset-body"></div>
-                </div>
+            <div class="row">
+                <form method="post" id="id_diary-new-form" enctype="multipart/form-data" onsubmit="return false;">
+                    {% csrf_token %}
+                    <div class="row" id="diary_form">
+                        <div id="diary-management">{{ diary_formset.management_form }}</div>
+                        <div id="location-management">{{ diary_formset.empty_form.formset.management_form }}</div>
+                        <div id="diary-formset-body"></div>
+                    </div>
 
-                <div class="row">
-                    <div class="col">
-                        <button type="submit" class="btn btn-primary" name="diary-new-form" style="display: none;">
-                            日記作成
+                    <div class="row py-3 justify-content-center">
+                        <button type="submit" class="diary-new-button" name="diary-new-form" style="display: none;">
+                            <span class="text">日記作成</span>
                         </button>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
+
             <div id="empty-form-diary" style="display:none;">
                 {{ diary_formset.empty_form.date }}
                 {{ diary_formset.empty_form.id }}
@@ -83,7 +84,6 @@
                     <button type="button" class="btn p-0" onclick="edit_location(this)">
                         <i class="bi bi-pencil-square icon-location"></i>
                     </button> 
-                    <i id="id_locations-__prefix__-imagePreview" class="bi bi-image icon-location" alt="icon-image" style="color: cornflowerblue;"></i>
                     <button type="button" class="btn p-0" onclick="">
                         <i class="bi bi-trash icon-location" alt="icon-trash" style="color: crimson;"></i>
                     </button> 
