@@ -98,7 +98,7 @@ def _get_addressCode():
 						if "Excelファイル" in link.text:
 							# ExcelファイルのURLを取得
 							excel_url = link['href']
-							excel_url = urljoin(f"https://www.soumu.go.jp",excel_url)
+							excel_url = urljoin("https://www.soumu.go.jp",excel_url)
 
 							# Excelファイルをダウンロード
 							res = requests.get(excel_url)
@@ -285,7 +285,7 @@ def geocode_gsi(place_name:str):
 	params={
 		"q":place_name
 	}
-	url = f"https://msearch.gsi.go.jp/address-search/AddressSearch"
+	url = "https://msearch.gsi.go.jp/address-search/AddressSearch"
 	try:
 		data_list = _fetch_data(url,params)
 	except Exception as e:
@@ -332,7 +332,7 @@ def geocode_yahoo(place_name,cliant_id):
 		"output": "json",
 		"results": 100,
 	}
-	url = f"https://map.yahooapis.jp/geocode/V1/geoCoder"
+	url = "https://map.yahooapis.jp/geocode/V1/geoCoder"
 	try:
 		data_list = _fetch_data(url,params).get('Feature')
 	except Exception as e:
@@ -343,7 +343,7 @@ def geocode_yahoo(place_name,cliant_id):
 	# もし該当箇所がなかったらlocalでもう一回検索
 	if not data_list:
 		params['sort'] = "-match"
-		url = f"https://map.yahooapis.jp/search/local/V1/localSearch"
+		url = "https://map.yahooapis.jp/search/local/V1/localSearch"
 		try:
 			data_list = _fetch_data(url,params).get('Feature')
 		except Exception as e:
@@ -375,7 +375,7 @@ def geocode_yahoo(place_name,cliant_id):
 	return LocationDataList(geocode_list)
 
 def regeocode_gsi(lat:float,lon:float) -> LocationData:
-	url = f"https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress"
+	url = "https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress"
 	params = {
 		"lat": lat,
 		"lon": lon,
@@ -408,7 +408,7 @@ def regeocode_gsi(lat:float,lon:float) -> LocationData:
 	return loc
 
 def regeocode_HeartTails(lat:float,lon:float) -> LocationData:
-	url = f"https://geoapi.heartrails.com/api/json?method=searchByGeoLocation"
+	url = "https://geoapi.heartrails.com/api/json?method=searchByGeoLocation"
 	params = {
 		"y": lat,
 		"x": lon,
@@ -439,6 +439,41 @@ def regeocode_HeartTails(lat:float,lon:float) -> LocationData:
 	else:
 		raise Exception(f"Error data is empty")
 	return loc
+
+# def regeocode_yahoo(lat:float,lon:float,cliant_id) -> LocationData:
+# 	url = "https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder"
+# 	params = {
+# 		"lat": lat,
+# 		"lon": lon,
+# 		"appid": cliant_id,
+# 		"output": "json",
+# 	}
+# 	try:
+# 		data = _fetch_data(url,params)
+# 	except Exception as e:
+# 		print(f"エラーが発生しました: {e}")
+# 		raise 
+# 	# return data
+# 	if data:
+# 		result = data.get("response")
+# 		result = result.get("location")[0]
+# 		address = {
+# 			"geotype": 'yahoo',
+# 			"name": result.get('town'),
+# 			"state": result.get('prefecture'),
+# 			"city": result.get('city'),
+# 			"locality": result.get('town'),
+# 			"postcode": result.get('postal'),
+# 		}
+# 		location = {
+# 			"lat": lat,
+# 			"lon": lon,
+# 			"address": address,
+# 		}
+# 		loc = LocationData(**location)
+# 	else:
+# 		raise Exception(f"Error data is empty")
+# 	return loc
 
 if __name__=="__main__":
 	# import string
