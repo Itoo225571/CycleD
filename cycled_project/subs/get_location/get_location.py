@@ -440,40 +440,52 @@ def regeocode_HeartTails(lat:float,lon:float) -> LocationData:
 		raise Exception(f"Error data is empty")
 	return loc
 
-# def regeocode_yahoo(lat:float,lon:float,cliant_id) -> LocationData:
-# 	url = "https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder"
-# 	params = {
-# 		"lat": lat,
-# 		"lon": lon,
-# 		"appid": cliant_id,
-# 		"output": "json",
-# 	}
-# 	try:
-# 		data = _fetch_data(url,params)
-# 	except Exception as e:
-# 		print(f"エラーが発生しました: {e}")
-# 		raise 
-# 	# return data
-# 	if data:
-# 		result = data.get("response")
-# 		result = result.get("location")[0]
-# 		address = {
-# 			"geotype": 'yahoo',
-# 			"name": result.get('town'),
-# 			"state": result.get('prefecture'),
-# 			"city": result.get('city'),
-# 			"locality": result.get('town'),
-# 			"postcode": result.get('postal'),
-# 		}
-# 		location = {
-# 			"lat": lat,
-# 			"lon": lon,
-# 			"address": address,
-# 		}
-# 		loc = LocationData(**location)
-# 	else:
-# 		raise Exception(f"Error data is empty")
-# 	return loc
+def regeocode_yahoo(lat:float,lon:float,cliant_id) -> LocationData:
+	url = "https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder"
+	params = {
+		"lat": lat,
+		"lon": lon,
+		"appid": cliant_id,
+		"output": "json",
+	}
+	try:
+		data = _fetch_data(url,params)
+	except Exception as e:
+		print(f"エラーが発生しました: {e}")
+		raise 
+	# return data
+	if data:
+		result = data.get("Feature")[0]
+		element = {item['Level']:item['Name'] for item in result['Property']['AddressElement']}
+		code = {item['Level']:item.get('Code') for item in result['Property']['AddressElement']}
+		code = code.get('city')
+		# address = {
+		# 	"geotype": 'yahoo',
+		# 	"fulladdress": result['Property']['Address'],
+		# 	"state": element.get('prefecture'),
+		# 	"city": element.get('city'),
+		# 	"locality": element.get('oaza'),
+		# 	"code": code,
+		# }
+		address = {
+			"geotype": "yahoo",
+			"search": "",
+			"name":element.get('oaza'),
+			"fulladdress": result['Property']['Address'],
+			"code": code,
+			"matcher":1.0,
+
+			"locality": element.get('oaza'),
+		}
+		location = {
+			"lat": lat,
+			"lon": lon,
+			"address": address,
+		}
+		loc = LocationData(**location)
+	else:
+		raise Exception(f"Error data is empty")
+	return loc
 
 if __name__=="__main__":
 	# import string
@@ -484,7 +496,7 @@ if __name__=="__main__":
 	# 	result = ''.join(random.choices(string.ascii_uppercase, k=5))
 	# 	print(result)
 	# 	geo = geocode_gsi(result)
-	# geo = regeocode_gsi(35.7247454,139.5812729)
-	geo = regeocode_HeartTails(35.7247454,139.5812729)
+	geo = regeocode_gsi(35.7247454,139.5812729)
+	# geo = regeocode_HeartTails(35.7247454,139.5812729)
 	# print(geo)
 	
