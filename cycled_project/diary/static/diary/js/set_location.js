@@ -21,7 +21,7 @@ export function set_location(data,is_exist=false){
             let $input = $(this);
             let name = $input.attr('name');
             name = name.replace(prefix, '');
-            if (name=="id"){
+            if (name==="id"){
                 name = "location_id"
             }
             const value = searchKeys(data,name);

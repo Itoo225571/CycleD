@@ -19,6 +19,7 @@ from subs.photo_info.photo_info import get_photo_info,to_jpeg,to_pHash
 from datetime import timedelta
 import json
 import tempfile
+import uuid
 from pprint import pprint
 
 """______Diary関係______"""
@@ -65,6 +66,10 @@ def sendDairies(request):
 
 # 日記作成・編集共通のクラス
 class DiaryMixin(object):
+    template_name = "diary/calendar.html"
+    form_class = DiaryForm
+    success_url = reverse_lazy("diary:calendar")
+    model = Diary
     def form_valid(self, form):
         form.instance.user = self.request.user
         return  super().form_valid(form)
@@ -72,8 +77,9 @@ class DiaryMixin(object):
     def form_invalid(self, form):
         # エラーをセッションに保存(Editでも使えるようにする)
         self.request.session['diary_form_errors'] = json.dumps(form.errors,ensure_ascii=False)
+        print(form.errors)
         # 新規作成画面にリダイレクト
-        return redirect(reverse_lazy('diary:diary'))
+        return redirect(reverse_lazy('diary:calendar'))
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -83,6 +89,8 @@ class DiaryMixin(object):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # 仮のPK
+        context['mock_uuid'] = uuid.uuid4()
         # セッションからエラー情報を取得
         form_errors = self.request.session.pop('diary_form_errors', None)
         if form_errors:
@@ -91,12 +99,6 @@ class DiaryMixin(object):
         return context
 
 class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
-    template_name = "diary/diary.html"
-    form_class = DiaryForm
-    # formset_class = LocationInDiaryFormSet
-    success_url = reverse_lazy("diary:diary")
-    model = Diary
-
     def post(self, request, *args: str, **kwargs) -> HttpResponse:
         if "address-search-form" in request.POST:
             return self.handle_address_search(request)
@@ -131,18 +133,16 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
     def handle_get_current_address(self, request):
         form = LocationCoordForm(request.POST)
         if form.is_valid():
-            loc = form.save(commit=False)
             lat = form.cleaned_data["lat"]
             lon = form.cleaned_data["lon"]
             # 住所情報の取得
             geo = regeocode(lat, lon)
-            loc.state = geo.address.state
-            loc.display = geo.address.display
-            loc.label = geo.address.label
             response = {
-                "data": loc.to_dict(),
+                "state": geo.address.state,
+                "display": geo.address.display,
+                "label": geo.address.label,
             }
-            return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
+            return JsonResponse({"data": response}, json_dumps_params={'ensure_ascii': False})
         else:
             # 最初のフォームが無効な場合
             return self.form_invalid(form)
@@ -150,19 +150,15 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
     def handle_diary_new(self, request):
         # print(request.POST)
         form = DiaryForm(request.POST, request=request)
+        # print(form)
         if form.is_valid():
             return self.form_valid(form)
         return self.form_invalid(form)
 
 class DiaryEditView(LoginRequiredMixin,DiaryMixin,generic.UpdateView):
     is_update_view = True
-    template_name = "diary/diary.html"
-    form_class = DiaryForm
-    success_url = reverse_lazy("diary:diary")
-    model = Diary
-    
     def get(self, request, *args, **kwargs):
-        return redirect(reverse_lazy('diary:diary'))
+        return redirect(reverse_lazy('diary:calendar'))
 
     def post(self, request, pk):
         diary = get_object_or_404(Diary, pk=pk, user=request.user)
@@ -173,12 +169,12 @@ class DiaryEditView(LoginRequiredMixin,DiaryMixin,generic.UpdateView):
             return self.form_invalid(form)
 
 class DiaryDeleteView(LoginRequiredMixin, generic.DeleteView):
-    template_name = "diary/diary.html"
-    success_url = reverse_lazy("diary:diary")
+    template_name = "diary/calendar.html"
+    success_url = reverse_lazy("diary:calendar")
     model = Diary
     
     def get(self, request, *args, **kwargs):
-        return redirect(reverse_lazy('diary:diary'))
+        return redirect(reverse_lazy('diary:calendar'))
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         # print(f"Deleted object with ID: {self.kwargs['pk']}")
@@ -186,7 +182,7 @@ class DiaryDeleteView(LoginRequiredMixin, generic.DeleteView):
 
 class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
     template_name ="diary/diary_photo.html"
-    success_url = reverse_lazy("diary:diary")
+    success_url = reverse_lazy("diary:calendar")
     redirect_url = reverse_lazy('diary:diary_photo')
     form_class = PhotoForm
 
