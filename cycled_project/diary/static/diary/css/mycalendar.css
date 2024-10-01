@@ -46,6 +46,12 @@
     white-space: pre-line; /* 改行文字を反映させる */
     background-color: transparent; /* 背景を透明にする */
 }
+@media (max-width: 768px) { /* 画面幅768px以下の場合 */
+    #mycalendar .fc-event.holiday {
+      display: none; /* 祝日イベントを非表示に */
+    }
+}
+  
 /* 土曜日 */
 #mycalendar td.fc-day-sat {
     color: blue;
@@ -61,9 +67,11 @@
     justify-content: center;
     cursor: pointer; /* カーソルをポインタに設定 */
 }
-#mycalendar .diary-event .icon-bike{
-    color: #74C0FC;
-    font-size: 2.5em;
+#mycalendar .diary-event .fc-event-title::before {
+    content: "\e52f"; /* Unicode for the icon */
+    font-family: 'Material Icons'; /* Material Iconsフォント */
+    font-size: 24px; /* アイコンのサイズ */
+    color: #1B85FB;
 }
 
 /* モーダルウィンドウ */

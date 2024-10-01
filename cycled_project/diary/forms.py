@@ -140,7 +140,7 @@ LocationFormSet = forms.inlineformset_factory(
         form=LocationForm,
         extra=0,
         can_delete=True,
-        max_num=5*2,
+        max_num=50,
         validate_max=True,
         min_num=1,
         validate_min=True,
@@ -251,7 +251,7 @@ DiaryFormSet = forms.modelformset_factory(
     # can_delete=True,  
     min_num=0,
     validate_min=True,
-    max_num=10,
+    max_num=50,
     validate_max=True,
 )
 

@@ -49,7 +49,6 @@ function addDiariesToCalendar() {
                     className: "diary-event",
 					backgroundColor: 'rgba(255, 255, 255, 0)',  // 背景色を指定
 					borderColor: 'rgba(255, 255, 255, 0)',      // 枠線の色も同じにする場合
-					iconHtml: '<span class="material-icons icon-bike">directions_bike</span>',  // カスタムプロパティとしてアイコンを設定
                 });
             });
             return events;
@@ -179,10 +178,6 @@ document.addEventListener('DOMContentLoaded', function() {
 							tooltip.show();
 						}
 					});
-				}
-				// 自転車アイコンを追加
-				if (e.event.extendedProps.iconHtml) {
-					e.el.querySelector('.fc-event-title').innerHTML = e.event.extendedProps.iconHtml;
 				}
 			},
 			
