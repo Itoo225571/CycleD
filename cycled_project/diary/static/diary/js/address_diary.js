@@ -162,6 +162,12 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault();
         const submitButton = $(event.originalEvent.submitter); // クリックされたボタンを取得
         const buttonName = submitButton.attr('name');
+        const baseUrl = submitButton.data('url');;
+        const diaryPk = MyDiary.getPk();  // MyDiaryオブジェクトから`pk`を取得
+        if(diaryPk && baseUrl){
+            const newActionUrl = baseUrl.replace(mockUuid, diaryPk);
+            $(this).prop('action', newActionUrl);
+        }
         $('<input>').attr({
             type: 'hidden',
             name: buttonName,
@@ -173,10 +179,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const userConfirmed = confirm(confirmMessage);
             if (!userConfirmed) {
                 return; // ユーザーがキャンセルした場合、フォームの送信をキャンセルする
-            }
-            if(MyDiary.getPk()){
-                const newActionUrl = `${initialActionUrl}${MyDiary.getPk()}/delete`;
-                $(this).prop('action', newActionUrl);
             }
         }
 
@@ -228,10 +230,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const userConfirmed = confirm(confirmMessage);
                 if (!userConfirmed) {
                     return; // ユーザーがキャンセルした場合、フォームの送信をキャンセルする
-                }
-                if(MyDiary.getPk()){
-                    const newActionUrl = `${initialActionUrl}${MyDiary.getPk()}/edit`;
-                    $(this).prop('action', newActionUrl);
                 }
             }
         }

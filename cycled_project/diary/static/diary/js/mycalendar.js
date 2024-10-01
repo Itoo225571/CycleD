@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			// ヘッダー設定
 			headerToolbar: {
 				start: "prev",
-				center: "title",
+				center: "",
 				end: "today,next"
 			},
 			height: "auto",
@@ -180,7 +180,14 @@ document.addEventListener('DOMContentLoaded', function() {
 					});
 				}
 			},
-			
+			viewDidMount: function(info) {
+				var title = info.view.title; // 現在のビューのタイトルを取得
+				$('.calendarTitle').text(title); // jQueryでタイトルを設定
+			},
+			datesSet: function(info) {
+				var title = info.view.title; // 現在のビューのタイトルを取得
+				$('.calendarTitle').text(title); // jQueryでタイトルを設定			
+			},			
 		});
 		// モーダル表示の共通処理
 		function showDiaryModalBase(dateStr){

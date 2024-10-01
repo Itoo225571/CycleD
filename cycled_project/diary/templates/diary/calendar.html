@@ -8,7 +8,7 @@
 {% endblock title %}
 
 {% block page_title %}
-    <h2 class="justify-content-md-center text-center">日記メニュー</h2>
+    {% comment %} <h2 class="justify-content-md-center text-center">日記メニュー</h2> {% endcomment %}
 {% endblock page_title %}
 
 {% block extra_css %}
@@ -21,13 +21,8 @@
     <div class="container">
         <div class="justify-content-md-center text-center"> 
             <div class="container-fluid">
-                <div class="row">
-                    <!-- ボタンを右端に配置 -->
-                    <div class="col d-flex justify-content-end">
-                        <button class="button_inverse" onclick="location.href='{% url "diary:diary_photo" %}'">写真から作成</button>
-                    </div>
-                </div>
-                <div class="row my-md-3 my-2"> 
+                <div class="row my-md-3 my-2">
+                    <h2 class="calendarTitle"></h2>
                     <div id="mycalendar"></div>
                 </div>
             </div>
@@ -81,9 +76,15 @@
                             </div> 
                             <div class="row">
                                 <div class="col">
-                                    <button type="submit" id="id-diary-new-button" class="btn btn-primary" name="diary-new-form">作成</button>
-                                    <button type="submit" id="id-diary-edit-button" class="btn btn-primary" name="diary-edit-form">変更</button>
-                                    <button type="submit" id="id-diary-delete-button" class="btn btn-danger" name="diary-delete-form">削除</button>
+                                    <button type="submit" id="id-diary-new-button" class="btn btn-primary" name="diary-new-form">
+                                        作成
+                                    </button>
+                                    <button type="submit" id="id-diary-edit-button" class="btn btn-primary" name="diary-edit-form" data-url="{% url 'diary:diary_edit' mock_uuid %}">
+                                        変更
+                                    </button>
+                                    <button type="submit" id="id-diary-delete-button" class="btn btn-danger" name="diary-delete-form" data-url="{% url 'diary:diary_delete' mock_uuid %}">
+                                        削除
+                                    </button>
                                 </div>
                             </div>
                         </form>
@@ -138,6 +139,7 @@
     <script>
         // DjangoテンプレートタグでURLを埋め込む
         const url_sendDiaries = "{% url 'diary:sendDiaries' %}";
+        const mockUuid = "{{ mock_uuid }}"; 
     </script>
     <script src="{% static 'diary/js/mycalendar.js' %}" type="module"></script>
     <script src="{% static 'diary/js/address_diary.js' %}" type="module"></script>
