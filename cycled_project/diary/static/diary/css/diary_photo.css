@@ -117,7 +117,7 @@
 
 .diary-new-button:hover::before {
     left: calc(100% - 30px - 1.5em); /* ホバー時にアイコンを右端に移動 */
-    transition: left 1s ease;
+    transition: left .3s ease;
 }
 
 .diary-new-button::after {
@@ -131,7 +131,7 @@
     background: #1B85FB;
     transform: scaleX(0);
     transform-origin: right;
-    transition: all 1.2s ease;
+    transition: all .5s ease;
     transition-property: transform;
 }
 .diary-new-button:hover::after {
@@ -147,7 +147,7 @@
 .thumbnail-image {
     opacity: 0;
     transform: translateX(-20px); /* 左から少しずれた位置 */
-    transition: opacity 0.5s ease, transform 0.5s ease; /* opacityとtranslateXを同時にアニメーション */
+    transition: opacity .5s ease, transform 0.5s ease; /* opacityとtranslateXを同時にアニメーション */
 }
 .thumbnail-image-loaded {
     opacity: 1;

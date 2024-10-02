@@ -112,7 +112,7 @@ class LocationForm(forms.ModelForm):
     id_of_image = forms.UUIDField(required=False, widget=forms.HiddenInput())
     class Meta:
         model = Location
-        fields = ["lat","lon","state","display","label",
+        fields = ["lat","lon","state","display","label","is_thumbnail",
                   "date_of_Diary","id_of_image"]
         labels = {
             "label": "表示名",

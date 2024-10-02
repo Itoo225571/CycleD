@@ -20,6 +20,7 @@ from datetime import timedelta
 import json
 import tempfile
 import uuid
+import os
 from pprint import pprint
 
 """______Diary関係______"""
@@ -277,16 +278,22 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
             dates = set()
             messages = {}
             for img_file in files:
-                with tempfile.NamedTemporaryFile(delete=True) as temp_file:
-                    temp_file.write(img_file.read())
-                    temp_file_path = temp_file.name
-                    photo_data = get_photo_info(temp_file_path)
-                    image_file = to_jpeg(temp_file_path)
-                    jpeg_file = InMemoryUploadedFile(
-                        image_file, field_name=None, name='temp.jpg' ,content_type='image/jpg',
-                        size=image_file.getbuffer().nbytes, charset=None
-                    )
-
+                try:
+                    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                        temp_file.write(img_file.read())
+                        temp_file_path = temp_file.name
+                        photo_data = get_photo_info(temp_file_path)
+                        image_file = to_jpeg(temp_file_path)
+                        jpeg_file = InMemoryUploadedFile(
+                            image_file, field_name=None, name='temp.jpg' ,content_type='image/jpg',
+                            size=image_file.getbuffer().nbytes, charset=None
+                        )
+                except Exception as e:
+                    print(f"Error occurred: {e}")
+                finally:
+                    if os.path.exists(temp_file_path):
+                        os.remove(temp_file_path)
+                        
                 if photo_data.errors:
                     for e in photo_data.errors:
                         print(f"Photo data Eorrors: {e}")

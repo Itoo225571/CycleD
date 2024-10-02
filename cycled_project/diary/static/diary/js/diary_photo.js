@@ -145,6 +145,11 @@ $(document).ready(function() {
                 var thumbnail = `<img loading="lazy" src="${src}" class="thumbnail-image thumbnail-image-loaded">`;
                 $photoTthumbnail.html(thumbnail);
                 $locationNewForm.find(`input[name="location-radiobutton-group-${diaryNum}"]`).prop('checked', true);
+
+                var $is_thumbnail = $locationNewForm.find(`#id_locations-${locationNum}-is_thumbnail`);
+                $is_thumbnail.prop('readonly', false);
+                $is_thumbnail.val(true);
+                $is_thumbnail.prop('readonly', true);
             }
 
             // diaryが既存の場合，そのIDをセット
@@ -170,19 +175,30 @@ $(document).ready(function() {
 
             // 選択されたラジオボタンのlocation.imageを表示
             $locationNewForm.find('.class_location-radiobutton').on('change', function() {
-                var src = window.location.origin + location.image;
-                var $photoTthumbnail = $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail`);
-                // 新しい Image オブジェクトを作成
-                var img = new Image();
-                img.src = src;  // 画像のソースを設定
-                img.className = 'thumbnail-image';  // 初期状態は非表示
-                // 画像が完全に読み込まれたら、アニメーションを実行
-                img.onload = function() {
-                    $photoTthumbnail.html(img);  // 読み込まれた画像をDOMに挿入
-                    setTimeout(function() {
-                        $(img).addClass('thumbnail-image-loaded');  // クラスを追加してアニメーションをトリガー
-                    }, 10);  // 少し遅延を与えることでアニメーションが確実に適用される
-                };
+                var isChecked = $(this).is(':checked'); // 変更されたラジオボタンがONかどうかを確認
+                var $is_thumbnail = $locationNewForm.find(`#id_locations-${locationNum}-is_thumbnail`);
+                $is_thumbnail.prop('readonly', false);
+                if (isChecked) {
+                    var src = window.location.origin + location.image;
+                    var $photoTthumbnail = $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail`);
+                    // 新しい Image オブジェクトを作成
+                    var img = new Image();
+                    img.src = src;  // 画像のソースを設定
+                    img.className = 'thumbnail-image';  // 初期状態は非表示
+                    // 画像が完全に読み込まれたら、アニメーションを実行
+                    img.onload = function() {
+                        $photoTthumbnail.html(img);  // 読み込まれた画像をDOMに挿入
+                        setTimeout(function() {
+                            $(img).addClass('thumbnail-image-loaded');  // クラスを追加してアニメーションをトリガー
+                        }, 10);  // 少し遅延を与えることでアニメーションが確実に適用される
+                    };
+
+                    $is_thumbnail.val(true);
+                }
+                else {
+                    $is_thumbnail.val(false);
+                }
+                $is_thumbnail.prop('readonly', true);
             });
 
             return $diaryNewForm
@@ -207,10 +223,6 @@ $(document).ready(function() {
                 return result;
             }
         }
-    });
-
-    $('.class_location-radiobutton').on('change', function() {
-
     });
 
     $('#id_diary-new-form').submit(function(event) {  
