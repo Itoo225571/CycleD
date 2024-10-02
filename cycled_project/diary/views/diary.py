@@ -51,14 +51,7 @@ def sendDairies(request):
                 "locations": []
             }
             for location in diary.locations.all():
-                location_data = {
-                    "location_id": location.id,
-                    "lat": location.lat,
-                    "lon": location.lon,
-                    "state": location.state,
-                    "display": location.display,
-                    "label": location.label,
-                }
+                location_data = location.to_dict()
                 diary_data["locations"].append(location_data)
             diaries_data.append(diary_data)
         return JsonResponse(diaries_data, safe=False)
@@ -134,24 +127,25 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
     def handle_get_current_address(self, request):
         form = LocationCoordForm(request.POST)
         if form.is_valid():
+            loc = form.save(commit=False)
             lat = form.cleaned_data["lat"]
             lon = form.cleaned_data["lon"]
             # 住所情報の取得
             geo = regeocode(lat, lon)
+            loc.state = geo.address.state
+            loc.display = geo.address.display
+            loc.label = geo.address.label
+            loc.id = None
             response = {
-                "state": geo.address.state,
-                "display": geo.address.display,
-                "label": geo.address.label,
+                "data": loc.to_dict(),
             }
-            return JsonResponse({"data": response}, json_dumps_params={'ensure_ascii': False})
+            return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
         else:
             # 最初のフォームが無効な場合
             return self.form_invalid(form)
 
     def handle_diary_new(self, request):
-        # print(request.POST)
         form = DiaryForm(request.POST, request=request)
-        # print(form)
         if form.is_valid():
             return self.form_valid(form)
         return self.form_invalid(form)
