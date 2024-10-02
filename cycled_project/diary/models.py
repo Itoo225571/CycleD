@@ -2,9 +2,10 @@ from typing import Collection
 from django.db import models
 from django.forms.models import model_to_dict
 from django.contrib.auth.models import AbstractUser
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete,pre_delete
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist
 
 import uuid
 from subs.photo_info.photo_info import to_pHash
@@ -41,6 +42,13 @@ class Location(models.Model):
     def save(self, *args, **kwargs):
         if self.image and not self.image_hash:
             self.image_hash = to_pHash(self.image)   # pHashの生成
+        # is_thumbnailがTrueの場合、同じDiary内の他のLocationのis_thumbnailをFalseにする
+        if self.is_thumbnail:
+            # Diaryを取得
+            diary = self.diary
+            if diary:
+                # 同じDiary内の他のLocationのis_thumbnailをFalseにする
+                Location.objects.filter(diary=diary).exclude(id=self.id).update(is_thumbnail=False)
         super().save(*args, **kwargs)
 # モデル削除後に`image`を削除する。
 @receiver(post_delete, sender=Location)
@@ -50,6 +58,20 @@ def delete_file(sender, instance, **kwargs):
             instance.image.delete(False)
         except Exception as e:
             print(f"Error deleting file {instance.image.name}: {e}")
+# モデル削除直前に他にis_thumbnailを移動
+@receiver(pre_delete, sender=Location)
+def set_thumbnail_on_delete(sender, instance, **kwargs):
+    instance.refresh_from_db()
+    try:
+        diary = instance.diary
+        if instance.is_thumbnail:
+            if diary:
+                new_thumbnail_location = Location.objects.filter(diary=diary).exclude(id=instance.id).first()
+                if new_thumbnail_location:
+                    new_thumbnail_location.is_thumbnail = True
+                    new_thumbnail_location.save()
+    except ObjectDoesNotExist:
+        return
 
 def upload_to(instance, filename):
     # 拡張子を取得
