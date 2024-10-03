@@ -13,29 +13,41 @@ from ..forms import *
 from subs.get_location.get_location import geocode_gsi,geocode_yahoo,regeocode_gsi,regeocode_HeartTails,ResponseEmptyError
 
 """______Address関係______"""
+# requestはレート制限に必要
 @ratelimit(key='user', rate='100/d', method='POST')
+def geocode_gsi_ratelimit(request,keyword):
+    return geocode_gsi(keyword)
+@ratelimit(key='user', rate='100/d', method='POST')
+def geocode_yahoo_ratelimit(request,keyword,id=settings.CLIANT_ID_YAHOO):
+    return geocode_yahoo(keyword,id)
+
 def geocode(request,keyword):
     try:
-        geocode_data_list = geocode_gsi(keyword)
+        geocode_data_list = geocode_gsi_ratelimit(request,keyword)
     except Exception as e:
         try:
-            geocode_data_list = geocode_yahoo(keyword,settings.CLIANT_ID_YAHOO)
+            geocode_data_list = geocode_yahoo_ratelimit(request,keyword)
         except Exception as e:
             print(f"その他のエラーが発生しました: {e}")
             raise
-
     response = {
         "data_list": geocode_data_list.model_dump(),
     }
     return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
 
-@ratelimit(key='user', rate='100/m', method='POST')
+@ratelimit(key='user', rate='100/d', method='POST')
+def regeocode_gsi_ratelimit(request,lat,lon):
+    return regeocode_gsi(lat,lon)
+@ratelimit(key='user', rate='100/d', method='POST')
+def regeocode_HeartTails_ratelimit(request,lat,lon):
+    return regeocode_HeartTails(lat,lon)
+
 def regeocode(request,lat,lon):
     try:
-        geocode_data = regeocode_gsi(lat,lon)
+        geocode_data = regeocode_gsi_ratelimit(request,lat,lon)
     except Exception as e:
         try:
-            geocode_data = regeocode_HeartTails(lat,lon)
+            geocode_data = regeocode_HeartTails_ratelimit(request,lat,lon)
         except Exception as e:
             print(f"その他のエラーが発生しました: {e}")
             raise
