@@ -184,7 +184,6 @@ class ResponseEmptyError(ValueError):
 
 # リクエストを送ってその返事をもらう関数
 def _fetch_data(url,params,timeout=5.0):
-	sleep(1)
 	try:
 		res = requests.get(url,params,timeout=timeout)
 		res.raise_for_status()  # HTTPエラーチェック

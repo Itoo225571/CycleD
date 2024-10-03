@@ -14,8 +14,7 @@ from subs.get_location.get_location import geocode_gsi,geocode_yahoo,regeocode_g
 
 """______Address関係______"""
 @ratelimit(key='user', rate='100/d', method='POST')
-def address_search(request,form):
-    keyword = form.cleaned_data.get('keyword')
+def geocode(request,keyword):
     try:
         geocode_data_list = geocode_gsi(keyword)
     except Exception as e:
@@ -30,7 +29,8 @@ def address_search(request,form):
     }
     return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
 
-def regeocode(lat,lon):
+@ratelimit(key='user', rate='100/m', method='POST')
+def regeocode(request,lat,lon):
     try:
         geocode_data = regeocode_gsi(lat,lon)
     except Exception as e:
@@ -70,7 +70,8 @@ class AddressHomeView(LoginRequiredMixin,generic.FormView):
             form = AddressSearchForm(request.POST)
             if form.is_valid():
                 if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                    return address_search(request,form)
+                    keyword = form.cleaned_data.get('keyword')
+                    return geocode(request,keyword)
                 return self.form_valid(form)
             return self.form_invalid(form)
             
@@ -97,7 +98,7 @@ class AddressHomeView(LoginRequiredMixin,generic.FormView):
                 
                 lat = form.cleaned_data["lat"]
                 lon = form.cleaned_data["lon"]
-                geo = regeocode(lat,lon)
+                geo = regeocode(request,lat,lon)
                 loc.state = geo.address.state
                 loc.display = geo.address.display
                 # Homeの場合Trueにする
@@ -129,7 +130,8 @@ class AddressDiaryNewView(AddressHomeView):
             form = AddressSearchForm(request.POST)
             if form.is_valid():
                 if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                    return address_search(request,form)
+                    keyword = form.cleaned_data.get('keyword')
+                    return geocode(request,keyword)
                 return self.form_valid(form)
             return self.form_invalid(form)
             
@@ -148,7 +150,7 @@ class AddressDiaryNewView(AddressHomeView):
                 
                 lat = form.cleaned_data["lat"]
                 lon = form.cleaned_data["lon"]
-                geo = regeocode(lat,lon)
+                geo = regeocode(request,lat,lon)
                 loc.state = geo.address.state
                 loc.display = geo.address.display
                 loc.label = geo.address.label
