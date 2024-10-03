@@ -272,7 +272,7 @@ class MultipleFileField(forms.FileField):
     def clean(self, data, initial=None):
         single_file_clean = super().clean
         allowed_mime_types = ['image/jpeg', 'image/png', 'image/gif', 'image/heic',]
-        if isinstance(data, (list, tuple)):
+        if isinstance(data, (list, tuple)):         
             result = []
             for d in data:
                 file = single_file_clean(d, initial)

@@ -13,7 +13,7 @@ from ..forms import DiaryForm,AddressSearchForm,LocationForm,LocationCoordForm,L
 from ..models import Diary,Location,TempImage
 from django.core.exceptions import ValidationError
 
-from .address import address_search,regeocode
+from .address import geocode,regeocode
 from subs.photo_info.photo_info import get_photo_info,to_jpeg,to_pHash
 
 from datetime import timedelta
@@ -114,7 +114,8 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
         form = AddressSearchForm(request.POST)
         if form.is_valid():
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return address_search(request,form)
+                keyword = form.cleaned_data.get('keyword')
+                return geocode(request,keyword)
             # return self.form_valid(form)
         return self.form_invalid(form)
 
@@ -131,7 +132,7 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
             lat = form.cleaned_data["lat"]
             lon = form.cleaned_data["lon"]
             # 住所情報の取得
-            geo = regeocode(lat, lon)
+            geo = regeocode(request,lat, lon)
             loc.state = geo.address.state
             loc.display = geo.address.display
             loc.label = geo.address.label
@@ -299,7 +300,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                 if photo_hash in image_hash_list:
                     messages[date] = '選択した写真と同じものが既に使用されています。'
                     continue
-                geo = regeocode(photo_data.lat,photo_data.lon)
+                geo = regeocode(request,photo_data.lat,photo_data.lon)
                 geo_data = geo.model_dump()
                 temp_image = TempImage()
                 temp_image.image = jpeg_file  # 画像ファイルを設定
