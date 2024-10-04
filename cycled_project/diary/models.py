@@ -84,6 +84,7 @@ class TempImage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     user = models.ForeignKey('User',on_delete=models.CASCADE,)
     image = models.ImageField(upload_to=upload_to)
+    date_created = models.DateTimeField(verbose_name="作成日時",auto_now_add=True,null=True)
 @receiver(post_delete, sender=TempImage)
 def delete_file(sender, instance, **kwargs):
     if instance.image:

@@ -458,14 +458,6 @@ def regeocode_yahoo(lat:float,lon:float,cliant_id) -> LocationData:
 		element = {item['Level']:item['Name'] for item in result['Property']['AddressElement']}
 		code = {item['Level']:item.get('Code') for item in result['Property']['AddressElement']}
 		code = code.get('city')
-		# address = {
-		# 	"geotype": 'yahoo',
-		# 	"fulladdress": result['Property']['Address'],
-		# 	"state": element.get('prefecture'),
-		# 	"city": element.get('city'),
-		# 	"locality": element.get('oaza'),
-		# 	"code": code,
-		# }
 		address = {
 			"geotype": "yahoo",
 			"search": "",

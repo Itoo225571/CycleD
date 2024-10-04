@@ -226,9 +226,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         except Exception as e:
             for diary in diaries:
                 diary.delete()
-            temp_images = TempImage.objects.filter(user=self.request.user)
-            for image in temp_images:
-                image.delete()
+            TempImage.objects.filter(user=self.request.user).delete()
             print(f"Error occurred: {e}")
             return self.formset_invalid(diary_formset, location_formset)
 
@@ -262,14 +260,12 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
     # 写真データから位置情報を取り出して送る 
     def photos2LocationsAndDate(self,request):
         form = PhotoForm(request.POST,request.FILES)
-        temp_images = TempImage.objects.filter(user=request.user)
-        for image in temp_images:
-            image.delete()
+        TempImage.objects.filter(user=request.user).delete()
         if form.is_valid():
             files = request.FILES.getlist('location_files')
             diaries = Diary.objects.filter(user=request.user).prefetch_related('locations')
             image_hash_list = [location.image_hash for diary in diaries for location in diary.locations.all() if location.image_hash]
-            location_dict = {}
+            location_new = {}
             dates = set()
             messages = {}
             for img_file in files:
@@ -300,8 +296,6 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                 if photo_hash in image_hash_list:
                     messages[date] = '選択した写真と同じものが既に使用されています。'
                     continue
-                geo = regeocode(request,photo_data.lat,photo_data.lon)
-                geo_data = geo.model_dump()
                 temp_image = TempImage()
                 temp_image.image = jpeg_file  # 画像ファイルを設定
                 temp_image.user = request.user
@@ -313,11 +307,12 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                     messages['temp_image'] = e.message_dict.values()
                     continue
 
+                geo = regeocode(request,photo_data.lat,photo_data.lon)
+                geo_data = geo.model_dump()
+
                 geo_data['image'] = temp_image.image.url
                 geo_data['id_of_image'] = temp_image.id
-
-                # geo_data["photo_review"] = to_base64(photo_review)
-                location_dict.setdefault(date,[]).append(geo_data)
+                location_new.setdefault(date,[]).append(geo_data)
             
             diary_existed = {}
             location_existed = {}
@@ -334,7 +329,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                     location_existed.setdefault(date,[]).append(location.to_dict())
 
             response = {
-                "location_new": location_dict,
+                "location_new": location_new,
                 "diary_existed": diary_existed,
                 "location_existed": location_existed,
                 "message": list(messages),
