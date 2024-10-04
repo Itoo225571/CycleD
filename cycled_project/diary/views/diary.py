@@ -23,6 +23,9 @@ import uuid
 import os
 from pprint import pprint
 
+import asyncio
+from asgiref.sync import sync_to_async
+
 """______Diary関係______"""
 class DiaryListView(LoginRequiredMixin,generic.ListView):
     template_name = "diary/diary_list.html"
@@ -191,8 +194,8 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
     def post(self, request, *args: str, **kwargs) -> HttpResponse:
         if "diary-new-form" in request.POST:
             return self.handle_diary_formset(request)
-        elif "photos-form" in request.POST:
-            return self.photos2LocationsAndDate(request)
+        # elif "photos-form" in request.POST:
+        #     return self.photos2LocationsAndDate(request)
         else:
             print(f"post name error: {request.POST}")
             return self.form_invalid(None)
@@ -257,17 +260,36 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         else:  
             return self.formset_invalid(diary_formset,location_formset)
 
-    # 写真データから位置情報を取り出して送る 
-    def photos2LocationsAndDate(self,request):
-        form = PhotoForm(request.POST,request.FILES)
-        TempImage.objects.filter(user=request.user).delete()
+async def regeocode_async(request, img_data):
+    geo = await sync_to_async(regeocode)(request, img_data.lat, img_data.lon)
+    geo_data = geo.model_dump()
+    geo_data['image'] = img_data.image.url
+    geo_data['id_of_image'] = img_data.id
+    geo_data['date'] = img_data.date  # 日付も格納
+    return geo_data
+
+# 写真データから位置情報を取り出して送る 
+async def photos2Locations(request):
+    if request.method == 'POST':
+        form = PhotoForm(request.POST, request.FILES)
+        
+        # ユーザーのTempImageを削除
+        await sync_to_async(lambda: TempImage.objects.filter(user=request.user).delete(), thread_sensitive=False)()
+        
         if form.is_valid():
             files = request.FILES.getlist('location_files')
-            diaries = Diary.objects.filter(user=request.user).prefetch_related('locations')
-            image_hash_list = [location.image_hash for diary in diaries for location in diary.locations.all() if location.image_hash]
+            diaries = await sync_to_async(Diary.objects.filter)(user=request.user)
+            image_hash_list = [
+                location.image_hash 
+                async for diary in diaries 
+                async for location in await sync_to_async(diary.locations.all)() 
+                if location.image_hash
+            ]
             location_new = {}
             dates = set()
             messages = {}
+            temp_images = []
+
             for img_file in files:
                 try:
                     with tempfile.NamedTemporaryFile(delete=False) as temp_file:
@@ -276,7 +298,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                         photo_data = get_photo_info(temp_file_path)
                         image_file = to_jpeg(temp_file_path)
                         jpeg_file = InMemoryUploadedFile(
-                            image_file, field_name=None, name='temp.jpg' ,content_type='image/jpg',
+                            image_file, field_name=None, name='temp.jpg', content_type='image/jpg',
                             size=image_file.getbuffer().nbytes, charset=None
                         )
                 except Exception as e:
@@ -284,39 +306,51 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                 finally:
                     if os.path.exists(temp_file_path):
                         os.remove(temp_file_path)
-                        
+
                 if photo_data.errors:
                     for e in photo_data.errors:
-                        print(f"Photo data Eorrors: {e}")
+                        print(f"Photo data Errors: {e}")
                         messages['none_field'] = e
                     continue
+                
                 date = photo_data.dt.strftime('%Y-%m-%d')
                 dates.add(date)
                 photo_hash = to_pHash(jpeg_file)
+                
                 if photo_hash in image_hash_list:
                     messages[date] = '選択した写真と同じものが既に使用されています。'
                     continue
-                temp_image = TempImage()
-                temp_image.image = jpeg_file  # 画像ファイルを設定
-                temp_image.user = request.user
+
+                # TempImageの作成を非同期で行う
+                temp_image = await sync_to_async(TempImage.objects.create)(
+                    image=jpeg_file,
+                    user=request.user,
+                    lat=photo_data.lat,
+                    lon=photo_data.lon,
+                    date=date,
+                )
+
                 try:
-                    temp_image.full_clean()
-                    temp_image.save()  # 保存
+                    await sync_to_async(temp_image.full_clean)()  # バリデーションを実行
+                    await sync_to_async(temp_image.save)()  # 保存
                 except ValidationError as e:
                     print("Validation errors:", e.message_dict)
                     messages['temp_image'] = e.message_dict.values()
                     continue
+                
+                temp_images.append(temp_image)
 
-                geo = regeocode(request,photo_data.lat,photo_data.lon)
-                geo_data = geo.model_dump()
+            # 非同期タスクを作成
+            tasks = [regeocode_async(request, temp_image) for temp_image in temp_images]
+            geo_data_list = await asyncio.gather(*tasks)
 
-                geo_data['image'] = temp_image.image.url
-                geo_data['id_of_image'] = temp_image.id
-                location_new.setdefault(date,[]).append(geo_data)
+            for geo_data in geo_data_list:
+                location_new.setdefault(geo_data['date'], []).append(geo_data)
             
             diary_existed = {}
             location_existed = {}
-            diary_existed_query = diaries.filter(date__in=list(dates))
+            diary_existed_query = await sync_to_async(list)(Diary.objects.filter(user=request.user, date__in=list(dates)))
+
             for diary in diary_existed_query:
                 date = diary.date.strftime('%Y-%m-%d')
                 diary_data = {
@@ -325,8 +359,9 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                     'comment': diary.comment,
                 }
                 diary_existed[date] = diary_data
-                for location in diary.locations.all():
-                    location_existed.setdefault(date,[]).append(location.to_dict())
+                locations = await sync_to_async(diary.locations.all)()
+                for location in locations:
+                    location_existed.setdefault(date, []).append(location.to_dict())
 
             response = {
                 "location_new": location_new,
@@ -337,4 +372,10 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
             return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
         else:
             print('Photo Form Invalid')
-            self.form_invalid(form)
+            return JsonResponse({'error': '無効なフォームです。'}, status=400)
+    else:
+        context = {
+            'photo_form': PhotoForm(),
+            'diary_formset': DiaryFormSet(queryset=Diary.objects.none()),
+        }
+        return render(request, 'diary/diary_photo.html', context)

@@ -18,14 +18,14 @@ $(document).ready(function() {
         }
 
         let formData = new FormData();
-        $.each(files, function(index, file) {
+        $.each(files, function(_, file) {
             formData.append('location_files', file);  // サーバー側で受け取るフィールド名
         });
         formData.append(form.prop("name"),'');
 
         $.ajax({
-            url: form.prop("action"),  // Djangoでファイルを処理するためのURL
-            type: form.prop("method"),
+            url: url_photos2Locations,  // Djangoでファイルを処理するためのURL
+            type: 'POST',
             data: formData,
             processData: false,  // ファイルを送信するため、jQueryがデータを処理しないように設定
             contentType: false,  // ファイルのMIMEタイプを自動で設定
