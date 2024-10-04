@@ -25,6 +25,7 @@ from pprint import pprint
 
 import asyncio
 from asgiref.sync import sync_to_async
+from concurrent.futures import ThreadPoolExecutor
 
 """______Diary関係______"""
 class DiaryListView(LoginRequiredMixin,generic.ListView):
@@ -268,14 +269,23 @@ async def regeocode_async(request, img_data):
     geo_data['date'] = img_data.date  # 日付も格納
     return geo_data
 
+executor = ThreadPoolExecutor(max_workers=4)
+
+async def to_jpeg_async(file):
+    loop = asyncio.get_event_loop()
+    image_file = await loop.run_in_executor(executor, to_jpeg, file)
+    jpeg_file = InMemoryUploadedFile(
+        image_file, field_name=None, name='temp.jpg', content_type='image/jpg',
+        size=image_file.getbuffer().nbytes, charset=None
+    )
+    return jpeg_file
+
 # 写真データから位置情報を取り出して送る 
 async def photos2Locations(request):
     if request.method == 'POST':
         form = PhotoForm(request.POST, request.FILES)
-        
         # ユーザーのTempImageを削除
         await sync_to_async(lambda: TempImage.objects.filter(user=request.user).delete(), thread_sensitive=False)()
-        
         if form.is_valid():
             files = request.FILES.getlist('location_files')
             diaries = await sync_to_async(Diary.objects.filter)(user=request.user)
@@ -289,6 +299,8 @@ async def photos2Locations(request):
             dates = set()
             messages = {}
             temp_images = []
+            temp_files = []
+            photo_data_list = []
 
             for img_file in files:
                 try:
@@ -296,40 +308,40 @@ async def photos2Locations(request):
                         temp_file.write(img_file.read())
                         temp_file_path = temp_file.name
                         photo_data = get_photo_info(temp_file_path)
-                        image_file = to_jpeg(temp_file_path)
-                        jpeg_file = InMemoryUploadedFile(
-                            image_file, field_name=None, name='temp.jpg', content_type='image/jpg',
-                            size=image_file.getbuffer().nbytes, charset=None
-                        )
+                        photo_hash = to_pHash(temp_file_path)
+                        if photo_hash in image_hash_list:
+                            messages[date] = '選択した写真と同じものが既に使用されています。'
+                            continue
+                        if photo_data.errors:
+                            for e in photo_data.errors:
+                                print(f"Photo data Errors: {e}")
+                                messages['none_field'] = e
+                            continue
+                        temp_files.append(temp_file_path)
+                        photo_data_list.append(photo_data)
+                        
                 except Exception as e:
                     print(f"Error occurred: {e}")
-                finally:
-                    if os.path.exists(temp_file_path):
-                        os.remove(temp_file_path)
-
-                if photo_data.errors:
-                    for e in photo_data.errors:
-                        print(f"Photo data Errors: {e}")
-                        messages['none_field'] = e
-                    continue
                 
                 date = photo_data.dt.strftime('%Y-%m-%d')
                 dates.add(date)
-                photo_hash = to_pHash(jpeg_file)
-                
-                if photo_hash in image_hash_list:
-                    messages[date] = '選択した写真と同じものが既に使用されています。'
-                    continue
 
+            tasks = [to_jpeg_async(temp_file) for temp_file in temp_files]
+            jpeg_files = await asyncio.gather(*tasks) 
+
+            for temp_file in temp_files:
+                if os.path.exists(temp_file):
+                    os.remove(temp_file)
+
+            for jpeg_file, photo_data in zip(jpeg_files, photo_data_list):
                 # TempImageの作成を非同期で行う
                 temp_image = await sync_to_async(TempImage.objects.create)(
                     image=jpeg_file,
                     user=request.user,
                     lat=photo_data.lat,
                     lon=photo_data.lon,
-                    date=date,
+                    date=photo_data.dt.strftime('%Y-%m-%d'),
                 )
-
                 try:
                     await sync_to_async(temp_image.full_clean)()  # バリデーションを実行
                     await sync_to_async(temp_image.save)()  # 保存
