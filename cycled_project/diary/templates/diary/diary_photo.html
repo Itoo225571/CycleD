@@ -99,6 +99,10 @@
 {% block extra_js %}
     <script src="{% static 'diary/js/getCookie.js' %}"></script>
     <script src="{% static 'diary/js/loading_overlay.js' %}"></script>
+    <script>
+        // DjangoテンプレートタグでURLを埋め込む
+        const url_photos2Locations = "{% url 'diary:photos2Locations' %}";
+    </script>
     <script src="{% static 'diary/js/diary_photo.js' %}"></script>
     
 {% endblock %}
