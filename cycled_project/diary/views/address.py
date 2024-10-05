@@ -24,24 +24,20 @@ def geocode_gsi_ratelimit(request,keyword):
 def geocode_yahoo_ratelimit(request,keyword,id=settings.CLIANT_ID_YAHOO):
     return geocode_yahoo(keyword,id)
 
-last_func_index_geocode = 0
 def geocode(request,keyword,count=0):
-    global last_func_index_geocode
     func_list = [geocode_gsi_ratelimit, geocode_yahoo_ratelimit,]
     try:
-        geocode_data_list = func_list[last_func_index_geocode](request,keyword)
+        geocode_data_list = func_list[count](request,keyword)
         return geocode_data_list.model_dump()
     except Exception as e:
         count += 1
-        current_func = func_list[last_func_index_geocode].__name__  # 現在の関数名を取得
+        current_func = func_list[count].__name__  # 現在の関数名を取得
         logging.error(f"{current_func}が失敗しました: {e}, リクエスト: {request}, 検索値: {keyword}")
         if count < len(func_list):
             return geocode(request,keyword,count)
         else:
             logging.error(f"すべてのregeocodeが失敗しました")
             raise
-    finally:
-        last_func_index_geocode = (last_func_index_geocode + 1) % len(func_list)
 
 @ratelimit(key='user', rate='100/d', method='POST')
 def regeocode_gsi_ratelimit(request,lat,lon):
