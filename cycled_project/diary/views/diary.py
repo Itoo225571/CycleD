@@ -120,7 +120,8 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
         if form.is_valid():
             if request.headers.get('x-requested-with') == 'XMLHttpRequest':
                 keyword = form.cleaned_data.get('keyword')
-                return geocode(request,keyword)
+                response = {"data_list":geocode(request,keyword)}
+                return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
             # return self.form_valid(form)
         return self.form_invalid(form)
 
