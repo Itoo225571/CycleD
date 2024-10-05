@@ -35,6 +35,7 @@ class DiaryListView(LoginRequiredMixin,generic.ListView):
 
 # ajaxでDiary日情報を送る用の関数
 def sendDairies(request):
+    print('UUUUUUUU')
     if request.method == 'GET':
         # Diaryをコンテキストに含める
         # すべてのDiaryと関連するLocationを一度に取得
