@@ -168,22 +168,17 @@
                       {% endfor %}
                     {% endif %}
                   {% endfor %}
-                  {% for form_error in form_errors %}
-                    {% if form_error %}
-                      <li class="list-group-item list-group-item-danger">
-                        {% for field,error in form_error.items %}
-                          <h5>{{ field }}</h5>
-                            {% for error_msg in error %}
-                              {{ error_msg }}
-                            {% endfor %}
-                        {% endfor %}
-                      </li>
-                    {% endif %}
-                  {% endfor %}
         
-                  {{ form.certifications.errors }}
+                  {% if messages %}
+                      {% for message in messages %}
+                        {% if message.tags == 'error' %}
+                          <li class="list-group-item list-group-item-danger">
+                            <i class="bi bi-exclamation-circle me-2"></i>{{ message }}
+                          </li>
+                        {% endif %}
+                      {% endfor %}
+                  {% endif %}
                 </ul>
-
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>

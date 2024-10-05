@@ -26,22 +26,24 @@ def geocode_yahoo_ratelimit(request,keyword,id=settings.CLIANT_ID_YAHOO):
 
 def geocode(request,keyword,count=0):
     func_list = [geocode_gsi_ratelimit, geocode_yahoo_ratelimit,]
+    current_func = func_list[count]
     try:
         geocode_data_list = func_list[count](request,keyword)
         return geocode_data_list.model_dump()
     except Exception as e:
         count += 1
-        current_func = func_list[count].__name__  # 現在の関数名を取得
-        logging.error(f"{current_func}が失敗しました: {e}, リクエスト: {request}, 検索値: {keyword}")
+        logger.error(f"{current_func.__name__}が失敗しました: {e}, リクエスト: {request}, 検索値: {keyword}")
         if count < len(func_list):
             return geocode(request,keyword,count)
         else:
-            logging.error(f"すべてのregeocodeが失敗しました")
+            logger.error(f"すべてのregeocodeが失敗しました")
             raise
 
+@ratelimit(key='user', rate='5/s', method='POST')
 @ratelimit(key='user', rate='100/d', method='POST')
 def regeocode_gsi_ratelimit(request,lat,lon):
     return regeocode_gsi(lat,lon)
+@ratelimit(key='user', rate='5/s', method='POST')
 @ratelimit(key='user', rate='100/d', method='POST')
 def regeocode_HeartTails_ratelimit(request,lat,lon):
     return regeocode_HeartTails(lat,lon)
@@ -50,20 +52,19 @@ last_func_index_regeocode = 0
 def regeocode(request,lat,lon,count=0):
     global last_func_index_regeocode
     func_list = [regeocode_gsi_ratelimit, regeocode_HeartTails_ratelimit,]
+    current_func = func_list[last_func_index_regeocode]
+    last_func_index_regeocode = (last_func_index_regeocode + 1) % len(func_list)
     try:
-        geocode_data = func_list[last_func_index_regeocode](request,lat,lon,)
+        geocode_data = current_func(request,lat,lon,)
         return geocode_data
     except Exception as e:
         count += 1
-        current_func = func_list[last_func_index_regeocode].__name__  # 現在の関数名を取得
-        logging.error(f"{current_func}が失敗しました: {e}, リクエスト: {request}, 緯度: {lat}, 経度: {lon}")
+        logger.error(f"{current_func.__name__}が失敗しました: {e}, リクエスト: {request}, 緯度: {lat}, 経度: {lon}")
         if count < len(func_list):
             return regeocode(request,lat,lon,count)
         else:
-            logging.error(f"すべてのregeocodeが失敗しました")
-            raise
-    finally:
-        last_func_index_regeocode = (last_func_index_regeocode + 1) % len(func_list)
+            logger.error(f"すべてのregeocodeが失敗しました")
+            raise        
 
 class AddressHomeView(LoginRequiredMixin,generic.FormView):
     template_name = "diary/address.html"
