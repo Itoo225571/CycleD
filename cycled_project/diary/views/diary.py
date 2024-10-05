@@ -12,6 +12,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from ..forms import DiaryForm,AddressSearchForm,LocationForm,LocationCoordForm,LocationFormSet,DiaryFormSet,PhotoForm
 from ..models import Diary,Location,TempImage
 from django.core.exceptions import ValidationError
+from django.contrib import messages
 
 from .address import geocode,regeocode
 from subs.photo_info.photo_info import get_photo_info,to_jpeg,to_pHash
@@ -35,7 +36,6 @@ class DiaryListView(LoginRequiredMixin,generic.ListView):
 
 # ajaxでDiary日情報を送る用の関数
 def sendDairies(request):
-    print('UUUUUUUU')
     if request.method == 'GET':
         # Diaryをコンテキストに含める
         # すべてのDiaryと関連するLocationを一度に取得
@@ -237,17 +237,17 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
             return self.formset_invalid(diary_formset, location_formset)
 
     def formset_invalid(self, diary_formset=None, location_formset=None):
-        # コンテキストを取得
-        context = self.get_context_data()
-        context['form_errors'] = []
         # diary_formset が提供されている場合のエラー処理
         if diary_formset:
-            context['form_errors'].extend(diary_formset.errors)
+            for form_error in diary_formset.errors:
+                # 各エラーメッセージを追加
+                messages.error(self.request, form_error)
         # location_formset が提供されている場合のエラー処理
         if location_formset:
-            context['form_errors'].extend(location_formset.errors)
-        # コンテキストを使用してレスポンスをレンダリング
-        return self.render_to_response(context)
+            for form_error in location_formset.errors:
+                # 各エラーメッセージを追加
+                messages.error(self.request, form_error)
+        return self.render_to_response(self.get_context_data())
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -297,13 +297,9 @@ async def photos2Locations(request):
                 async for location in await sync_to_async(diary.locations.all)() 
                 if location.image_hash
             ]
-            location_new = {}
             dates = set()
-            messages = {}
-            temp_images = []
             temp_files = []
             photo_data_list = []
-
             for img_file in files:
                 try:
                     with tempfile.NamedTemporaryFile(delete=False) as temp_file:
@@ -312,18 +308,20 @@ async def photos2Locations(request):
                         photo_data = get_photo_info(temp_file_path)
                         photo_hash = to_pHash(temp_file_path)
                         if photo_hash in image_hash_list:
-                            messages[date] = '選択した写真と同じものが既に使用されています。'
+                            messages.warning('選択した写真と同じものが既に使用されています。') 
                             continue
                         if photo_data.errors:
                             for e in photo_data.errors:
                                 print(f"Photo data Errors: {e}")
-                                messages['none_field'] = e
+                                messages.warning(e)
                             continue
                         temp_files.append(temp_file_path)
                         photo_data_list.append(photo_data)
                         
                 except Exception as e:
                     print(f"Error occurred: {e}")
+                    messages.warning(e)
+                    continue
                 
                 date = photo_data.dt.strftime('%Y-%m-%d')
                 dates.add(date)
@@ -335,6 +333,7 @@ async def photos2Locations(request):
                 if os.path.exists(temp_file):
                     os.remove(temp_file)
 
+            temp_images = []
             for jpeg_file, photo_data in zip(jpeg_files, photo_data_list):
                 # TempImageの作成を非同期で行う
                 temp_image = await sync_to_async(TempImage.objects.create)(
@@ -349,15 +348,15 @@ async def photos2Locations(request):
                     await sync_to_async(temp_image.save)()  # 保存
                 except ValidationError as e:
                     print("Validation errors:", e.message_dict)
-                    messages['temp_image'] = e.message_dict.values()
+                    messages.warning(e.message_dict.values())
                     continue
-                
                 temp_images.append(temp_image)
 
             # 非同期タスクを作成
             tasks = [regeocode_async(request, temp_image) for temp_image in temp_images]
             geo_data_list = await asyncio.gather(*tasks)
 
+            location_new = {}
             for geo_data in geo_data_list:
                 location_new.setdefault(geo_data['date'], []).append(geo_data)
             
@@ -381,7 +380,6 @@ async def photos2Locations(request):
                 "location_new": location_new,
                 "diary_existed": diary_existed,
                 "location_existed": location_existed,
-                "message": list(messages),
             }
             return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
         else:
