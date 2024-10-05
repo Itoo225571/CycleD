@@ -12,6 +12,9 @@ from ..forms import *
 
 from subs.get_location.get_location import geocode_gsi,geocode_yahoo,regeocode_gsi,regeocode_HeartTails,ResponseEmptyError
 
+import logging
+logger = logging.getLogger(__name__)
+
 """______Address関係______"""
 # requestはレート制限に必要
 @ratelimit(key='user', rate='100/d', method='POST')
@@ -42,16 +45,24 @@ def regeocode_gsi_ratelimit(request,lat,lon):
 def regeocode_HeartTails_ratelimit(request,lat,lon):
     return regeocode_HeartTails(lat,lon)
 
-def regeocode(request,lat,lon):
+last_func_index = 0
+def regeocode(request,lat,lon,count=0):
+    global last_func_index
+    func_list = [regeocode_gsi_ratelimit, regeocode_HeartTails_ratelimit,]
     try:
-        geocode_data = regeocode_gsi_ratelimit(request,lat,lon)
+        geocode_data = func_list[last_func_index](request,lat,lon,)
+        return geocode_data
     except Exception as e:
-        try:
-            geocode_data = regeocode_HeartTails_ratelimit(request,lat,lon)
-        except Exception as e:
-            print(f"その他のエラーが発生しました: {e}")
+        count += 1
+        current_func = func_list[last_func_index].__name__  # 現在の関数名を取得
+        logging.error(f"{current_func}が失敗しました: {e}, リクエスト: {request}, 緯度: {lat}, 経度: {lon}")
+        if count < len(func_list):
+            return regeocode(request,lat,lon,count)
+        else:
+            logging.error(f"すべてのregeocodeが失敗しました")
             raise
-    return geocode_data
+    finally:
+        last_func_index = (last_func_index + 1) % len(func_list)
 
 class AddressHomeView(LoginRequiredMixin,generic.FormView):
     template_name = "diary/address.html"
