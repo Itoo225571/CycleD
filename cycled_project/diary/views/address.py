@@ -8,18 +8,21 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.models import model_to_dict
 from django.shortcuts import redirect
 
-from ..forms import *
+from ..forms import AddressSearchForm,LocationForm,LocationCoordForm
 
-from subs.get_location.get_location import geocode_gsi,geocode_yahoo,regeocode_gsi,regeocode_HeartTails,ResponseEmptyError
+from subs.get_location import geocode_gsi,geocode_yahoo,regeocode_gsi,regeocode_HeartTails,regeocode_yahoo
+from subs.get_location import regeocode_gsi_async,regeocode_HeartTails_async,regeocode_yahoo_async
 
 import logging
+from asgiref.sync import sync_to_async
 logger = logging.getLogger(__name__)
 
 """______Address関係______"""
 # requestはレート制限に必要
-@ratelimit(key='user', rate='100/d', method='POST')
+@ratelimit(key='user', rate='5/s', method='POST')
 def geocode_gsi_ratelimit(request,keyword):
     return geocode_gsi(keyword)
+@ratelimit(key='user', rate='5/s', method='POST')
 @ratelimit(key='user', rate='100/d', method='POST')
 def geocode_yahoo_ratelimit(request,keyword,id=settings.CLIANT_ID_YAHOO):
     return geocode_yahoo(keyword,id)
@@ -40,23 +43,22 @@ def geocode(request,keyword,count=0):
             raise
 
 @ratelimit(key='user', rate='5/s', method='POST')
-@ratelimit(key='user', rate='100/d', method='POST')
 def regeocode_gsi_ratelimit(request,lat,lon):
     return regeocode_gsi(lat,lon)
 @ratelimit(key='user', rate='5/s', method='POST')
-@ratelimit(key='user', rate='100/d', method='POST')
 def regeocode_HeartTails_ratelimit(request,lat,lon):
     return regeocode_HeartTails(lat,lon)
+@ratelimit(key='user', rate='5/s', method='POST')
+@ratelimit(key='user', rate='100/d', method='POST')
+def regeocode_yahoo_ratelimit(request,lat,lon,id=settings.CLIANT_ID_YAHOO):
+    return regeocode_yahoo(lat,lon,id)
 
-last_func_index_regeocode = 0
 def regeocode(request,lat,lon,count=0):
-    global last_func_index_regeocode
-    func_list = [regeocode_gsi_ratelimit, regeocode_HeartTails_ratelimit,]
-    current_func = func_list[last_func_index_regeocode]
-    last_func_index_regeocode = (last_func_index_regeocode + 1) % len(func_list)
+    func_list = [regeocode_gsi_ratelimit, regeocode_HeartTails_ratelimit,regeocode_yahoo_ratelimit]
+    current_func = func_list[count]
     try:
         geocode_data = current_func(request,lat,lon,)
-        return geocode_data
+        return geocode_data.model_dump()
     except Exception as e:
         count += 1
         logger.error(f"{current_func.__name__}が失敗しました: {e}, リクエスト: {request}, 緯度: {lat}, 経度: {lon}")
@@ -64,7 +66,36 @@ def regeocode(request,lat,lon,count=0):
             return regeocode(request,lat,lon,count)
         else:
             logger.error(f"すべてのregeocodeが失敗しました")
-            raise        
+            raise 
+
+@ratelimit(key='user', rate='5/s', method='POST')
+async def regeocode_gsi_ratelimit_async(request,lat,lon):
+    return await regeocode_gsi_async(lat,lon)
+@ratelimit(key='user', rate='5/s', method='POST')
+async def regeocode_HeartTails_ratelimit_async(request,lat,lon):
+    return await regeocode_HeartTails_async(lat,lon)
+@ratelimit(key='user', rate='5/s', method='POST')
+@ratelimit(key='user', rate='100/d', method='POST')
+async def regeocode_yahoo_ratelimit_async(request,lat,lon,id=settings.CLIANT_ID_YAHOO):
+    return await regeocode_yahoo_async(lat,lon,id)
+
+last_func_index_regeocode = 0
+async def regeocode_async(request,lat,lon,count=0):
+    global last_func_index_regeocode
+    func_list = [regeocode_gsi_ratelimit_async, regeocode_HeartTails_ratelimit_async,regeocode_yahoo_ratelimit_async]
+    current_func = func_list[last_func_index_regeocode]
+    last_func_index_regeocode = (last_func_index_regeocode + 1) % len(func_list)
+    try:
+        geocode_data = await current_func(request, lat, lon)
+    except Exception as e:
+        count += 1
+        logger.error(f"{current_func.__name__}が失敗しました: {e}, リクエスト: {request}, 緯度: {lat}, 経度: {lon}")
+        if count < len(func_list):
+            return await regeocode_async(request, lat, lon, count)
+        else:
+            logger.error(f"すべてのregeocodeが失敗しました")
+            raise 
+    return geocode_data.model_dump()
 
 class AddressHomeView(LoginRequiredMixin,generic.FormView):
     template_name = "diary/address.html"
