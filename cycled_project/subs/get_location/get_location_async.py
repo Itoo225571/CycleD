@@ -8,11 +8,37 @@ async def _fetch_data_async(url: str, params: dict, timeout: float = 5.0):
             res.raise_for_status()
             if not res.text.strip():
                 raise ResponseEmptyError(f"レスポンスが空です: {res.url}")
-            return res.json()
         except httpx.TimeoutException:
             raise ValueError("リクエストがタイムアウトしました。")
         except httpx.RequestError as e:
             raise ValueError(f"リクエストエラー: {e}")
+        except Exception as e:  # 他の例外もキャッチ
+            raise ValueError(f"予期しないエラー: {e}")
+        if res.status_code != 200:
+            raise ValueError(f"Error: {res.status_code}")
+        return res.json()
+    
+async def _fetch_data_async(url: str, params: dict, timeout: float = 5.0):
+    async with httpx.AsyncClient(timeout=timeout) as client:
+        try:
+            res = await client.get(url, params=params)
+            res.raise_for_status()
+            if not res.text.strip():
+                raise ResponseEmptyError(f"レスポンスが空です: {res.url}")
+            try:
+                data = res.json()
+            except httpx.exceptions.JSONDecodeError:
+                raise ValueError(f"JSONデコードエラー: {res.text}")  # デバッグのためにレスポンスを出力
+        except httpx.TimeoutException:
+            raise ValueError("リクエストがタイムアウトしました。")
+        except httpx.RequestError as e:
+            raise ValueError(f"リクエストエラー: {e}")
+        except Exception as e:  # 他の例外もキャッチ
+            raise ValueError(f"予期しないエラー: {e}")
+        if res.status_code != 200:
+            raise ValueError(f"Error: {res.status_code}")
+        
+        return data
 
 # 非同期バージョン
 async def regeocode_gsi_async(lat: float, lon: float) -> LocationData:
@@ -21,8 +47,11 @@ async def regeocode_gsi_async(lat: float, lon: float) -> LocationData:
         "lat": lat,
         "lon": lon,
     }
-    data = await _fetch_data_async(url, params)
-    
+    try:
+        data = await _fetch_data_async(url, params)
+    except Exception as e:
+        print(f"エラーが発生しました: {e}")
+        raise 
     if data:
         result = data.get("results")
         code = result.get("muniCd", "")
@@ -47,7 +76,11 @@ async def regeocode_HeartTails_async(lat: float, lon: float) -> LocationData:
         "y": lat,
         "x": lon,
     }
-    data = await _fetch_data_async(url, params)
+    try:
+        data = await _fetch_data_async(url, params)
+    except Exception as e:
+        print(f"エラーが発生しました: {e}")
+        raise 
 
     if data:
         result = data.get("response", {}).get("location", [{}])[0]
@@ -76,7 +109,11 @@ async def regeocode_yahoo_async(lat: float, lon: float, client_id: str) -> Locat
         "appid": client_id,
         "output": "json",
     }
-    data = await _fetch_data_async(url, params)
+    try:
+        data = await _fetch_data_async(url, params)
+    except Exception as e:
+        print(f"エラーが発生しました: {e}")
+        raise 
 
     if data:
         result = data.get("Feature", [{}])[0]
