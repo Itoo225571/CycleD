@@ -263,12 +263,12 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         else:  
             return self.formset_invalid(diary_formset,location_formset)
 
-async def regeocode_addImage(request, img_data):
-    geo_data = await regeocode_async(request, img_data.lat, img_data.lon)
-    geo_data['image'] = img_data.image.url
-    geo_data['id_of_image'] = img_data.id
-    geo_data['date'] = img_data.date  # 日付も格納
-    return geo_data
+# async def regeocode_addImage(request, img_data):
+#     geo_data = await regeocode_async(request, img_data.lat, img_data.lon)
+#     geo_data['image'] = img_data.image.url
+#     geo_data['id_of_image'] = img_data.id
+#     geo_data['date'] = img_data.date  # 日付も格納
+#     return geo_data
 
 executor = ThreadPoolExecutor(max_workers=4)
 
@@ -289,37 +289,30 @@ async def to_pHash_async(file):
 # 非同期で画像ファイルを処理する関数
 async def process_image_file(img_file, image_hash_list, request):
     try:
-        temp_file_path = None
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        with tempfile.NamedTemporaryFile(delete=True) as temp_file:
             temp_file.write(img_file.read())  # 画像データを書き込み
             temp_file_path = temp_file.name
         
-        # 非同期に写真の情報を取得
-        photo_data = await sync_to_async(get_photo_info)(temp_file_path)
+            # 非同期に写真の情報を取得
+            photo_data = await sync_to_async(get_photo_info)(temp_file_path)
+            # エラーチェック
+            if photo_data.errors:
+                for e in photo_data.errors:
+                    messages.warning(request, f"Photo data Errors: {e}")
+                return None  # エラー時はNoneを返す
+            
+            # 非同期でpHashを取得&重複チェック
+            photo_hash = await to_pHash_async(temp_file_path)
+            if photo_hash in image_hash_list:
+                messages.warning(request, '選択した写真と同じものが既に使用されています。')
+                return None
 
-        # 画像をJPEGに変換
-        image_file = await sync_to_async(to_jpeg)(temp_file_path)
-        jpeg_file = InMemoryUploadedFile(
-            image_file, field_name=None, name='temp.jpg', content_type='image/jpg',
-            size=image_file.getbuffer().nbytes, charset=None
-        )
-        
-        # 一時ファイルの削除
-        if temp_file_path and os.path.exists(temp_file_path):
-            os.remove(temp_file_path)
-
-        # エラーチェック
-        if photo_data.errors:
-            for e in photo_data.errors:
-                messages.warning(request, f"Photo data Errors: {e}")
-            return None  # エラー時はNoneを返す
-
-        # 非同期でpHashを取得
-        photo_hash = await to_pHash_async(jpeg_file)
-        
-        if photo_hash in image_hash_list:
-            messages.warning(request, '選択した写真と同じものが既に使用されています。')
-            return None
+            # 画像をJPEGに変換
+            image_file = await sync_to_async(to_jpeg)(temp_file_path)
+            jpeg_file = InMemoryUploadedFile(
+                image_file, field_name=None, name='temp.jpg', content_type='image/jpg',
+                size=image_file.getbuffer().nbytes, charset=None
+            )
 
         # TempImageを非同期に作成
         temp_image = await sync_to_async(TempImage.objects.create)(
@@ -337,10 +330,25 @@ async def process_image_file(img_file, image_hash_list, request):
         except ValidationError as e:
             # print("Validation errors:", e.message_dict)
             # messages['temp_image'] = e.message_dict.values()
-            messages.warning(request, e.message_dict.values())
+            for field, errors in e.message_dict.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
             return None
 
-        return temp_image
+        try:
+            geo_data = await regeocode_async(request, temp_image.lat, temp_image.lon)
+        except Exception as e:
+            messages.error(request, e)
+            raise 
+        if geo_data:
+            geo_data['image'] = temp_image.image.url
+            geo_data['id_of_image'] = temp_image.id
+            geo_data['date'] = temp_image.date  # 日付も格納
+        else:
+            messages.warning(f"住所取得に失敗しました。")
+            return None
+
+        return geo_data
     except Exception as e:
         print(f"Error occurred: {e}")
         return None
@@ -364,22 +372,23 @@ async def photos2Locations(request):
 
             # TempImageの作成と添削
             tasks = [process_image_file(img_file, image_hash_list, request) for img_file in files]
-            results = await asyncio.gather(*tasks)  # すべてのタスクを並行実行
-            temp_images = [temp_image for temp_image in results if temp_image]
+            geo_data_list = await asyncio.gather(*tasks)  # すべてのタスクを並行実行
+            # temp_images = [temp_image for temp_image in results if temp_image]
     
             # regeocode+Image情報追加
-            tasks = [regeocode_addImage(request, temp_image) for temp_image in temp_images]
-            geo_data_list = await asyncio.gather(*tasks)
-
-            dates = [img.date for img in temp_images]
+            # tasks = [regeocode_addImage(request, temp_image) for temp_image in temp_images]
+            # geo_data_list = await asyncio.gather(*tasks)
 
             location_new = {}
+            dates = set()
             for geo_data in geo_data_list:
-                location_new.setdefault(geo_data['date'], []).append(geo_data)
+                if geo_data:
+                    dates.add(geo_data['date'])
+                    location_new.setdefault(geo_data['date'], []).append(geo_data)
             
             diary_existed = {}
             location_existed = {}
-            diary_existed_query = await sync_to_async(list)(Diary.objects.filter(user=request.user, date__in=dates))
+            diary_existed_query = await sync_to_async(list)(Diary.objects.filter(user=request.user, date__in=list(dates)))
 
             for diary in diary_existed_query:
                 date = diary.date.strftime('%Y-%m-%d')

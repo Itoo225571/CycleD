@@ -4,6 +4,7 @@ from django.views import generic
 from django.urls import reverse_lazy
 from django.conf import settings
 from django_ratelimit.decorators import ratelimit
+from django_ratelimit.exceptions import Ratelimited
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.models import model_to_dict
 from django.shortcuts import redirect
@@ -14,7 +15,7 @@ from subs.get_location import geocode_gsi,geocode_yahoo,regeocode_gsi,regeocode_
 from subs.get_location import regeocode_gsi_async,regeocode_HeartTails_async,regeocode_yahoo_async
 
 import logging
-from asgiref.sync import sync_to_async
+import asyncio
 logger = logging.getLogger(__name__)
 
 """______Address関係______"""
@@ -35,7 +36,7 @@ def geocode(request,keyword,count=0):
         return geocode_data_list.model_dump()
     except Exception as e:
         count += 1
-        logger.error(f"{current_func.__name__}が失敗しました: {e}, リクエスト: {request}, 検索値: {keyword}")
+        logger.warning(f"{current_func.__name__}が失敗しました: {e}, リクエスト: {request}, 検索値: {keyword}")
         if count < len(func_list):
             return geocode(request,keyword,count)
         else:
@@ -61,7 +62,7 @@ def regeocode(request,lat,lon,count=0):
         return geocode_data.model_dump()
     except Exception as e:
         count += 1
-        logger.error(f"{current_func.__name__}が失敗しました: {e}, リクエスト: {request}, 緯度: {lat}, 経度: {lon}")
+        logger.warning(f"{current_func.__name__}が失敗しました: {e}, リクエスト: {request}, 緯度: {lat}, 経度: {lon}")
         if count < len(func_list):
             return regeocode(request,lat,lon,count)
         else:
@@ -79,22 +80,30 @@ async def regeocode_HeartTails_ratelimit_async(request,lat,lon):
 async def regeocode_yahoo_ratelimit_async(request,lat,lon,id=settings.CLIANT_ID_YAHOO):
     return await regeocode_yahoo_async(lat,lon,id)
 
+sem = asyncio.Semaphore(10)
 last_func_index_regeocode = 0
 async def regeocode_async(request,lat,lon,count=0):
     global last_func_index_regeocode
     func_list = [regeocode_gsi_ratelimit_async, regeocode_HeartTails_ratelimit_async,regeocode_yahoo_ratelimit_async]
     current_func = func_list[last_func_index_regeocode]
     last_func_index_regeocode = (last_func_index_regeocode + 1) % len(func_list)
-    try:
-        geocode_data = await current_func(request, lat, lon)
-    except Exception as e:
-        count += 1
-        logger.error(f"{current_func.__name__}が失敗しました: {e}, リクエスト: {request}, 緯度: {lat}, 経度: {lon}")
-        if count < len(func_list):
-            return await regeocode_async(request, lat, lon, count)
-        else:
-            logger.error(f"すべてのregeocodeが失敗しました")
-            raise 
+    # 1度に実行できる数を制限
+    async with sem:
+        try:
+            geocode_data = await current_func(request, lat, lon)
+        except Exception as e:
+            if isinstance(e, Ratelimited):
+                logger.warning(f"{current_func.__name__}のレート制限に達しました\n緯度: {lat}, 経度: {lon}")
+            else:
+                logger.warning(f"{current_func.__name__}が失敗しました: {e}\n緯度: {lat}, 経度: {lon}")
+            count += 1
+            if count < len(func_list):
+                return await regeocode_async(request, lat, lon, count)
+            else:
+                logger.error(f"すべてのregeocodeが失敗しました")
+                raise
+        # 1秒待機
+        await asyncio.sleep(1)
     return geocode_data.model_dump()
 
 class AddressHomeView(LoginRequiredMixin,generic.FormView):
