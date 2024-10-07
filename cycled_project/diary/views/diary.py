@@ -27,6 +27,8 @@ from pprint import pprint
 import asyncio
 from asgiref.sync import sync_to_async
 from concurrent.futures import ThreadPoolExecutor
+import logging
+logger = logging.getLogger(__name__)
 
 """______Diary関係______"""
 class DiaryListView(LoginRequiredMixin,generic.ListView):
@@ -289,7 +291,7 @@ async def to_pHash_async(file):
 # 非同期で画像ファイルを処理する関数
 async def process_image_file(img_file, image_hash_list, request):
     try:
-        with tempfile.NamedTemporaryFile(delete=True) as temp_file:
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             temp_file.write(img_file.read())  # 画像データを書き込み
             temp_file_path = temp_file.name
         
@@ -299,12 +301,14 @@ async def process_image_file(img_file, image_hash_list, request):
             if photo_data.errors:
                 for e in photo_data.errors:
                     messages.warning(request, f"Photo data Errors: {e}")
+                    logger.error(f"Photo data Errors: {e}")
                 return None  # エラー時はNoneを返す
             
             # 非同期でpHashを取得&重複チェック
             photo_hash = await to_pHash_async(temp_file_path)
             if photo_hash in image_hash_list:
                 messages.warning(request, '選択した写真と同じものが既に使用されています。')
+                logger.error('選択した写真と同じものが既に使用されています。')
                 return None
 
             # 画像をJPEGに変換
@@ -352,6 +356,10 @@ async def process_image_file(img_file, image_hash_list, request):
     except Exception as e:
         print(f"Error occurred: {e}")
         return None
+    finally:
+        # 最後に一時ファイルを削除
+        if temp_file_path and os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
 
 # 写真データから位置情報を取り出して送る 
 async def photos2Locations(request):
