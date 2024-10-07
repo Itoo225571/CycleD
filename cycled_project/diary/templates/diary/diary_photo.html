@@ -12,6 +12,7 @@
 {% endblock page_title %}
 
 {% block extra_css %}
+    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'diary/css/diary_photo.css' %}" type="text/css" >
 {% endblock extra_css %}
 
@@ -23,11 +24,11 @@
                 <div id="photo_form">
                     <div class="row my-3">
                         <div class="col">
-                            <label for="{{ photo_form.images.id_for_label }}">{{ photo_form.images.label }}</label>
-                                {{ photo_form.images }}
-                                {% if field.errors %}
-                                    <div class="error">{{ photo_form.images.errors }}</div>
-                                {% endif %}
+                            {% comment %} <label for="{{ photo_form.images.id_for_label }}">{{ photo_form.images.label }}</label> {% endcomment %}
+                            {{ photo_form.images|add_class:"filepond" }}
+                            {% if field.errors %}
+                                <div class="error">{{ photo_form.images.errors }}</div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -44,7 +45,7 @@
 
                     <div class="row py-3 justify-content-center">
                         <button type="submit" class="diary-new-button" name="diary-new-form" style="display: none;">
-                            <span class="text">日記作成</span>
+                            <span class="text">日記作成!</span>
                         </button>
                     </div>
                 </form>
@@ -97,6 +98,12 @@
 {% endblock content %}
 
 {% block extra_js %}
+    <!-- FilePondをインストール -->
+    {% comment %} これはHeicの関係上導入できない {% endcomment %}
+    {% comment %} <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script> {% endcomment %}
+    {% comment %} サイズ制限 {% endcomment %}
+    <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.js"></script>
+    <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
     <script src="{% static 'diary/js/getCookie.js' %}"></script>
     <script src="{% static 'diary/js/loading_overlay.js' %}"></script>
     <script>
