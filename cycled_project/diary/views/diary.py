@@ -13,6 +13,7 @@ from ..forms import DiaryForm,AddressSearchForm,LocationForm,LocationCoordForm,L
 from ..models import Diary,Location,TempImage
 from django.core.exceptions import ValidationError
 from django.contrib import messages
+from django.core.cache import cache
 
 from .address import geocode,regeocode,regeocode_async
 from subs.photo_info.photo_info import get_photo_info,to_jpeg,to_pHash
@@ -25,6 +26,7 @@ import os
 from pprint import pprint
 
 import asyncio
+import aiofiles
 from asgiref.sync import sync_to_async
 from concurrent.futures import ThreadPoolExecutor
 import logging
@@ -196,6 +198,11 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         context['diary_formset'] = DiaryFormSet(queryset=Diary.objects.none())
         return context
     
+    def get(self, request: HttpRequest, *args: str, **kwargs) -> HttpResponse:
+        # TempImage削除
+        TempImage.objects.filter(user=request.user).delete()
+        return super().get(request, *args, **kwargs)
+
     def post(self, request, *args: str, **kwargs) -> HttpResponse:
         if "diary-new-form" in request.POST:
             return self.handle_diary_formset(request)
@@ -234,7 +241,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         except Exception as e:
             for diary in diaries:
                 diary.delete()
-            TempImage.objects.filter(user=self.request.user).delete()
+            # TempImage.objects.filter(user=self.request.user).delete()
             print(f"Error occurred: {e}")
             return self.formset_invalid(diary_formset, location_formset)
 
@@ -274,49 +281,58 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
 
 executor = ThreadPoolExecutor(max_workers=4)
 
-async def to_jpeg_async(file):
-    loop = asyncio.get_event_loop()
-    image_file = await loop.run_in_executor(executor, to_jpeg, file)
-    jpeg_file = InMemoryUploadedFile(
-        image_file, field_name=None, name='temp.jpg', content_type='image/jpg',
-        size=image_file.getbuffer().nbytes, charset=None
-    )
-    return jpeg_file
+# async def to_jpeg_async(file):
+#     loop = asyncio.get_event_loop()
+#     image_file = await loop.run_in_executor(executor, to_jpeg, file)
+#     jpeg_file = InMemoryUploadedFile(
+#         image_file, field_name=None, name='temp.jpg', content_type='image/jpg',
+#         size=image_file.getbuffer().nbytes, charset=None
+#     )
+#     return jpeg_file
 
 async def to_pHash_async(file):
     loop = asyncio.get_event_loop()
     image_file = await loop.run_in_executor(executor, to_pHash, file)
     return image_file
 
+async def async_temp_file_writer(img_file):
+    # 一時ファイルを作成
+    temp_file = tempfile.NamedTemporaryFile(delete=False)  # delete=False にしてファイルを保持
+    temp_file_path = temp_file.name
+    temp_file.close()  # 先にファイルを閉じて他の操作を可能にします
+    # 非同期にファイルに書き込み
+    async with aiofiles.open(temp_file_path, 'wb') as f:
+        file_content = await sync_to_async(img_file.read)() 
+        await f.write(file_content)
+    return temp_file_path
+
 # 非同期で画像ファイルを処理する関数
 async def process_image_file(img_file, image_hash_list, request):
+    global saving
+    temp_file_path = None
     try:
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            temp_file.write(img_file.read())  # 画像データを書き込み
-            temp_file_path = temp_file.name
-        
-            # 非同期に写真の情報を取得
-            photo_data = await sync_to_async(get_photo_info)(temp_file_path)
-            # エラーチェック
-            if photo_data.errors:
-                for e in photo_data.errors:
-                    messages.warning(request, f"Photo data Errors: {e}")
-                    logger.error(f"Photo data Errors: {e}")
-                return None  # エラー時はNoneを返す
-            
-            # 非同期でpHashを取得&重複チェック
-            photo_hash = await to_pHash_async(temp_file_path)
-            if photo_hash in image_hash_list:
-                messages.warning(request, '選択した写真と同じものが既に使用されています。')
-                logger.error('選択した写真と同じものが既に使用されています。')
-                return None
+        temp_file_path = await async_temp_file_writer(img_file)
+    
+        # 非同期に写真の情報を取得
+        photo_data = await sync_to_async(get_photo_info)(temp_file_path)
+        # エラーチェック
+        if photo_data.errors:
+            for e in photo_data.errors:
+                # messages.warning(request, f"Photo data Errors: {e}")
+                logger.error(f"Photo data Errors: {e}")
+            return {'error': f"Photo data Errors: {e}"}
 
-            # 画像をJPEGに変換
-            image_file = await sync_to_async(to_jpeg)(temp_file_path)
-            jpeg_file = InMemoryUploadedFile(
-                image_file, field_name=None, name='temp.jpg', content_type='image/jpg',
-                size=image_file.getbuffer().nbytes, charset=None
-            )
+        # 画像をJPEGに変換
+        image_file = await sync_to_async(to_jpeg)(temp_file_path)
+        jpeg_file = InMemoryUploadedFile(
+            image_file, field_name=None, name='temp.jpg', content_type='image/jpg',
+            size=image_file.getbuffer().nbytes, charset=None
+        )
+        # 非同期でpHashを取得&重複チェック (変換前後でpHash値は変化する)
+        photo_hash = await to_pHash_async(jpeg_file)
+        if photo_hash in image_hash_list:
+            logger.error('選択した写真と同じものが既に使用されています。')
+            return {'error':'選択した写真と同じものが既に使用されています。'}
 
         # TempImageを非同期に作成
         temp_image = await sync_to_async(TempImage.objects.create)(
@@ -331,97 +347,117 @@ async def process_image_file(img_file, image_hash_list, request):
         try:
             await sync_to_async(temp_image.full_clean)()  # バリデーションを実行
             await sync_to_async(temp_image.save)()  # 保存
+            # await temp_image.asave()
         except ValidationError as e:
             # print("Validation errors:", e.message_dict)
             # messages['temp_image'] = e.message_dict.values()
+            error_values = []
             for field, errors in e.message_dict.items():
                 for error in errors:
                     messages.error(request, f"{field}: {error}")
-            return None
-
+                    error_values.append(error)
+            return {'error':error_values}
         try:
             geo_data = await regeocode_async(request, temp_image.lat, temp_image.lon)
         except Exception as e:
             messages.error(request, e)
-            raise 
+            return {'error':e}
         if geo_data:
             geo_data['image'] = temp_image.image.url
             geo_data['id_of_image'] = temp_image.id
             geo_data['date'] = temp_image.date  # 日付も格納
         else:
-            messages.warning(f"住所取得に失敗しました。")
-            return None
+            logger.error(f"住所取得に失敗しました。")
+            return {'error':"住所取得に失敗しました。"}
 
         return geo_data
     except Exception as e:
         print(f"Error occurred: {e}")
-        return None
+        return {'error':e}
     finally:
         # 最後に一時ファイルを削除
         if temp_file_path and os.path.exists(temp_file_path):
             os.remove(temp_file_path)
 
 # 写真データから位置情報を取り出して送る 
-async def photos2Locations(request):
-    if request.method == 'POST':
-        form = PhotoForm(request.POST, request.FILES)
-        # ユーザーのTempImageを削除
-        await sync_to_async(lambda: TempImage.objects.filter(user=request.user).delete(), thread_sensitive=False)()
-
-        if form.is_valid():
-            files = request.FILES.getlist('location_files')
-            diaries = await sync_to_async(Diary.objects.filter)(user=request.user)
-            image_hash_list = [
-                location.image_hash 
-                async for diary in diaries 
-                async for location in await sync_to_async(diary.locations.all)() 
-                if location.image_hash
-            ]
-
-            # TempImageの作成と添削
-            tasks = [process_image_file(img_file, image_hash_list, request) for img_file in files]
-            geo_data_list = await asyncio.gather(*tasks)  # すべてのタスクを並行実行
-            # temp_images = [temp_image for temp_image in results if temp_image]
+class Photos2LocationsView(generic.View):
+    async def dispatch(self, request, *args, **kwargs):
+        # ユーザー認証の確認
+        self.user = await sync_to_async(lambda: request.user)()
+        is_authenticated = await sync_to_async(lambda: self.user.is_authenticated)()
+        if not is_authenticated:
+            return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
+        return await super().dispatch(request, *args, **kwargs)
     
-            # regeocode+Image情報追加
-            # tasks = [regeocode_addImage(request, temp_image) for temp_image in temp_images]
-            # geo_data_list = await asyncio.gather(*tasks)
-
-            location_new = {}
-            dates = set()
-            for geo_data in geo_data_list:
-                if geo_data:
-                    dates.add(geo_data['date'])
-                    location_new.setdefault(geo_data['date'], []).append(geo_data)
-            
-            diary_existed = {}
-            location_existed = {}
-            diary_existed_query = await sync_to_async(list)(Diary.objects.filter(user=request.user, date__in=list(dates)))
-
-            for diary in diary_existed_query:
-                date = diary.date.strftime('%Y-%m-%d')
-                diary_data = {
-                    'id': diary.id,
-                    'date': date,
-                    'comment': diary.comment,
-                }
-                diary_existed[date] = diary_data
-                locations = await sync_to_async(list)(diary.locations.all())
-                for location in locations:
-                    location_existed.setdefault(date, []).append(location.to_dict())
-
-            response = {
-                "location_new": location_new,
-                "diary_existed": diary_existed,
-                "location_existed": location_existed,
-            }
-            return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
-        else:
-            print('Photo Form Invalid')
-            return JsonResponse({'error': '無効なフォームです。'}, status=400)
-    else:
+    async def get(self, request):
+        # TempImage削除
+        # await sync_to_async(lambda: TempImage.objects.filter(user=request.user).delete(), thread_sensitive=False)()
         context = {
             'photo_form': PhotoForm(),
             'diary_formset': DiaryFormSet(queryset=Diary.objects.none()),
         }
         return render(request, 'diary/diary_photo.html', context)
+    
+    async def post(self,request):
+        form = PhotoForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            files = request.FILES.getlist('images')
+            diaries = await cache.aget(f'diaries_{self.user.id}')
+            image_hash_list = await cache.aget(f'image_hash_list_{self.user.id}')
+            if not diaries or not image_hash_list:
+                # 非同期にデータを取得しながら辞書に変換
+                diary_queryset = await sync_to_async(Diary.objects.filter)(user=request.user)
+                # diaries = await sync_to_async(list)(diary_queryset)
+                diaries = await sync_to_async(lambda qs: {diary.date: diary for diary in qs})(diary_queryset)
+                
+                await cache.aset(f'diaries_{self.user.id}', diaries, timeout=600)
+                image_hash_list = []
+                for diary in diaries.values():
+                    # locations.all()は同期的な操作なので非同期化する
+                    locations = await sync_to_async(list)(diary.locations.all())
+                    for location in locations:
+                        if location.image_hash:
+                            image_hash_list.append(location.image_hash)
+                await cache.aset(f'image_hash_list_{self.user.id}', image_hash_list, timeout=600)
+
+            # TempImageの作成と添削
+            location_new = await process_image_file(files[0], image_hash_list, request)
+            if location_new.get('error'):
+                return JsonResponse(location_new, json_dumps_params={'ensure_ascii': False})
+
+            date = location_new['date']
+            print(date)
+                
+            # diary_query = await sync_to_async(lambda: diaries.filter(date=date).first())()
+            diary_query = diaries.get(date)
+
+            location_existed = {}
+            if diary_query:
+                diary = {
+                    'id': diary_query.id,
+                    'date': date,
+                    'comment': diary_query.comment,
+                    'empty': False,
+                }
+                locations = await sync_to_async(list)(diary_query.locations.all())
+                for location in locations:
+                    location_existed.setdefault(date, []).append(location.to_dict())
+            else:
+                diary_query = {}
+                diary = {'date': date, 'empty':True, }
+
+            response = {
+                "diary": diary,
+                "location_existed": location_existed,
+                "location_new": location_new,
+            }
+            # response = {
+            #     "diary": '',
+            #     "location_existed": '',
+            #     "location_new": '',
+            # }
+            return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
+        else:
+            print('Photo Form Invalid')
+            return JsonResponse({'error': '無効なフォームです。'}, status=400)

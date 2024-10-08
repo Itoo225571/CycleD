@@ -3,95 +3,113 @@ $(document).ready(function() {
     const diaryMaxNum = $('#id_form-MAX_NUM_FORMS').val();
     const locationMaxNum = $('#id_locations-MAX_NUM_FORMS').val();
     let diaryEditNum = 0;
+    let errorCount = 0;
     remove_error();
 
     // FilePondを初期化
     $('input.filepond').each(function() {
         // プラグインをインポート
         FilePond.registerPlugin(FilePondPluginFileValidateSize);
+        FilePond.registerPlugin(FilePondPluginFileValidateType);
         FilePond.setOptions({
             allowFileSizeValidation : true,//制御をON
-            maxFileSize : '2MB',//上限値は2MB(2メガバイト)
-            labelMaxFileSizeExceeded : 'ファイルサイズが大きすぎます！',
-            labelMaxFileSize : 'ファイルサイズは2MBまでです',
+            maxFileSize : '10MB',//上限値は10MB
+            labelMaxFileSizeExceeded : '写真のサイズが大きすぎます！',
+            labelMaxFileSize : 'ファイルサイズは10MBまでです',
         });
         // FilePondインスタンスを作成
         const pond = FilePond.create(this, {
-            storeAsFile: true,
+            storeAsFile: false,
             allowMultiple: true,
             maxFiles: locationMaxNum,
+            maxParallelUploads: 10, // 同時にアップロードするファイルの最大数
             allowRemove: false,
-            labelIdle: 'ここにファイルをドラッグ＆ドロップするか、<span class="filepond--label-action">ファイルを選択</span>してください。',
+            allowRevert: false,
+            labelIdle: 'ここにファイルをドラッグ＆ドロップするか<br>ファイルを選択してください。',
             labelFileLoading: 'ファイルを読み込んでいます...',
             labelFileAdded: 'ファイルが追加されました',
             labelFileCount: '{count} 個のファイルが選択されています',
             labelFileProcessing: 'ファイルをアップロードしています...',
             labelFileProcessingComplete: 'アップロード完了',
-            labelFileProcessingError: 'アップロードエラー',
+            labelFileProcessingError: 'アップロードエラー',            
+
+            instantUpload: true,
+            server: {
+                process: {
+                    url: url_photos2Locations,  // ファイルのアップロード先URL
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')  // DjangoのCSRFトークンをセット
+                    },
+                    onload: (response) => {
+                        // アップロード成功時の処理
+                        response = JSON.parse(response);
+                        console.log(response);
+        
+                        if ('error' in response) {
+                            console.log(response.error);
+                            errorCount += 1;
+                            append_error(response.error);
+                            return;
+                        }
+                        // 編集するDiaryの数をセット
+                        let Diary = response.diary
+                        if (!Diary.empty) {
+                            diaryEditNum += 1;
+                        }
+                        let $diaryForm = set_diary(Diary);
+                        $diaryForm = set_locationInDiary($diaryForm, response.location_new);
+                        diaryFormsetBody.append($diaryForm);
+                        return ;
+                    },
+                    onerror: (response,file) => {
+                        // エラー処理
+                        console.error('アップロードに失敗しました。', response);
+                        return ;
+                    }
+                },
+            },
+            // 追加された後にファイル選択を無効にする
             onaddfile: (error, file) => {
-                // ファイルが追加されたときの処理
+                remove_error();
                 if (error) {
                     console.error('ファイル追加エラー:', error);
                     return;
                 }
-                // AJAXリクエストの準備
-                const formData = new FormData();
-                formData.append('location_files', file.file);  // FilePondが提供するファイル
-                // 名前を追加
-                const form = $(this).closest('form'); // これで正しいフォームを取得
-                formData.append(form.prop("name"), '');
-
-                // AJAXリクエスト
-                $.ajax({
-                    url: url_photos2Locations,  // Djangoでファイルを処理するためのURL
-                    type: 'POST',
-                    data: formData,
-                    processData: false,  // jQueryがデータを処理しないように設定
-                    contentType: false,  // ファイルのMIMEタイプを自動で設定
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken') // DjangoのCSRFトークン
-                    },
-                    beforeSend: function() {
-                        // 通信中の表示を変更
-                        pond.setOptions({
-                            labelFileProcessing: 'アップロード中...'
-                        });
-                        console.log('UPLOAD')
-                    },
-                    success: function(response) {
-                        console.log(response);
-                        remove_loading();
-                        if (Object.keys(response.location_new).length === 0) {
-                            append_error(`GPS情報を持つ写真や登録されていない写真が選択されていませんでした。`);
-                            $('#id_photos-form').show();
-                            return;
-                        }
-                        
-                        // 編集するDiaryの数をセット
-                        $.each(response.location_new, function(date, oneday_location_list) {
-                            let Diary = response.diary_existed[date] || { date: date, empty: true };
-                            if (!Diary.empty) {
-                                diaryEditNum += 1;
-                            }
-                            let $diaryForm = set_diary(Diary);
-                            $.each(oneday_location_list, function(_, location) {
-                                $diaryForm = set_locationInDiary($diaryForm, location);
-                            });
-                            diaryFormsetBody.append($diaryForm);
-                        });
-                        $('.diary-photo-container').show();
-                        $('button[name="diary-new-form"]').show();
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('アップロードに失敗しました。', error);
-                        append_error(`ファイルのアップロードに失敗しました。`);
-                        pond.setOptions({
-                            labelFileProcessing: 'アップロードエラー',
-                        });
-                    },
+                // ファイルが追加されたら、ファイル選択を無効にする
+                pond.setOptions({
+                    allowMultiple: false,  
                 });
             },
+            // すべてのファイルがアップロードされた後の処理
+            onprocessfiles: () => {
+                if (errorCount >= pond.getFiles().length) {
+                    append_error('全ての写真でアップロードが失敗しました。');
+                    pond.setOptions({
+                        allowMultiple: true,  
+                    });
+                    pond.removeFiles();
+                    errorCount = 0;
+                }
+                else {
+                    setTimeout(() => {
+                        // フェードアウトアニメーションを追加
+                        $('#id_photos-form').fadeOut(400, function() {
+                            // フェードアウトが完了した後にFilePondインスタンスを削除
+                            pond.destroy();
+                            // DOMから削除
+                            $(this).remove();
+                        });
+                    }, 1000); 
+                    // タイミングをずらしてフェードインさせる
+                    setTimeout(() => {
+                        $('.diary-photo-container').fadeIn(400); // 400msのフェードイン
+                        $('button[name="diary-new-form"]').fadeIn(400); // 400msのフェードイン
+                    }, 1500);
+                }
+            },
         });
+
         function set_diary(diary){
             const diaryNum = $('div.diary-form-wrapper').length;
             let diaryNewFormHtml = $('#empty-form-diary').html().replace(/__prefix__/g, `${diaryNum}`);
@@ -247,10 +265,8 @@ $(document).ready(function() {
                 return result;
             }
         }
+
     });
-
-    
-
 
     $('#id_diary-new-form').submit(function(event) {  
         // event.preventDefault();

@@ -108,7 +108,7 @@ def get_values_from_photo(exif_data):
         # print("必要なGPS情報が含まれていません。")
         return {}
 
-def to_jpeg(original_file, quality=80, max_size=(1280, 720)):
+def to_jpeg(original_file, quality=80, max_size=(1920, 1080)):
     pillow_heif.register_heif_opener()
     with Image.open(original_file) as img:
         img.thumbnail(max_size)  # 画像のサイズを1280x720に制限
