@@ -8,6 +8,16 @@ function append_error(error_message) {
     }
     $('#error-list-container').show();
 }
+function append_warning(warning_message) {
+    const existingError = $('#error-list li').filter(function() {
+        return $(this).text() === warning_message;
+    });
+    if (existingError.length === 0) {
+        const newItem = $('<li class="list-group-item list-group-item-warning"></li>').text(warning_message);
+        $('#error-list').append(newItem);
+    }
+    $('#error-list-container').show();
+}
 function remove_error() {
     $('#error-list').empty();
     $('#error-list-container').hide();

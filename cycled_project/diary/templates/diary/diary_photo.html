@@ -19,7 +19,7 @@
 {% block content %}
     <div class="container">
         <div class="row"> 
-            <form method="post" id="id_photos-form" name="photos-form" enctype="multipart/form-data">
+            <form method="post" id="id_photos-form" name="photos-form" enctype="multipart/form-data" >
                 {% csrf_token %}
                 <div id="photo_form">
                     <div class="row my-3">
@@ -100,7 +100,7 @@
 {% block extra_js %}
     <!-- FilePondをインストール -->
     {% comment %} これはHeicの関係上導入できない {% endcomment %}
-    {% comment %} <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script> {% endcomment %}
+    <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
     {% comment %} サイズ制限 {% endcomment %}
     <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.js"></script>
     <script src="https://unpkg.com/filepond/dist/filepond.js"></script>

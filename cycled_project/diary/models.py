@@ -6,6 +6,7 @@ from django.db.models.signals import post_delete,pre_delete
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.cache import cache
 
 import uuid
 from subs.photo_info.photo_info import to_pHash
@@ -158,3 +159,16 @@ class Diary(models.Model):
     #         # 新規作成の場合はすべてのインスタンスの重複をチェック
     #         if Diary.objects.filter(date=self.date, user=user).exists():
     #             raise ValidationError("この日時の日記はすでに存在します。")
+    
+@receiver(models.signals.post_save, sender=Diary)
+def update_cache_on_create_or_update(sender, instance, created, **kwargs):
+    # キャッシュを削除または更新する
+    cache_key = f'diaries_{instance.user.id}'
+    cache.delete(cache_key)  # Diaryが作成または更新されたときにキャッシュを削除
+
+@receiver(models.signals.post_delete, sender=Diary)
+def update_cache_on_delete(sender, instance, **kwargs):
+    # キャッシュを削除する
+    cache_key = f'diaries_{instance.user.id}'
+    cache.delete(cache_key)  # Diaryが削除されたときにキャッシュを削除
+

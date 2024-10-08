@@ -13,11 +13,18 @@
     opacity: 1;
 }
 
-.thumbnail-image {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
+/* ファイルinputデザイン */
+.filepond--root {
+    cursor: pointer; /* フィールド全体をクリック可能に */
+}
+.filepond--drop-label label {
+    cursor: pointer; /* ドロップエリアのラベル */
+}
+.filepond--credits {
+    cursor: default;
+}
+.filepond--item-panel .filepond--item-remove-button {
+    display: none; /* バツマークを非表示にする */
 }
 
 /* ラジオボタン(通常) */
@@ -145,6 +152,11 @@
 
 /* サムネイル */
 .thumbnail-image {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+
     opacity: 0;
     transform: translateX(-20px); /* 左から少しずれた位置 */
     transition: opacity .5s ease, transform 0.5s ease; /* opacityとtranslateXを同時にアニメーション */
