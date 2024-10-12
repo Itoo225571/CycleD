@@ -3,6 +3,7 @@ export const MyDiary = {
     pk: '',
     setPk: function(newPk) {
         this.pk = newPk;
+        console.log(`newPK:${newPk}`)
     },
     getPk: function() {
         return this.pk;
@@ -167,6 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if(diaryPk && baseUrl){
             const newActionUrl = baseUrl.replace(mockUuid, diaryPk);
             $(this).prop('action', newActionUrl);
+            console.log(newActionUrl)
         }
         $('<input>').attr({
             type: 'hidden',
