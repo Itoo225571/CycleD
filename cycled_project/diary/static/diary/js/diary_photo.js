@@ -25,11 +25,11 @@ $(document).ready(function() {
             maxParallelUploads: 10, // 同時にアップロードするファイルの最大数
             allowRemove: false,
             allowRevert: false,
-            labelIdle: 'ここにファイルをドラッグ＆ドロップするか<br>ファイルを選択してください。',
-            labelFileLoading: 'ファイルを読み込んでいます...',
-            labelFileAdded: 'ファイルが追加されました',
-            labelFileCount: '{count} 個のファイルが選択されています',
-            labelFileProcessing: 'ファイルをアップロードしています...',
+            labelIdle: 'ここに写真をドラッグ＆ドロップするか<br>写真を選択してください。',
+            labelFileLoading: '写真を読み込んでいます...',
+            labelFileAdded: '写真が追加されました',
+            labelFileCount: '{count} 個の写真が選択されています',
+            labelFileProcessing: '写真をアップロードしています...',
             labelFileProcessingComplete: 'アップロード完了',
             labelFileProcessingError: 'アップロードエラー',            
 
@@ -58,17 +58,8 @@ $(document).ready(function() {
                             diaryEditNum += 1;
                         }
                         let $diaryForm = set_diary(Diary);
-                        $diaryForm = set_locationInDiary($diaryForm, response.location_new);
+                        set_locationInDiary($diaryForm, response.location_new);
                         diaryFormsetBody.append($diaryForm);
-
-                        // フェードアウト処理
-                        const fileElement = document.querySelector(`.file-element-selector`); // ここで該当する要素を取得
-                        if (fileElement) {
-                            fileElement.classList.add('fade-out');
-                            setTimeout(() => {
-                                fileElement.remove();  // 完全に削除する場合
-                            }, 500);  // CSSのトランジション時間と一致させる
-                        }
                         
                         return ;
                     },
@@ -99,7 +90,7 @@ $(document).ready(function() {
                     allowMultiple: false,  
                 });
             },
-            // 1ファイルアップロードが
+            // 1ファイルアップロードが完了したときに実行される
             onprocessfile: (error,file) => {
                 setTimeout(() => {
                     pond.removeFile(file)
@@ -135,6 +126,18 @@ $(document).ready(function() {
         });
 
         function set_diary(diary){
+            let $diaryExistingForm = null;
+            // 同じ日のDiaryがないか確認
+            diaryFormsetBody.find('input[id^="id_form-"][id$="-date"]').each(function() {
+                var date = $(this).val();
+                if (date === diary.date){
+                    $diaryExistingForm = $(this).closest('.diary-form-wrapper');
+                    return false; // ループを終了
+                }
+            });
+            if ($diaryExistingForm){
+                return $diaryExistingForm
+            }
             const diaryNum = $('div.diary-form-wrapper').length;
             let diaryNewFormHtml = $('#empty-form-diary').html().replace(/__prefix__/g, `${diaryNum}`);
             let $diaryNewForm = $(`<div class='diary-form-wrapper'>`).html(diaryNewFormHtml);
@@ -157,14 +160,21 @@ $(document).ready(function() {
             date = date.toLocaleDateString(options = {timeZone: 'UTC'});
             var cardHeader = $diaryNewForm.find('.card-header').first();
             cardHeader.text(date);
-            
+
+            // 新しいinput hiddenを追加
+            $('<input>', {
+                type: 'hidden',
+                name: 'diary_num', // 隠し入力の名前
+                value: diaryNum // 隠し入力の値
+            }).appendTo($diaryNewForm); // $diaryNewFormに追加
             return $diaryNewForm
         }
 
         function set_locationInDiary($diaryNewForm, location) {
-            const diaryNum = $('div.diary-form-wrapper').length;
+            const diaryNum = $diaryNewForm.find('input[name="diary_num"]').val();
             const locationsFormsetBody = $diaryNewForm.find(`#id_form-${diaryNum}-location-formset-body`);
-            const locationNum = $('div.locations-form-wrapper').length + $diaryNewForm.find('div.locations-form-wrapper').length;
+            // const locationNum = $('div.locations-form-wrapper').length + $diaryNewForm.find('div.locations-form-wrapper').length;
+            const locationNum = $('div.locations-form-wrapper').length;
             let locationNewFormHtml = $('#empty-form-location').html().replace(/__prefix__/g, `${locationNum}`);
             let $locationNewForm = $(
                 `<div class="locations-form-wrapper">
@@ -267,7 +277,7 @@ $(document).ready(function() {
                 $is_thumbnail.prop('readonly', true);
             });
 
-            return $diaryNewForm
+            return
 
             function searchKeys(obj, keyToFind) {
                 let result = undefined;
