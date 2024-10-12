@@ -427,7 +427,6 @@ class Photos2LocationsView(generic.View):
                 return JsonResponse(location_new, json_dumps_params={'ensure_ascii': False})
 
             date = location_new['date']
-            print(date)
                 
             # diary_query = await sync_to_async(lambda: diaries.filter(date=date).first())()
             diary_query = diaries.get(date)
