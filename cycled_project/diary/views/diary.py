@@ -9,11 +9,15 @@ from django.utils.timezone import now
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from ..forms import DiaryForm,AddressSearchForm,LocationForm,LocationCoordForm,LocationFormSet,DiaryFormSet,PhotoForm
-from ..models import Diary,Location,TempImage
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.core.cache import cache
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+from ..forms import DiaryForm,AddressSearchForm,LocationForm,LocationCoordForm,LocationFormSet,DiaryFormSet,PhotoForm
+from ..models import Diary,Location,TempImage
+from ..serializers import DiarySerializer,LocationSerializer
 
 from .address import geocode,regeocode,regeocode_async
 from subs.photo_info.photo_info import get_photo_info,to_jpeg,to_pHash
@@ -24,7 +28,6 @@ import tempfile
 import uuid
 import os
 from pprint import pprint
-
 import asyncio
 import aiofiles
 from asgiref.sync import sync_to_async
@@ -39,33 +42,20 @@ class DiaryListView(LoginRequiredMixin,generic.ListView):
     context_object_name = 'diaries'  # テンプレートで使用するコンテキスト変数の名前
 
 # ajaxでDiary日情報を送る用の関数
+@api_view(['GET'])
 def sendDairies(request):
-    if request.method == 'GET':
-        # Diaryをコンテキストに含める
-        # すべてのDiaryと関連するLocationを一度に取得
-        current_date = now().date()
-        one_year_ago = current_date - timedelta(days=365)
-        diaries = Diary.objects.prefetch_related('locations').filter(
-            date__gte=one_year_ago,
-            date__lte=current_date,
-            user=request.user,
-        )
-        # カスタムシリアル化
-        diaries_data = []
-        for diary in diaries:
-            diary_data = {
-                "diary_id": diary.id,
-                "date": diary.date.isoformat(),
-                "comment": diary.comment,
-                "locations": []
-            }
-            for location in diary.locations.all():
-                location_data = location.to_dict()
-                diary_data["locations"].append(location_data)
-            diaries_data.append(diary_data)
-        return JsonResponse(diaries_data, safe=False)
-    else:
-        return JsonResponse({'error': 'Invalid request method.'}, status=400)
+    # Diaryをコンテキストに含める
+    # すべてのDiaryと関連するLocationを一度に取得
+    current_date = now().date()
+    one_year_ago = current_date - timedelta(days=365)
+    diaries = Diary.objects.prefetch_related('locations').filter(
+        date__gte=one_year_ago,
+        date__lte=current_date,
+        user=request.user,
+    )
+    serializer = DiarySerializer(diaries, many=True)
+
+    return Response(serializer.data)
 
 # 日記作成・編集共通のクラス
 class DiaryMixin(object):
@@ -146,7 +136,7 @@ class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
             loc.state = geo.address.state
             loc.display = geo.address.display
             loc.label = geo.address.label
-            loc.id = None
+            loc.location_id = None
             response = {
                 "data": loc.to_dict(),
             }
@@ -435,7 +425,7 @@ class Photos2LocationsView(generic.View):
             location_existed = {}
             if diary_query:
                 diary = {
-                    'id': diary_query.id,
+                    'id': diary_query.diary_id,
                     'date': date,
                     'comment': diary_query.comment,
                     'empty': False,
@@ -452,12 +442,7 @@ class Photos2LocationsView(generic.View):
                 "location_existed": location_existed,
                 "location_new": location_new,
             }
-            # response = {
-            #     "diary": '',
-            #     "location_existed": '',
-            #     "location_new": '',
-            # }
             return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
         else:
             print('Photo Form Invalid')
-            return JsonResponse({'error': '無効なフォームです。'}, status=400)
+            return JsonResponse({'error': '無効なフォームです。'}, status=400, json_dumps_params={'ensure_ascii': False})

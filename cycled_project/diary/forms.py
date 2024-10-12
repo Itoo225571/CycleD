@@ -11,6 +11,7 @@ from diary.models import Location,Diary,TempImage
 from pathlib import Path
 import os
 from subs.photo_info.photo_info import to_pHash
+import mimetypes
 
 def validate_file_extension(value):
     ext = os.path.splitext(value.name)[1]  # 拡張子を取得
@@ -259,9 +260,9 @@ class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
     def __init__(self, attrs=None):
         if attrs is None:
-            attrs = {'accept': 'image/*,image/heic'}
+            attrs = {'accept': 'image/*,image/heic,image/heif'}
         else:
-            attrs.update({'accept': 'image/*,image/heic'})
+            attrs.update({'accept': 'image/*,image/heic,image/heif'})
         super().__init__(attrs)
     
 class MultipleFileField(forms.FileField):
@@ -271,11 +272,16 @@ class MultipleFileField(forms.FileField):
 
     def clean(self, data, initial=None):
         single_file_clean = super().clean
-        allowed_mime_types = ['image/jpeg', 'image/png', 'image/gif', 'image/heic',]
+        allowed_mime_types = ['image/jpeg', 'image/png', 'image/gif', 'image/heic','image/heif']
         if isinstance(data, (list, tuple)):         
             result = []
             for d in data:
                 file = single_file_clean(d, initial)
+                mime_type, _ = mimetypes.guess_type(file.name)
+                if mime_type:
+                    file.content_type = mime_type
+                elif file.name.lower().endswith('.heic') or file.name.lower().endswith('.heif'):
+                    file.content_type = 'image/heic'  # または適切なMIMEタイプ
                 if file.content_type not in allowed_mime_types:
                     raise forms.ValidationError(f"{file.name} は許可されていないファイルタイプです。")
                 result.append(file)

@@ -12,7 +12,7 @@ import uuid
 from subs.photo_info.photo_info import to_pHash
 
 class Location(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    location_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     # user = models.ForeignKey(User,on_delete=models.CASCADE)
     lat = models.FloatField()
     lon = models.FloatField()
@@ -33,12 +33,12 @@ class Location(models.Model):
     def __str__(self) -> str:
         return self.label
     
-    def to_dict(self):
-        location_dict = model_to_dict(self)
-        # 画像フィールドを URL に変換
-        location_dict['image'] = self.image.url if self.image else None
-        location_dict['location_id'] = self.id  # 手動で追加
-        return location_dict
+    # def to_dict(self):
+    #     location_dict = model_to_dict(self)
+    #     # 画像フィールドを URL に変換
+    #     location_dict['image'] = self.image.url if self.image else None
+    #     location_dict['location_id'] = self.id  # 手動で追加
+    #     return location_dict
     
     def save(self, *args, **kwargs):
         if self.image and not self.image_hash:
@@ -49,7 +49,7 @@ class Location(models.Model):
             diary = self.diary
             if diary:
                 # 同じDiary内の他のLocationのis_thumbnailをFalseにする
-                Location.objects.filter(diary=diary).exclude(id=self.id).update(is_thumbnail=False)
+                Location.objects.filter(diary=diary).exclude(location_id=self.location_id).update(is_thumbnail=False)
         super().save(*args, **kwargs)
 # モデル削除後に`image`を削除する。
 @receiver(post_delete, sender=Location)
@@ -67,7 +67,7 @@ def set_thumbnail_on_delete(sender, instance, **kwargs):
         diary = instance.diary
         if instance.is_thumbnail:
             if diary:
-                new_thumbnail_location = Location.objects.filter(diary=diary).exclude(id=instance.id).first()
+                new_thumbnail_location = Location.objects.filter(diary=diary).exclude(location_id=instance.location_id).first()
                 if new_thumbnail_location:
                     new_thumbnail_location.is_thumbnail = True
                     new_thumbnail_location.save()
@@ -122,7 +122,7 @@ class User(AbstractUser):
         return self.username
     
 class Diary(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    diary_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     date = models.DateField(verbose_name="日記の日時", null=True, unique=True)
     # 詳しい時間
     # datetime = models.DateTimeField("time detail",blank=True)

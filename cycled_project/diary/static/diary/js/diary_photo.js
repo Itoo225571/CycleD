@@ -10,7 +10,7 @@ $(document).ready(function() {
     $('input.filepond').each(function() {
         // プラグインをインポート
         FilePond.registerPlugin(FilePondPluginFileValidateSize);
-        FilePond.registerPlugin(FilePondPluginFileValidateType);
+        // FilePond.registerPlugin(FilePondPluginFileValidateType);
         FilePond.setOptions({
             allowFileSizeValidation : true,//制御をON
             maxFileSize : '10MB',//上限値は10MB
@@ -60,6 +60,16 @@ $(document).ready(function() {
                         let $diaryForm = set_diary(Diary);
                         $diaryForm = set_locationInDiary($diaryForm, response.location_new);
                         diaryFormsetBody.append($diaryForm);
+
+                        // フェードアウト処理
+                        const fileElement = document.querySelector(`.file-element-selector`); // ここで該当する要素を取得
+                        if (fileElement) {
+                            fileElement.classList.add('fade-out');
+                            setTimeout(() => {
+                                fileElement.remove();  // 完全に削除する場合
+                            }, 500);  // CSSのトランジション時間と一致させる
+                        }
+                        
                         return ;
                     },
                     onerror: (response,file) => {
@@ -68,6 +78,14 @@ $(document).ready(function() {
                         return ;
                     }
                 },
+            },
+            onerror: (error,file) => {
+                const mimeType = file.file.type; // MIMEタイプを取得
+                console.log(file.file)
+                const errorMessage = `アップロードエラー: ${error.main} (MIMEタイプ: ${mimeType})`;
+            
+                // ここでエラーメッセージを表示する
+                console.error(errorMessage);
             },
             // 追加された後にファイル選択を無効にする
             onaddfile: (error, file) => {
@@ -80,6 +98,12 @@ $(document).ready(function() {
                 pond.setOptions({
                     allowMultiple: false,  
                 });
+            },
+            // 1ファイルアップロードが
+            onprocessfile: (error,file) => {
+                setTimeout(() => {
+                    pond.removeFile(file)
+                }, 2000);
             },
             // すべてのファイルがアップロードされた後の処理
             onprocessfiles: () => {
@@ -160,9 +184,9 @@ $(document).ready(function() {
                 let $input = $(this);
                 let name = $input.attr('name');
                 name = name.replace(prefix, '');
-                if (name==="id"){
-                    name = "location_id"
-                }
+                // if (name==="id"){
+                //     name = "location_id"
+                // }
                 const value = searchKeys(location,name);
                 // 値を取得して設定する
                 if (value) {
