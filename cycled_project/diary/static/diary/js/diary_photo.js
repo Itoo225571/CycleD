@@ -3,6 +3,7 @@ $(document).ready(function() {
     const diaryMaxNum = $('#id_form-MAX_NUM_FORMS').val();
     const locationMaxNum = $('#id_locations-MAX_NUM_FORMS').val();
     let diaryEditNum = 0;
+    let locationEditNum = 0;
     let errorCount = 0;
     remove_error();
 
@@ -50,7 +51,7 @@ $(document).ready(function() {
                         console.log(response);
         
                         if ('error' in response) {
-                            console.log(response.error);
+                            console.error(response.error);
                             errorCount += 1;
                             append_error(response.error);
                             return;
@@ -69,6 +70,10 @@ $(document).ready(function() {
                     onerror: (response,file) => {
                         // エラー処理
                         console.error('アップロードに失敗しました。', response);
+                        pond.setOptions({
+                            allowMultiple: true,  
+                        });
+                        $('.filepond--drop-label').show();
                         return ;
                     }
                 },
@@ -80,7 +85,6 @@ $(document).ready(function() {
             onwarning: (warning) => {
                 let msg = '不明な警告が発生しました';
                 const maxFiles = pond.maxFiles;
-                const maxSize = pond.maxFileSize;
                 // 警告の種類によってメッセージを変更
                 switch (warning.body) {
                     case 'Max files':
@@ -186,14 +190,22 @@ $(document).ready(function() {
                 name: 'diary_num', // 隠し入力の名前
                 value: diaryNum // 隠し入力の値
             }).appendTo($diaryNewForm); // $diaryNewFormに追加
+
+            //既存のLocations挿入
+            if (diary.locations){
+                diary.locations.forEach(function(location){
+                    set_locationInDiary($diaryNewForm, location);
+                    locationEditNum += 1;
+                });
+            }
             return $diaryNewForm
         }
 
         function set_locationInDiary($diaryNewForm, location) {
             const diaryNum = $diaryNewForm.find('input[name="diary_num"]').val();
             const locationsFormsetBody = $diaryNewForm.find(`#id_form-${diaryNum}-location-formset-body`);
-            // const locationNum = $('div.locations-form-wrapper').length + $diaryNewForm.find('div.locations-form-wrapper').length;
-            const locationNum = $('div.locations-form-wrapper').length;
+            const locationNum = $('div.locations-form-wrapper').length + $diaryNewForm.find('div.locations-form-wrapper').length;
+            // const locationNum = $('div.locations-form-wrapper').length;
             let locationNewFormHtml = $('#empty-form-location').html().replace(/__prefix__/g, `${locationNum}`);
             let $locationNewForm = $(
                 `<div class="locations-form-wrapper">
@@ -213,9 +225,6 @@ $(document).ready(function() {
                 let $input = $(this);
                 let name = $input.attr('name');
                 name = name.replace(prefix, '');
-                // if (name==="id"){
-                //     name = "location_id"
-                // }
                 const value = searchKeys(location,name);
                 // 値を取得して設定する
                 if (value) {
@@ -232,9 +241,16 @@ $(document).ready(function() {
                 }
             });
 
-            // サムネイルと選択肢の初期設定
-            var LocationNumInDiaryThis = $diaryNewForm.find(`input[name="location-radiobutton-group-${diaryNum}"]`).length; 
-            if (LocationNumInDiaryThis === 0) {
+            // チェックされたLocationがなかった場合
+            var $checkedLocation = $diaryNewForm.find(`input[name="location-radiobutton-group-${diaryNum}"]`).filter(':checked');
+            if ($checkedLocation.length === 0 || location.is_thumbnail) {
+                // 他全てをfalseに
+                var $all_forms = $locationNewForm.find(`input[name^="id_locations-"][name$="-is_thumbnail"]`);
+                $all_forms.prop('checked', false);
+                $all_forms.prop('readonly', false);
+                $all_forms.val(true);
+                $all_forms.prop('readonly', true);
+
                 var src = window.location.origin + location.image;
                 var $photoTthumbnail = $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail`);
                 var thumbnail = `<img loading="lazy" src="${src}" class="thumbnail-image thumbnail-image-loaded">`;
@@ -249,9 +265,9 @@ $(document).ready(function() {
 
             // diaryが既存の場合，そのIDをセット
             // location.diary = $diaryNewForm.find(`#id_form-${diaryNum}-id`).val();
+            $locationNewForm.find(`#id_locations-${locationNum}-diary`).val('');
             var date = $diaryNewForm.find(`#id_form-${diaryNum}-date`).val();
             $locationNewForm.find(`#id_locations-${locationNum}-date_of_Diary`).val(date);
-            locationsFormsetBody.append($locationNewForm);
 
             // 値変更の監視
             $locationNewForm.find('.class_locations-label').on('change', function() {
@@ -296,6 +312,7 @@ $(document).ready(function() {
                 $is_thumbnail.prop('readonly', true);
             });
 
+            locationsFormsetBody.append($locationNewForm);
             return
 
             function searchKeys(obj, keyToFind) {
@@ -334,6 +351,8 @@ $(document).ready(function() {
         const locationTotalForms = $('#id_locations-TOTAL_FORMS');
         const locationNum = $('div.locations-form-wrapper').length;
         locationTotalForms.val(locationNum);
+        const locationInitialForms = $('#id_locations-INITIAL_FORMS');
+        locationInitialForms.val(locationEditNum);
 
         const submitButton = $(event.originalEvent.submitter); // クリックされたボタンを取得
         const buttonName = submitButton.attr('name');

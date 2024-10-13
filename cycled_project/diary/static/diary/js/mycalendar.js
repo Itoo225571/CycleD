@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		const calendarEl = document.getElementById('mycalendar');
 		// カレンダーの初期設定
 		const calendar = new FullCalendar.Calendar(calendarEl, {
-			initialDate: sessionStorage.getItem('diaryDate') || null,
+			initialDate: sessionStorage.getItem('diaryDate') || new Date().toISOString().split('T')[0], // なかったら今日にする			,
 			// カレンダーの種類
 			initialView: "dayGridMonth",
 			// 祝日イベントを追加

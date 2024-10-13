@@ -7,6 +7,7 @@ from django.dispatch import receiver
 from django.core.exceptions import ValidationError
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.cache import cache
+from django.utils import timezone
 
 import uuid
 from subs.photo_info.photo_info import to_pHash
@@ -43,6 +44,14 @@ class Location(models.Model):
                 # 同じDiary内の他のLocationのis_thumbnailをFalseにする
                 Location.objects.filter(diary=diary).exclude(location_id=self.location_id).update(is_thumbnail=False)
         super().save(*args, **kwargs)
+    def clean(self):
+        super().clean()
+        if self.diary:  # 更新の場合
+            if self.diary.diary_id:  # 更新の場合
+                # 更新後のLocationの数をカウント
+                location_count = self.diary.locations.count() 
+                if location_count >= self.diary.MAX_LOCATIONS:  # MAX_LOCATIONSは許可される最大数を指定
+                    raise ValidationError(f"この日記には{self.diary.MAX_LOCATIONS}個以上の場所を追加できません。")
         
 # モデル削除後に`image`を削除する。
 @receiver(post_delete, sender=Location)
@@ -103,31 +112,24 @@ class User(AbstractUser):
     # date_created=models.DateField(verbose_name="creation date",auto_now_add=True,null=True)
     # date_last_login=models.DateField(verbose_name="last login date",auto_now=True,null=True)
     # is_admin=models.BooleanField(verbose_name="is admin",default=False)
-    
     REQUIRED_FIELDS = ["email",]
-    
     class Meta:
         db_table = 'CycleDiary_User'
         verbose_name = 'User'
         verbose_name_plural = 'Users'
-    
     def __str__(self):
         return self.username
     
 class Diary(models.Model):
     diary_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     date = models.DateField(verbose_name="日記の日時", null=True, unique=True)
-    
     date_created = models.DateField(verbose_name="作成日",auto_now_add=True,null=True)
     date_last_updated = models.DateField(verbose_name="最終更新日",auto_now=True,null=True)
     comment = models.TextField(blank=True,verbose_name="コメント")
-    
     user = models.ForeignKey(User,on_delete=models.CASCADE,)
     MAX_LOCATIONS = 50  # 最大Location数
-    
     def __str__(self):
         return str(self.date)
-    
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -135,6 +137,10 @@ class Diary(models.Model):
                 name="diary_date_unique"
             ),
         ]
+    def clean(self):
+        super().clean()  # 既存のバリデーションを保持
+        if self.date and self.date > timezone.localdate():  # 今日より未来の日付かどうかを確認
+            raise ValidationError("日記の日付は今日以前の日付でなければなりません。")
     
 @receiver(models.signals.post_save, sender=Diary)
 def update_cache_on_create_or_update(sender, instance, created, **kwargs):

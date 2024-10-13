@@ -27,12 +27,12 @@ import json
 import tempfile
 import uuid
 import os
-from pprint import pprint
 import asyncio
 import aiofiles
 from asgiref.sync import sync_to_async
 from concurrent.futures import ThreadPoolExecutor
 import logging
+from datetime import datetime
 logger = logging.getLogger(__name__)
 
 """______Diary関係______"""
@@ -209,8 +209,14 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
             diary.save()  # 保存
         try:
             for form in location_formset.forms:
+                # locationがすでに存在しているか確認
+                location = form.cleaned_data.get("location_id")
+                if location:
+                    form.instance = location  # 既存のインスタンスをフォームに設定
+                else:
+                    location = form.save(commit=False)
                 id = form.cleaned_data.get("id_of_image")
-                location = form.save(commit=False)
+                # tempImageの場合
                 if id:
                     temp_image = get_object_or_404(TempImage, id=id, user=self.request.user)
                     image = temp_image.image
@@ -221,16 +227,19 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                             size=image.file.size, charset=None
                         )
                         form.instance.image = image
-                        # location.image = image
                         temp_image.delete() 
+                # Location編集の場合
+                else:
+                    print(location.location_id)
+                    pass
                 date = form.cleaned_data.get("date_of_Diary")
                 location.diary = get_object_or_404(Diary, user=self.request.user, date=date)
                 location.full_clean()  # バリデーションを実行
                 location.save()
             return super().form_valid(diary_formset)
         except Exception as e:
-            for diary in diaries:
-                diary.delete()
+            # for diary in diaries:
+            #     diary.delete()
             # TempImage.objects.filter(user=self.request.user).delete()
             print(f"Error occurred: {e}")
             return self.formset_invalid(diary_formset, location_formset)
@@ -298,7 +307,6 @@ async def async_temp_file_writer(img_file):
 
 # 非同期で画像ファイルを処理する関数
 async def process_image_file(img_file, image_hash_list, request):
-    global saving
     temp_file_path = None
     try:
         temp_file_path = await async_temp_file_writer(img_file)
@@ -416,29 +424,24 @@ class Photos2LocationsView(generic.View):
             if location_new.get('error'):
                 return JsonResponse(location_new, json_dumps_params={'ensure_ascii': False})
 
-            date = location_new['date']
+            date_str = location_new['date']
+            date = datetime.strptime(date_str, "%Y-%m-%d").date()
                 
             # diary_query = await sync_to_async(lambda: diaries.filter(date=date).first())()
-            diary_query = diaries.get(date)
+            diary_query = await sync_to_async(lambda: diaries.get(date))()
 
-            location_existed = {}
             if diary_query:
+                diary_serializer = await sync_to_async(DiarySerializer)(diary_query)
+                diary_data = await sync_to_async(lambda: diary_serializer.data)()
                 diary = {
-                    'id': diary_query.diary_id,
-                    'date': date,
-                    'comment': diary_query.comment,
-                    'empty': False,
+                    **diary_data,  # シリアライズ結果を追加
+                    'empty': False,           # emptyフラグを設定
                 }
-                locations = await sync_to_async(list)(diary_query.locations.all())
-                for location in locations:
-                    location_existed.setdefault(date, []).append(location.to_dict())
             else:
-                diary_query = {}
-                diary = {'date': date, 'empty':True, }
+                diary = {'date': date_str, 'empty':True, }
 
             response = {
                 "diary": diary,
-                "location_existed": location_existed,
                 "location_new": location_new,
             }
             return JsonResponse(response, json_dumps_params={'ensure_ascii': False})

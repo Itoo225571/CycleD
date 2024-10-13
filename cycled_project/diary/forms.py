@@ -134,11 +134,21 @@ class LocationForm(forms.ModelForm):
         if phash in phash_all:
             self.add_error("image","同じ画像が既に存在します。")
         return data
-    
+
+class CustomLocationFormSet(forms.BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        # Diary オブジェクトに関連する Location の数をカウント
+        if self.instance and isinstance(self.instance, Diary):
+            total_forms_count = self.total_form_count()  # フォームセットのフォームの総数
+            if total_forms_count > self.instance.MAX_LOCATIONS:
+                raise ValidationError(f"この日記には最大 {self.instance.MAX_LOCATIONS} 個の場所しか追加できません。")
+            
 LocationFormSet = forms.inlineformset_factory(
         Diary,
         Location,
         form=LocationForm,
+        formset=CustomLocationFormSet,
         extra=0,
         can_delete=True,
         max_num=50,
