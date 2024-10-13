@@ -224,7 +224,6 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                         # location.image = image
                         temp_image.delete() 
                 date = form.cleaned_data.get("date_of_Diary")
-                print(self.request.user,date)
                 location.diary = get_object_or_404(Diary, user=self.request.user, date=date)
                 location.full_clean()  # バリデーションを実行
                 location.save()

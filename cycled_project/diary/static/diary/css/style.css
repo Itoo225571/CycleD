@@ -62,3 +62,7 @@
 #errorModal .modal-header, .modal-footer {
     border: none; /* ヘッダーとフッターのボーダーを全て削除 */
 }
+
+.hidden {
+    display: none; /* hiddenクラスが適用されると要素が非表示になります */
+}
