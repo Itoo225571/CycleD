@@ -22,8 +22,8 @@
             <form method="post" id="id_photos-form" name="photos-form" enctype="multipart/form-data" >
                 {% csrf_token %}
                 <div id="photo_form">
-                    <div class="row my-3">
-                        <div class="col">
+                    <div class="row my-3 justify-content-center">
+                        <div class="col-10">
                             <!-- {% comment %} <label for="{{ photo_form.images.id_for_label }}">{{ photo_form.images.label }}</label> {% endcomment %} -->
                             <!-- {{ photo_form.images|add_class:"filepond"}} -->
                             <input type="file" class="filepond" name="{{ photo_form.images.name }}" accept=".jpeg, .jpg, .png, .gif, .heic, .heif" multiple>
@@ -101,7 +101,7 @@
 {% block extra_js %}
     <!-- FilePondをインストール -->
     {% comment %} これはHeicの関係上導入できない {% endcomment %}
-    <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
+    {% comment %} <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script> {% endcomment %}
     {% comment %} サイズ制限 {% endcomment %}
     <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.js"></script>
     <script src="https://unpkg.com/filepond/dist/filepond.js"></script>

@@ -22,16 +22,19 @@ $(document).ready(function() {
             storeAsFile: false,
             allowMultiple: true,
             maxFiles: locationMaxNum,
-            maxParallelUploads: 10, // 同時にアップロードするファイルの最大数
+            maxParallelUploads: 8, // 同時にアップロードするファイルの最大数
             allowRemove: false,
             allowRevert: false,
-            labelIdle: 'ここに写真をドラッグ＆ドロップするか<br>写真を選択してください。',
+            labelIdle: '<span class="icon-upload">写真を選択してください</span>',
             labelFileLoading: '写真を読み込んでいます...',
             labelFileAdded: '写真が追加されました',
             labelFileCount: '{count} 個の写真が選択されています',
             labelFileProcessing: '写真をアップロードしています...',
             labelFileProcessingComplete: 'アップロード完了',
-            labelFileProcessingError: 'アップロードエラー',            
+            labelFileProcessingError: 'アップロードエラー',    
+            
+            labelTapToCancel: '',
+            labelTapToUndo: '',
 
             instantUpload: true,
             server: {
@@ -71,10 +74,6 @@ $(document).ready(function() {
                 },
             },
             onerror: (error,file) => {
-                const mimeType = file.file.type; // MIMEタイプを取得
-                console.log(file.file)
-                const errorMessage = `アップロードエラー: ${error.main} (MIMEタイプ: ${mimeType})`;
-            
                 // ここでエラーメッセージを表示する
                 console.error(errorMessage);
             },
@@ -85,16 +84,20 @@ $(document).ready(function() {
                     console.error('ファイル追加エラー:', error);
                     return;
                 }
-                // ファイルが追加されたら、ファイル選択を無効にする
+                // ファイル選択を無効にする
                 pond.setOptions({
                     allowMultiple: false,  
                 });
+                $('.filepond--drop-label').hide();
             },
             // 1ファイルアップロードが完了したときに実行される
             onprocessfile: (error,file) => {
                 setTimeout(() => {
-                    pond.removeFile(file)
-                }, 2000);
+                    var element = $(`#filepond--item-${file.id}`);
+                    element.fadeOut(() => {
+                        element.addClass('hidden');
+                    });
+                }, 1500);
             },
             // すべてのファイルがアップロードされた後の処理
             onprocessfiles: () => {
@@ -103,18 +106,14 @@ $(document).ready(function() {
                     pond.setOptions({
                         allowMultiple: true,  
                     });
+                    $('.filepond--drop-label').show();
                     pond.removeFiles();
                     errorCount = 0;
                 }
                 else {
                     setTimeout(() => {
                         // フェードアウトアニメーションを追加
-                        $('#id_photos-form').fadeOut(400, function() {
-                            // フェードアウトが完了した後にFilePondインスタンスを削除
-                            pond.destroy();
-                            // DOMから削除
-                            $(this).remove();
-                        });
+                        $('#id_photos-form').fadeOut(400);
                     }, 1000); 
                     // タイミングをずらしてフェードインさせる
                     setTimeout(() => {

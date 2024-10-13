@@ -16,6 +16,20 @@
 /* ファイルinputデザイン */
 .filepond--root {
     cursor: pointer; /* フィールド全体をクリック可能に */
+    border: 2px dashed #ccc; /* 見た目を調整 */
+    border-radius: 10px;
+    aspect-ratio: 3/1;
+    transition: background-color 0.3s, border-color 0.3s; /* スムーズな遷移 */
+}
+.filepond--root:hover {
+    background-color: #f0f0f0; /* ホバー時の背景色 */
+    border-color: #007bff; /* ホバー時のボーダー色 */
+}
+.filepond--drop-label{
+    height: 100%;
+}
+.filepond--list-scroller{
+    height: 90%!important;
 }
 .filepond--drop-label label {
     cursor: pointer; /* ドロップエリアのラベル */
@@ -25,6 +39,20 @@
 }
 .filepond--item-panel .filepond--item-remove-button {
     display: none; /* バツマークを非表示にする */
+}
+/* アップロードアイコン */
+.icon-upload {
+    position: relative; /* 擬似要素の位置を設定するために relative を使用 */
+    padding-left: 3em; /* アイコンのための余白を追加 */
+}
+.icon-upload::before {
+    font-family: 'Material Icons';
+    content: '\f09b'; /* Unicodeのアイコンや他の記号を指定 */
+    position: absolute; /* 絶対位置を指定 */
+    left: 0; /* 左側に配置 */
+    top: 50%; /* 上部から50%の位置に配置 */
+    transform: translateY(-50%); /* 中央に配置するためにY軸を調整 */
+    font-size: 2em; /* アイコンのサイズを調整 */
 }
 
 /* ラジオボタン(通常) */
