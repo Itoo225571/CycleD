@@ -13,7 +13,6 @@ from subs.photo_info.photo_info import to_pHash
 
 class Location(models.Model):
     location_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-    # user = models.ForeignKey(User,on_delete=models.CASCADE)
     lat = models.FloatField()
     lon = models.FloatField()
     # 市区町村
@@ -33,13 +32,6 @@ class Location(models.Model):
     def __str__(self) -> str:
         return self.label
     
-    # def to_dict(self):
-    #     location_dict = model_to_dict(self)
-    #     # 画像フィールドを URL に変換
-    #     location_dict['image'] = self.image.url if self.image else None
-    #     location_dict['location_id'] = self.id  # 手動で追加
-    #     return location_dict
-    
     def save(self, *args, **kwargs):
         if self.image and not self.image_hash:
             self.image_hash = to_pHash(self.image)   # pHashの生成
@@ -51,6 +43,7 @@ class Location(models.Model):
                 # 同じDiary内の他のLocationのis_thumbnailをFalseにする
                 Location.objects.filter(diary=diary).exclude(location_id=self.location_id).update(is_thumbnail=False)
         super().save(*args, **kwargs)
+        
 # モデル削除後に`image`を削除する。
 @receiver(post_delete, sender=Location)
 def delete_file(sender, instance, **kwargs):
@@ -124,17 +117,13 @@ class User(AbstractUser):
 class Diary(models.Model):
     diary_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     date = models.DateField(verbose_name="日記の日時", null=True, unique=True)
-    # 詳しい時間
-    # datetime = models.DateTimeField("time detail",blank=True)
-    # name_place = models.CharField(max_length=128,verbose_name="place name",null=True)
     
     date_created = models.DateField(verbose_name="作成日",auto_now_add=True,null=True)
     date_last_updated = models.DateField(verbose_name="最終更新日",auto_now=True,null=True)
-    # is_publish = models.BooleanField(verbose_name="is publish",default=False)
     comment = models.TextField(blank=True,verbose_name="コメント")
     
-    # locations = models.ManyToManyField('Location', verbose_name="場所情報", related_name="diaries")
     user = models.ForeignKey(User,on_delete=models.CASCADE,)
+    MAX_LOCATIONS = 50  # 最大Location数
     
     def __str__(self):
         return str(self.date)
@@ -146,19 +135,6 @@ class Diary(models.Model):
                 name="diary_date_unique"
             ),
         ]
-    
-    # def clean(self):
-    #     super().clean()  # 親クラスのcleanを呼び出す
-    #     user = self.user
-    #     # フォームのインスタンスが新規作成か更新かを判定
-    #     if self.pk:
-    #         # 更新の場合は他のインスタンスの重複をチェック
-    #         if Diary.objects.filter(date=self.date, user=user).exclude(pk=self.pk).exists():
-    #             raise ValidationError(f"この日時の日記はすでに存在します。pk={self.pk}")
-    #     else:
-    #         # 新規作成の場合はすべてのインスタンスの重複をチェック
-    #         if Diary.objects.filter(date=self.date, user=user).exists():
-    #             raise ValidationError("この日時の日記はすでに存在します。")
     
 @receiver(models.signals.post_save, sender=Diary)
 def update_cache_on_create_or_update(sender, instance, created, **kwargs):
