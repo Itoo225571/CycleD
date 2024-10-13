@@ -213,6 +213,9 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                 location = form.cleaned_data.get("location_id")
                 if location:
                     form.instance = location  # 既存のインスタンスをフォームに設定
+                    # フォームのデータを既存のインスタンスに適用
+                    form.instance.label = form.cleaned_data.get("label")
+                    form.instance.is_thumbnail = form.cleaned_data.get("is_thumbnail")
                 else:
                     location = form.save(commit=False)
                 id = form.cleaned_data.get("id_of_image")
