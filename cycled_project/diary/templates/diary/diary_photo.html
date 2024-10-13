@@ -54,7 +54,7 @@
 
             <div id="empty-form-diary" style="display:none;">
                 {{ diary_formset.empty_form.date }}
-                {{ diary_formset.empty_form.id }}
+                {{ diary_formset.empty_form.diary_id }}
                 <div class="card" id="id_form-__prefix__-card">
                     <h5 class="card-header">
                         Diary Card Header
@@ -110,6 +110,7 @@
     <script>
         // DjangoテンプレートタグでURLを埋め込む
         const url_photos2Locations = "{% url 'diary:photos2Locations' %}";
+        const url_sendDiaries = "{% url 'diary:sendDiaries' %}";
     </script>
     <script src="{% static 'diary/js/diary_photo.js' %}"></script>
     
