@@ -11,27 +11,27 @@ $(document).ready(function() {
         // プラグインをインポート
         FilePond.registerPlugin(FilePondPluginFileValidateSize);
         // FilePond.registerPlugin(FilePondPluginFileValidateType);
+        const maxFileSize = '10MB';
         FilePond.setOptions({
             allowFileSizeValidation : true,//制御をON
-            maxFileSize : '10MB',//上限値は10MB
+            maxFileSize : maxFileSize,//上限値は10MB
             labelMaxFileSizeExceeded : '写真のサイズが大きすぎます！',
-            labelMaxFileSize : 'ファイルサイズは10MBまでです',
+            labelMaxFileSize : `ファイルサイズは${maxFileSize}までです`,
         });
         // FilePondインスタンスを作成
         const pond = FilePond.create(this, {
             storeAsFile: false,
             allowMultiple: true,
-            maxFiles: locationMaxNum,
+            maxFiles: Math.min(diaryMaxNum,locationMaxNum),
             maxParallelUploads: 8, // 同時にアップロードするファイルの最大数
             allowRemove: false,
             allowRevert: false,
             labelIdle: '<span class="icon-upload">写真を選択してください</span>',
             labelFileLoading: '写真を読み込んでいます...',
             labelFileAdded: '写真が追加されました',
-            labelFileCount: '{count} 個の写真が選択されています',
             labelFileProcessing: '写真をアップロードしています...',
             labelFileProcessingComplete: 'アップロード完了',
-            labelFileProcessingError: 'アップロードエラー',    
+            labelFileProcessingError: 'アップロードエラー', 
             
             labelTapToCancel: '',
             labelTapToUndo: '',
@@ -75,13 +75,33 @@ $(document).ready(function() {
             },
             onerror: (error,file) => {
                 // ここでエラーメッセージを表示する
-                console.error(errorMessage);
+                console.error(error);
+            },
+            onwarning: (warning) => {
+                let msg = '不明な警告が発生しました';
+                const maxFiles = pond.maxFiles;
+                const maxSize = pond.maxFileSize;
+                // 警告の種類によってメッセージを変更
+                switch (warning.body) {
+                    case 'Max files':
+                        msg = `最大 ${maxFiles} 個のファイルを選択できます`;
+                        break;
+                    case 'File size too large':
+                        return;
+                    default:
+                        msg = warning.body || '不明な警告が発生しました';
+                }
+                console.warn('警告:', warning);
+                alert(`警告: ${msg}`);
             },
             // 追加された後にファイル選択を無効にする
             onaddfile: (error, file) => {
                 remove_error();
                 if (error) {
                     console.error('ファイル追加エラー:', error);
+                    setTimeout(() => {
+                        pond.removeFile(file); 
+                    }, 2000);
                     return;
                 }
                 // ファイル選択を無効にする
