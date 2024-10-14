@@ -137,7 +137,6 @@
     color: white; /* ホバー時の文字色を白に */
     
 }
-
 .diary-new-button::before {
     content: "\e52f"; /* Unicode for the icon */
     font-family: 'Material Icons'; /* Use the Material Icons font */
@@ -149,12 +148,10 @@
     transition: left .01s ease;
     color: #1B85FB;
 }
-
 .diary-new-button:hover::before {
     left: calc(100% - 30px - 1.5em); /* ホバー時にアイコンを右端に移動 */
     transition: left .3s ease;
 }
-
 .diary-new-button::after {
     position: absolute;
     top: 0;
@@ -177,6 +174,29 @@
     position: relative;
     z-index: 1;
 }
+.diary-new-button:disabled {
+    background-color: #e0e0e0; /* 無効化された時の背景色 */
+    color: #a0a0a0; /* 無効化された時の文字色 */
+    border-color: #a0a0a0; /* 無効化された時の枠の色 */
+    cursor: default;
+    opacity: 0.3; /* 透明度を強調 */
+}
+.diary-new-button:disabled::before {
+    color: #a0a0a0; /* アイコンの色も無効化に合わせて変更 */
+}
+.diary-new-button:disabled::after {
+    background: none; /* 背景のアニメーションを無効化 */
+}
+.diary-new-button:disabled:hover {
+    color: #a0a0a0; /* ホバーしても文字色が変わらないようにする */
+}
+.diary-new-button:disabled:hover::before {
+    left: 30px; /* アイコンはホバー時に動かない */
+}
+.diary-new-button:disabled:hover::after {
+    transform: scaleX(0); /* 背景アニメーションを無効化 */
+}
+
 
 /* サムネイル */
 .thumbnail-image {
