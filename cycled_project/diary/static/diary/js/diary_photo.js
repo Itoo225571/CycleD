@@ -2,8 +2,8 @@ $(document).ready(function() {
     const diaryFormsetBody = $('#diary-formset-body');
     const diaryMaxNum = $('#id_form-MAX_NUM_FORMS').val();
     const locationMaxNum = $('#id_locations-MAX_NUM_FORMS').val();
-    let diaryEditNum = 0;
-    let locationEditNum = 0;
+    $('#id_form-TOTAL_FORMS').val(0);//初期化
+    $('#id_locations-TOTAL_FORMS').val(0);
     let errorCount = 0;
     remove_error();
 
@@ -58,9 +58,9 @@ $(document).ready(function() {
                         }
                         // 編集するDiaryの数をセット
                         let Diary = response.diary
-                        if (!Diary.empty) {
-                            diaryEditNum += 1;
-                        }
+                        // if (!Diary.empty) {
+                        //     diaryEditNum += 1;
+                        // }
                         let $diaryForm = set_diary(Diary);
                         set_locationInDiary($diaryForm, response.location_new);
                         diaryFormsetBody.append($diaryForm);
@@ -149,21 +149,25 @@ $(document).ready(function() {
         });
 
         function set_diary(diary){
-            let $diaryExistingForm = null;
+            let $diaryFormSame = null;
             // 同じ日のDiaryがないか確認
             diaryFormsetBody.find('input[id^="id_form-"][id$="-date"]').each(function() {
                 var date = $(this).val();
                 if (date === diary.date){
-                    $diaryExistingForm = $(this).closest('.diary-form-wrapper');
+                    $diaryFormSame = $(this).closest('.diary-form-wrapper');
                     return false; // ループを終了
                 }
             });
-            if ($diaryExistingForm){
-                return $diaryExistingForm
+            if ($diaryFormSame){
+                return $diaryFormSame
             }
-            const diaryNum = $('div.diary-form-wrapper').length;
+            const diaryNum = $('#id_form-TOTAL_FORMS').val();
             let diaryNewFormHtml = $('#empty-form-diary').html().replace(/__prefix__/g, `${diaryNum}`);
             let $diaryNewForm = $(`<div class='diary-form-wrapper'>`).html(diaryNewFormHtml);
+            // 既存のDiaryでない場合にedit-wrapperを追加
+            if (!diary.empty) {
+                $diaryNewForm.addClass('diary-form-edit');
+            }
             // フィールド入力
             let prefix = `form-${diaryNum}-`;
             $diaryNewForm.find('input, textarea').each(function() {
@@ -181,10 +185,13 @@ $(document).ready(function() {
             // テキスト入力
             date = new Date(diary['date']);
             date = date.toLocaleDateString(options = {timeZone: 'UTC'});
-            var cardHeader = $diaryNewForm.find('.card-header').first();
-            cardHeader.text(date);
+            $diaryNewForm.find('.card-diary-date').first().text(date);
 
-            // 新しいinput hiddenを追加
+            // totalformを変更
+            const diaryTotalForms = $('#id_form-TOTAL_FORMS');
+            const currentTotal = parseInt(diaryTotalForms.val(), 10) || 0; // NaN の場合は 0 にする
+            diaryTotalForms.val(currentTotal + 1); // 更新された値をセット
+            // DiaryのNumをlocation用に用意
             $('<input>', {
                 type: 'hidden',
                 name: 'diary_num', // 隠し入力の名前
@@ -195,7 +202,6 @@ $(document).ready(function() {
             if (diary.locations){
                 diary.locations.forEach(function(location){
                     set_locationInDiary($diaryNewForm, location);
-                    locationEditNum += 1;
                 });
             }
             return $diaryNewForm
@@ -204,8 +210,8 @@ $(document).ready(function() {
         function set_locationInDiary($diaryNewForm, location) {
             const diaryNum = $diaryNewForm.find('input[name="diary_num"]').val();
             const locationsFormsetBody = $diaryNewForm.find(`#id_form-${diaryNum}-location-formset-body`);
-            const locationNum = $('div.locations-form-wrapper').length + $diaryNewForm.find('div.locations-form-wrapper').length;
-            // const locationNum = $('div.locations-form-wrapper').length;
+            // const locationNum = $('div.locations-form-wrapper').length + $diaryNewForm.find('div.locations-form-wrapper').length;
+            const locationNum = $('#id_locations-TOTAL_FORMS').val();
             let locationNewFormHtml = $('#empty-form-location').html().replace(/__prefix__/g, `${locationNum}`);
             let $locationNewForm = $(
                 `<div class="locations-form-wrapper">
@@ -236,7 +242,6 @@ $(document).ready(function() {
                     $display.text(value);
                 }
                 if (name !==`location-radiobutton-group-${diaryNum}`) {
-                    $input.prop('readonly', true);
                     $input.attr('type', 'hidden');
                 }
             });
@@ -244,8 +249,10 @@ $(document).ready(function() {
             // チェックされたLocationがなかった場合
             var $checkedLocation = $diaryNewForm.find(`input[name="location-radiobutton-group-${diaryNum}"]`).filter(':checked');
             var is_thumbnail;
+            // locationが既存の場合
             if (location.location_id) {
                 is_thumbnail = location.is_thumbnail;
+                $locationNewForm.addClass('location-form-edit');
             }
             else {
                 is_thumbnail = $checkedLocation.length === 0;
@@ -254,9 +261,7 @@ $(document).ready(function() {
                 // 他全てをfalseに
                 var $all_forms = $locationNewForm.find(`input[name^="id_locations-"][name$="-is_thumbnail"]`);
                 $all_forms.prop('checked', false);
-                $all_forms.prop('readonly', false);
                 $all_forms.val(false);
-                $all_forms.prop('readonly', true);
 
                 var src = window.location.origin + location.image;
                 var $photoTthumbnail = $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail`);
@@ -265,9 +270,7 @@ $(document).ready(function() {
                 $locationNewForm.find(`input[name="location-radiobutton-group-${diaryNum}"]`).prop('checked', true);
 
                 var $is_thumbnail = $locationNewForm.find(`#id_locations-${locationNum}-is_thumbnail`);
-                $is_thumbnail.prop('readonly', false);
                 $is_thumbnail.val(true);
-                $is_thumbnail.prop('readonly', true);
             }
 
             // diaryが既存の場合，そのIDをセット
@@ -319,11 +322,27 @@ $(document).ready(function() {
                 $is_thumbnail.prop('readonly', true);
             });
 
-            if (locationNum > MAX_LOCATIONS) {
+            var locationNumInDiary = $diaryNewForm.find('div.locations-form-wrapper').length;
+            if (locationNumInDiary > MAX_LOCATIONS) {
                 $('button[name="diary-new-form"]').prop('disabled', true);
+                const $diaryErrors = $diaryNewForm.find(`#id_form-${diaryNum}-diary-errors`);
+                // 同じメッセージがすでに存在するか確認
+                if ($diaryErrors.find('.diary_locationNum_error').length === 0) {
+                    var msg = $(
+                        `<div class="card-errors diary_locationNum_error">
+                            日記に追加できる行先は${MAX_LOCATIONS}個まです。指定数になるまで削除してください。
+                        </div>`
+                    );
+                    $diaryErrors.append(msg);
+                    $diaryErrors.show();
+                }
             }
 
             locationsFormsetBody.append($locationNewForm);
+            // totalformを変更
+            const locationTotalForms = $('#id_locations-TOTAL_FORMS');
+            const currentTotal = parseInt(locationTotalForms.val(), 10) || 0; // NaN の場合は 0 にする
+            locationTotalForms.val(currentTotal + 1);
             return
 
             function searchKeys(obj, keyToFind) {
@@ -349,18 +368,26 @@ $(document).ready(function() {
     });
 
     $('#id_diary-new-form').submit(function(event) {  
-        // event.preventDefault();
+        var error = false;
+        event.preventDefault();
         this.classList.toggle('clicked');
+        // 編集の数を数える
+        const diaryEditNum = $('.diary-form-edit').length;
+        const locationEditNum = $('.location-form-edit').length;
         // Diaryの合計数を編集
-        const diaryTotalForms = $('#id_form-TOTAL_FORMS');
+        const diaryTotalForms = $('#id_form-TOTAL_FORMS').val();
         const diaryNum = $('div.diary-form-wrapper').length;
-        diaryTotalForms.val(diaryNum);
+        if (diaryTotalForms !== diaryNum){
+            error = true;
+        }
         const diaryInitialForms = $('#id_form-INITIAL_FORMS');
         diaryInitialForms.val(diaryEditNum);
         // Locationの合計数を編集
-        const locationTotalForms = $('#id_locations-TOTAL_FORMS');
+        const locationTotalForms = $('#id_locations-TOTAL_FORMS').val();
         const locationNum = $('div.locations-form-wrapper').length;
-        locationTotalForms.val(locationNum);
+        if (locationTotalForms !== locationNum){
+            error = true;
+        }
         const locationInitialForms = $('#id_locations-INITIAL_FORMS');
         locationInitialForms.val(locationEditNum);
 
@@ -371,6 +398,7 @@ $(document).ready(function() {
             name: buttonName,
             value: '',
         }).appendTo(this);
+
         this.submit();
     });
 });
@@ -401,6 +429,45 @@ function edit_location(button){
         input.prop('readonly', false);
         input.attr('type', 'text');
         input.show();
+    }
+}
+
+function delete_location(button) {
+    const $diaryForm = $(button.closest('.diary-form-wrapper'));
+    const locationExsitNum = $diaryForm.find('input[name^="locations-"][name$="-DELETE"]')
+        .filter(function() {
+            return !$(this).val(); // 値が空またはfalsyな場合にtrue
+        }).length;
+    // Diary内のLocationが２以上の場合実行可能
+    if (locationExsitNum > 1){
+        const $locationForm = $(button.closest('.locations-form-wrapper'));
+        var $deleteInput = $locationForm.find('input[name^="locations-"][name$="-DELETE"]');
+        var $radioButton = $locationForm.find('.class_location-radiobutton').first();
+        var $otherradioButtons = $diaryForm.find('.class_location-radiobutton').not($radioButton);
+        if ($radioButton.is(':checked')){
+            var is_thumbnail = $locationForm.find('input[name^="locations-"][name$="-is_thumbnail"]');
+            $radioButton.prop('checked',false);
+            is_thumbnail.val(false);
+
+            var nextRadio = $otherradioButtons.eq(0);
+            var nextLocation = nextRadio.closest('.locations-form-wrapper');
+            var nextThumbnail = nextLocation.find('input[name^="locations-"][name$="-is_thumbnail"]');
+            nextRadio.prop('checked', true);
+            nextRadio.trigger('change');
+            nextThumbnail.val(true);
+        }
+        $deleteInput.val(true);
+        $locationForm.hide();
+        // totalformを変更
+        const locationTotalForms = $('#id_locations-TOTAL_FORMS');
+        const currentTotal = parseInt(locationTotalForms.val(), 10) || 1; // NaN の場合は 1 にする
+        locationTotalForms.val(currentTotal - 1); // 更新された値をセット
+
+        var locationNumInDiary = $diaryForm.find('.locations-form-wrapper').length;
+        if (locationNumInDiary > MAX_LOCATIONS) {
+            $('button[name="diary-new-form"]').prop('disabled', false);
+            $diaryForm.find(`.diary_locationNum_error`).remove();
+        }
     }
 }
 

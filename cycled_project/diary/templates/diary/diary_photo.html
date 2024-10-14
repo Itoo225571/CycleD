@@ -56,9 +56,11 @@
                 {{ diary_formset.empty_form.date }}
                 {{ diary_formset.empty_form.diary_id }}
                 <div class="card" id="id_form-__prefix__-card">
-                    <h5 class="card-header">
-                        Diary Card Header
-                    </h5>
+                    <div class="card-header">
+                        <h5 class="card-diary-date"></h5>
+                        <div id="id_form-__prefix__-diary-errors"></div>
+                    </div>
+                    
                     <div class="card-body">
                         <h5 class="card-title col-auto">写真で得られた地域一覧</h5>
                         <div class="explanation">
@@ -89,7 +91,7 @@
                     <button type="button" class="btn p-0" onclick="edit_location(this)">
                         <i class="bi bi-pencil-square icon-location"></i>
                     </button> 
-                    <button type="button" class="btn p-0" onclick="">
+                    <button type="button" class="btn p-0" onclick="delete_location(this)">
                         <i class="bi bi-trash icon-location" alt="icon-trash" style="color: crimson;"></i>
                     </button> 
                 </div>

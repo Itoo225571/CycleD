@@ -127,7 +127,7 @@ class Diary(models.Model):
     date_last_updated = models.DateField(verbose_name="最終更新日",auto_now=True,null=True)
     comment = models.TextField(blank=True,verbose_name="コメント")
     user = models.ForeignKey(User,on_delete=models.CASCADE,)
-    MAX_LOCATIONS = 2  # 最大Location数
+    MAX_LOCATIONS = 3  # 最大Location数
     def __str__(self):
         return str(self.date)
     class Meta:

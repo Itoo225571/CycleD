@@ -213,10 +213,20 @@
     opacity: 1;
     transform: translateX(0); /* 元の位置に移動 */
 }
-
+/* 説明文 */
 .explanation {
     font-size: 0.8em;  /* 小さめのフォントサイズ */
     color: #888;       /* グレー系の薄い色 */
     margin: 5px 0;     /* 余白を小さく */
     line-height: 1.4;  /* 行間を少し広めに */
+}
+.card .card-errors{
+    font-size: 0.8em;  
+    color: crimson;      
+    margin: 5px 0;    
+    line-height: 1.4;
+}
+.card:has(.card-errors) {
+    border-color: red; /* .card-errorsがあるときの境界線の色 */
+    background-color: rgba(255, 238, 238, 0.5);
 }
