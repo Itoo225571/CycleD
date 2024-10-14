@@ -243,12 +243,19 @@ $(document).ready(function() {
 
             // チェックされたLocationがなかった場合
             var $checkedLocation = $diaryNewForm.find(`input[name="location-radiobutton-group-${diaryNum}"]`).filter(':checked');
-            if ($checkedLocation.length === 0 || location.is_thumbnail) {
+            var is_thumbnail;
+            if (location.location_id) {
+                is_thumbnail = location.is_thumbnail;
+            }
+            else {
+                is_thumbnail = $checkedLocation.length === 0;
+            }
+            if (is_thumbnail) {
                 // 他全てをfalseに
                 var $all_forms = $locationNewForm.find(`input[name^="id_locations-"][name$="-is_thumbnail"]`);
                 $all_forms.prop('checked', false);
                 $all_forms.prop('readonly', false);
-                $all_forms.val(true);
+                $all_forms.val(false);
                 $all_forms.prop('readonly', true);
 
                 var src = window.location.origin + location.image;
@@ -312,6 +319,10 @@ $(document).ready(function() {
                 $is_thumbnail.prop('readonly', true);
             });
 
+            if (locationNum > MAX_LOCATIONS) {
+                $('button[name="diary-new-form"]').prop('disabled', true);
+            }
+
             locationsFormsetBody.append($locationNewForm);
             return
 
@@ -335,7 +346,6 @@ $(document).ready(function() {
                 return result;
             }
         }
-
     });
 
     $('#id_diary-new-form').submit(function(event) {  

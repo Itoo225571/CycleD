@@ -186,6 +186,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         context = super().get_context_data(**kwargs)
         context['photo_form'] = context.pop('form', None)
         context['diary_formset'] = DiaryFormSet(queryset=Diary.objects.none())
+        context['MAX_LOCATIONS'] = Diary.MAX_LOCATIONS
         return context
     
     def get(self, request: HttpRequest, *args: str, **kwargs) -> HttpResponse:
