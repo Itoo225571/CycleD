@@ -319,7 +319,6 @@ $(document).ready(function() {
                 else {
                     $is_thumbnail.val(false);
                 }
-                $is_thumbnail.prop('readonly', true);
             });
 
             var locationNumInDiary = $diaryNewForm.find('div.locations-form-wrapper').length;
@@ -434,22 +433,22 @@ function edit_location(button){
 
 function delete_location(button) {
     const $diaryForm = $(button.closest('.diary-form-wrapper'));
-    const locationExsitNum = $diaryForm.find('input[name^="locations-"][name$="-DELETE"]')
+    const $locationExist = $diaryForm.find('input[name^="locations-"][name$="-DELETE"]')
         .filter(function() {
             return !$(this).val(); // 値が空またはfalsyな場合にtrue
-        }).length;
+        }).parents('.locations-form-wrapper');
     // Diary内のLocationが２以上の場合実行可能
-    if (locationExsitNum > 1){
+    if ($locationExist.length > 1){
         const $locationForm = $(button.closest('.locations-form-wrapper'));
         var $deleteInput = $locationForm.find('input[name^="locations-"][name$="-DELETE"]');
         var $radioButton = $locationForm.find('.class_location-radiobutton').first();
-        var $otherradioButtons = $diaryForm.find('.class_location-radiobutton').not($radioButton);
+        var $otherradioButtons = $locationExist.find('.class_location-radiobutton').not($radioButton);
         if ($radioButton.is(':checked')){
             var is_thumbnail = $locationForm.find('input[name^="locations-"][name$="-is_thumbnail"]');
             $radioButton.prop('checked',false);
             is_thumbnail.val(false);
 
-            var nextRadio = $otherradioButtons.eq(0);
+            var nextRadio = $otherradioButtons.first();
             var nextLocation = nextRadio.closest('.locations-form-wrapper');
             var nextThumbnail = nextLocation.find('input[name^="locations-"][name$="-is_thumbnail"]');
             nextRadio.prop('checked', true);
