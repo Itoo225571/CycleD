@@ -48,8 +48,7 @@
                                         <div class="error" id="date-error">{{ form.date.errors }}</div>
                                     {% endif %}
                             </div>
-                            {% comment %}                             
-                            <div class="row my-3">
+                            <div class="row mb-2">
                                 <div class="col">
                                 <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }}</label>
                                     {{ form.comment }}
@@ -58,7 +57,6 @@
                                     {% endif %}
                                 </div>
                             </div>         
-                            {% endcomment %}
                             <!-- フォームセット全体を表示 -->
                             <div class="row">
                                 <div class="col">
@@ -110,8 +108,10 @@
                                 <div class="address-search-form">
                                     <form method="post" id="address-search-form" name="address-search-form">
                                         {% csrf_token %}
-                                        {{ form.keyword }}
-                                        <button class="btn btn-primary mx-3" type="submit">検索</button>
+                                        <div class="input-group">
+                                            {{ form.keyword }}
+                                            <button class="btn btn-primary mx-3" type="submit">検索</button>
+                                        </div>
                                     </form>
                                 </div>
                             </div>
@@ -128,9 +128,6 @@
 {% endblock content %}
 
 {% block extra_js %}
-    <script>
-        window.hasFormErrors = {% if diary_form_errors %}true{% else %}false{% endif %};
-    </script>
     <script src="{% static 'diary/js/getCookie.js' %}"></script>
     <script src="{% static 'diary/js/pagination.js' %}"></script>
     <script src="{% static 'diary/js/loading_overlay.js' %}"></script>
@@ -140,6 +137,7 @@
         // DjangoテンプレートタグでURLを埋め込む
         const url_sendDiaries = "{% url 'diary:sendDiaries' %}";
         const mockUuid = "{{ mock_uuid }}"; 
+        window.hasFormErrors = {% if diary_form_errors %}true{% else %}false{% endif %};
     </script>
     <script src="{% static 'diary/js/mycalendar.js' %}" type="module"></script>
     <script src="{% static 'diary/js/address_diary.js' %}" type="module"></script>
