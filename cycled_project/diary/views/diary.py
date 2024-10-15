@@ -205,50 +205,49 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         
     def form_valid(self, diary_formset, location_formset):
         diaries = diary_formset.save(commit=False)
-        for diary in diaries:
-            diary.user = self.request.user  # 現在のユーザーを設定
-            diary.save()  # 保存
         try:
-            for form in location_formset.forms:
-                # locationがすでに存在しているか確認
-                location = form.cleaned_data.get("location_id")
-                if location:
-                    form.instance = location  # 既存のインスタンスをフォームに設定
-                    # フォームのデータを既存のインスタンスに適用
-                    form.instance.label = form.cleaned_data.get("label")
-                    form.instance.is_thumbnail = form.cleaned_data.get("is_thumbnail")
-                else:
-                    location = form.save(commit=False)
-                id = form.cleaned_data.get("id_of_image")
-                # tempImageの場合
-                if id:
-                    temp_image = get_object_or_404(TempImage, id=id, user=self.request.user)
-                    image = temp_image.image
-                    if image:
-                        image_file = ContentFile(image.read(), name=image.name)
-                        image = InMemoryUploadedFile(
-                            image_file, field_name=None, name=image.name ,content_type='image/jpg',
-                            size=image.file.size, charset=None
-                        )
-                        form.instance.image = image
-                        temp_image.delete() 
-                # Location編集の場合
-                else:
-                    print(location.location_id)
-                    pass
-                date = form.cleaned_data.get("date_of_Diary")
-                location.diary = get_object_or_404(Diary, user=self.request.user, date=date)
-                location.full_clean()  # バリデーションを実行
-                location.save()
-            return super().form_valid(diary_formset)
+            with transaction.atomic():
+                for diary in diaries:
+                    diary.user = self.request.user  # 現在のユーザーを設定
+                    diary.save()  # 保存
+                for form in location_formset.forms:
+                    # locationがすでに存在しているか確認
+                    location = form.cleaned_data.get("location_id")
+                    if location:
+                        form.instance = location  # 既存のインスタンスをフォームに設定
+                        # フォームのデータを既存のインスタンスに適用
+                        form.instance.label = form.cleaned_data.get("label")
+                        form.instance.is_thumbnail = form.cleaned_data.get("is_thumbnail")
+                    else:
+                        location = form.save(commit=False)
+                    id = form.cleaned_data.get("id_of_image")
+                
+                    # tempImageの場合
+                    if id:
+                        temp_image = get_object_or_404(TempImage, id=id, user=self.request.user)
+                        image = temp_image.image
+                        if image:
+                            image_file = ContentFile(image.read(), name=image.name)
+                            image = InMemoryUploadedFile(
+                                image_file, field_name=None, name=image.name ,content_type='image/jpg',
+                                size=image.file.size, charset=None
+                            )
+                            form.instance.image = image
+                            temp_image.delete() 
+                    # Location編集の場合
+                    else:
+                        print(location.location_id)
+                        pass
+                    date = form.cleaned_data.get("date_of_Diary")
+                    location.diary = get_object_or_404(Diary, user=self.request.user, date=date)
+                    location.full_clean()  # バリデーションを実行
+                    location.save()
+                return super().form_valid(diary_formset)
         except Exception as e:
-            # for diary in diaries:
-            #     diary.delete()
-            # TempImage.objects.filter(user=self.request.user).delete()
             print(f"Error occurred: {e}")
             return self.formset_invalid(diary_formset, location_formset)
 
-    def formset_invalid(self, diary_formset=None, location_formset=None):
+    def formset_invalid(self, diary_formset=None, location_formset=None,errors=None):
         # diary_formset が提供されている場合のエラー処理
         if diary_formset:
             for form_error in diary_formset.errors:
@@ -259,6 +258,9 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
             for form_error in location_formset.errors:
                 # 各エラーメッセージを追加
                 messages.error(self.request, form_error)
+        if errors:
+            for err in errors:
+                messages.error(self.request,err)
         return self.render_to_response(self.get_context_data())
     
     def get_form_kwargs(self):
