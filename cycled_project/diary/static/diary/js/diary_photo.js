@@ -1,10 +1,11 @@
 $(document).ready(function() {
-    const diaryFormsetBody = $('#diary-formset-body');
+    const $diaryFormsetBody = $('#diary-formset-body');
     const diaryMaxNum = $('#id_form-MAX_NUM_FORMS').val();
     const locationMaxNum = $('#id_locations-MAX_NUM_FORMS').val();
     $('#id_form-TOTAL_FORMS').val(0);//初期化
     $('#id_locations-TOTAL_FORMS').val(0);
     let errorCount = 0;
+    let diaryEntries = [];
     remove_error();
 
     // FilePondを初期化
@@ -56,17 +57,13 @@ $(document).ready(function() {
                             append_error(response.error);
                             return;
                         }
-                        // 編集するDiaryの数をセット
-                        let Diary = response.diary
-                        // if (!Diary.empty) {
-                        //     diaryEditNum += 1;
-                        // }
-                        let $diaryForm = set_diary(Diary);
-                        set_locationInDiary($diaryForm, response.location_new);
+                        let $diaryForm = set_diary(response.diary); //diary初期化
+                        set_locationInDiary($diaryForm, response.location_new); //locationsをセット
                         // ツールチップ初期化
                         var tooltipTriggerList = $diaryForm.find('[data-bs-toggle="tooltip"]');
-                        var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-                        diaryFormsetBody.append($diaryForm);
+                        var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+                        // $diaryFormsetBody.append($diaryForm);
+                        diaryEntries.push({ form: $diaryForm, date: response.diary.date });
                         
                         return ;
                     },
@@ -126,7 +123,7 @@ $(document).ready(function() {
                     });
                 }, 1500);
             },
-            // すべてのファイルがアップロードされた後の処理
+            // すべてのファイルの処理が終わった後に実行される
             onprocessfiles: () => {
                 if (errorCount >= pond.getFiles().length) {
                     append_error('全ての写真でアップロードが失敗しました。');
@@ -138,6 +135,12 @@ $(document).ready(function() {
                     errorCount = 0;
                 }
                 else {
+                    diaryEntries.sort((a, b) => new Date(a.date) - new Date(b.date));
+                    // ソートされた順にフォームを追加
+                    diaryEntries.forEach(entry => {
+                        $diaryFormsetBody.append(entry.form);
+                    });
+
                     setTimeout(() => {
                         // フェードアウトアニメーションを追加
                         $('#id_photos-form').fadeOut(400);
@@ -152,17 +155,10 @@ $(document).ready(function() {
         });
 
         function set_diary(diary){
-            let $diaryFormSame = null;
             // 同じ日のDiaryがないか確認
-            diaryFormsetBody.find('input[id^="id_form-"][id$="-date"]').each(function() {
-                var date = $(this).val();
-                if (date === diary.date){
-                    $diaryFormSame = $(this).closest('.diary-form-wrapper');
-                    return false; // ループを終了
-                }
-            });
-            if ($diaryFormSame){
-                return $diaryFormSame
+            const $diaryFormSameDict = diaryEntries.find(entry => entry.date === diary.date);
+            if ($diaryFormSameDict){
+                return $diaryFormSameDict.form
             }
             const diaryNum = $('#id_form-TOTAL_FORMS').val();
             let diaryNewFormHtml = $('#empty-form-diary').html().replace(/__prefix__/g, `${diaryNum}`);
