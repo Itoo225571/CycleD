@@ -63,6 +63,9 @@ $(document).ready(function() {
                         // }
                         let $diaryForm = set_diary(Diary);
                         set_locationInDiary($diaryForm, response.location_new);
+                        // ツールチップ初期化
+                        var tooltipTriggerList = $diaryForm.find('[data-bs-toggle="tooltip"]');
+                        var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
                         diaryFormsetBody.append($diaryForm);
                         
                         return ;
