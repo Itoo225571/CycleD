@@ -9,6 +9,8 @@ from io import BytesIO
 import base64
 import imagehash
 
+from pprint import pprint
+
 class Photo(BaseModel):
     # path: Path
     dt: datetime = None
@@ -86,6 +88,7 @@ def get_values_from_photo(exif_data):
         lon_ref = exif_data["GPS GPSLongitudeRef"].printable.strip()
         lat_dms = exif_data["GPS GPSLatitude"].printable
         lon_dms = exif_data["GPS GPSLongitude"].printable
+
         pre_latitude = parse_dms_string(lat_dms)
         pre_longitude = parse_dms_string(lon_dms)
         pre_height = exif_data["GPS GPSAltitude"].printable
@@ -130,6 +133,6 @@ def to_pHash(image):
 
 if __name__=="__main__":
     file = r"/Users/itoudaiki/Downloads/plus.png"
-    file= r"/Users/itoudaiki/Library/CloudStorage/OneDrive-MeijiMail/設計計画/20240905_013804792_iOS.heic"
+    file= r"/Users/itoudaiki/Library/CloudStorage/OneDrive-MeijiMail/設計計画/写真/20240731_081808188_iOS.heic"
 
     info = get_photo_info(file)

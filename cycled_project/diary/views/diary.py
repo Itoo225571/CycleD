@@ -15,7 +15,7 @@ from django.core.cache import cache
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from ..forms import DiaryForm,AddressSearchForm,LocationForm,LocationCoordForm,LocationFormSet,DiaryFormSet,PhotoForm
+from ..forms import DiaryForm,AddressSearchForm,LocationForm,LocationCoordForm,LocationFormSet,DiaryFormSet,PhotosForm
 from ..models import Diary,Location,TempImage
 from ..serializers import DiarySerializer,LocationSerializer
 
@@ -180,7 +180,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
     template_name ="diary/diary_photo.html"
     success_url = reverse_lazy("diary:calendar")
     redirect_url = reverse_lazy('diary:diary_photo')
-    form_class = PhotoForm
+    form_class = PhotosForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -315,8 +315,13 @@ async def async_temp_file_writer(img_file):
 async def process_image_file(img_file, image_hash_list, request):
     temp_file_path = None
     try:
+        # 作成日時について
+        metadata = request.POST.get('images')
+        if metadata:
+            lastModifiedDate = json.loads(metadata).get('lastModifiedDate')
+            lastModifiedDate = datetime.strptime(lastModifiedDate, '%Y/%m/%d %H:%M:%S')
+
         temp_file_path = await async_temp_file_writer(img_file)
-    
         # 非同期に写真の情報を取得
         photo_data = await sync_to_async(get_photo_info)(temp_file_path)
         # エラーチェック
@@ -344,7 +349,8 @@ async def process_image_file(img_file, image_hash_list, request):
             user=request.user,
             lat=photo_data.lat,
             lon=photo_data.lon,
-            date=photo_data.dt.strftime('%Y-%m-%d'),
+            date_photographed=photo_data.dt.strftime('%Y-%m-%d %H:%M:%S'),
+            date_lastModified=lastModifiedDate.strftime('%Y-%m-%d %H:%M:%S'),
         )
 
         # バリデーションと保存
@@ -369,10 +375,17 @@ async def process_image_file(img_file, image_hash_list, request):
         if geo_data:
             geo_data['image'] = temp_image.image.url
             geo_data['id_of_image'] = temp_image.id
-            geo_data['date'] = temp_image.date  # 日付も格納
+            geo_data['date'] = temp_image.date_photographed.strftime('%Y-%m-%d')  # 日付も格納
+            geo_data['is_within_24_hours'] = False
         else:
             logger.error(f"住所取得に失敗しました。")
             return {'error':"住所取得に失敗しました。"}
+        
+        if lastModifiedDate:
+            is_within_24_hours_file = datetime.now() - timedelta(hours=24) <= lastModifiedDate <= datetime.now()
+            is_within_24_hours_photo = datetime.now() - timedelta(hours=24) <= photo_data.dt <= datetime.now()
+            if is_within_24_hours_file and is_within_24_hours_photo:
+                geo_data['is_within_24_hours'] = True
 
         return geo_data
     except Exception as e:
@@ -397,14 +410,13 @@ class Photos2LocationsView(generic.View):
         # TempImage削除
         # await sync_to_async(lambda: TempImage.objects.filter(user=request.user).delete(), thread_sensitive=False)()
         context = {
-            'photo_form': PhotoForm(),
+            'photo_form': PhotosForm(),
             'diary_formset': DiaryFormSet(queryset=Diary.objects.none()),
         }
         return render(request, 'diary/diary_photo.html', context)
     
     async def post(self,request):
-        form = PhotoForm(request.POST, request.FILES)
-
+        form = PhotosForm(request.POST, request.FILES)
         if form.is_valid():
             files = request.FILES.getlist('images')
             diaries = await cache.aget(f'diaries_{self.user.id}')
