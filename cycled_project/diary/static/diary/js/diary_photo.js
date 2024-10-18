@@ -110,8 +110,11 @@ $(document).ready(function() {
                 }
                 // ファイル選択を無効にする
                 pond.setOptions({
-                    allowMultiple: false,  
+                    allowMultiple: false,
                 });
+
+                const lastModifiedDate = new Date(file.file.lastModified); // 更新日を取得
+                file.setMetadata('lastModifiedDate',lastModifiedDate.toLocaleString({ timeZone: 'Asia/Tokyo' }));
                 $('.filepond--drop-label').hide();
             },
             // 1ファイルアップロードが完了したときに実行される

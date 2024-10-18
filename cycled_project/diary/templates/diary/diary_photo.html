@@ -26,7 +26,7 @@
                         <div class="col-10">
                             <!-- {% comment %} <label for="{{ photo_form.images.id_for_label }}">{{ photo_form.images.label }}</label> {% endcomment %} -->
                             <!-- {{ photo_form.images|add_class:"filepond"}} -->
-                            <input type="file" class="filepond" name="{{ photo_form.images.name }}" accept=".jpeg, .jpg, .png, .gif, .heic, .heif" multiple>
+                            <input type="file" class="filepond" name="{{ photo_form.images.name }}" multiple>
                             {% if field.errors %}
                                 <div class="error">{{ photo_form.images.errors }}</div>
                             {% endif %}

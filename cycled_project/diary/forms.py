@@ -111,10 +111,11 @@ class AddressSearchForm(forms.Form):
 class LocationForm(forms.ModelForm):
     date_of_Diary = forms.DateField(required=False, widget=forms.HiddenInput())
     id_of_image = forms.UUIDField(required=False, widget=forms.HiddenInput())
+    is_within_24_hours = forms.BooleanField(required=False, widget=forms.HiddenInput())
     class Meta:
         model = Location
         fields = ["lat","lon","state","display","label","is_thumbnail",
-                  "date_of_Diary","id_of_image"]
+                  "date_of_Diary","id_of_image","is_within_24_hours"]
         labels = {
             "label": "表示名",
         }
@@ -302,10 +303,9 @@ class MultipleFileField(forms.FileField):
             result = file
         return result
     
-class PhotoForm(forms.Form):
+class PhotosForm(forms.Form):
     images = MultipleFileField(label='写真を選択', required=False,)
     def __init__(self, *args, **kwargs):
         # viewsでrequestを使用可能にする
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
-    
