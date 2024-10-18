@@ -226,6 +226,12 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                     if id:
                         temp_image = get_object_or_404(TempImage, id=id, user=self.request.user)
                         image = temp_image.image
+                        # 24時間以内に作成されたものかどうか
+                        elapsed_time_photo = datetime.now() - temp_image.date_photographed
+                        elapsed_time_file = datetime.now() - temp_image.date_lastModified
+                        if elapsed_time_photo < timedelta(hours=24) and elapsed_time_file < timedelta(hours=24):
+                            pass
+                        
                         if image:
                             image_file = ContentFile(image.read(), name=image.name)
                             image = InMemoryUploadedFile(
@@ -233,7 +239,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                                 size=image.file.size, charset=None
                             )
                             form.instance.image = image
-                            temp_image.delete() 
+                            temp_image.delete()
                     # Location編集の場合
                     else:
                         print(location.location_id)
@@ -382,9 +388,9 @@ async def process_image_file(img_file, image_hash_list, request):
             return {'error':"住所取得に失敗しました。"}
         
         if lastModifiedDate:
-            is_within_24_hours_file = datetime.now() - timedelta(hours=24) <= lastModifiedDate <= datetime.now()
-            is_within_24_hours_photo = datetime.now() - timedelta(hours=24) <= photo_data.dt <= datetime.now()
-            if is_within_24_hours_file and is_within_24_hours_photo:
+            elapsed_time_photo = datetime.now() - temp_image.date_photographed
+            elapsed_time_file = datetime.now() - temp_image.date_lastModified
+            if elapsed_time_photo < timedelta(hours=24) and elapsed_time_file < timedelta(hours=24):
                 geo_data['is_within_24_hours'] = True
 
         return geo_data
