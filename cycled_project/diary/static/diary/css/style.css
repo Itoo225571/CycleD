@@ -9,6 +9,12 @@
     pointer-events: none; /* この要素を操作不可にする */
 }
 
+/* ナビゲーションバー */
+@charset "shift_JIS";
+.navbar .navbar-brand {
+    font-family: HGP創英角ﾎﾟｯﾌﾟ体,メイリオ,'ＭＳ Ｐゴシック',Osaka,sans-serif;
+}
+
 /* エラーリスト */
 #error-list-container{
     display: none;
