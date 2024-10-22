@@ -220,13 +220,23 @@
     margin: 5px 0;     /* 余白を小さく */
     line-height: 1.4;  /* 行間を少し広めに */
 }
-.card .card-errors{
+
+/* カード */
+.card-rank0 {
+    border: 1px solid #b39855;
+}
+.card-rank0 .card-header {
+    background: linear-gradient(90deg, #b39855 0%, #fff9e6 50%, #b39855 100%);
+    background-repeat: no-repeat;
+    color: black;
+}
+.card .card-errors-element{
     font-size: 0.8em;  
     color: crimson;      
     margin: 5px 0;    
     line-height: 1.4;
 }
-.card:has(.card-errors) {
-    border-color: red; /* .card-errorsがあるときの境界線の色 */
+.card:has(.card-errors-element) {
+    border-color: red; /* .card-errors-elementがあるときの境界線の色 */
     background-color: rgba(255, 238, 238, 0.5);
 }

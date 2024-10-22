@@ -111,11 +111,11 @@ class AddressSearchForm(forms.Form):
 class LocationForm(forms.ModelForm):
     date_of_Diary = forms.DateField(required=False, widget=forms.HiddenInput())
     id_of_image = forms.UUIDField(required=False, widget=forms.HiddenInput())
-    is_within_24_hours = forms.BooleanField(required=False, widget=forms.HiddenInput())
+    rank = forms.ChoiceField(choices=Diary.RANK_CHOICES, initial=1, required=False, widget=forms.HiddenInput())
     class Meta:
         model = Location
         fields = ["lat","lon","state","display","label","is_thumbnail",
-                  "date_of_Diary","id_of_image","is_within_24_hours"]
+                  "date_of_Diary","id_of_image","rank"]
         labels = {
             "label": "表示名",
         }
