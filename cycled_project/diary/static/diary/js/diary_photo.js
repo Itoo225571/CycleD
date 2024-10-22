@@ -115,6 +115,7 @@ $(document).ready(function() {
 
                 const lastModifiedDate = new Date(file.file.lastModified); // 更新日を取得
                 file.setMetadata('lastModifiedDate',lastModifiedDate.toLocaleString({ timeZone: 'Asia/Tokyo' }));
+                // file.setMetadata('lastModifiedDate',lastModifiedDate.toISOString());
                 $('.filepond--drop-label').hide();
             },
             // 1ファイルアップロードが完了したときに実行される
@@ -248,6 +249,11 @@ $(document).ready(function() {
                 }
             });
 
+            // ランクをクラスに追加
+            if (location.rank !== 1){
+                $diaryNewForm.find('.card').addClass(`card-rank${location.rank}`);
+            }
+
             // チェックされたLocationがなかった場合
             var $checkedLocation = $diaryNewForm.find(`input[name="location-radiobutton-group-${diaryNum}"]`).filter(':checked');
             var is_thumbnail;
@@ -330,7 +336,7 @@ $(document).ready(function() {
                 // 同じメッセージがすでに存在するか確認
                 if ($diaryErrors.find('.diary_locationNum_error').length === 0) {
                     var msg = $(
-                        `<div class="card-errors diary_locationNum_error">
+                        `<div class="card-errors-element diary_locationNum_error">
                             日記に追加できる行先は${MAX_LOCATIONS}個まです。指定数になるまで削除してください。
                         </div>`
                     );

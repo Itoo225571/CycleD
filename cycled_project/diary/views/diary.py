@@ -14,6 +14,7 @@ from django.contrib import messages
 from django.core.cache import cache
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.utils import timezone
 
 from ..forms import DiaryForm,AddressSearchForm,LocationForm,LocationCoordForm,LocationFormSet,DiaryFormSet,PhotosForm
 from ..models import Diary,Location,TempImage
@@ -225,13 +226,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                     # tempImageの場合
                     if id:
                         temp_image = get_object_or_404(TempImage, id=id, user=self.request.user)
-                        image = temp_image.image
-                        # 24時間以内に作成されたものかどうか
-                        elapsed_time_photo = datetime.now() - temp_image.date_photographed
-                        elapsed_time_file = datetime.now() - temp_image.date_lastModified
-                        if elapsed_time_photo < timedelta(hours=24) and elapsed_time_file < timedelta(hours=24):
-                            pass
-                        
+                        image = temp_image.image                        
                         if image:
                             image_file = ContentFile(image.read(), name=image.name)
                             image = InMemoryUploadedFile(
@@ -246,6 +241,10 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                         pass
                     date = form.cleaned_data.get("date_of_Diary")
                     location.diary = get_object_or_404(Diary, user=self.request.user, date=date)
+                    # 今日中に作成されたものかどうか(0がGOLD)
+                    if id:
+                        if datetime.now().date() == temp_image.date_photographed.date() == temp_image.date_lastModified.date():
+                            location.diary.rank = 0
                     location.full_clean()  # バリデーションを実行
                     location.save()
                 return super().form_valid(diary_formset)
@@ -355,8 +354,9 @@ async def process_image_file(img_file, image_hash_list, request):
             user=request.user,
             lat=photo_data.lat,
             lon=photo_data.lon,
-            date_photographed=photo_data.dt.strftime('%Y-%m-%d %H:%M:%S'),
-            date_lastModified=lastModifiedDate.strftime('%Y-%m-%d %H:%M:%S'),
+            # naiveなdatetimeをtimezone-awareなdatetimeに変換
+            date_photographed = timezone.make_aware(photo_data.dt, timezone.get_current_timezone()),
+            date_lastModified = timezone.make_aware(lastModifiedDate, timezone.get_current_timezone()),
         )
 
         # バリデーションと保存
@@ -382,16 +382,13 @@ async def process_image_file(img_file, image_hash_list, request):
             geo_data['image'] = temp_image.image.url
             geo_data['id_of_image'] = temp_image.id
             geo_data['date'] = temp_image.date_photographed.strftime('%Y-%m-%d')  # 日付も格納
-            geo_data['is_within_24_hours'] = False
         else:
             logger.error(f"住所取得に失敗しました。")
             return {'error':"住所取得に失敗しました。"}
         
         if lastModifiedDate:
-            elapsed_time_photo = datetime.now() - temp_image.date_photographed
-            elapsed_time_file = datetime.now() - temp_image.date_lastModified
-            if elapsed_time_photo < timedelta(hours=24) and elapsed_time_file < timedelta(hours=24):
-                geo_data['is_within_24_hours'] = True
+            if datetime.now().date() == temp_image.date_photographed.date() == temp_image.date_lastModified.date():
+                geo_data['rank'] = 0
 
         return geo_data
     except Exception as e:
