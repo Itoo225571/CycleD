@@ -64,6 +64,11 @@
     font-size: 24px; /* アイコンのサイズ */
     color: #1B85FB;
 }
+/* ランク0の表示方法 */
+#mycalendar .diary-event.diary-rank-0 .fc-event-title::before {
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+    color: gold;
+}
 
 /* モーダルウィンドウ */
 /* #diaryModal .address-form-content{

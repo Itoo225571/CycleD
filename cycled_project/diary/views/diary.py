@@ -245,8 +245,10 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                     if id:
                         if datetime.now().date() == temp_image.date_photographed.date() == temp_image.date_lastModified.date():
                             location.diary.rank = 0
+                            self.request.user.coin.add()
                     location.full_clean()  # バリデーションを実行
                     location.save()
+                    location.diary.save()
                 return super().form_valid(diary_formset)
         except Exception as e:
             print(f"Error occurred: {e}")

@@ -48,7 +48,7 @@ function addDiariesToCalendar() {
 					description: description,
                     start: diary.date,                     // 日記の日付
                     allDay: true,                          // 終日イベントとして設定
-                    className: "diary-event",
+                    className: `diary-event diary-rank-${diary.rank}`, // rankを含めたクラス名
 					backgroundColor: 'rgba(255, 255, 255, 0)',  // 背景色を指定
 					borderColor: 'rgba(255, 255, 255, 0)',      // 枠線の色も同じにする場合
                 });
