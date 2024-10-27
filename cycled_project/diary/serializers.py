@@ -27,5 +27,6 @@ class DiarySerializer(serializers.ModelSerializer):
             'diary_id', 
             'date', 
             'comment', 
-            'locations'
+            'locations',
+            'rank',
         ]

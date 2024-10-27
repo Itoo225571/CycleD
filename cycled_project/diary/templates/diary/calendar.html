@@ -12,7 +12,7 @@
 {% endblock page_title %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'diary/css/mycalendar.css' %}" type="text/css" >
+    <link rel="stylesheet" href="{% static 'diary/css/calendar.css' %}" type="text/css" >
     <link rel="stylesheet" href="{% static 'diary/css/address.css' %}" type="text/css" >
     <link rel="stylesheet" href="{% static 'diary/css/diary.css' %}" type="text/css" >
 {% endblock extra_css %}
@@ -139,6 +139,6 @@
         const mockUuid = "{{ mock_uuid }}"; 
         window.hasFormErrors = {% if diary_form_errors %}true{% else %}false{% endif %};
     </script>
-    <script src="{% static 'diary/js/mycalendar.js' %}" type="module"></script>
+    <script src="{% static 'diary/js/calendar.js' %}" type="module"></script>
     <script src="{% static 'diary/js/address_diary.js' %}" type="module"></script>
 {% endblock %}

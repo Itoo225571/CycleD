@@ -6,7 +6,8 @@ class DiaryConfig(AppConfig):
     name = "diary"
 
     def ready(self):
-        from .ap_scheduler import start,delete_tempImages
+        from diary.ap_scheduler import start,delete_tempImages
+        import diary.signals
         start()
         threading.Timer(10.0, delete_tempImages).start()  # 10秒後に実行
         

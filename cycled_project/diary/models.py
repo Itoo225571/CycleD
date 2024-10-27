@@ -5,8 +5,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_delete,pre_delete
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.cache import cache
 from django.utils import timezone
 
 import uuid
@@ -52,29 +50,6 @@ class Location(models.Model):
                 location_count = self.diary.locations.count() 
                 if location_count >= self.diary.MAX_LOCATIONS:  # MAX_LOCATIONSは許可される最大数を指定
                     raise ValidationError(f"この日記には{self.diary.MAX_LOCATIONS}個以上の場所を追加できません。")
-        
-# モデル削除後に`image`を削除する。
-@receiver(post_delete, sender=Location)
-def delete_file(sender, instance, **kwargs):
-    if instance.image:
-        try:
-            instance.image.delete(False)
-        except Exception as e:
-            print(f"Error deleting file {instance.image.name}: {e}")
-# モデル削除直前に他にis_thumbnailを移動
-@receiver(pre_delete, sender=Location)
-def set_thumbnail_on_delete(sender, instance, **kwargs):
-    instance.refresh_from_db()
-    try:
-        diary = instance.diary
-        if instance.is_thumbnail:
-            if diary:
-                new_thumbnail_location = Location.objects.filter(diary=diary).exclude(location_id=instance.location_id).first()
-                if new_thumbnail_location:
-                    new_thumbnail_location.is_thumbnail = True
-                    new_thumbnail_location.save()
-    except ObjectDoesNotExist:
-        return
 
 def upload_to(instance, filename):
     # 拡張子を取得
@@ -92,13 +67,6 @@ class TempImage(models.Model):
     lon = models.FloatField(null=True)
     date_photographed = models.DateTimeField(verbose_name="撮影日時",null=True)
     date_lastModified = models.DateTimeField(verbose_name="ファイル更新日時",null=True)
-@receiver(post_delete, sender=TempImage)
-def delete_file(sender, instance, **kwargs):
-    if instance.image:
-        try:
-            instance.image.delete(False)
-        except Exception as e:
-            print(f"Error deleting file {instance.image.name}: {e}")
 
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
@@ -109,6 +77,7 @@ class User(AbstractUser):
     # groups = None
     icon = models.ImageField(upload_to="images/",blank=True,null=True,verbose_name="アイコン")
     home = models.OneToOneField(Location,on_delete=models.CASCADE,blank=True,null=True,verbose_name="お気に入りの場所")
+    coin = models.OneToOneField('Coin',on_delete=models.CASCADE, blank=True, null=True, verbose_name="サイクルコイン")
     # password=models.CharField(max_length=128,verbose_name="password")
     # date_created=models.DateField(verbose_name="creation date",auto_now_add=True,null=True)
     # date_last_login=models.DateField(verbose_name="last login date",auto_now=True,null=True)
@@ -149,16 +118,20 @@ class Diary(models.Model):
         super().clean()  # 既存のバリデーションを保持
         if self.date and self.date > timezone.localdate():  # 今日より未来の日付かどうかを確認
             raise ValidationError("日記の日付は今日以前の日付でなければなりません。")
-    
-@receiver(models.signals.post_save, sender=Diary)
-def update_cache_on_create_or_update(sender, instance, created, **kwargs):
-    # キャッシュを削除または更新する
-    cache_key = f'diaries_{instance.user.id}'
-    cache.delete(cache_key)  # Diaryが作成または更新されたときにキャッシュを削除
 
-@receiver(models.signals.post_delete, sender=Diary)
-def update_cache_on_delete(sender, instance, **kwargs):
-    # キャッシュを削除する
-    cache_key = f'diaries_{instance.user.id}'
-    cache.delete(cache_key)  # Diaryが削除されたときにキャッシュを削除
-
+class Coin(models.Model):
+    num = models.IntegerField(default=0)
+    num_continue = models.IntegerField(default=0)
+    timestamp = models.DateTimeField(null=True)
+    @property
+    def can_increment(self):
+        if self.timestamp is None:
+            return True  # まだ加算されたことがない場合
+        return self.timestamp.date() != timezone.now().date()
+    def add(self, amount=1):
+        if self.can_increment:
+            self.num += amount
+            self.num_continue += 1
+            self.timestamp = timezone.now()
+            self.save()
+        return self.num

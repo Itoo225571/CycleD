@@ -12,6 +12,12 @@
 
 {% block content %}
     <div class="container">
+        <div class="diary-count-field">
+            {% if user.coin.timestamp %}
+            <p>日記継続日数: <strong>{{user.coin.num_continue}}日</strong></p>
+            <p>総コイン数: <strong>{{user.coin.num}}枚</strong></p>
+            {% endif %}
+        </div>
         {% if not user.home %}
         <div>
             <p>住所が登録されていません</p>
