@@ -92,7 +92,7 @@ class User(AbstractUser):
     
 class Diary(models.Model):
     diary_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-    date = models.DateField(verbose_name="日記の日時", null=True, unique=True)
+    date = models.DateField(verbose_name="日記の日時", null=True, )
     date_created = models.DateField(verbose_name="作成日",auto_now_add=True,null=True)
     date_last_updated = models.DateField(verbose_name="最終更新日",auto_now=True,null=True)
     comment = models.TextField(blank=True,verbose_name="コメント")
@@ -105,6 +105,8 @@ class Diary(models.Model):
     ]
     rank = models.IntegerField(choices=RANK_CHOICES, default=1)
 
+    class Meta:
+        unique_together = ('user', 'date')  # ユーザーごとに日付をユニークにする
     def __str__(self):
         return str(self.date)
     class Meta:

@@ -235,6 +235,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         this.submit();
         // フォームの action をリセット
-        $('#diaryForm').prop('action', initialActionUrl);
+        // $('#diaryForm').prop('action', initialActionUrl);
     });
 });
