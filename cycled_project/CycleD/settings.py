@@ -33,7 +33,7 @@ MEDIA_URL="/media/"
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
 
 RATELIMIT_ENABLE = True
 RATELIMIT_USE_CACHE = "default"
@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'widget_tweaks', #HTMLの見た目調節
     'imagekit', #image周り
     'django_cleanup', #不要なファイルを削除
+    'sslserver', #仮のHttps
 ]
 
 MIDDLEWARE = [
@@ -165,3 +166,7 @@ DEBUG_TOOLBAR_CONFIG={
 # ユーザーモデル変更
 AUTH_USER_MODEL = 'diary.User'
 
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# SECURE_SSL_REDIRECT = False
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
