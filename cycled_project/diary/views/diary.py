@@ -261,7 +261,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                         buffer = io.BytesIO()
                         ret_img.save(fp=buffer, format=org_img.format)
                         buffer.seek(0)  # バッファの先頭に戻す
-                        location.image.save(name=location.image.name,content=buffer)
+                        location.image.save(name=os.path.basename(location.image.name),content=buffer)
 
                 return super().form_valid(diary_formset)
         except Exception as e:
