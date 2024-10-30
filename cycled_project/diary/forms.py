@@ -178,17 +178,19 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
         required=False,
         widget=forms.TextInput(attrs={"placeholder":" 地名・施設名・駅名など"})
     )
+    thumbnail_rotate_angle = forms.IntegerField(required=False, widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
         # viewsでrequestを使用可能にする
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
+        self.initial['thumbnail_rotate_angle'] = 0  # ここで初期値を設定
         for _, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
 
     class Meta:
         model=Diary
-        fields=["date","comment"]
+        fields=["date","comment","thumbnail_rotate_angle"]
         labels = {
             "date": "サイクリング日時",
             "comment": "コメント",

@@ -175,13 +175,15 @@ $(document).ready(function() {
             let prefix = `form-${diaryNum}-`;
             $diaryNewForm.find('input, textarea').each(function() {
                 let inputName = $(this).attr('name'); // inputのname属性を取得
-                inputName = inputName.replace(prefix, '');
-                if (diary.hasOwnProperty(inputName)) {
-                    $(this).val(diary[inputName]); // 対応するデータをinputにセット
-                }
-                if (inputName === "date") {
-                    $(this).attr('type', 'hidden');
-                    $(this).prop('readonly', true);
+                if (inputName && inputName.includes(prefix)) {
+                    inputName = inputName.replace(prefix, '');
+                    if (diary.hasOwnProperty(inputName)) {
+                        $(this).val(diary[inputName]); // 対応するデータをinputにセット
+                    }
+                    if (inputName === "date") {
+                        $(this).attr('type', 'hidden');
+                        $(this).prop('readonly', true);
+                    }
                 }
             });
 
@@ -207,6 +209,18 @@ $(document).ready(function() {
                     set_locationInDiary($diaryNewForm, location);
                 });
             }
+
+            // 写真を回転させるボタン
+            const $photoTthumbnail = $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail`);
+            $diaryNewForm.find('.class_img-rotate-button').off('click').on('click', function() {
+                img = $photoTthumbnail.find('img').first();
+                var $angle = $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail_rotate_angle`).first();
+                var angle = parseInt($angle.val(), 10);
+                angle += 90; // ボタンがクリックされるたびに90度回転
+                img.css({'transform': `rotate(${angle}deg)`,'transition':'transform 0.5s ease',}); // CSSのtransformを更新
+                $angle.val(angle);
+            });
+
             return $diaryNewForm
         }
 
@@ -229,6 +243,8 @@ $(document).ready(function() {
                 </div>`
             );
             let prefix = `locations-${locationNum}-`;
+            // サムネイルをはめる枠
+            const $photoTthumbnail = $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail`);
 
             $locationNewForm.find('input').each(function() {
                 let $input = $(this);
@@ -272,7 +288,6 @@ $(document).ready(function() {
                 $all_forms.val(false);
 
                 var src = window.location.origin + location.image;
-                var $photoTthumbnail = $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail`);
                 var thumbnail = `<img loading="lazy" src="${src}" class="thumbnail-image thumbnail-image-loaded">`;
                 $photoTthumbnail.html(thumbnail);
                 $locationNewForm.find(`input[name="location-radiobutton-group-${diaryNum}"]`).prop('checked', true);
@@ -307,9 +322,9 @@ $(document).ready(function() {
                 var isChecked = $(this).is(':checked'); // 変更されたラジオボタンがONかどうかを確認
                 var $is_thumbnail = $locationNewForm.find(`#id_locations-${locationNum}-is_thumbnail`);
                 $is_thumbnail.prop('readonly', false);
+                $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail_rotate_angle`).first().val(0); //サムネイルの角度をリセット
                 if (isChecked) {
                     var src = window.location.origin + location.image;
-                    var $photoTthumbnail = $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail`);
                     // 新しい Image オブジェクトを作成
                     var img = new Image();
                     img.src = src;  // 画像のソースを設定
@@ -321,7 +336,6 @@ $(document).ready(function() {
                             $(img).addClass('thumbnail-image-loaded');  // クラスを追加してアニメーションをトリガー
                         }, 10);  // 少し遅延を与えることでアニメーションが確実に適用される
                     };
-
                     $is_thumbnail.val(true);
                 }
                 else {

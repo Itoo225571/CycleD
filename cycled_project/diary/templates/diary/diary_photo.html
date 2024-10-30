@@ -67,8 +67,15 @@
                             <div>地域を選択すると日記のサムネイルを変更できます。</div>
                         </div>
                         <div class="row">
-                            <div id="id_form-__prefix__-thumbnail" class="col diary-thumbnail order-md-2"></div>
-                            <ul id="id_form-__prefix__-location-formset-body" class="list-group col-12 col-md-7 order-md-1"></ul>
+                            <div class="col order-md-2">
+                                <button class="class_img-rotate-button" type="button">回る</button>
+                                <input type="hidden" id="id_form-__prefix__-rotate_angle" class="rotate_angle" value="0">
+                                {{ diary_formset.empty_form.thumbnail_rotate_angle}}
+                                <div id="id_form-__prefix__-thumbnail" class="diary-thumbnail "></div>
+                            </div>
+                            <div class="col-12 col-md-7 order-md-1">
+                                <ul id="id_form-__prefix__-location-formset-body" class="list-group"></ul>
+                            </div>
                         </div>
                         <div class="mt-4">
                             <label for="{{ diary_formset.empty_form.comment.id_for_label }}" class="form-label">{{ diary_formset.empty_form.comment.label }}</label>

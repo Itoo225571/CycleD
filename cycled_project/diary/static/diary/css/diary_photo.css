@@ -208,6 +208,7 @@
     opacity: 0;
     transform: translateX(-20px); /* 左から少しずれた位置 */
     transition: opacity .5s ease, transform 0.5s ease; /* opacityとtranslateXを同時にアニメーション */
+    transform-origin: center; /* 回転の基準点を中心に設定 */
 }
 .thumbnail-image-loaded {
     opacity: 1;
