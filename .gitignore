@@ -163,3 +163,8 @@ cython_debug/
 media/
 
 .DS_Store
+
+# Ignore SSL keys and certificates
+server.key
+server.crt
+server.csr

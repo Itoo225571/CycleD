@@ -59,6 +59,10 @@ def create_coin_for_user(sender, instance, created, **kwargs):
         instance.save()  # Userインスタンスを保存
 @receiver(user_logged_in)
 def reset_num_continue(sender, request, user, **kwargs):
+    if user.coin is None:
+        coin = Coin.objects.create(num=0, timestamp=None)  # Coinインスタンスを作成
+        user.coin = coin  # ユーザーのcoinフィールドに関連付け
+        user.save()  # Userインスタンスを保存  
     if user.coin.timestamp:
         if user.coin.timestamp.date() < timezone.now().date() - timedelta(days=1):
             user.coin.num_continue = 0
