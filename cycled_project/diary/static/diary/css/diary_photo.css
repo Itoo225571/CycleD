@@ -214,6 +214,9 @@
     opacity: 1;
     transform: translateX(0); /* 元の位置に移動 */
 }
+.diary-thumbnail {
+    aspect-ratio: 1/1;
+}
 /* 説明文 */
 .explanation {
     font-size: 0.8em;  /* 小さめのフォントサイズ */
