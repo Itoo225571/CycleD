@@ -34,6 +34,8 @@ from asgiref.sync import sync_to_async
 from concurrent.futures import ThreadPoolExecutor
 import logging
 from datetime import datetime
+from PIL import Image as PILImage
+import io
 logger = logging.getLogger(__name__)
 
 """______Diary関係______"""
@@ -206,10 +208,12 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         
     def form_valid(self, diary_formset, location_formset):
         diaries = diary_formset.save(commit=False)
+        angles = {}
         try:
             with transaction.atomic():
-                for diary in diaries:
+                for diary, form in zip(diaries, diary_formset.forms):
                     diary.user = self.request.user  # 現在のユーザーを設定
+                    angles[diary.date] = form.cleaned_data.get("thumbnail_rotate_angle")  # フォームから値を取得
                     diary.save()  # 保存
                 for form in location_formset.forms:
                     # locationがすでに存在しているか確認
@@ -222,11 +226,12 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                     else:
                         location = form.save(commit=False)
                     id = form.cleaned_data.get("id_of_image")
-                
+                    date = form.cleaned_data.get("date_of_Diary")
+
                     # tempImageの場合
                     if id:
                         temp_image = get_object_or_404(TempImage, id=id, user=self.request.user)
-                        image = temp_image.image                        
+                        image = temp_image.image
                         if image:
                             image_file = ContentFile(image.read(), name=image.name)
                             image = InMemoryUploadedFile(
@@ -239,16 +244,25 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                     else:
                         print(location.location_id)
                         pass
-                    date = form.cleaned_data.get("date_of_Diary")
+
                     location.diary = get_object_or_404(Diary, user=self.request.user, date=date)
                     # 今日中に作成されたものかどうか(0がGOLD)
                     if id:
                         if datetime.now().date() == temp_image.date_photographed.date() == temp_image.date_lastModified.date():
                             location.diary.rank = 0
                             self.request.user.coin.add()
+                            location.diary.save()
                     location.full_clean()  # バリデーションを実行
                     location.save()
-                    location.diary.save()
+                    angle = angles.get(date, 0)  # 回転角度を取得
+                    if location.image:
+                        org_img = PILImage.open(location.image)
+                        ret_img = org_img.rotate(-angle,expand=True)
+                        buffer = io.BytesIO()
+                        ret_img.save(fp=buffer, format=org_img.format)
+                        buffer.seek(0)  # バッファの先頭に戻す
+                        location.image.save(name=location.image.name,content=buffer)
+
                 return super().form_valid(diary_formset)
         except Exception as e:
             print(f"Error occurred: {e}")
