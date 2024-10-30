@@ -57,7 +57,7 @@ INSTALLED_APPS = [
     'widget_tweaks', #HTMLの見た目調節
     'imagekit', #image周り
     'django_cleanup', #不要なファイルを削除
-    'sslserver', #仮のHttps
+    'django_extensions', #仮のHttps
 ]
 
 MIDDLEWARE = [
@@ -166,7 +166,7 @@ DEBUG_TOOLBAR_CONFIG={
 # ユーザーモデル変更
 AUTH_USER_MODEL = 'diary.User'
 
-# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-# SECURE_SSL_REDIRECT = False
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
