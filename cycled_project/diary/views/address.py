@@ -59,7 +59,7 @@ def regeocode(request,lat,lon,count=0):
     current_func = func_list[count]
     try:
         geocode_data = current_func(request,lat,lon,)
-        return geocode_data.model_dump()
+        return geocode_data
     except Exception as e:
         count += 1
         logger.warning(f"{current_func.__name__}が失敗しました: {e}, リクエスト: {request}, 緯度: {lat}, 経度: {lon}")
@@ -106,11 +106,11 @@ async def regeocode_async(request,lat,lon,count=0):
         await asyncio.sleep(1)
     return geocode_data.model_dump()
 
-class AddressHomeView(LoginRequiredMixin,generic.FormView):
+class AddressUserView(LoginRequiredMixin,generic.FormView):
     template_name = "diary/address.html"
     # ↓二つは後で変える
     form_class = AddressSearchForm
-    success_url = reverse_lazy('diary:address_home')
+    success_url = reverse_lazy('diary:address_user')
 
     def get_form_class(self) -> type:
         if "address-search-form" in self.request.POST:
@@ -123,9 +123,9 @@ class AddressHomeView(LoginRequiredMixin,generic.FormView):
 
     def get_success_url(self) -> str:
         if "address-search-form" in self.request.POST:
-            return reverse_lazy('diary:address_home')
+            return reverse_lazy('diary:address_user')
         elif "address-select-form" in self.request.POST or "get-current-address-form" in self.request.POST:
-            return reverse_lazy('diary:home')
+            return reverse_lazy('diary:weather_report')
         return super().get_success_url()
 
     def post(self, request: HttpRequest, *args: str, **kwargs) -> HttpResponse:
@@ -180,7 +180,7 @@ class AddressHomeView(LoginRequiredMixin,generic.FormView):
 
         return self.form_valid(form)
     
-class AddressDiaryNewView(AddressHomeView):
+class AddressDiaryNewView(AddressUserView):
     success_url = reverse_lazy('diary:calendar')
 
     def get_success_url(self) -> str:
@@ -230,7 +230,7 @@ class AddressDiaryEditView(AddressDiaryNewView):
     success_url = reverse_lazy('diary:diary_edit')
     def get_success_url(self) -> str:
         if "address-search-form" in self.request.POST:
-            return reverse_lazy('diary:address_diary_edit')
+            return reverse_lazy('diary:address_user_diary_edit')
         elif "address-select-form" in self.request.POST or "get-current-address-form" in self.request.POST:
             return reverse_lazy('diary:diary_edit')
         return super().get_success_url()

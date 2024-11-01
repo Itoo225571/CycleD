@@ -47,11 +47,11 @@ class Location():
         address_dict={
             "country": address_list[0],
             "prefecture": address_list[1],
-            "district":address_list[2],#練馬区とかさいたま市はここ
+            "district":address_user_list[2],#練馬区とかさいたま市はここ
             "city": address_list[3],
             # "street": address_list[4],
             "post_number":post_number,
-            "address":address_str,
+            "address":address_user_str,
         }
         return address_dict
     
