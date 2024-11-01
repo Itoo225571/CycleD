@@ -16,6 +16,8 @@
     <script src="https://kit.fontawesome.com/36614546d5.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
+    <link rel="icon" href="{% static 'diary/img/favicon.ico' %}" type="image/x-icon">
+    {% comment %} webアイコン {% endcomment %}
     <link rel="stylesheet" href="{% static 'diary/css/style.css' %}">
     {% block extra_css %}{% endblock %}
 
@@ -208,7 +210,7 @@
     </div>
     
     {% comment %} エラー表示用 {% endcomment %}
-    <script src="{% static 'diary/js/related_error.js' %}"></script>
+    <script src="{% static 'diary/js/error_lib.js' %}"></script>
     {% block extra_js %}{% endblock %}
   </body>
 </html>
