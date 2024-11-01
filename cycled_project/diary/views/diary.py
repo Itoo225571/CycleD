@@ -181,7 +181,7 @@ class DiaryDeleteView(LoginRequiredMixin, generic.DeleteView):
 
 class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
     template_name ="diary/diary_photo.html"
-    success_url = reverse_lazy("diary:calendar")
+    success_url = reverse_lazy("diary:home")
     redirect_url = reverse_lazy('diary:diary_photo')
     form_class = PhotosForm
 

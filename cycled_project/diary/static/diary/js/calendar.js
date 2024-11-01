@@ -161,45 +161,6 @@ document.addEventListener('DOMContentLoaded', function() {
 					showDiaryModalNew(info.dateStr);
 				}
 			},
-			// カレンダーに配置された時のイベント
-			// TippyでTooltipを設定する
-			eventDidMount: (e) => { 
-				const description = e.event.extendedProps.description;
-				let thumbnailLocation;
-				// is_thumbnailがTrueのLocationを取得
-				if (e.event.extendedProps.locations){
-					thumbnailLocation = e.event.extendedProps.locations.find(location => location.is_thumbnail === true);
-				}
-				let tooltipContent;
-				if (thumbnailLocation) {
-					// サムネイルがある場合、画像を表示
-					tooltipContent = `<img src="${thumbnailLocation.image}" alt="サムネイル" />`; // 画像URLを設定
-				} else {
-					// サムネイルがない場合、説明を表示
-					tooltipContent = description || "";
-				}
-				const tooltipClass = thumbnailLocation ? "locations_thumbnail" : "";
-				const tooltipTemplate = `
-					<div class="tooltip ${tooltipClass}" role="tooltip">
-						<div class="tooltip-arrow"></div>
-						<div class="tooltip-inner"></div>
-					</div>
-				`;
-				const tooltip = new bootstrap.Tooltip(e.el, {
-					title: tooltipContent,
-					html: true, // HTML コンテンツを有効にする場合
-					placement: 'auto', // ツールチップの表示位置
-					template: tooltipTemplate, // カスタムテンプレートを指定
-				});
-				e.el.addEventListener('click', () => {
-					// ツールチップが表示中の場合は非表示にする
-					if (tooltip._element.getAttribute('aria-describedby')) {
-						tooltip.hide();
-					} else {
-						tooltip.show();
-					}
-				});
-			},
 			viewDidMount: function(info) {
 				var title = info.view.title; // 現在のビューのタイトルを取得
 				$('.calendarTitle').text(title); // jQueryでタイトルを設定

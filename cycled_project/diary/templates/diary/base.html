@@ -64,14 +64,12 @@
                       カレンダー
                     </a>
                 </li>
-                {% comment %} 
                 <li class="nav-item mx-2">
-                    <a class="nav-link" href="#">
-                      <img src="{% static 'diary/img/gacha.png' %}" alt="gacha" width="30" height="35" class="d-inline-block align-text-bottom">
-                      ガチャ
+                    <a class="nav-link" href="{% url 'diary:weather_report' %}">
+                      <img src="{% static 'diary/img/hareotoko.png' %}" alt="weather" width="30" height="35" class="d-inline-block align-text-bottom">
+                      天気予報
                     </a>
                 </li> 
-                {% endcomment %}
               </ul>
 
               <ul class="navbar-nav flex-row flex-wrap ms-md-auto">

@@ -1,0 +1,233 @@
+{% extends "diary/base.html" %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block title %}
+    天気よほー
+{% endblock title %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'diary/css/weather.css' %}" type="text/css" >
+{% endblock extra_css %}
+
+{% block content %}
+    <div class="container">
+        {% if not user.home %}
+        <div>
+            <p>住所が登録されていません</p>
+            <p>住所を登録することで天気を見ることができます</p>
+            <button class="button_inverse" onclick="location.href='{% url "diary:address_user" %}'">新しく登録する</button>
+        </div>
+        
+        {% else %}
+        <div class="row">
+            <div class="col-auto">
+                <div class="justify-content-md-center">
+                    <div class="row"><h3>{{user.home.display}}</h3></div>
+                    <div class="row"><h4>{{user.home.state}}</h4></div>
+                    <button class="button_inverse" onclick="location.href='{% url "diary:address_user" %}'">住所を変更する</button>
+                </div>
+            </div>
+            <div class="col justify-content-md-center text-center">
+                <div id="currentWeather"></div>
+            </div>
+        </div>
+
+        <div class="weather-table-hourly table-responsive row justify-content-md-center mt-5">
+            <div class="col-auto">
+                <table class="table text-center" id="weather_table_hourly"></table>
+            </div>
+        </div>
+
+        {% endif %}
+        
+    </div>
+{% endblock content %}
+
+{% block extra_js %}
+    <script src="{% static 'diary/js/getCookie.js' %}"></script>
+    <script src="{% static 'diary/js/loading_overlay.js' %}"></script>
+    <script>
+        {% if user.home %}
+        $(document).ready(sendLocationToServer({{ user.home.lat }}, {{ user.home.lon }}));
+        {% endif %}
+
+        function sendLocationToServer(lat,lon) {
+            start_loading(false);
+        
+            // ここからAjaxリクエストの処理
+            var csrftoken = getCookie('csrftoken');    
+            $.ajax({
+                method: "POST",
+                url: "{% url 'diary:ajax_location2weather' %}",
+                headers: {
+                    "X-CSRFToken": csrftoken  // CSRFトークンも必要な場合
+                },
+                data: {
+                    'latitude': lat,
+                    'longitude': lon,
+                    'csrfmiddlewaretoken': csrftoken  // フォームの場合と同じように、CSRFトークンを含める
+                },
+                dataType: 'json',
+                timeout:15000,
+            })
+        
+            .done(function(data_raw) {
+                //Loadingアイコン削除
+                remove_loading();
+                
+                var data = data_raw.weather
+                var today = `
+                    <h4>${data.today.time.month}/${data.today.time.day}</h4>
+                    <img src="${data.today.img_file_path_day}" alt="today_weather" width="100px" height="100px" class="ms-auto">
+                `;
+                var tomorrow =  `
+                    <h4>${data.tomorrow.time.month}/${data.tomorrow.time.day}</h4>
+                    <img src="${data.tomorrow.img_file_path_day}" alt="tomorrow_weather" width="100px" height="100px" class="ms-auto">
+                `;
+                var windImageMap = {
+                    0: "{% static 'diary/img/arrow0.png' %}",
+                    1: "{% static 'diary/img/arrow1.png' %}",
+                    2: "{% static 'diary/img/arrow2.png' %}",
+                    3: "{% static 'diary/img/arrow3.png' %}",
+                    error: "{% static 'diary/img/error.png' %}"
+                };
+                var getWindImage = (speed) => {
+                    if (speed < 3) return windImageMap[0];
+                    if (speed < 7) return windImageMap[1];
+                    if (speed < 10) return windImageMap[2];
+                    if (speed >= 10) return windImageMap[3];
+                    return windImageMap['error'];
+                };
+                var windImageSrc = getWindImage(data.current.wind_speed_10m);
+                if(Number(data.current.time.minute)<10){
+                    data.current.time.minute = "0" + data.current.time.minute
+                }
+                // console.log(data.current.is_day)
+                if(data.current.is_day){
+                    data.current.img_file_path = data.current.img_file_path_day
+                }
+                else{
+                    data.current.img_file_path = data.current.img_file_path_night
+                }
+                var current = `
+                    <div class="row">
+                        <div class="col-auto ms-5 mx-2">
+                            <div class="row d-flex justify-content-center">
+                                <img src="${data.current.img_file_path}" alt="tomorrow_weather" width="60" height="60">
+                            </div>
+                            <div class="row my-1">気温: ${data.current.temperature_2m}℃</div>
+                            <div class="row my-1">湿度: ${data.current.relative_humidity_2m}%</div>
+                        </div>
+                        <div class="col-auto mx-2">
+                            <div class="row d-flex justify-content-center py-3">
+                                <img src="${windImageSrc}" alt="wind" width="40" height="40" style="transform:rotate(${data.current.wind_direction_10m}deg);">
+                            </div>
+                            <div class="row my-1">風速: ${data.current.wind_speed_10m}m/s</div>
+                        </div>
+                        <div class="col-auto mx-2">
+                            <div class="row"><p>${data.current.time.hour}:${data.current.time.minute} 時点</p></div>
+                        </div>
+                    </div>
+                `;
+                $('#todayWeather').append(today);
+                $('#tomorrowWeather').append(tomorrow);
+                $('#currentWeather').append(current);
+                $('#weather_table_hourly').html(template(data.hourly,data.current))
+            })
+        
+            .fail(function(jqXHR, textStatus, errorThrown) {
+                //Loadingアイコン削除
+                remove_loading();
+                // エラーメッセージを表示
+                console.error("Error sending location data:", errorThrown);
+            });
+        
+        };
+
+        function template(dataArray,dataCurrent){
+            var table = `
+                <thead>
+                    <tr id="time"><th scope="col">時刻</th></tr>
+                </thead>
+                <tbody>
+                    <tr id="img-and-day"><td scope="row"></td></tr>
+                    <tr id="tempareture"><td scope="row">気温</td></tr>
+                    <tr id="precipitation_probability"><td scope="row">降水確率</td></tr>
+                    <tr id="precipitation"><td scope="row">降水量</td></tr>
+                    <tr id="wind"><td scope="row">風</td></tr>
+                </tbody>
+            `;
+            var tObject = $(table);
+
+            dataArray.map(function(data,index){
+                if(data.time.hour == 0){
+                    var colClass = `daily-column`;
+                    var elements = [
+                        { id: '#time', content: `<th scope="col" class=${colClass}></th>` },
+                        { id: '#img-and-day', content: `<td rowspan="5" scope="row" class="align-top ${colClass}">${data.time.day}日</td>` },
+                    ];
+                    elements.forEach(({ id, content }) => {
+                        tObject.find(id).append(content);
+                    });
+                } 
+                var iconCurrent = '';
+                var colClass = `hourly-column`
+                var windImageMap = {
+                    0: "{% static 'diary/img/arrow0.png' %}",
+                    1: "{% static 'diary/img/arrow1.png' %}",
+                    2: "{% static 'diary/img/arrow2.png' %}",
+                    3: "{% static 'diary/img/arrow3.png' %}",
+                    error: "{% static 'diary/img/error.png' %}"
+                };
+                var getWindImage = (speed) => {
+                    if (speed < 3) return windImageMap[0];
+                    if (speed < 7) return windImageMap[1];
+                    if (speed < 10) return windImageMap[2];
+                    if (speed >= 10) return windImageMap[3];
+                    return windImageMap['error'];
+                };
+                
+                var windImageSrc = getWindImage(data.wind_speed_10m);
+                if(data.is_day){
+                    data.img_file_path = data.img_file_path_day
+                }
+                else{
+                    data.img_file_path = data.img_file_path_night
+                }
+                // 現在時刻を示す印
+                if(data.time.day===dataCurrent.time.day && data.time.hour===dataCurrent.time.hour){
+                    iconCurrent = '<i class="fa-solid fa-sort-down fa-bounce fa-2xl" style="color: #ff0000;"></i>'
+                }
+                
+                var elements = [
+                    { id: '#time', content: `<th scope="col" class="${colClass}">${iconCurrent}<br>${data.time.hour}</th>` },
+                    { id: '#img-and-day', content: `<td scope="row" class="${colClass}"><img src="${data.img_file_path}" alt="weather" width="40px" height="40px" class="ms-auto"></td>` },
+                    { id: '#tempareture', content: `<td scope="row" class="${colClass}">${data.temperature_2m}℃</td>` },
+                    { id: '#precipitation', content: `<td scope="row" class="${colClass}">${data.precipitation === 0 ? 'ー' : `${data.precipitation}mm`}</td>` },
+                    { id: '#precipitation_probability', content: `<td scope="row" class="${colClass}">${data.precipitation_probability}%</td>` },
+                    { 
+                        id: '#wind', 
+                        content: `
+                            <td scope="row" class="text-center ${colClass}">
+                                <div class="ratio ratio-1x1 wind-img">
+                                    <div>
+                                        <img src="${windImageSrc}" alt="wind" width="25px" height="25px" style="transform:rotate(${data.wind_direction_10m}deg);">
+                                    </div>
+                                </div>
+                                <div>
+                                    ${data.wind_speed_10m}m/s
+                                </div>
+                            </td>
+                            `
+                    },
+                ];
+                
+                elements.forEach(({ id, content }) => {
+                    tObject.find(id).append(content);
+                });
+            })
+            return tObject
+        }
+    </script>
+{% endblock %}
