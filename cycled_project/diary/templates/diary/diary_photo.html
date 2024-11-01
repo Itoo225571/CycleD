@@ -62,15 +62,21 @@
                     </div>
                     
                     <div class="card-body">
-                        <h5 class="card-title col-auto">写真で得られた地域一覧</h5>
+                        <h5 class="card-title col-auto">
+                            写真で得られた地域一覧
+                        </h5>
                         <div class="explanation">
                             <div>地域を選択すると日記のサムネイルを変更できます。</div>
                         </div>
                         <div class="row">
                             <div class="col order-md-2">
-                                <button class="class_img-rotate-button" type="button">回る</button>
                                 <input type="hidden" id="id_form-__prefix__-rotate_angle" class="rotate_angle" value="0">
                                 {{ diary_formset.empty_form.thumbnail_rotate_angle}}
+                                <div class="d-flex justify-content-end">
+                                    <button class="btn class_img-rotate-button" type="button">
+                                        <i class="class_img-rotate-icon"></i>
+                                    </button>
+                                </div>
                                 <div id="id_form-__prefix__-thumbnail" class="diary-thumbnail d-flex justify-content-center align-items-center"></div>
                             </div>
                             <div class="col-12 col-md-7 order-md-1">

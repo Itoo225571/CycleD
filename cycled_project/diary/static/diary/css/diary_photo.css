@@ -216,6 +216,21 @@
 }
 .diary-thumbnail {
     aspect-ratio: 1/1;
+    position: relative; /* 画像の親要素を相対位置に設定 */
+}
+/* 回転ボタン */
+.class_img-rotate-button {
+    padding: 0;
+    border: none;
+}
+.class_img-rotate-icon::before {
+    content: "\eaab";
+    font-family: 'Material Icons'; /* Material Iconsフォント */
+    font-style: normal; /* 斜体を解除 */
+    font-size: 2em;
+    display: inline-block; /* ブロック要素として扱う */
+    transform: rotate(135deg); /* 30度傾ける */
+    transform-origin: center; /* 回転の基点を中央に設定 */
 }
 /* 説明文 */
 .explanation {

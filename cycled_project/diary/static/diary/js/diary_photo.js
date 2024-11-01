@@ -1,10 +1,11 @@
+let file_errors = [];
+
 $(document).ready(function() {
     const $diaryFormsetBody = $('#diary-formset-body');
     const diaryMaxNum = $('#id_form-MAX_NUM_FORMS').val();
     const locationMaxNum = $('#id_locations-MAX_NUM_FORMS').val();
     $('#id_form-TOTAL_FORMS').val(0);//初期化
     $('#id_locations-TOTAL_FORMS').val(0);
-    let errorCount = 0;
     let diaryEntries = [];
     remove_error();
 
@@ -49,12 +50,10 @@ $(document).ready(function() {
                     onload: (response) => {
                         // アップロード成功時の処理
                         response = JSON.parse(response);
-                        console.log(response);
         
                         if ('error' in response) {
                             console.error(response.error);
-                            errorCount += 1;
-                            append_error(response.error);
+                            file_errors.push(response.error);
                             return;
                         }
                         let $diaryForm = set_diary(response.diary); //diary初期化
@@ -129,14 +128,20 @@ $(document).ready(function() {
             },
             // すべてのファイルの処理が終わった後に実行される
             onprocessfiles: () => {
-                if (errorCount >= pond.getFiles().length) {
+                // フォームと同時に登場
+                setTimeout(() => {
+                    file_errors.forEach((error, _) => {
+                        append_error(error);
+                    });
+                }, 1500);
+                if (file_errors.length >= pond.getFiles().length) {
                     append_error('全ての写真でアップロードが失敗しました。');
                     pond.setOptions({
                         allowMultiple: true,  
                     });
                     $('.filepond--drop-label').show();
                     pond.removeFiles();
-                    errorCount = 0;
+                    file_errors = [];
                 }
                 else {
                     diaryEntries.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -148,7 +153,7 @@ $(document).ready(function() {
                     setTimeout(() => {
                         // フェードアウトアニメーションを追加
                         $('#id_photos-form').fadeOut(400);
-                    }, 1000); 
+                    }, 1000);
                     // タイミングをずらしてフェードインさせる
                     setTimeout(() => {
                         $('.diary-photo-container').fadeIn(400); // 400msのフェードイン

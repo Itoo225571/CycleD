@@ -54,7 +54,9 @@
     <script src="{% static 'diary/js/getCookie.js' %}"></script>
     <script src="{% static 'diary/js/loading_overlay.js' %}"></script>
     <script>
-        $(document).ready(sendLocationToServer({{ user.home.lat }}, {{ user.home.lon }}));
+        {% if user.home %}
+            $(document).ready(sendLocationToServer({{ user.home.lat }}, {{ user.home.lon }}));
+        {% endif %}
 
         function sendLocationToServer(lat,lon) {
             start_loading(false);
