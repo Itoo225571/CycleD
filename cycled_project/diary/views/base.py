@@ -16,6 +16,3 @@ class BaseView(generic.TemplateView):
 
 class TopView(generic.TemplateView):
     template_name="diary/top.html"
-
-class HomeView(LoginRequiredMixin,generic.TemplateView):
-    template_name="diary/home.html"

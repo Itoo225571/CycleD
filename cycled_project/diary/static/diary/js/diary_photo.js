@@ -6,6 +6,8 @@ $(document).ready(function() {
     const locationMaxNum = $('#id_locations-MAX_NUM_FORMS').val();
     $('#id_form-TOTAL_FORMS').val(0);//初期化
     $('#id_locations-TOTAL_FORMS').val(0);
+    $('#id_form-INITIAL_FORMS').val(0);
+    $('#id_locations-INITIAL_FORMS').val(0);
     let diaryEntries = [];
     remove_error();
 
@@ -210,7 +212,13 @@ $(document).ready(function() {
 
             //既存のLocations挿入
             if (diary.locations){
+                var diaryEditForm = $('#id_form-INITIAL_FORMS');
+                var currentDiaryEditTotal = parseInt(diaryEditForm.val(), 10) || 0; // NaN の場合は 0 にする
+                diaryEditForm.val(currentDiaryEditTotal + 1); // 更新された値をセット
                 diary.locations.forEach(function(location){
+                    var locationEditForm = $('#id_locations-INITIAL_FORMS');
+                    var currentLocationEditTotal = parseInt(locationEditForm.val(), 10) || 0; // NaN の場合は 0 にする
+                    locationEditForm.val(currentLocationEditTotal + 1); // 更新された値をセット
                     set_locationInDiary($diaryNewForm, location);
                 });
             }
@@ -348,8 +356,10 @@ $(document).ready(function() {
                 }
             });
 
-            var locationNumInDiary = $diaryNewForm.find('div.locations-form-wrapper').length;
-            if (locationNumInDiary > MAX_LOCATIONS) {
+            var locationNumInDiary = $diaryNewForm.find('.locations-form-wrapper').length;
+            console.log(locationNumInDiary);
+            console.log(MAX_LOCATIONS);
+            if (locationNumInDiary >= MAX_LOCATIONS) {
                 $('button[name="diary-new-form"]').prop('disabled', true);
                 const $diaryErrors = $diaryNewForm.find(`#id_form-${diaryNum}-diary-errors`);
                 // 同じメッセージがすでに存在するか確認
@@ -397,25 +407,25 @@ $(document).ready(function() {
         var error = false;
         event.preventDefault();
         this.classList.toggle('clicked');
-        // 編集の数を数える
-        const diaryEditNum = $('.diary-form-edit').length;
-        const locationEditNum = $('.location-form-edit').length;
-        // Diaryの合計数を編集
-        const diaryTotalForms = $('#id_form-TOTAL_FORMS').val();
+
+        // 新規作成数
         const diaryNum = $('div.diary-form-wrapper').length;
-        if (diaryTotalForms !== diaryNum){
+        if (diaryNum !== $('#id_form-TOTAL_FORMS').val()){
             error = true;
         }
-        const diaryInitialForms = $('#id_form-INITIAL_FORMS');
-        diaryInitialForms.val(diaryEditNum);
-        // Locationの合計数を編集
-        const locationTotalForms = $('#id_locations-TOTAL_FORMS').val();
         const locationNum = $('div.locations-form-wrapper').length;
-        if (locationTotalForms !== locationNum){
+        if (locationNum !== $('#id_locations-TOTAL_FORMS').val()){
             error = true;
         }
-        const locationInitialForms = $('#id_locations-INITIAL_FORMS');
-        locationInitialForms.val(locationEditNum);
+        // 編集数
+        const diaryEditNum = $('.diary-form-edit').length;
+        if (diaryEditNum !== $('#id_form-INITIAL_FORMS').val()){
+            error = true;
+        }
+        const locationEditNum = $('.location-form-edit').length;
+        if (locationEditNum !== $('#id_locations-INITIAL_FORMS').val()){
+            error = true;
+        }
 
         const submitButton = $(event.originalEvent.submitter); // クリックされたボタンを取得
         const buttonName = submitButton.attr('name');
