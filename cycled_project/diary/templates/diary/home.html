@@ -12,11 +12,12 @@
 
 {% block content %}
     <div class="container-home">
-        <div class="diary-count-field">
-            {% if user.coin.timestamp %}
-            <p>日記継続日数: <strong>{{user.coin.num_continue}}日</strong></p>
-            <p>総コイン数: <strong>{{user.coin.num}}枚</strong></p>
-            {% endif %}
+        <div class="diary-count-field d-flex text-center justify-content-center row">
+            <div class="col-12">当日に日記を投稿した回数が表示されます。</div>
+            <div class="continue-count-container col-12 col-md-6">
+                <div>日記を書いた回数: <strong>{{user.coin.num}}回</strong></div>
+                <div>継続日数: <strong>{{ user.coin.num_continue }}日</strong></div>
+            </div>
         </div>
         <div class="diary-myself-field mt-5">
             <div class="diary-list row">
