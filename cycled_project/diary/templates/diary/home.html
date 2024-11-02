@@ -24,7 +24,7 @@
                     <div class="card-container col-12 col-md-6 col-lg-4 mb-3">
                         {% for loc in diary.locations.all %}
                             {% if loc.is_thumbnail %}
-                                <div class="card" onclick="zoom_image('{{ loc.image.url }}')">
+                                <div class="card card-rank{{ diary.rank }}" onclick="zoom_image('{{ loc.image.url }}')">
                                     <div class="card-thumbnail">
                                         <img src="{{ loc.image.url }}" alt="サムネイル" class="thumbnail-img">  <!-- 画像を表示 -->
                                     </div>

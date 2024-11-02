@@ -9,18 +9,12 @@
 }
 .diary-list .card .thumbnail-img {
     width: 100%;
-    aspect-ratio: 16/9;
+    aspect-ratio: 5/3;
     object-fit: cover;  /* 画像を適切にトリミング */
     border-radius: 10px;
 }
 .diary-list .card .card-body {
     padding-top: 10px;
-}
-.diary-list .card .card-explanation {
-    font-size: 0.8em;  /* 小さめのフォントサイズ */
-    color: #888;       /* グレー系の薄い色 */
-    margin: 5px 0;     /* 余白を小さく */
-    line-height: 1.4;  /* 行間を少し広めに */
 }
 .diary-list .card .card-locations {
     overflow: hidden;
@@ -32,6 +26,19 @@
     box-orient: vertical; /* 一部の古いブラウザでの対応 */
     line-height: 1.4; /* 行間の調整（任意） */
     text-overflow: ellipsis;
+}
+.diary-list .card .card-explanation {
+    font-size: 0.8em;  /* 小さめのフォントサイズ */
+    color: #888;       /* グレー系の薄い色 */
+    margin: 5px 0;     /* 余白を小さく */
+    line-height: 1.4;  /* 行間を少し広めに */
+}
+
+.diary-list .card-rank0 {
+    background: linear-gradient(90deg, #b39855 0%, #fff9e6 50%, #b39855 100%);
+}
+.diary-list .card-rank0 .card-locations {
+    font-weight: bold;
 }
 
 #imageModalContainer .modal-body {
