@@ -18,6 +18,39 @@
             <p>総コイン数: <strong>{{user.coin.num}}枚</strong></p>
             {% endif %}
         </div>
+        <div class="diary-myself-field">
+            <div class="row">
+                <h4>日記一覧</h4>
+                {% for diary in diaries_mine %}
+                    <div class="card-container col">
+                        <div class="card">
+                            {% for loc in diary.locations.all %}
+                                {% if loc.is_thumbnail %}
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="card-thumbnail">
+                                                <img src="{{ loc.image.url }}" alt="サムネイル" class="thumbnail-img">  <!-- 画像を表示 -->
+                                            </div>
+                                            <div class="card-locations px-3 pt-1">
+                                                {{ loc.label }}
+                                            </div>
+                                            <div class="card-explanation px-3">
+                                                <div class="diary-date">
+                                                    {{ diary.date }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>まだ日記が登録されていません</p>
+                    <a href="{% url 'diary:diary_photo' %}">日記作成はここから</a>
+                {% endfor %}
+                </div>
+        </div>
     </div>
 {% endblock content %}
 

@@ -39,10 +39,20 @@ import io
 logger = logging.getLogger(__name__)
 
 """______Diary関係______"""
-class DiaryListView(LoginRequiredMixin,generic.ListView):
-    template_name = "diary/diary_list.html"
+class HomeView(LoginRequiredMixin,generic.ListView):
+    template_name="diary/home.html"
     model = Diary
-    context_object_name = 'diaries'  # テンプレートで使用するコンテキスト変数の名前
+    context_object_name = 'diaries_mine'  # テンプレートで使用するコンテキスト変数の名前
+    def get_queryset(self, **kwargs):
+        return Diary.objects.filter(user=self.request.user).order_by('-date_last_updated').order_by('-date')[:5] #自分の日記
+        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # context['diaries_publish'] = Diary.objects.filter(
+        #     is_publish=True,
+        #     date=timezone.now().date(),
+        # ).order_by('-date_last_updated')[:5]  # 全体で公開された日記
+        return context
 
 # ajaxでDiary日情報を送る用の関数
 @api_view(['GET'])

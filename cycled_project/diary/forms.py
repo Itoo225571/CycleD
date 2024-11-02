@@ -207,12 +207,7 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
         date = self.cleaned_data["date"]
         user = self.request.user
         # フォームのインスタンスが新規作成か更新かを判定
-        if self.instance.pk:
-            # 更新の場合は他のインスタンスの重複をチェック
-            if Diary.objects.filter(date=date, user=user).exclude(pk=self.instance.pk).exists():
-                self.add_error('date',f"この日時の日記はすでに存在します。pk={self.instance.pk}")
-        else:
-            # 新規作成の場合はすべてのインスタンスの重複をチェック
+        if not self.instance.pk:
             if Diary.objects.filter(date=date, user=user).exists():
                 self.add_error('date',"この日時の日記はすでに存在します。")
         return date
