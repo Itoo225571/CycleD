@@ -11,45 +11,51 @@
 {% endblock extra_css %}
 
 {% block content %}
-    <div class="container">
+    <div class="container-home">
         <div class="diary-count-field">
             {% if user.coin.timestamp %}
             <p>日記継続日数: <strong>{{user.coin.num_continue}}日</strong></p>
             <p>総コイン数: <strong>{{user.coin.num}}枚</strong></p>
             {% endif %}
         </div>
-        <div class="diary-myself-field">
-            <div class="row">
-                <h4>日記一覧</h4>
+        <div class="diary-myself-field mt-5">
+            <div class="diary-list row">
                 {% for diary in diaries_mine %}
-                    <div class="card-container col">
-                        <div class="card">
-                            {% for loc in diary.locations.all %}
-                                {% if loc.is_thumbnail %}
+                    <div class="card-container col-12 col-md-6 col-lg-4 mb-3">
+                        {% for loc in diary.locations.all %}
+                            {% if loc.is_thumbnail %}
+                                <div class="card" onclick="zoom_image('{{ loc.image.url }}')">
+                                    <div class="card-thumbnail">
+                                        <img src="{{ loc.image.url }}" alt="サムネイル" class="thumbnail-img">  <!-- 画像を表示 -->
+                                    </div>
                                     <div class="card-body">
-                                        <div class="row">
-                                            <div class="card-thumbnail">
-                                                <img src="{{ loc.image.url }}" alt="サムネイル" class="thumbnail-img">  <!-- 画像を表示 -->
-                                            </div>
-                                            <div class="card-locations px-3 pt-1">
-                                                {{ loc.label }}
-                                            </div>
-                                            <div class="card-explanation px-3">
-                                                <div class="diary-date">
-                                                    {{ diary.date }}
-                                                </div>
+                                        <div class="card-locations">
+                                            {{ loc.label }}
+                                        </div>
+                                        <div class="card-explanation">
+                                            <div class="diary-date">
+                                                {{ diary.date }}
                                             </div>
                                         </div>
                                     </div>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
                     </div>
                 {% empty %}
                     <p>まだ日記が登録されていません</p>
                     <a href="{% url 'diary:diary_photo' %}">日記作成はここから</a>
                 {% endfor %}
+            </div>
+        </div>
+        <div class="modal fade" id="imageModalContainer" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <img id="modalImage" src="" alt="サムネイル拡大表示" class="zoom_image">  <!-- モーダルで表示する画像 -->
+                    </div>
                 </div>
+            </div>
         </div>
     </div>
 {% endblock content %}
@@ -57,4 +63,5 @@
 {% block extra_js %}
     <script src="{% static 'diary/js/getCookie.js' %}"></script>
     <script src="{% static 'diary/js/loading_overlay.js' %}"></script>
+    <script src="{% static 'diary/js/home.js' %}"></script>
 {% endblock %}

@@ -1,23 +1,47 @@
-.diary-myself-field {
-    justify-content: space-between;
-}
-.card-container {
+.diary-list .card {
+    aspect-ratio: 6 / 5;
     display: flex;
-    flex-wrap: wrap; /* カードが画面幅に合わせて折り返す */
-    margin-bottom: 1em;
+    flex-direction: column;  /* 縦に並べる */
+    justify-content: space-between;  /* 上下の間隔を均等に */
+    height: 100%;  /* 高さを100%にして親要素に合わせる */
+    border: none;
+    cursor: pointer;
 }
-.card-container .card {
-    width: 400px;
-}
-.card-container .card .thumbnail-img {
+.diary-list .card .thumbnail-img {
     width: 100%;
-    height: 200px;
-    object-fit: contain;
-    overflow: hidden;
+    aspect-ratio: 16/9;
+    object-fit: cover;  /* 画像を適切にトリミング */
+    border-radius: 10px;
 }
-.card-container .card .card-explanation {
+.diary-list .card .card-body {
+    padding-top: 10px;
+}
+.diary-list .card .card-explanation {
     font-size: 0.8em;  /* 小さめのフォントサイズ */
     color: #888;       /* グレー系の薄い色 */
     margin: 5px 0;     /* 余白を小さく */
     line-height: 1.4;  /* 行間を少し広めに */
+}
+.diary-list .card .card-locations {
+    overflow: hidden;
+    display: -webkit-box;
+    display: box; /* 一部の古いブラウザでの対応 */
+    -webkit-line-clamp: 1; /* 最大2行に制限 */
+    line-clamp: 1; /* ベンダープレフィックスなしの標準プロパティ */
+    -webkit-box-orient: vertical;
+    box-orient: vertical; /* 一部の古いブラウザでの対応 */
+    line-height: 1.4; /* 行間の調整（任意） */
+    text-overflow: ellipsis;
+}
+
+#imageModalContainer .modal-body {
+    padding: 1px;
+}
+#modalImage {
+    width: 100%;
+    border-radius: .5rem;
+    transition: transform 0.3s ease;  /* 画像のズームインエフェクトの設定 */
+}
+#modalImage.show {
+    transform: scale(1.1);  /* 少しズームインする */
 }
