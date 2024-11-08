@@ -19,35 +19,92 @@
                 <div>継続日数: <strong>{{ user.coin.num_continue }}日</strong></div>
             </div>
         </div>
-        <div class="diary-myself-field mt-5">
-            <div class="diary-list row">
-                {% for diary in diaries_mine %}
-                    <div class="card-container col-12 col-md-6 col-lg-4 mb-3">
-                        {% for loc in diary.locations.all %}
-                            {% if loc.is_thumbnail %}
-                                <div class="card card-rank{{ diary.rank }}" onclick="zoom_image('{{ loc.image.url }}')">
-                                    <div class="card-thumbnail">
-                                        <img src="{{ loc.image.url }}" alt="サムネイル" class="thumbnail-img">  <!-- 画像を表示 -->
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="card-locations">
-                                            {{ loc.label }}
-                                        </div>
-                                        <div class="card-explanation">
-                                            <div class="diary-date">
-                                                {{ diary.date }}
+
+        <div class="diary-list-field my-3">
+            <ul class="nav nav-tabs nav-fill">
+                <li class="nav-item">
+                    <button class="nav-link active" type="button" data-bs-toggle="tab" data-bs-target="#tab_diary-myself-field">
+                        {{user.username}}さんの日記
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" type="button" data-bs-toggle="tab" data-bs-target="#tab_diary-public-field">
+                        全ユーザーの日記
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_diary-myself-field">
+                    <div class="diary-myself-field mt-5">
+                        <div class="diary-list row">
+                            {% for diary in diaries_mine %}
+                                <div class="card-container col-12 col-md-6 col-lg-4 mb-3">
+                                    {% for loc in diary.locations.all %}
+                                        {% if loc.is_thumbnail %}
+                                            <div class="card card-rank{{ diary.rank }}" onclick="zoom_image('{{ loc.image.url }}')">
+                                                <div class="card-thumbnail">
+                                                    <img src="{{ loc.image.url }}" alt="サムネイル" class="thumbnail-img">  <!-- 画像を表示 -->
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="card-locations">
+                                                        {{ loc.label }}
+                                                    </div>
+                                                    <div class="card-explanation">
+                                                        <div class="diary-date">
+                                                            {{ diary.date }}
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
+                                        {% endif %}
+                                    {% endfor %}
                                 </div>
-                            {% endif %}
-                        {% endfor %}
+                            {% empty %}
+                            <div class="row justify-content-center text-center">
+                                <img src="{% static 'diary/img/sabori_man.png' %}" class="col-4" alt="サボり人">
+                                <p>まだ日記が登録されていません</p>
+                                <a href="{% url 'diary:diary_photo' %}">日記作成はここから</a>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                {% empty %}
-                    <p>まだ日記が登録されていません</p>
-                    <a href="{% url 'diary:diary_photo' %}">日記作成はここから</a>
-                {% endfor %}
+                </div>
+
+                <div class="tab-pane" id="tab_diary-public-field">
+                    <div class="diary-public-field mt-5">
+                        <div class="diary-list row">
+                            {% for diary in diaries_public %}
+                                <div class="card-container col-12 col-md-6 col-lg-4 mb-3">
+                                    {% for loc in diary.locations.all %}
+                                        {% if loc.is_thumbnail %}
+                                            <div class="card" onclick="zoom_image('{{ loc.image.url }}')">
+                                                <div class="card-thumbnail">
+                                                    <img src="{{ loc.image.url }}" alt="サムネイル" class="thumbnail-img">  <!-- 画像を表示 -->
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="card-user">
+                                                        <img src="{{ loc.diary.user.icon_url}}" class="rounded-circle bg-white" width="30" height="30" alt="icon" loading="lazy">
+                                                        <span class="card-explanation px-2">{{ loc.diary.user.username }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% empty %}
+                            <div class="row justify-content-center text-center">
+                                <img src="{% static 'diary/img/sabori_man.png' %}" class="col-4" alt="サボり人">
+                                <p>今日の日記はまだ登録されていません</p>
+                                <p>あなたが最初のユーザーになるチャンス！</p>
+                                <a href="{% url 'diary:diary_photo' %}">日記作成はここから</a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
             </div>
+
         </div>
         <div class="modal fade" id="imageModalContainer" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">

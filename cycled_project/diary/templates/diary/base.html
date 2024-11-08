@@ -77,15 +77,9 @@
                   
                   {% if user and user.is_authenticated %}
                     <div class="nav-item dropdown">
-                      {% if user.icon %}
                       <a type="button" class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                        <img src="{{ MEDIA_URL }}{{user.icon}}" class="rounded-circle" width="50" height="50" alt="icon" loading="lazy">
+                        <img src="{{user.icon_url}}" class="rounded-circle" width="50" height="50" alt="icon" loading="lazy">
                       </a>
-                      {% else %}
-                      <a type="button" class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                        <img src="{% static 'diary/img/user_icon_default.png' %}" class="rounded-circle" width="50" height="50" alt="icon" loading="lazy">
-                      </a>
-                      {% endif %}
                       
                       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuAvatar">
                         <!-- <span class="dropdown-item-text">ユーザー名：</span> -->

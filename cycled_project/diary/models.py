@@ -1,11 +1,8 @@
-from typing import Collection
 from django.db import models
-from django.forms.models import model_to_dict
 from django.contrib.auth.models import AbstractUser
-from django.db.models.signals import post_delete,pre_delete
-from django.dispatch import receiver
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.templatetags.static import static
 
 import uuid
 from subs.photo_info.photo_info import to_pHash
@@ -69,12 +66,22 @@ class TempImage(models.Model):
     date_lastModified = models.DateTimeField(verbose_name="ファイル更新日時",null=True)
 
 class User(AbstractUser):
+    ICON_CHOICES = [
+        ('diary/img/user_icons/user_icon_default_man.png', 'User Image1'),
+        # ('user_icons/default2.jpg', 'User Image 2'),
+    ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     # username=models.CharField(max_length=128,verbose_name="user   name")
     # email=None
     first_name = None
     last_name = None
-    icon = models.ImageField(upload_to="images/",blank=True,null=True,verbose_name="アイコン")
+    icon = models.CharField(
+        max_length=100,
+        choices=ICON_CHOICES,
+        default='diary/img/user_icons/user_icon_default_man.png',  # ここでデフォルト画像を指定
+        verbose_name="アイコン",
+    )
     home = models.OneToOneField(Location,on_delete=models.CASCADE,blank=True,null=True,verbose_name="お気に入りの場所")
     coin = models.OneToOneField('Coin',on_delete=models.CASCADE, blank=True, null=True, verbose_name="サイクルコイン")
     REQUIRED_FIELDS = ["email",]
@@ -84,6 +91,8 @@ class User(AbstractUser):
         verbose_name_plural = 'Users'
     def __str__(self):
         return self.username
+    def icon_url(self):
+        return static(self.icon)
     
 class Diary(models.Model):
     diary_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
