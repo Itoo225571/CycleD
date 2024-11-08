@@ -13,6 +13,22 @@
     transform: scale(1.02); /* ホバー時に少し拡大 */
 }
 
+/* タブ */
+.nav-tabs .nav-link {
+    background-color:darkgray;
+    color: white; /* 文字色（未選択の状態でも同じ文字色） */
+}
+/* アクティブなタブ */
+.nav-tabs .nav-link.active {
+    border-right-color: black;
+    border-top-color: black;
+    border-left-color: black;
+    background-color: transparent; /* 背景色なし */
+    color: black; /* アクティブ時も文字色を変更しない */
+    font-weight: bold; /* 文字を太字にする */
+}
+
+/* 日記一覧の外側 */
 
 /* 日記一覧 */
 .diary-list .card {
@@ -45,12 +61,16 @@
     text-overflow: ellipsis;
 }
 .diary-list .card .card-explanation {
+    font-weight: bold;
     font-size: 0.8em;  /* 小さめのフォントサイズ */
-    color: #888;       /* グレー系の薄い色 */
+    color: black;       /* グレー系の薄い色 */
     margin: 5px 0;     /* 余白を小さく */
     line-height: 1.4;  /* 行間を少し広めに */
 }
 
+.diary-list .card-rank0 .card-explanation {
+    color: #888;       /* グレー系の薄い色 */
+}
 .diary-list .card-rank0 {
     background: linear-gradient(90deg, #b39855 0%, #fff9e6 50%, #b39855 100%);
 }

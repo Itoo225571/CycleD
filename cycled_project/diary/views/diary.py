@@ -48,10 +48,11 @@ class HomeView(LoginRequiredMixin,generic.ListView):
         
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # context['diaries_publish'] = Diary.objects.filter(
-        #     is_publish=True,
-        #     date=timezone.now().date(),
-        # ).order_by('-date_last_updated')[:5]  # 全体で公開された日記
+        context['diaries_public'] = Diary.objects.filter(
+            # is_publish=True,
+            date=timezone.now().date(),
+            rank=0,
+        ).order_by('-date_last_updated')[:5]  # 全体で公開された日記
         return context
 
 # ajaxでDiary日情報を送る用の関数
