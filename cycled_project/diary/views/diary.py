@@ -44,15 +44,17 @@ class HomeView(LoginRequiredMixin,generic.ListView):
     model = Diary
     context_object_name = 'diaries_mine'  # テンプレートで使用するコンテキスト変数の名前
     def get_queryset(self, **kwargs):
-        return Diary.objects.filter(user=self.request.user).order_by('-date_last_updated').order_by('-date')[:5] #自分の日記
+        diaries = Diary.objects.filter(user=self.request.user).order_by('-date_last_updated').order_by('-date')[:5] #自分の日記
+        return diaries
         
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['diaries_public'] = Diary.objects.filter(
+        seven_days_ago = timezone.now() - timedelta(days=7)
+        diaries = Diary.objects.filter(
             # is_publish=True,
-            date=timezone.now().date(),
+            date__gte=seven_days_ago.date(),  # `date`が7日以内の日記を取得
             rank=0,
-        ).order_by('-date_last_updated')[:5]  # 全体で公開された日記
+        ).order_by('-date_last_updated')[:10]  # 全体で公開された日記
         return context
 
 # ajaxでDiary日情報を送る用の関数
@@ -68,7 +70,6 @@ def sendDairies(request):
         user=request.user,
     )
     serializer = DiarySerializer(diaries, many=True)
-
     return Response(serializer.data)
 
 # 日記作成・編集共通のクラス
@@ -265,7 +266,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                             location.diary.save()
                     location.full_clean()  # バリデーションを実行
                     location.save()
-                    angle = angles.get(date, 0)  # 回転角度を取得
+                    angle = angles.get(date, 0) % 360  # 回転角度を取得
                     if location.image:
                         org_img = PILImage.open(location.image)
                         ret_img = org_img.rotate(-angle,expand=True)
