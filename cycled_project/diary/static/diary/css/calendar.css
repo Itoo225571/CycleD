@@ -74,15 +74,6 @@
 /* #diaryModal .address-form-content{
     display: none;
 } */
-
-/* ツールチップ */
-.locations_thumbnail img {
-    max-width: 300px;
-    max-height: 300px;
-    width: auto;
-    height: auto;
-}
-.locations_thumbnail .tooltip-inner {
-    max-width: none;         /* ツールチップの内部コンテンツの最大幅を制限しない */
-    background-color: transparent; /* ツールチップの背景色を透明に設定 */
+#diaryModal .diary-image {
+    width: 100%;
 }

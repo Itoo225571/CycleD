@@ -1,3 +1,6 @@
+import { set_location } from './set_location.js';
+import { MyDiary } from './address_diary.js';
+
 // 祝日データを取得してカレンダーに追加する関数
 function addHolidaysToCalendar() {
 	return fetch('https://holidays-jp.github.io/api/v1/date.json')
@@ -141,7 +144,10 @@ document.addEventListener('DOMContentLoaded', function() {
 					});
 					if (eventsOnDate.length > 0) {
 						let event = eventsOnDate[0]
-						showDiaryModal(event);
+						showDiaryModalEdit(event);
+					}
+					else { 
+						showDiaryModalNew(info.dateStr);
 					}
 				}
 			},
@@ -150,7 +156,9 @@ document.addEventListener('DOMContentLoaded', function() {
 			eventClick: function(info) {
 				const event = info.event;
 				if (event.classNames.includes('diary-event')) {
-					showDiaryModal(event);
+					showDiaryModalEdit(event);
+				} else {
+					showDiaryModalNew(info.dateStr);
 				}
 			},
 			viewDidMount: function(info) {
@@ -162,25 +170,70 @@ document.addEventListener('DOMContentLoaded', function() {
 				$('.calendarTitle').text(title); // jQueryでタイトルを設定			
 			},			
 		});
-		// Diary表示
-		function showDiaryModal(event) {
+		// モーダル表示の共通処理
+		function showDiaryModalBase(dateStr){
+			// リセット
+			$('#id_locations-INITIAL_FORMS').val(0);
 			var modal = new bootstrap.Modal(document.getElementById('diaryModal'));
 			modal.show();
-			var diary = event.extendedProps.diary;
+			// 選択された日付をフォームにセットする
+			const dateField = document.querySelector('#id_date');
+			dateField.value = dateStr;
+			dateField.setAttribute('readonly', 'true'); // 読み取り専用に設定
+			sessionStorage.setItem('diaryDate', dateStr);  // sessionStorageに保存
+		}
+		// 新規作成
+		function showDiaryModalNew(dateStr) {
+			showDiaryModalBase(dateStr);
 			// タイトル用
 			var title = document.getElementById('diaryModalLabel');
-			title.innerHTML = `<span id="selectedDate">${formatDateJapanese(diary.date)}</span>`;
-
-			var locations = diary.locations;
-			var loc_thumbnail = locations.filter(location => location.is_thumbnail === true)[0];
-			var diaryContent = document.querySelector('.diary-content');
-			diaryContent.innerHTML = `<img loading="lazy" src="${loc_thumbnail.image}" class="diary-image">`;
+			title.innerHTML = `日記の作成 - <span id="selectedDate">${formatDateJapanese(dateStr)}</span>`
+			// ボタン表示非表示
+			$("#id-diary-new-button").show();
+			$("#id-diary-edit-button").hide();
+			$("#id-diary-delete-button").hide();
+		}
+		// 編集
+		function showDiaryModalEdit(event) {
+			const formatDate = (date) => {
+				// タイムゾーンのオフセットを考慮して日付を調整
+				const offset = date.getTimezoneOffset();
+				const adjustedDate = new Date(date.getTime() - offset * 60000);
+				return adjustedDate.toISOString().split('T')[0];
+			};
+			showDiaryModalBase(formatDate(event.start));
+			var diary = event.extendedProps.diary
+			// const commentField = document.querySelector('#id_comment_field');
+			// dateField.value = diary.comment;
+			var initialFormCount = 0;
+			diary.locations.forEach(item => {
+				set_location(item,true);
+				initialFormCount += 1;
+			});
+			// Form初期の数は最初に記述
+			$('#id_locations-INITIAL_FORMS').val(initialFormCount);
+			MyDiary.setPk(diary.diary_id);
+			// タイトル用
+			var title = document.getElementById('diaryModalLabel');
+			title.innerHTML = `日記の編集 - <span id="selectedDate">${formatDateJapanese(diary.date)}</span>`
+			// const titleField = document.querySelector('#id_date');
+			// ボタン表示非表示
+			$("#id-diary-new-button").hide();
+			$("#id-diary-edit-button").show();
+			$("#id-diary-delete-button").show();
 		}
 		// カレンダーを表示
 		calendar.render();
 	});
 
 	diaryModal.addEventListener('hidden.bs.modal', function () {
+		// フォームをリセット
+		// const diaryForm = document.getElementById('diaryForm'); // フォームのIDを使って取得
+		// diaryForm.reset();
+		$('#formset-body').html(''); // formsetリセット
+		MyDiary.resetPk(); //setしたpkをリセット
+		$('#error-normal').empty(); // エラーをクリア
+
 		// 強制的にモーダルを閉じる
 		var backdrop = document.querySelector('.modal-backdrop');
 		if (backdrop) {

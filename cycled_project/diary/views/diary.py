@@ -56,7 +56,12 @@ class HomeView(LoginRequiredMixin,generic.ListView):
             rank=0,
         ).order_by('-date_last_updated')[:10]  # 全体で公開された日記
         return context
-
+    
+class CalendarView(LoginRequiredMixin,generic.ListView):
+    template_name="diary/calendar.html"
+    model = Diary
+    context_object_name = 'diaries'  # テンプレートで使用するコンテキスト変数の名前
+    
 # ajaxでDiary日情報を送る用の関数
 @api_view(['GET'])
 def sendDairies(request):
@@ -74,7 +79,7 @@ def sendDairies(request):
 
 # 日記作成・編集共通のクラス
 class DiaryMixin(object):
-    template_name = "diary/calendar.html"
+    template_name = "diary/calendar_edit.html"
     form_class = DiaryForm
     success_url = reverse_lazy("diary:calendar")
     model = Diary
@@ -180,7 +185,7 @@ class DiaryEditView(LoginRequiredMixin,DiaryMixin,generic.UpdateView):
             return self.form_invalid(form)
 
 class DiaryDeleteView(LoginRequiredMixin, generic.DeleteView):
-    template_name = "diary/calendar.html"
+    template_name = "diary/calendar_edit.html"
     success_url = reverse_lazy("diary:calendar")
     model = Diary
     
