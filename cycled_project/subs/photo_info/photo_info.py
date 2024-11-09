@@ -57,7 +57,6 @@ def get_photo_info(infile):
     else:
         errors.append("EXIFデータの読み込みに失敗しました。")
     photo_info["errors"] = errors
-    # photo_info["path"] = Path(infile)
     photo = Photo(**photo_info)
     return photo
 
@@ -116,7 +115,7 @@ def to_jpeg(original_file, quality=80, max_size=(1920, 1080)):
     with Image.open(original_file) as img:
         img.thumbnail(max_size)  # 画像のサイズを1280x720に制限
         jpeg_io = BytesIO()
-        img.convert('RGB').save(jpeg_io, format='JPEG', quality=quality) 
+        img.convert('RGB').save(jpeg_io, format='JPEG', quality=quality) #exifを削除
         jpeg_io.seek(0)  # ファイルポインタを先頭に戻す
         return jpeg_io
 
@@ -133,6 +132,6 @@ def to_pHash(image):
 
 if __name__=="__main__":
     file = r"/Users/itoudaiki/Downloads/plus.png"
-    file= r"/Users/itoudaiki/Library/CloudStorage/OneDrive-MeijiMail/設計計画/写真/20240731_081808188_iOS.heic"
+    file= r"C:\Users\desig\Box\設計システム研究室\研究用データ\研究グループ\ロバスト設計\2024-_伊藤大貴\写真\IMG_0599.HEIC"
 
     info = get_photo_info(file)
