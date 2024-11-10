@@ -15,6 +15,7 @@ from django.core.cache import cache
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.utils import timezone
+from django.db.models import Prefetch
 
 from ..forms import DiaryForm,AddressSearchForm,LocationForm,LocationCoordForm,LocationFormSet,DiaryFormSet,PhotosForm
 from ..models import Diary,Location,TempImage
@@ -50,11 +51,29 @@ class HomeView(LoginRequiredMixin,generic.ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         seven_days_ago = timezone.now() - timedelta(days=7)
+        thumbnail_location = Prefetch(
+            'locations',  # `locations` のリレーションを指定
+            queryset=Location.objects.filter(is_thumbnail=True),  # サムネイル画像の場所のみ取得
+            to_attr='thumbnail_locations'  # 新しい属性名に保存
+        )
         diaries = Diary.objects.filter(
             # is_publish=True,
             date__gte=seven_days_ago.date(),  # `date`が7日以内の日記を取得
             rank=0,
-        ).order_by('-date_last_updated')[:10]  # 全体で公開された日記
+        ).order_by('-date_last_updated')[:10].prefetch_related(thumbnail_location, 'user')  # 全体で公開された日記
+            # 必要な情報のみ抽出
+        diaries_data = [
+            {
+                "user": {
+                    "username": diary.user.username,
+                    "icon_url": diary.user.icon_url,
+                },
+                "date": diary.date,
+                "image": diary.thumbnail_locations[0].image.url if diary.thumbnail_locations else None,  # サムネイルがある場合のみURLを取得
+            }
+            for diary in diaries
+        ]
+        context['diaries_public'] = diaries_data
         return context
     
 class CalendarView(LoginRequiredMixin,generic.ListView):
