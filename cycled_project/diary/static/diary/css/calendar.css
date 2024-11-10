@@ -17,11 +17,15 @@
 
 #mycalendar{
 	align-items : center;
+    position: relative;
+    height: 100%; /* 高さを自動調整 */
+    margin-bottom: 20px;  /* 下部に少し余白を追加 */
+    padding: 10px;  /* 必要に応じてカレンダー内にパディングを追加 */
 }
+
 #mycalendar td.fc-daygrid-day:not(.fc-day-future) {
     cursor: pointer; /* カーソルをポインタに設定 */
 }
-
 /* 日曜日 */
 #mycalendar td.fc-day-sun {
     color: crimson;
@@ -33,7 +37,7 @@
 #mycalendar .holiday{
     color: crimson; /* 祝日タイトルの色 */
     font-weight: bold; /* 太字 */
-    font-size: 0.8em;
+    font-size: .8em;
     white-space: pre-line; /* 改行文字を反映させる */
     background-color: transparent; /* 背景を透明にする */
 }
@@ -61,13 +65,31 @@
 #mycalendar .diary-event .fc-event-title::before {
     content: "\e52f"; /* Unicode for the icon */
     font-family: 'Material Icons'; /* Material Iconsフォント */
-    font-size: 24px; /* アイコンのサイズ */
     color: #1B85FB;
+    font-size: 1.5em;
 }
 /* ランク0の表示方法 */
 #mycalendar .diary-event.diary-rank-0 .fc-event-title::before {
     text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
     color: gold;
+}
+/* スマートフォンや小さい画面用のスタイル */
+@media (max-width: 767px) {
+    #mycalendar {
+      font-size: 8px; /* 文字サイズを小さく */
+      margin-bottom: 0;  
+      padding: 0;
+    }
+    #mycalendar .fc-daygrid-day-number {
+        padding: 2px;
+    }
+    #mycalendar .fc-event {
+        font-size: 10px;  /* イベントの文字サイズを小さくする */
+        padding: 0;  /* イベントの余白を小さくする */
+    }
+    #mycalendar .diary-event .fc-event-title::before {
+        font-size: 1em;
+    }
 }
 
 /* モーダルウィンドウ */

@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				center: "",
 				end: "today,next"
 			},
-			height: "auto",
+	
 			// 日にちの範囲
 			validRange: function() {
 				const today = new Date();
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			datesSet: function(info) {
 				var title = info.view.title; // 現在のビューのタイトルを取得
 				$('.calendarTitle').text(title); // jQueryでタイトルを設定			
-			},			
+			},
 		});
 		// Diary表示
 		function showDiaryModal(event) {
