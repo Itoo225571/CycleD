@@ -357,8 +357,6 @@ $(document).ready(function() {
             });
 
             var locationNumInDiary = $diaryNewForm.find('.locations-form-wrapper').length;
-            console.log(locationNumInDiary);
-            console.log(MAX_LOCATIONS);
             if (locationNumInDiary >= MAX_LOCATIONS) {
                 $('button[name="diary-new-form"]').prop('disabled', true);
                 const $diaryErrors = $diaryNewForm.find(`#id_form-${diaryNum}-diary-errors`);
