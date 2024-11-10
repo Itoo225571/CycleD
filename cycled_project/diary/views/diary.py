@@ -61,7 +61,7 @@ class HomeView(LoginRequiredMixin,generic.ListView):
             date__gte=seven_days_ago.date(),  # `date`が7日以内の日記を取得
             rank=0,
         ).order_by('-date_last_updated')[:10].prefetch_related(thumbnail_location, 'user')  # 全体で公開された日記
-            # 必要な情報のみ抽出
+        # 必要な情報のみ抽出
         diaries_data = [
             {
                 "user": {

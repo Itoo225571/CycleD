@@ -81,9 +81,11 @@
     color: #063761;
 }
 
+/* モーダルウィンドウ */
 #imageModalContainer .modal-body {
     padding: 1px;
     background-color: #888;
+    border-radius: .5rem;
 }
 #modalImage {
     width: 100%;
@@ -92,4 +94,21 @@
 }
 #modalImage.show {
     transform: scale(1.1);  /* 少しズームインする */
+}
+/* モーダル背景を透明に */
+#imageModalContainer .modal-backdrop {
+    background-color: transparent !important;
+}
+/* モーダルの内容を透明に */
+#imageModalContainer .modal-content {
+    background-color: transparent !important;
+    border: none;  /* ボーダーも非表示 */
+}
+#imageModalContainer .btn-close {
+    font-size: 1.5rem;   /* フォントサイズを大きくする */
+    width: 40px;         /* 幅を指定 */
+    height: 40px;        /* 高さを指定 */
+}
+#imageModalContainer .btn-close:focus {
+    box-shadow: none;  /* フォーカス時のシャドウを消す */
 }
