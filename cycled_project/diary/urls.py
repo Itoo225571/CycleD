@@ -30,5 +30,6 @@ urlpatterns = [
     path("diary/sendDiaries",views.sendDairies,name="sendDiaries"),
     # path("diary/photos2Locations",views.photos2Locations,name="photos2Locations"),
     path("diary/photos2Locations",views.Photos2LocationsView.as_view(),name="photos2Locations"),
+    path('diary/delete-all-diaries/', views.delete_all_diaries, name='delete_all_diaries'),
 ]
 

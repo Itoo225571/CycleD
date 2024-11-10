@@ -16,6 +16,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.utils import timezone
 from django.db.models import Prefetch
+from django.contrib.auth.decorators import login_required
 
 from ..forms import DiaryForm,AddressSearchForm,LocationForm,LocationCoordForm,LocationFormSet,DiaryFormSet,PhotosForm
 from ..models import Diary,Location,TempImage
@@ -83,6 +84,7 @@ class CalendarView(LoginRequiredMixin,generic.ListView):
     
 # ajaxでDiary日情報を送る用の関数
 @api_view(['GET'])
+@login_required
 def sendDairies(request):
     # Diaryをコンテキストに含める
     # すべてのDiaryと関連するLocationを一度に取得
@@ -95,6 +97,18 @@ def sendDairies(request):
     )
     serializer = DiarySerializer(diaries, many=True)
     return Response(serializer.data)
+
+# ログインしているユーザー本人のすべての日記を削除
+@api_view(['POST'])
+@login_required
+def delete_all_diaries(request):
+    diaries = Diary.objects.filter(user=request.user)
+    if diaries:
+        diaries.delete()  # 日記を全て削除
+        msg = '全ての日記を削除しました'
+    else:
+        msg = '日記が存在しませんでした'
+    return Response({"status": "success", "message": msg})
 
 # 日記作成・編集共通のクラス
 class DiaryMixin(object):

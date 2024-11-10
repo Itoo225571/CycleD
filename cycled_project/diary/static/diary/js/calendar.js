@@ -173,8 +173,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
 			var locations = diary.locations;
 			var loc_thumbnail = locations.filter(location => location.is_thumbnail === true)[0];
-			var diaryContent = document.querySelector('.diary-content');
-			diaryContent.innerHTML = `<img loading="lazy" src="${loc_thumbnail.image}" class="diary-image">`;
+			// loc_thumbnail を配列から取り出す
+			locations = locations.filter(location => location.is_thumbnail !== true);
+			// loc_thumbnail を配列の最初に追加
+			locations.unshift(loc_thumbnail);
+
+			const diaryContentHtml = `
+				<div class="diary-thumbnail-field">
+					<img class="diary-image" loading="lazy" src="${locations[0].image}">
+				</div>
+				<div class="diary-locations-field mt-3">
+					${locations.map((location, index) => `
+						<div class="diary-location-item">
+							<input class="diary-location-radiobutton visually-hidden" 
+								type="radio" id="location${index}" 
+								name="location" value="${location.label}"
+								${index === 0 ? 'checked' : ''}>
+							<label for="location${index}" class="location-label w-100 text-start">${location.label}</label>
+							<input type="hidden" value="${location.image}" class="location-img">
+						</div>
+					`).join('')}
+				</div>
+			`;
+			$('.diary-content').html(diaryContentHtml);
+
+			// jQueryでラジオボタンの変更イベントを監視し、画像を更新
+			$('.diary-location-radiobutton').on('change', function() {
+				if ($(this).is(':checked')) {
+					// 親要素の中にある隠しフィールドから画像のURLを取得
+					const newImageSrc = $(this).closest('.diary-location-item').find('.location-img').val();
+					$('.diary-image').fadeOut(300, function() { // フェードアウト
+						$(this).attr('src', newImageSrc).fadeIn(300); // srcを更新し、フェードイン
+					});
+				}
+			});
 		}
 		// カレンダーを表示
 		calendar.render();

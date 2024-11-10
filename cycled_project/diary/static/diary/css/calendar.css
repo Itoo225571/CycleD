@@ -97,5 +97,53 @@
     display: none;
 } */
 #diaryModal .diary-image {
-    width: 100%;
+    max-width: 100%;
+    max-height: 50vh;
+    border-radius: 10px;
+}
+/* ラジオボタン(通常) */
+.location-label {
+    margin: .1em; 
+    padding: .7em 1em;
+    font-size: 114%;
+    line-height: 1;
+    position: relative;
+    cursor: pointer;
+    border-radius: .5em;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+
+    padding-left: 30px;
+}
+.location-label::before,
+.location-label::after {
+    content: "";
+    display: block; 
+    border-radius: 50%;
+    position: absolute;
+    transform: translateY(-50%);
+    top: 50%;
+}
+.location-label::before {
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    background-color: #fff;
+    width: 20px;
+    height: 20px;
+    left: 5px;
+}
+.location-label::after {
+    border-radius: 50%;
+    opacity: 0;
+    width: 10px;
+    height: 10px;
+    left: 10px;
+}
+/* ラジオボタン(チェック) */
+.diary-location-radiobutton:checked + .location-label {
+    top: 1px;
+    box-shadow: 0 0 rgba(0, 0, 0, 0);
+    border: 1px solid deepskyblue;
+} 
+.diary-location-radiobutton:checked + .location-label::after {
+    background-color: deepskyblue;
+    opacity: 1;
 }
