@@ -77,26 +77,22 @@
                         <div class="diary-list row">
                             {% for diary in diaries_public %}
                                 <div class="card-container col-12 col-md-6 col-lg-4 mb-3">
-                                    {% for loc in diary.locations.all %}
-                                        {% if loc.is_thumbnail %}
-                                            <div class="card" onclick="zoom_image('{{ loc.image.url }}')">
-                                                <div class="card-thumbnail">
-                                                    <img src="{{ loc.image.url }}" alt="サムネイル" class="thumbnail-img">  <!-- 画像を表示 -->
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="card-user">
-                                                        <img src="{{ diary.user.icon_url}}" class="rounded-circle bg-white" width="30" height="30" alt="icon" loading="lazy">
-                                                        <span class="card-explanation px-2">{{ diary.user.username }}</span>
-                                                    </div>
-                                                    <div class="card-date">
-                                                        <div class="card-explanation">
-                                                            {{ diary.date|days_ago }}  <!-- 日付を「何日前」形式で表示 -->
-                                                        </div>
-                                                    </div>
+                                    <div class="card" onclick="zoom_image('{{ diary.image }}')">
+                                        <div class="card-thumbnail">
+                                            <img src="{{ diary.image }}" alt="サムネイル" class="thumbnail-img">  <!-- 画像を表示 -->
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="card-user">
+                                                <img src="{{ diary.user.icon_url}}" class="rounded-circle bg-white" width="30" height="30" alt="icon" loading="lazy">
+                                                <span class="card-explanation px-2">{{ diary.user.username }}</span>
+                                            </div>
+                                            <div class="card-date">
+                                                <div class="card-explanation">
+                                                    {{ diary.date|days_ago }}  <!-- 日付を「何日前」形式で表示 -->
                                                 </div>
                                             </div>
-                                        {% endif %}
-                                    {% endfor %}
+                                        </div>
+                                    </div>
                                 </div>
                             {% empty %}
                             <div class="row justify-content-center text-center">
@@ -115,6 +111,7 @@
         <div class="modal fade" id="imageModalContainer" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
+                    <button type="button" class="btn-close pull-right" data-bs-dismiss="modal" aria-label="Close"></button>
                     <div class="modal-body">
                         <img id="modalImage" src="" alt="サムネイル拡大表示" class="zoom_image">  <!-- モーダルで表示する画像 -->
                     </div>
