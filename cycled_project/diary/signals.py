@@ -51,6 +51,14 @@ def update_cache_on_delete(sender, instance, **kwargs):
     cache_key = f'diaries_{instance.user.id}'
     cache.delete(cache_key)  # Diaryが削除されたときにキャッシュを削除
 
+    # 削除した日記のrankが0の場合、連続数をリセット
+    if instance.rank == 0:
+        instance.user.coin.num_continue = 0
+        instance.user.coin.num -= 1
+        if instance.user.coin.num < 0:
+            instance.user.coin.num = 0
+        instance.user.coin.save()
+
 @receiver(post_save, sender=User)
 def create_coin_for_user(sender, instance, created, **kwargs):
     if created and instance.coin is None:  # ユーザーが新規作成された場合のみ
