@@ -38,13 +38,13 @@
     justify-content: space-between;  /* 上下の間隔を均等に */
     height: 100%;  /* 高さを100%にして親要素に合わせる */
     border: none;
-    cursor: pointer;
 }
 .diary-list .card .thumbnail-img {
     width: 100%;
     aspect-ratio: 5/3;
     object-fit: cover;  /* 画像を適切にトリミング */
     border-radius: 10px;
+    cursor: pointer;
 }
 .diary-list .card .card-body {
     padding-top: 10px;
@@ -66,6 +66,34 @@
     color: black;       /* グレー系の薄い色 */
     margin: 5px 0;     /* 余白を小さく */
     line-height: 1.4;  /* 行間を少し広めに */
+}
+
+/* ユーザーの画像の場合、画像内にEditボタンを追加する */
+.diary-myself-field .diary-list .card .card-thumbnail {
+    position: relative; 
+    display: inline-block;
+}
+.diary-myself-field .diary-list .card .diary-edit-button{
+    position: absolute; 
+    top: 5%;
+    right: 5%;
+    width: 35px;
+    height: 35px;
+    font-size: 20px; /* ボタンの大きさも画面サイズに応じて変化 */
+    opacity: 0.8;
+    border: none;
+    border-radius: 3px;
+    background-color: black;
+    /* コンテンツの中央揃え */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.diary-myself-field .diary-list .card .diary-edit-button::before {
+    font-family: 'bootstrap-icons';
+    content: '\F4CA'; /* Unicodeのアイコンや他の記号を指定 */
+    color: #FFFFFF;
+    background-color: black;
 }
 
 .diary-list .card-rank0 .card-explanation {

@@ -43,9 +43,10 @@
                                 <div class="card-container col-12 col-md-6 col-lg-4 mb-3">
                                     {% for loc in diary.locations.all %}
                                         {% if loc.is_thumbnail %}
-                                            <div class="card card-rank{{ diary.rank }}" onclick="zoom_image('{{ loc.image.url }}')">
+                                            <div class="card card-rank{{ diary.rank }}">
                                                 <div class="card-thumbnail">
-                                                    <img src="{{ loc.image.url }}" alt="サムネイル" class="thumbnail-img">  <!-- 画像を表示 -->
+                                                    <img src="{{ loc.image.url }}" alt="サムネイル" class="thumbnail-img" onclick="zoom_image('{{ loc.image.url }}')">  <!-- 画像を表示 -->
+                                                    <button type="button" class="diary-edit-button" onclick="edit_diary('{{diary}}')"></button>
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="card-locations">
@@ -77,8 +78,8 @@
                         <div class="diary-list row">
                             {% for diary in diaries_public %}
                                 <div class="card-container col-12 col-md-6 col-lg-4 mb-3">
-                                    <div class="card" onclick="zoom_image('{{ diary.image }}')">
-                                        <div class="card-thumbnail">
+                                    <div class="card">
+                                        <div class="card-thumbnail" onclick="zoom_image('{{ diary.image }}')">
                                             <img src="{{ diary.image }}" alt="サムネイル" class="thumbnail-img">  <!-- 画像を表示 -->
                                         </div>
                                         <div class="card-body">
@@ -97,7 +98,7 @@
                             {% empty %}
                             <div class="row justify-content-center text-center">
                                 <img src="{% static 'diary/img/sabori_man.png' %}" class="col-4" alt="サボり人">
-                                <p>日記がまだ登録されていません</p>
+                                <p>まだ日記が登録されていません</p>
                                 <p>あなたが最初のユーザーになるチャンス！</p>
                                 <a href="{% url 'diary:diary_photo' %}">日記作成はここから</a>
                             </div>
