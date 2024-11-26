@@ -45,7 +45,7 @@ class Location(models.Model):
             if self.diary.diary_id:  # 更新の場合
                 # 更新後のLocationの数をカウント
                 location_count = self.diary.locations.count() 
-                if location_count >= self.diary.MAX_LOCATIONS:  # MAX_LOCATIONSは許可される最大数を指定
+                if location_count > self.diary.MAX_LOCATIONS:  # MAX_LOCATIONSは許可される最大数を指定
                     raise ValidationError(f"この日記には{self.diary.MAX_LOCATIONS}個以上の場所を追加できません。")
 
 def upload_to(instance, filename):
