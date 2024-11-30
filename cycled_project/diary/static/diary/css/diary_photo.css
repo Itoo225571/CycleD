@@ -65,6 +65,7 @@
     cursor: pointer;
     border-radius: .5em;
     border: 1px solid rgba(0, 0, 0, 0.125);
+    background-color: #fff;
 
     padding-left: 30px;
 }
@@ -105,6 +106,8 @@
     top: 1px;
     box-shadow: 0 0 rgba(0, 0, 0, 0);
     border: 1px solid deepskyblue;
+    transform: scale(1.1);
+    z-index: 1000;
 } 
 .class_location-radiobutton:checked + .location-label::after {
     background-color: deepskyblue;
@@ -258,4 +261,10 @@
 .card:has(.card-errors-element) {
     border-color: red; /* .card-errors-elementがあるときの境界線の色 */
     background-color: rgba(255, 238, 238, 0.5);
+}
+
+/* 編集中のLocation */
+.location-editing {
+    /* transform: scale(1.1); */
+    z-index: 1000;
 }

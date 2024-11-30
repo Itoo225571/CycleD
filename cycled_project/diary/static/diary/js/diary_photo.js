@@ -350,10 +350,21 @@ $(document).ready(function() {
                         }, 10);  // 少し遅延を与えることでアニメーションが確実に適用される
                     };
                     $is_thumbnail.val(true);
+                    // アニメーション追加
+                    $locationNewForm.addClass('scale-up-center');      // 通常アニメーションを追加
                 }
                 else {
                     $is_thumbnail.val(false);
+                    // アニメーション追加
+                    $locationForm.addClass('scale-down-center');  // 逆再生アニメーションを追加
                 }
+                // アニメーション終了時にクラスをリセット
+                $locationNewForm.on('animationend', function () {
+                    $locationNewForm.removeClass('scale-up-center');
+                    $locationNewForm.removeClass('scale-down-center');
+                    $locationNewForm.off('animationend'); // イベントリスナーを解除
+                });          
+
             });
 
             var locationNumInDiary = $diaryNewForm.find('.locations-form-wrapper').length;
@@ -440,8 +451,10 @@ $(document).ready(function() {
 function edit_location(button){
     var $labelDisplay = $(button).closest('.locations-form-wrapper').find('.location-list-label-display');
     var $labelInput = $(button).closest('.locations-form-wrapper').find('.class_locations-label');
-    var $otherLabelDisplays = $('.location-list-label-display').not($labelDisplay);
-    var $otherLabelInputs = $('.class_locations-label').not($labelInput);
+
+    var $editingLocation = $('.location-editing');
+    var $otherLabelDisplays = $editingLocation.find('.location-list-label-display');
+    var $otherLabelInputs = $editingLocation.find('.class_locations-label');
 
     if ($labelDisplay.is(":visible")) {
         $labelDisplay.hide();
@@ -491,7 +504,14 @@ function delete_location(button) {
             nextThumbnail.val(true);
         }
         $deleteInput.val(true);
-        $locationForm.hide();
+        $locationForm.addClass('scale-out-hor-left');
+        // アニメーション終了後に要素を非表示
+        $locationForm.on('animationend', function() {
+            setTimeout(() => {
+                $locationForm.hide(); // 非表示にする
+                $locationForm.off('animationend'); // イベントリスナーを解除
+            }, 500); // 0.5秒（500ms）待つ
+        });        
         // totalformを変更
         const locationTotalForms = $('#id_locations-TOTAL_FORMS');
         const currentTotal = parseInt(locationTotalForms.val(), 10) || 1; // NaN の場合は 1 にする
