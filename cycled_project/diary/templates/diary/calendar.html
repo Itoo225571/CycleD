@@ -13,6 +13,7 @@
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'diary/css/calendar.css' %}" type="text/css" >
+    <link rel="stylesheet" href="{% static 'diary/css/flip.css' %}" type="text/css" >
 {% endblock extra_css %}
 
 {% block content %}
@@ -27,14 +28,28 @@
         </div>
         <!-- モーダルウィンドウのHTML -->
         <div class="modal fade" id="diaryModal" tabindex="-1" aria-labelledby="diaryModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="diaryModalLabel"></h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="diary-content text-center"></div>
+            <div class="modal-dialog modal-lg">
+                <div class="flip">
+                    <div class="position-relative">
+                        <div class="modal-content flip-front">
+                            <div class="modal-header">
+                                <h5 class="modal-title"></h5>
+                                <button type="button" class="icon-edit ms-auto" onclick="change_to_edit(this)"></button>                               
+                                <button type="button" class="btn-close ms-1" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="diary-content text-center"></div>
+                            </div>
+                        </div>
+                        <div class="modal-content flip-back">
+                            <div class="modal-header">
+                                <h5 class="modal-title"></h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="diary-edit text-center"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -51,6 +66,6 @@
     <script>
         const url_sendDiaries = "{% url 'diary:sendDiaries' %}";
     </script>
-    <script src="{% static 'diary/js/calendar.js' %}" type="module"></script>
+    <script src="{% static 'diary/js/calendar.js' %}"></script>
 
 {% endblock %}

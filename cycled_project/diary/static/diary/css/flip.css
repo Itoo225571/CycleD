@@ -1,0 +1,35 @@
+.flip > div {
+    backface-visibility: hidden;
+    transition: transform 300ms;
+    transition-timing-function: linear;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+.flip-back,
+.flip-front {
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden; /* 裏面が見えないようにする */
+}
+
+.flip-front {
+    transform: rotateY(0deg);
+    z-index: 2; /* 表面が前面に表示されるようにする */
+}
+
+.flip-back {
+    transform: rotateY(180deg);
+    position: absolute;
+    top: 0;
+    z-index: 1; /* 裏面を背面に配置 */
+}
+
+.flip.flipped .flip-front {
+    transform: rotateY(-180deg); /* 表面を回転 */
+}
+
+.flip.flipped .flip-back {
+    transform: rotateY(0deg);    /* 裏面を回転 */
+}
