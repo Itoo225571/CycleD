@@ -451,10 +451,10 @@ $(document).ready(function() {
 function edit_location(button){
     var $labelDisplay = $(button).closest('.locations-form-wrapper').find('.location-list-label-display');
     var $labelInput = $(button).closest('.locations-form-wrapper').find('.class_locations-label');
+    var $radioInput = $(button).closest('.locations-form-wrapper').find('.class_location-radiobutton')
 
-    var $editingLocation = $('.location-editing');
-    var $otherLabelDisplays = $editingLocation.find('.location-list-label-display');
-    var $otherLabelInputs = $editingLocation.find('.class_locations-label');
+    var $otherLabelDisplays = $('.location-list-label-display').not($labelDisplay);
+    var $otherLabelInputs = $('.class_locations-label').not($labelInput);
 
     if ($labelDisplay.is(":visible")) {
         $labelDisplay.hide();
@@ -470,13 +470,30 @@ function edit_location(button){
     function hideInput(input){
         input.prop('readonly', true);
         input.attr('type', 'hidden');
+        input.removeClass('editing'); // editingを削除
         input.hide();
     }
     function showInput(input){
         input.prop('readonly', false);
         input.attr('type', 'text');
         input.show();
+        input.val(''); // 中身を削除
+        input.focus(); // 入力フィールドにフォーカスを当てる
+        input.addClass('editing'); // 編集中のinputにクラスを追加
+        $radioInput.prop('checked', true); // チェックを入れる
+        var count = $(button).closest('.diary-form-wrapper').find('.locations-form-wrapper').length;
+        if (count > 1){
+            $radioInput.trigger('change');  // changeイベントを手動で発火させる
+        }
     }
+    // input外をクリックしたらリセット
+    $(document).on('click', function(event) {
+        // inputやその親要素がクリックされた場合は無視
+        if (!$(event.target).closest('.locations-form-wrapper').find('.editing').length) {
+            $labelDisplay.show();
+            hideInput($labelInput);
+        }
+    });
 }
 
 function delete_location(button) {

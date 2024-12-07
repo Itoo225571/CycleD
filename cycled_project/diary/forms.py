@@ -122,6 +122,7 @@ class LocationForm(forms.ModelForm):
         help_texts = {
             "label": "サイクリング先の名前(編集できます)",
         }
+        
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
@@ -176,7 +177,7 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
         label="",
         max_length=64,
         required=False,
-        widget=forms.TextInput(attrs={"placeholder":" 地名・施設名・駅名など"})
+        widget=forms.TextInput(attrs={"placeholder":" 地名・施設名・駅名など",'type':'search'},)
     )
     thumbnail_rotate_angle = forms.IntegerField(required=False, widget=forms.HiddenInput())
 

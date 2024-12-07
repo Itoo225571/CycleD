@@ -57,7 +57,7 @@
 
 /* ラジオボタン(通常) */
 .location-label {
-    margin: .1em; 
+    margin: .1em auto; 
     padding: .7em 1em;
     font-size: 114%;
     line-height: 1;
@@ -66,6 +66,7 @@
     border-radius: .5em;
     border: 1px solid rgba(0, 0, 0, 0.125);
     background-color: #fff;
+    width: 90%;
 
     padding-left: 30px;
 }
@@ -107,6 +108,7 @@
     box-shadow: 0 0 rgba(0, 0, 0, 0);
     border: 1px solid deepskyblue;
     transform: scale(1.1);
+    /* transform-origin: left center; 左端を基準に拡大 */
     z-index: 1000;
 } 
 .class_location-radiobutton:checked + .location-label::after {
