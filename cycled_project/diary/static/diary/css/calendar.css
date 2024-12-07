@@ -147,3 +147,19 @@
     background-color: deepskyblue;
     opacity: 1;
 }
+
+.icon-edit {
+    border: none;
+    background-color: transparent;
+    /* コンテンツの中央揃え */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.icon-edit::before {
+    font-family: 'bootstrap-icons';
+    content: '\F4CA'; /* Unicodeのアイコンや他の記号を指定 */
+    color: #666666;
+    font-size: 1.5em;
+}

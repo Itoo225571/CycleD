@@ -164,12 +164,13 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 		// Diary表示
 		function showDiaryModal(event) {
-			var modal = new bootstrap.Modal(document.getElementById('diaryModal'));
+			const modal = new bootstrap.Modal(document.getElementById('diaryModal'));
+			const $modal = $('#diaryModal');
 			modal.show();
 			var diary = event.extendedProps.diary;
 			// タイトル用
-			var title = document.getElementById('diaryModalLabel');
-			title.innerHTML = `<span id="selectedDate">${formatDateJapanese(diary.date)}</span>`;
+			var title = $modal.find('.modal-title');
+			title.html(`<span id="selectedDate">${formatDateJapanese(diary.date)}</span>`);
 
 			var locations = diary.locations;
 			var loc_thumbnail = locations.filter(location => location.is_thumbnail === true)[0];
@@ -189,24 +190,38 @@ document.addEventListener('DOMContentLoaded', function() {
 								type="radio" id="location${index}" 
 								name="location" value="${location.label}"
 								${index === 0 ? 'checked' : ''}>
-							<label for="location${index}" class="location-label w-100 text-start">${location.label}</label>
+							<label for="location${index}" class="location-label w-100 text-start">
+								<text>${location.label}</text>
+							</label>
 							<input type="hidden" value="${location.image}" class="location-img">
 						</div>
 					`).join('')}
 				</div>
 			`;
 			$('.diary-content').html(diaryContentHtml);
-
 			// jQueryでラジオボタンの変更イベントを監視し、画像を更新
 			$('.diary-location-radiobutton').on('change', function() {
 				if ($(this).is(':checked')) {
 					// 親要素の中にある隠しフィールドから画像のURLを取得
 					const newImageSrc = $(this).closest('.diary-location-item').find('.location-img').val();
 					$('.diary-image').fadeOut(300, function() { // フェードアウト
-						$(this).attr('src', newImageSrc).fadeIn(300); // srcを更新し、フェードイン
+						$(this).attr('src', newImageSrc).fadeIn(600); // srcを更新し、フェードイン
 					});
 				}
 			});
+
+			const diaryEditHtml = `
+				<div class="diary-thumbnail-field">
+					<img class="diary-image" loading="lazy" src="${locations[0].image}">
+				</div>
+				<div class="diary-locations-field mt-3">
+				</div>
+				<div class="diary-edit-buttons-field row">
+					<button type="button" class="btn btn-outline-secondary col mx-3">Cancel</button>
+					<button type="button" class="btn btn-primary col mx-3">OK</button>
+				</div>
+			`;
+			$('.diary-edit').html(diaryEditHtml);
 		}
 		// カレンダーを表示
 		calendar.render();
@@ -224,4 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 });
 
-
+function change_to_edit(button){
+    const flipContainer = button.closest('.flip');  // ボタンから一番近い.flipコンテナを取得
+    flipContainer.classList.toggle('flipped');      // flippedクラスをトグル（切り替え）
+}

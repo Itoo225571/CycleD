@@ -347,7 +347,7 @@ $(document).ready(function() {
                         $photoTthumbnail.html(img);  // 読み込まれた画像をDOMに挿入
                         setTimeout(function() {
                             $(img).addClass('thumbnail-image-loaded');  // クラスを追加してアニメーションをトリガー
-                        }, 10);  // 少し遅延を与えることでアニメーションが確実に適用される
+                        }, 100);  // 少し遅延を与えることでアニメーションが確実に適用される
                     };
                     $is_thumbnail.val(true);
                     // アニメーション追加
