@@ -1,3 +1,19 @@
+body {
+    position: relative; /* 親要素を相対位置に設定 */
+    min-height: 100vh; /* ビューポートの高さを満たす */
+    margin: 0;
+    display: flex;
+    flex-direction: column; /* 縦方向の配置 */
+}
+footer {
+    width: 100%;
+    height: 130px;
+    margin-top: auto; /* フッターを一番下に配置 */
+    background-color: #f8f9fa;
+    color: #000;
+}
+
+
 #loading-overlay {
 	background: rgba(0, 0, 0, .5);
 	z-index: 10000;

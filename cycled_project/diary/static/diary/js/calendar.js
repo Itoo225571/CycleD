@@ -180,6 +180,9 @@ document.addEventListener('DOMContentLoaded', function() {
 			locations.unshift(loc_thumbnail);
 
 			const diaryContentHtml = `
+				<div class="diary-comment-field">
+					<text>${convertLineBreaks(diary.comment)}</text>
+				</div>
 				<div class="diary-thumbnail-field">
 					<img class="diary-image" loading="lazy" src="${locations[0].image}">
 				</div>
@@ -222,6 +225,8 @@ document.addEventListener('DOMContentLoaded', function() {
 			locations.unshift(loc_thumbnail);
 
 			const diaryEditHtml = `
+				<div class="diary-comment-field">
+				</div>
 				<div class="diary-thumbnail-field">
 					<img class="diary-image" loading="lazy" src="${locations[0].image}">
 				</div>
@@ -229,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				</div>
 				<div class="diary-edit-buttons-field row">
 					<button type="button" class="btn btn-outline-secondary col mx-3" onclick="flip_card(this)">Cancel</button>
-					<button type="button" class="btn btn-primary col mx-3" onclick="flip_card(this)">OK</button>
+					<button type="button" class="btn btn-primary col mx-3" onclick="">OK</button>
 				</div>
 			`;
 			$backContent.find('.diary-edit').html(diaryEditHtml);
@@ -254,4 +259,8 @@ document.addEventListener('DOMContentLoaded', function() {
 function flip_card(button){
     const $flipContainer = $(button).closest('.flip');  // ボタンから一番近い.flipコンテナを取得
 	$flipContainer.toggleClass('flipped');
+}
+
+function convertLineBreaks(text) {
+    return text.replace(/\n/g, "<br>");  // 改行文字を <br> に変換
 }

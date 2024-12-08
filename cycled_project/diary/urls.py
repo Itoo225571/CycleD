@@ -24,8 +24,8 @@ urlpatterns = [
 
     path("address/",views.AddressUserView.as_view(),name= "address_user"),
     
-    path("calendar/",views.CalendarView.as_view(),name="calendar"),   
-    path("calendar_edit/",views.DiaryNewView.as_view(),name="calendar_edit"),   
+    path("calendar/",views.DiaryNewView.as_view(),name="calendar"),   
+    # path("calendar_edit/",views.DiaryNewView.as_view(),name="calendar_edit"),   
 
     path("diary/sendDiaries",views.sendDairies,name="sendDiaries"),
     # path("diary/photos2Locations",views.photos2Locations,name="photos2Locations"),

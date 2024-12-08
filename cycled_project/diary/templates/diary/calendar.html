@@ -29,7 +29,7 @@
         <!-- モーダルウィンドウのHTML -->
         <div class="modal fade" id="diaryModal" tabindex="-1" aria-labelledby="diaryModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
-                <div class="flip">
+                <div class="flip h-100">
                     <div class="position-relative">
                         <div class="modal-content flip-front">
                             <div class="modal-header">
@@ -54,6 +54,16 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div id="empty-form-diary" style="display:none;">
+        {% for field in form %}
+            {{ field }}
+        {% endfor %}
+    </div>
+    <div id="empty-form-locations" style="display:none;">
+        {% for field in form.formset.empty_form %}
+            {{ field }}
+        {% endfor %}
     </div>
 {% endblock content %}
 
