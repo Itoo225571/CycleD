@@ -1,10 +1,9 @@
 .flip > div {
-    backface-visibility: hidden;
-    transition: transform 300ms;
-    transition-timing-function: linear;
     width: 100%;
     height: 100%;
     margin: 0;
+    transform-style: preserve-3d; /* 3D効果を維持 */
+    perspective: 1000px; /* 深度を強調する */
 }
 
 .flip-back,
@@ -12,6 +11,8 @@
     width: 100%;
     height: 100%;
     backface-visibility: hidden; /* 裏面が見えないようにする */
+    transform-style: preserve-3d;
+    transition: transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55), box-shadow 0.6s ease-out; /* よりスムーズなアニメーション */
 }
 
 .flip-front {
@@ -27,9 +28,9 @@
 }
 
 .flip.flipped .flip-front {
-    transform: rotateY(-180deg); /* 表面を回転 */
+    transform: rotateY(-180deg); 
 }
 
 .flip.flipped .flip-back {
-    transform: rotateY(0deg);    /* 裏面を回転 */
+    transform: rotateY(0deg);
 }
