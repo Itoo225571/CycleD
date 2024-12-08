@@ -113,6 +113,8 @@
     -webkit-line-clamp: 4; /* 最大4行で省略 */
     line-clamp: 4; /* 標準プロパティ */
     padding: 0px 30px 10px 30px;
+    margin-bottom: 2px;
+    font-family: HGP創英角ﾎﾟｯﾌﾟ体,メイリオ,'ＭＳ Ｐゴシック',Osaka,sans-serif;
 }
 /* ラジオボタン(通常) */
 .location-label {
