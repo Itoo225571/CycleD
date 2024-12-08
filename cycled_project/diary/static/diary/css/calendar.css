@@ -96,10 +96,23 @@
 /* #diaryModal .address-form-content{
     display: none;
 } */
-#diaryModal .diary-image {
+#diaryModal .modal-dialog {
+    height: 90vh; /* モーダル全体の高さを90vhに設定 */
+}
+#diaryModal .diary-content .diary-image {
     max-width: 100%;
-    max-height: 50vh;
+    max-height: 40vh;
     border-radius: 10px;
+}
+#diaryModal .diary-content .diary-comment-field {
+    vertical-align: top; /* 上揃え */
+    text-align: left; /* 左揃え */
+    overflow: hidden; /* はみ出た部分を隠す */
+    display: -webkit-box; /* 必須：行の制限を適用 */
+    -webkit-box-orient: vertical; /* 必須：縦方向にレイアウト */
+    -webkit-line-clamp: 4; /* 最大4行で省略 */
+    line-clamp: 4; /* 標準プロパティ */
+    padding: 0px 30px 10px 30px;
 }
 /* ラジオボタン(通常) */
 .location-label {
@@ -146,6 +159,12 @@
 .diary-location-radiobutton:checked + .location-label::after {
     background-color: deepskyblue;
     opacity: 1;
+}
+/* モーダルウィンドウ（編集） */
+#diaryModal .diary-edit .diary-image {
+    max-width: 100%;
+    max-height: 20vh;
+    border-radius: 10px;
 }
 
 .icon-edit {

@@ -112,7 +112,8 @@ def delete_all_diaries(request):
 
 # 日記作成・編集共通のクラス
 class DiaryMixin(object):
-    template_name = "diary/calendar_edit.html"
+    # template_name = "diary/calendar_edit.html"
+    template_name = "diary/calendar.html"
     form_class = DiaryForm
     success_url = reverse_lazy("diary:calendar")
     model = Diary
