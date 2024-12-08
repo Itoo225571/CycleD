@@ -165,11 +165,11 @@ document.addEventListener('DOMContentLoaded', function() {
 		// Diary表示
 		function showDiaryModal(event) {
 			const modal = new bootstrap.Modal(document.getElementById('diaryModal'));
-			const $modal = $('#diaryModal');
+			const $frontContent = $('#diaryModal').find('.modal-content.flip-front');
 			modal.show();
 			var diary = event.extendedProps.diary;
 			// タイトル用
-			var title = $modal.find('.modal-title');
+			var title = $frontContent.find('.modal-title');
 			title.html(`<span id="selectedDate">${formatDateJapanese(diary.date)}</span>`);
 
 			var locations = diary.locations;
@@ -198,17 +198,28 @@ document.addEventListener('DOMContentLoaded', function() {
 					`).join('')}
 				</div>
 			`;
-			$('.diary-content').html(diaryContentHtml);
+			$frontContent.find('.diary-content').html(diaryContentHtml);
 			// jQueryでラジオボタンの変更イベントを監視し、画像を更新
-			$('.diary-location-radiobutton').on('change', function() {
+			$frontContent.find('.diary-location-radiobutton').on('change', function() {
 				if ($(this).is(':checked')) {
 					// 親要素の中にある隠しフィールドから画像のURLを取得
 					const newImageSrc = $(this).closest('.diary-location-item').find('.location-img').val();
-					$('.diary-image').fadeOut(300, function() { // フェードアウト
+					$frontContent.find('.diary-image').fadeOut(300, function() { // フェードアウト
 						$(this).attr('src', newImageSrc).fadeIn(600); // srcを更新し、フェードイン
 					});
 				}
 			});
+			addDiaryEdit(event);
+		}
+		function addDiaryEdit(event) {
+			const $backContent = $('#diaryModal').find('.modal-content.flip-back');
+
+			const diary = event.extendedProps.diary;
+			$backContent.find('.modal-title').html(`<span id="selectedDate">${formatDateJapanese(diary.date)}</span>`);
+			var locations = diary.locations;
+			var loc_thumbnail = locations.filter(location => location.is_thumbnail === true)[0];
+			locations = locations.filter(location => location.is_thumbnail !== true);
+			locations.unshift(loc_thumbnail);
 
 			const diaryEditHtml = `
 				<div class="diary-thumbnail-field">
@@ -217,11 +228,12 @@ document.addEventListener('DOMContentLoaded', function() {
 				<div class="diary-locations-field mt-3">
 				</div>
 				<div class="diary-edit-buttons-field row">
-					<button type="button" class="btn btn-outline-secondary col mx-3">Cancel</button>
-					<button type="button" class="btn btn-primary col mx-3">OK</button>
+					<button type="button" class="btn btn-outline-secondary col mx-3" onclick="flip_card(this)">Cancel</button>
+					<button type="button" class="btn btn-primary col mx-3" onclick="flip_card(this)">OK</button>
 				</div>
 			`;
-			$('.diary-edit').html(diaryEditHtml);
+			$backContent.find('.diary-edit').html(diaryEditHtml);
+
 		}
 		// カレンダーを表示
 		calendar.render();
@@ -239,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 });
 
-function change_to_edit(button){
-    const flipContainer = button.closest('.flip');  // ボタンから一番近い.flipコンテナを取得
-    flipContainer.classList.toggle('flipped');      // flippedクラスをトグル（切り替え）
+function flip_card(button){
+    const $flipContainer = $(button).closest('.flip');  // ボタンから一番近い.flipコンテナを取得
+	$flipContainer.toggleClass('flipped');
 }
