@@ -21,16 +21,15 @@
 }
 
 .flip-back {
-    transform: rotateY(180deg);
+    transform: rotateY(-180deg);
     position: absolute;
     top: 0;
     z-index: 1; /* 裏面を背面に配置 */
 }
 
 .flip.flipped .flip-front {
-    transform: rotateY(-180deg); 
+    transform: rotateY(180deg); 
 }
-
 .flip.flipped .flip-back {
     transform: rotateY(0deg);
 }

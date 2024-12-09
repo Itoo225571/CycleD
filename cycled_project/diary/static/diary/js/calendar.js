@@ -212,9 +212,9 @@ document.addEventListener('DOMContentLoaded', function() {
 					});
 				}
 			});
-			addDiaryEdit(event);
+			initDiaryEdit(event);
 		}
-		function addDiaryEdit(event) {
+		function initDiaryEdit(event) {
 			const $backContent = $('#diaryModal').find('.modal-content.flip-back');
 
 			const diary = event.extendedProps.diary;
@@ -224,21 +224,52 @@ document.addEventListener('DOMContentLoaded', function() {
 			locations = locations.filter(location => location.is_thumbnail !== true);
 			locations.unshift(loc_thumbnail);
 
+			var form_comment = $backContent.find('.diary-form-comment');
+			form_comment.find('textarea').val(diary.comment);
+			form_comment.addClass('mb-3');
+
 			const diaryEditHtml = `
-				<div class="diary-comment-field">
-				</div>
 				<div class="diary-thumbnail-field">
 					<img class="diary-image" loading="lazy" src="${locations[0].image}">
 				</div>
 				<div class="diary-locations-field mt-3">
+					${locations.map((location, index) => `
+						<div class="diary-location-item">
+							<input class="diary-location-radiobutton visually-hidden" 
+								type="radio" id="location-edit${index}" 
+								name="location-edit" value="${location.label}"
+								${index === 0 ? 'checked' : ''}>
+							<label for="location-edit${index}" class="location-label w-100 text-start">
+								<text>${location.label}</text>
+							</label>
+							<input type="hidden" value="${location.image}" class="location-img">
+						</div>
+					`).join('')}
 				</div>
-				<div class="diary-edit-buttons-field row">
-					<button type="button" class="btn btn-outline-secondary col mx-3" onclick="flip_card(this)">Cancel</button>
-					<button type="button" class="btn btn-primary col mx-3" onclick="">OK</button>
+				<div class="diary-edit-buttons-field row mt-3">
+					<button type="button" class="btn btn-outline-secondary button-cancel col mx-3">Cancel</button>
+					<button type="button" class="btn btn-primary button-OK col mx-3" onclick="">OK</button>
 				</div>
 			`;
 			$backContent.find('.diary-edit').html(diaryEditHtml);
+			$backContent.find('.diary-edit').prepend(form_comment);
+			// form_comment.remove();
 
+			$backContent.find('.diary-location-radiobutton').on('change', function() {
+				if ($(this).is(':checked')) {
+					// 親要素の中にある隠しフィールドから画像のURLを取得
+					const newImageSrc = $(this).closest('.diary-location-item').find('.location-img').val();
+					$backContent.find('.diary-image').fadeOut(300, function() { // フェードアウト
+						$(this).attr('src', newImageSrc).fadeIn(600); // srcを更新し、フェードイン
+					});
+				}
+			});
+			$backContent.find('.button-cancel').on('click', function() {
+				flip_card(this);
+				setTimeout(function() {
+					initDiaryEdit(event);	//入力内容をリセット
+				}, 1000);
+			});
 		}
 		// カレンダーを表示
 		calendar.render();

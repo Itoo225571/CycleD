@@ -201,7 +201,12 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
             "comment": "",
         }
         widgets = {
-            'comment': forms.Textarea(attrs={'rows': 2}),
+            'comment': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'コメントを入力してください',  # placeholderを追加
+                'style': 'resize: none;',  # resizeを無効化
+                'oninput': 'checkLineLimit(this)',  # 入力ごとに行数をチェック
+            }),
         }
 
     def clean_date(self):
