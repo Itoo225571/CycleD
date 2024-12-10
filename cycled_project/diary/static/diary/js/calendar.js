@@ -212,7 +212,10 @@ document.addEventListener('DOMContentLoaded', function() {
 					});
 				}
 			});
-			initDiaryEdit(event);
+			$frontContent.find('.button-to-edit').off('click').on('click', function() {
+				initDiaryEdit(event);
+				flip_card(this);
+			});
 		}
 		function initDiaryEdit(event) {
 			const $backContent = $('#diaryModal').find('.modal-content.flip-back');
@@ -224,13 +227,18 @@ document.addEventListener('DOMContentLoaded', function() {
 			locations = locations.filter(location => location.is_thumbnail !== true);
 			locations.unshift(loc_thumbnail);
 
-			var form_comment = $backContent.find('.diary-form-comment');
-			form_comment.find('textarea').val(diary.comment);
-			form_comment.addClass('mb-3');
+			// 初期値
+			$('#id_comment').val(diary.comment);
+			$('#id_date').val(diary.date);
+			const form_comment = $('#id_comment');	//先にfield取得を行わなければdiaryEdit内にあったときに消える
 
 			const diaryEditHtml = `
+				<div class="diary-comment-field mb-3"></div>
 				<div class="diary-thumbnail-field">
 					<img class="diary-image" loading="lazy" src="${locations[0].image}">
+					<button type="button" class="diary-img-rotate-button icon-in-button">
+						<i class="icon-rotate"></i>
+					</button>
 				</div>
 				<div class="diary-locations-field mt-3">
 					${locations.map((location, index) => `
@@ -246,14 +254,9 @@ document.addEventListener('DOMContentLoaded', function() {
 						</div>
 					`).join('')}
 				</div>
-				<div class="diary-edit-buttons-field row mt-3">
-					<button type="button" class="btn btn-outline-secondary button-cancel col mx-3">Cancel</button>
-					<button type="button" class="btn btn-primary button-OK col mx-3" onclick="">OK</button>
-				</div>
 			`;
-			$backContent.find('.diary-edit').html(diaryEditHtml);
-			$backContent.find('.diary-edit').prepend(form_comment);
-			// form_comment.remove();
+			$backContent.find('.diary-edit-container').html(diaryEditHtml);
+			$backContent.find('.diary-comment-field').html(form_comment);
 
 			$backContent.find('.diary-location-radiobutton').on('change', function() {
 				if ($(this).is(':checked')) {
@@ -264,13 +267,24 @@ document.addEventListener('DOMContentLoaded', function() {
 					});
 				}
 			});
-			$backContent.find('.button-cancel').on('click', function() {
+			$backContent.find('.diary-img-rotate-button').off('click').on('click', function() {
+                var img = $backContent.find('.diary-image');
+                var $angle = $(`#id_thumbnail_rotate_angle`);
+                var angle = parseInt($angle.val(), 10);
+                angle += 90; // ボタンがクリックされるたびに90度回転
+                img.css({'transform': `rotate(${angle}deg)`,}); // CSSのtransformを更新
+                $angle.val(angle);
+            });
+			$backContent.find('.button-cancel').off('click').on('click', function() {
 				flip_card(this);
-				setTimeout(function() {
-					initDiaryEdit(event);	//入力内容をリセット
-				}, 1000);
+			});
+			$backContent.find('form').on('submit', function(event) {
+				event.preventDefault();
+				// sendDiaryEdit();
+				flip_card(this);
 			});
 		}
+		
 		// カレンダーを表示
 		calendar.render();
 	});

@@ -1,0 +1,102 @@
+/**** 表示側 ****/
+.diary-content .diary-image {
+    max-width: 100%;
+    height: 40vh;
+    min-height: 300px;
+    border-radius: 10px;
+}
+.diary-content .diary-comment-field {
+    vertical-align: top; /* 上揃え */
+    text-align: left; /* 左揃え */
+    overflow: hidden; /* はみ出た部分を隠す */
+    display: -webkit-box; /* 必須：行の制限を適用 */
+    -webkit-box-orient: vertical; /* 必須：縦方向にレイアウト */
+    -webkit-line-clamp: 4; /* 最大4行で省略 */
+    line-clamp: 4; /* 標準プロパティ */
+    padding: 0px 30px 10px 30px;
+    margin-bottom: 2px;
+    font-family: HGP創英角ﾎﾟｯﾌﾟ体,メイリオ,'ＭＳ Ｐゴシック',Osaka,sans-serif;
+}
+/* ラジオボタン(通常) */
+.location-label {
+    margin: .1em; 
+    padding: .7em 1em;
+    font-size: 114%;
+    line-height: 1;
+    position: relative;
+    cursor: pointer;
+    border-radius: .5em;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+
+    padding-left: 30px;
+}
+.location-label::before,
+.location-label::after {
+    content: "";
+    display: block; 
+    border-radius: 50%;
+    position: absolute;
+    transform: translateY(-50%);
+    top: 50%;
+}
+.location-label::before {
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    background-color: #fff;
+    width: 20px;
+    height: 20px;
+    left: 5px;
+}
+.location-label::after {
+    border-radius: 50%;
+    opacity: 0;
+    width: 10px;
+    height: 10px;
+    left: 10px;
+}
+/* ラジオボタン(チェック) */
+.diary-location-radiobutton:checked + .location-label {
+    top: 1px;
+    box-shadow: 0 0 rgba(0, 0, 0, 0);
+    border: 1px solid deepskyblue;
+} 
+.diary-location-radiobutton:checked + .location-label::after {
+    background-color: deepskyblue;
+    opacity: 1;
+}
+
+
+/**** 編集 ****/
+.diary-edit-container .diary-image {
+    max-width: 50%;
+    max-height: 50%;
+    width: auto;
+    height: auto;
+
+    border-radius: 10px;
+    transition: transform 0.5s ease; /* opacityとtranslateXを同時にアニメーション */
+    transform-origin: center; /* 回転の基準点を中心に設定 */
+}
+.diary-edit-container .location-label {
+    white-space: nowrap;         /* テキストを1行に制限 */
+    overflow: hidden;            /* コンテナを超えた部分を隠す */
+    text-overflow: ellipsis;     /* 溢れたテキストに省略記号（...）を表示 */
+}
+
+/**** アイコン ****/
+.icon-in-button {
+    margin: 0 .5rem;
+    font-size: 1.5rem;
+    border: none;
+    background-color: transparent;
+}
+
+/* 回転ボタン */
+.icon-rotate::before {
+    content: "\eaab";
+    font-family: 'Material Icons'; /* Material Iconsフォント */
+    font-style: normal; /* 斜体を解除 */
+    font-size: 2em;
+    display: inline-block; /* ブロック要素として扱う */
+    transform: rotate(135deg); /* 傾ける */
+    transform-origin: center; /* 回転の基点を中央に設定 */
+}

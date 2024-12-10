@@ -14,6 +14,7 @@
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'diary/css/calendar.css' %}" type="text/css" >
     <link rel="stylesheet" href="{% static 'diary/css/flip.css' %}" type="text/css" >
+    <link rel="stylesheet" href="{% static 'diary/css/diary_edit.css' %}" type="text/css" >
 {% endblock extra_css %}
 
 {% block content %}
@@ -34,7 +35,14 @@
                         <div class="modal-content flip-front">
                             <div class="modal-header">
                                 <h5 class="modal-title"></h5>
-                                <button type="button" class="icon-edit ms-auto" onclick="flip_card(this);"></button>                               
+                                <div class="ms-auto">
+                                    <button type="button" class="button-to-edit icon-in-button">
+                                        <i class="bi bi-pencil-square text-muted"></i>
+                                    </button>
+                                    <button type="button" class="button-to-delete icon-in-button ms-auto">
+                                        <i class="bi bi-trash text-danger"></i>
+                                    </button>
+                                </div>
                                 <button type="button" class="btn-close ms-1" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
@@ -47,12 +55,18 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <div id="diary-form-hide" style="display:none;">
-                                    <div class="diary-form-date">{{ form.date }}</div>
-                                    <div class="diary-form-thumbnail_rotate_angle">{{ form.thumbnail_rotate_angle }}</div>
-                                    <div class="diary-form-comment">{{ form.comment }}</div>
-                                </div>
-                                <div class="diary-edit text-center"></div>
+                                <form method="post" id="id_diary-form" name="diary-form">
+                                    <div id="diary-form-hidden" style="display:none;">
+                                        {% for field in form %}
+                                            {{ field }}
+                                        {% endfor %}
+                                    </div>
+                                    <div class="diary-edit-container text-center"></div>
+                                    <div class="diary-edit-buttons-field row mt-3">
+                                        <button type="button" class="btn btn-outline-secondary button-cancel col mx-3">Cancel</button>
+                                        <button type="submit" class="btn btn-primary button-OK col mx-3">OK</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
