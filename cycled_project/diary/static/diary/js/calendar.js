@@ -232,6 +232,55 @@ document.addEventListener('DOMContentLoaded', function() {
 			$('#id_date').val(diary.date);
 			const form_comment = $('#id_comment');	//先にfield取得を行わなければdiaryEdit内にあったときに消える
 
+			var locations_html = '';
+			locations.forEach((location, index) => {
+				var location_base = $('#empty-form-locations');
+				location_base.find('input').each(function() {
+					let $input = $(this);
+					let name = $input.attr('name');
+					name = name.replace('locations-__prefix__-', '');
+					const value = searchKeys(location,name);
+					// 値を取得して設定する
+					if (value) {
+						$input.val(value);
+					}
+				});
+				locations_html += `
+					<div class="diary-location-item">
+						<input class="diary-location-radiobutton visually-hidden" 
+							type="radio" id="location-edit${index}" 
+							name="location-edit" value="${location.label}"
+							${index === 0 ? 'checked' : ''}>
+						<label for="location-edit${index}" class="location-label w-100 text-start">
+							<text>${location.label}</text>
+						</label>
+						<input type="hidden" value="${location.image}" class="location-img">
+						<div class="location-form-hidden" style="display:none;">
+							${location_base.html().replace(/__prefix__/g, index)}
+						</div>
+					</div>
+				`;
+				function searchKeys(obj, keyToFind) {
+					let result = undefined;
+					function search(o) {
+						for (const key in o) {
+							if (o.hasOwnProperty(key)) {
+								if (key === keyToFind) {
+									result = o[key];
+									return; // 結果が見つかった場合、検索を終了
+								}
+								if (typeof o[key] === 'object' && o[key] !== null) {
+									search(o[key]);
+									if (result !== undefined) return; // 結果が見つかった場合、早期リターン
+								}
+							}
+						}
+					}
+					search(obj);
+					return result;
+				}
+			});
+
 			const diaryEditHtml = `
 				<div class="diary-comment-field mb-3"></div>
 				<div class="diary-thumbnail-field mx-auto">
@@ -241,35 +290,38 @@ document.addEventListener('DOMContentLoaded', function() {
 					</button>
 				</div>
 				<div class="diary-locations-field mt-3">
-					${locations.map((location, index) => `
-						<div class="diary-location-item">
-							<input class="diary-location-radiobutton visually-hidden" 
-								type="radio" id="location-edit${index}" 
-								name="location-edit" value="${location.label}"
-								${index === 0 ? 'checked' : ''}>
-							<label for="location-edit${index}" class="location-label w-100 text-start">
-								<text>${location.label}</text>
-							</label>
-							<input type="hidden" value="${location.image}" class="location-img">
-						</div>
-					`).join('')}
+					${locations_html}
 				</div>
 			`;
+			
 			$backContent.find('.diary-edit-container').html(diaryEditHtml);
 			$backContent.find('.diary-comment-field').html(form_comment);
 
 			$backContent.find('.diary-location-radiobutton').on('change', function() {
-				if ($(this).is(':checked')) {
-					// 親要素の中にある隠しフィールドから画像のURLを取得
-					const newImageSrc = $(this).closest('.diary-location-item').find('.location-img').val();
-					$backContent.find('.diary-image').fadeOut(300, function() { // フェードアウト
-						$(this).attr('src', newImageSrc).fadeIn(600); // srcを更新し、フェードイン
-					});
-				}
+				// 回転させる
+				var $checkedLocation = $(this).closest('.diary-location-item');
+                var $angle = $checkedLocation.find('[id*="rotate_angle"]');
+                var angle = parseInt($angle.val(), 10) % 360;
+				$angle.val(angle);
+				// 親要素の中にある隠しフィールドから画像のURLを取得
+				const newImageSrc = $(this).closest('.diary-location-item').find('.location-img').val();
+
+				var $img = $backContent.find('.diary-image')
+				$img.css({'transition': 'opacity 0.3s ease'}).css('opacity', 0); // 透明にする（スペースは保持）
+				setTimeout(function(){
+					$img.css({'transform': `rotate(${angle}deg)`,});
+					$backContent.find('.diary-image').attr('src', newImageSrc);					
+				},300);
+				setTimeout(function(){
+					$img.css('opacity', 1); // srcを更新し、フェードイン
+					$img.css({'transition': 'transform 0.5s ease'})
+				},500);
 			});
 			$backContent.find('.diary-img-rotate-button').off('click').on('click', function() {
+                var $checkedLocation = $('.diary-location-radiobutton:checked').closest('.diary-location-item');
+
                 var img = $backContent.find('.diary-image');
-                var $angle = $(`#id_thumbnail_rotate_angle`);
+                var $angle = $checkedLocation.find('[id*="rotate_angle"]');
                 var angle = parseInt($angle.val(), 10);
                 angle += 90; // ボタンがクリックされるたびに90度回転
                 img.css({'transform': `rotate(${angle}deg)`,}); // CSSのtransformを更新

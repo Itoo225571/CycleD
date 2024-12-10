@@ -67,8 +67,8 @@
 
 /**** 編集 ****/
 .diary-edit-container .diary-thumbnail-field {
-    height: 200px;
-    aspect-ratio: 1/1;
+    height: 250px;
+    width: 250px;
     position: relative; /* 画像の親要素を相対位置に設定 */
     display: flex;
     justify-content: center; /* 水平方向の中央揃え */
@@ -77,8 +77,9 @@
 .diary-edit-container .diary-image {
     max-height: 100%;
     max-width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: contain;
 
-    border-radius: 10px;
     transition: transform 0.5s ease; /* opacityとtranslateXを同時にアニメーション */
     transform-origin: center; /* 回転の基準点を中心に設定 */
 }

@@ -259,12 +259,11 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         
     def form_valid(self, diary_formset, location_formset):
         diaries = diary_formset.save(commit=False)
-        angles = {}
         try:
             with transaction.atomic():
                 for diary, form in zip(diaries, diary_formset.forms):
                     diary.user = self.request.user  # 現在のユーザーを設定
-                    angles[diary.date] = form.cleaned_data.get("thumbnail_rotate_angle")  # フォームから値を取得
+                    # angles[diary.date] = form.cleaned_data.get("rotate_angle")  # フォームから値を取得
                     diary.save()  # 保存
                 for form in location_formset.forms:
                     # locationがすでに存在しているか確認
@@ -305,7 +304,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                             location.diary.save()
                     location.full_clean()  # バリデーションを実行
                     location.save()
-                    angle = angles.get(date, 0) % 360  # 回転角度を取得
+                    angle = form.cleaned_data.get("rotate_angle",0) % 360  # 回転角度を取得
                     if location.image:
                         org_img = PILImage.open(location.image)
                         ret_img = org_img.rotate(-angle,expand=True)

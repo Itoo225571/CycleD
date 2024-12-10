@@ -112,10 +112,11 @@ class LocationForm(forms.ModelForm):
     date_of_Diary = forms.DateField(required=False, widget=forms.HiddenInput())
     id_of_image = forms.UUIDField(required=False, widget=forms.HiddenInput())
     rank = forms.ChoiceField(choices=Diary.RANK_CHOICES, initial=1, required=False, widget=forms.HiddenInput())
+    rotate_angle = forms.IntegerField(required=False, widget=forms.HiddenInput())
     class Meta:
         model = Location
         fields = ["lat","lon","state","display","label","is_thumbnail",
-                  "date_of_Diary","id_of_image","rank"]
+                  "date_of_Diary","id_of_image","rank","rotate_angle",]
         labels = {
             "label": "表示名",
         }
@@ -126,6 +127,7 @@ class LocationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
+        self.initial['rotate_angle'] = 0  # ここで初期値を設定
         # for _, field in self.fields.items():
         #     field.widget.attrs['class'] = 'form-control'
 
@@ -179,19 +181,18 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
         required=False,
         widget=forms.TextInput(attrs={"placeholder":" 地名・施設名・駅名など",'type':'search'},)
     )
-    thumbnail_rotate_angle = forms.IntegerField(required=False, widget=forms.HiddenInput())
+    
 
     def __init__(self, *args, **kwargs):
         # viewsでrequestを使用可能にする
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
-        self.initial['thumbnail_rotate_angle'] = 0  # ここで初期値を設定
         for _, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
 
     class Meta:
         model=Diary
-        fields=["date","comment","thumbnail_rotate_angle"]
+        fields=["date","comment",]
         labels = {
             "date": "サイクリング日時",
             "comment": "コメント",

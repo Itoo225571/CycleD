@@ -222,18 +222,6 @@ $(document).ready(function() {
                     set_locationInDiary($diaryNewForm, location);
                 });
             }
-
-            // 写真を回転させるボタン
-            const $photoTthumbnail = $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail`);
-            $diaryNewForm.find('.class_img-rotate-button').off('click').on('click', function() {
-                img = $photoTthumbnail.find('img').first();
-                var $angle = $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail_rotate_angle`).first();
-                var angle = parseInt($angle.val(), 10);
-                angle += 90; // ボタンがクリックされるたびに90度回転
-                img.css({'transform': `rotate(${angle}deg)`,'transition':'transform 0.5s ease',}); // CSSのtransformを更新
-                $angle.val(angle);
-            });
-
             return $diaryNewForm
         }
 
@@ -332,32 +320,34 @@ $(document).ready(function() {
 
             // 選択されたラジオボタンのlocation.imageを表示
             $locationNewForm.find('.class_location-radiobutton').on('change', function() {
-                var isChecked = $(this).is(':checked'); // 変更されたラジオボタンがONかどうかを確認
-                var $is_thumbnail = $locationNewForm.find(`#id_locations-${locationNum}-is_thumbnail`);
-                $is_thumbnail.prop('readonly', false);
-                $diaryNewForm.find(`#id_form-${diaryNum}-thumbnail_rotate_angle`).first().val(0); //サムネイルの角度をリセット
-                if (isChecked) {
-                    var src = window.location.origin + location.image;
-                    // 新しい Image オブジェクトを作成
-                    var img = new Image();
-                    img.src = src;  // 画像のソースを設定
-                    img.className = 'thumbnail-image';  // 初期状態は非表示
-                    // 画像が完全に読み込まれたら、アニメーションを実行
-                    img.onload = function() {
-                        $photoTthumbnail.html(img);  // 読み込まれた画像をDOMに挿入
-                        setTimeout(function() {
-                            $(img).addClass('thumbnail-image-loaded');  // クラスを追加してアニメーションをトリガー
-                        }, 100);  // 少し遅延を与えることでアニメーションが確実に適用される
-                    };
-                    $is_thumbnail.val(true);
-                    // アニメーション追加
-                    $locationNewForm.addClass('scale-up-center');      // 通常アニメーションを追加
-                }
-                else {
-                    $is_thumbnail.val(false);
-                    // アニメーション追加
-                    $locationForm.addClass('scale-down-center');  // 逆再生アニメーションを追加
-                }
+                var $checkedLocation = $(this).closest('.locations-form-wrapper');
+
+                var $is_thumbnail_all = $diaryNewForm.find('[id*="is_thumbnail"]');
+                $is_thumbnail_all.prop('readonly', false);
+                $is_thumbnail_all.val(false);
+                var $is_thumbnail = $checkedLocation.find('[id*="is_thumbnail"]');
+                $is_thumbnail.val(true);
+                $is_thumbnail_all.prop('readonly', true);
+
+                var $angle = $checkedLocation.find('[id*="rotate_angle"]');
+                var angle = parseInt($angle.val(), 10) % 360;
+                $angle.val(angle);
+                var src = window.location.origin + location.image;
+                // 新しい Image オブジェクトを作成
+                var img = new Image();
+                img.src = src;  // 画像のソースを設定
+                img.className = 'thumbnail-image';  // 初期状態は非表示
+                // 画像が完全に読み込まれたら、アニメーションを実行
+                img.onload = function() {
+                    $photoTthumbnail.html(img);  // 読み込まれた画像をDOMに挿入
+                    $(img).css({'transform': `rotate(${angle}deg)`});
+                    setTimeout(function() {
+                        $(img).addClass('thumbnail-image-loaded');  // クラスを追加してアニメーションをトリガー
+                    }, 100);  // 少し遅延を与えることでアニメーションが確実に適用される
+                };
+                // アニメーション追加
+                $locationNewForm.addClass('scale-up-center');      // 通常アニメーションを追加
+                
                 // アニメーション終了時にクラスをリセット
                 $locationNewForm.on('animationend', function () {
                     $locationNewForm.removeClass('scale-up-center');
@@ -365,6 +355,18 @@ $(document).ready(function() {
                     $locationNewForm.off('animationend'); // イベントリスナーを解除
                 });          
 
+            });
+
+            // 写真を回転させるボタン
+            $diaryNewForm.find('.class_img-rotate-button').off('click').on('click', function() {
+                var $checkedLocation = $diaryNewForm.find('[id*="is_thumbnail"]').filter(function() {
+                    return $(this).val() === 'true'; // 値が 'true' のものをフィルタ
+                }).closest('.locations-form-wrapper');
+                var $angle = $checkedLocation.find('[id*="rotate_angle"]');
+                var angle = parseInt($angle.val(), 10) % 360;
+                angle += 90; // ボタンがクリックされるたびに90度回転
+                $diaryNewForm.find('.thumbnail-image').css({'transform': `rotate(${angle}deg)`,'transition':'transform 0.5s ease',}); // CSSのtransformを更新
+                $angle.val(angle);
             });
 
             var locationNumInDiary = $diaryNewForm.find('.locations-form-wrapper').length;
