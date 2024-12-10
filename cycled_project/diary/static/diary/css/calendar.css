@@ -98,5 +98,5 @@
 } */
 #diaryModal .modal-dialog {
     height: 90vh; /* モーダル全体の高さを90vhに設定 */
-    min-height: 670px;
+    min-height: 700px;
 }

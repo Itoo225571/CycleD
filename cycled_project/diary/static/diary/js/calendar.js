@@ -234,9 +234,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 			const diaryEditHtml = `
 				<div class="diary-comment-field mb-3"></div>
-				<div class="diary-thumbnail-field">
+				<div class="diary-thumbnail-field mx-auto">
 					<img class="diary-image" loading="lazy" src="${locations[0].image}">
-					<button type="button" class="diary-img-rotate-button icon-in-button">
+					<button type="button" class="diary-img-rotate-button icon-in-button mb-auto mx-0">
 						<i class="icon-rotate"></i>
 					</button>
 				</div>
