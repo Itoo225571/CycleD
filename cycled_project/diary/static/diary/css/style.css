@@ -4,7 +4,9 @@ body {
     margin: 0;
     display: flex;
     flex-direction: column; /* 縦方向の配置 */
-    padding-bottom: 130px; /* フッターの高さ分の余白を確保 */
+}
+.container {
+    padding-bottom: 130px;
 }
 footer {
     width: 100%;
