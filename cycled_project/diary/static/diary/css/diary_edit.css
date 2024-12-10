@@ -66,15 +66,24 @@
 
 
 /**** 編集 ****/
+.diary-edit-container .diary-thumbnail-field {
+    height: 200px;
+    aspect-ratio: 1/1;
+    position: relative; /* 画像の親要素を相対位置に設定 */
+    display: flex;
+    justify-content: center; /* 水平方向の中央揃え */
+    align-items: center;    /* 垂直方向の中央揃え */
+}
 .diary-edit-container .diary-image {
-    max-width: 50%;
-    max-height: 50%;
-    width: auto;
-    height: auto;
+    max-height: 100%;
+    max-width: 100%;
 
     border-radius: 10px;
     transition: transform 0.5s ease; /* opacityとtranslateXを同時にアニメーション */
     transform-origin: center; /* 回転の基準点を中心に設定 */
+}
+.diary-edit-container .diary-img-rotate-button {
+    align-items: start;
 }
 .diary-edit-container .location-label {
     white-space: nowrap;         /* テキストを1行に制限 */
@@ -95,7 +104,6 @@
     content: "\eaab";
     font-family: 'Material Icons'; /* Material Iconsフォント */
     font-style: normal; /* 斜体を解除 */
-    font-size: 2em;
     display: inline-block; /* ブロック要素として扱う */
     transform: rotate(135deg); /* 傾ける */
     transform-origin: center; /* 回転の基点を中央に設定 */
