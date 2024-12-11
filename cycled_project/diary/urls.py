@@ -15,8 +15,6 @@ urlpatterns = [
     path("user/edit/",views.UserEditView.as_view(),name="user_edit"),
     
     # path("diary/",views.DiaryNewView.as_view(),name="diary"),
-    path("diary/<uuid:pk>/edit",views.DiaryEditView.as_view(),name="diary_edit"),
-    path("diary/<uuid:pk>/delete",views.DiaryDeleteView.as_view(),name="diary_delete"),    
     path("diary/photo/",views.DiaryPhotoView.as_view(),name="diary_photo"),
 
     path("weather/",views.WeatherView.as_view(),name="weather_report"),
@@ -24,12 +22,15 @@ urlpatterns = [
 
     path("address/",views.AddressUserView.as_view(),name= "address_user"),
     
-    path("calendar/",views.DiaryNewView.as_view(),name="calendar"),   
+    path("calendar/",views.CalendarView.as_view(),name="calendar"),
     # path("calendar_edit/",views.DiaryNewView.as_view(),name="calendar_edit"),   
 
     path("diary/sendDiaries",views.sendDairies,name="sendDiaries"),
     # path("diary/photos2Locations",views.photos2Locations,name="photos2Locations"),
     path("diary/photos2Locations",views.Photos2LocationsView.as_view(),name="photos2Locations"),
     path('diary/delete-all-diaries/', views.delete_all_diaries, name='delete_all_diaries'),
+
+    path('diary/edit-diary/', views.diary_edit, name='diary_edit_noPK'),
+    path('diary/delete-diary/', views.diary_delete, name='diary_delete_noPK'),
 ]
 
