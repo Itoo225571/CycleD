@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			modal.show();
 		}
 		function initDiaryContent(event_calendar,diary) {
-			// カレンダーを更新
+			// カレンダー内のDiaryを最新のものに更新
 			event_calendar.setExtendedProp('diary', diary);
 
 			const $frontContent = $('#diaryModal').find('.modal-content.flip-front');
@@ -346,11 +346,25 @@ document.addEventListener('DOMContentLoaded', function() {
 					},
 				})
 				.done(function(data) {
-					console.log(data);
-					var $button = $(document.activeElement);
-					diary.locations = data.locations;
-					initDiaryContent(event_calendar,diary);
-					flip_card($button);
+					if (data.success){
+						var $button = $(document.activeElement);
+						diary = data.diary;		// DiaryをDB反映後のものに変更
+						initDiaryContent(event_calendar,diary);
+						flip_card($button);
+					}
+					else {
+						console.error('リクエストが失敗しました');
+						// Diaryのエラーを表示
+						if (data.errors.Diary) {
+							console.log("Diary Errors:");
+							console.log(data.errors.Diary);
+						}
+						// Locationsのエラーを表示
+						if (data.errors.Locations) {
+							console.log("Locations Errors:");
+							console.log(data.errors.Locations);
+						}
+					}
 				})
 				.fail(function(jqXHR, textStatus, errorThrown) {
 					console.log("AJAXリクエストが失敗しました。");
