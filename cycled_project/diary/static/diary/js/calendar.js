@@ -213,8 +213,8 @@ document.addEventListener('DOMContentLoaded', function() {
 				if ($(this).is(':checked')) {
 					// 親要素の中にある隠しフィールドから画像のURLを取得
 					const newImageSrc = $(this).closest('.diary-location-item').find('.location-img-url').val();
-					$frontContent.find('.diary-image').fadeOut(300, function() { // フェードアウト
-						$(this).attr('src', newImageSrc).fadeIn(600); // srcを更新し、フェードイン
+					$frontContent.find('.diary-image').fadeOut(500, function() { // フェードアウト
+						$(this).attr('src', newImageSrc).fadeIn(500); // srcを更新し、フェードイン
 					});
 				}
 			});
@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				setTimeout(function(){
 					$img.css({'transform': `rotate(${angle}deg)`,});
 					$backContent.find('.diary-image').attr('src', newImageSrc);					
-				},300);
+				},100);
 				setTimeout(function(){
 					$img.css('opacity', 1); // srcを更新し、フェードイン
 					$img.css({'transition': 'transform 0.5s ease'})
@@ -347,13 +347,13 @@ document.addEventListener('DOMContentLoaded', function() {
 				})
 				.done(function(data) {
 					if (data.success){
-						var $button = $(document.activeElement);
+						var $button = $backContent.find('.button-OK');
 						diary = data.diary;		// DiaryをDB反映後のものに変更
 						initDiaryContent(event_calendar,diary);
 						flip_card($button);
 					}
 					else {
-						console.error('リクエストが失敗しました');
+						alert('リクエストが失敗しました');
 						// Diaryのエラーを表示
 						if (data.errors.Diary) {
 							console.log("Diary Errors:");

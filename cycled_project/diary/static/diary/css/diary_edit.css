@@ -1,8 +1,8 @@
 /**** 表示側 ****/
 .diary-content .diary-image {
     max-width: 100%;
-    height: 40vh;
-    min-height: 300px;
+    max-height: 30vh;
+    height: 500px;
     border-radius: 10px;
 }
 .diary-content .diary-comment-field {
