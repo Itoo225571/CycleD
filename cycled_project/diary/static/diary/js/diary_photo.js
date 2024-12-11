@@ -189,7 +189,6 @@ $(document).ready(function() {
                     }
                     if (inputName === "date") {
                         $(this).attr('type', 'hidden');
-                        $(this).prop('readonly', true);
                     }
                 }
             });
@@ -323,11 +322,9 @@ $(document).ready(function() {
                 var $checkedLocation = $(this).closest('.locations-form-wrapper');
 
                 var $is_thumbnail_all = $diaryNewForm.find('[id*="is_thumbnail"]');
-                $is_thumbnail_all.prop('readonly', false);
                 $is_thumbnail_all.val(false);
                 var $is_thumbnail = $checkedLocation.find('[id*="is_thumbnail"]');
                 $is_thumbnail.val(true);
-                $is_thumbnail_all.prop('readonly', true);
 
                 var $angle = $checkedLocation.find('[id*="rotate_angle"]');
                 var angle = parseInt($angle.val(), 10) % 360;
@@ -470,13 +467,11 @@ function edit_location(button){
         hideInput($labelInput);
     }
     function hideInput(input){
-        input.prop('readonly', true);
         input.attr('type', 'hidden');
         input.removeClass('editing'); // editingを削除
         input.hide();
     }
     function showInput(input){
-        input.prop('readonly', false);
         input.attr('type', 'text');
         input.show();
         input.val(''); // 中身を削除

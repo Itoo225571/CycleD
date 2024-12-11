@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function() {
 							<label for="location${index}" class="location-label w-100 text-start">
 								<text>${location.label}</text>
 							</label>
-							<input type="hidden" value="${location.image}" class="location-img">
+							<input type="hidden" value="${location.image}" class="location-img-url">
 						</div>
 					`).join('')}
 				</div>
@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			$frontContent.find('.diary-location-radiobutton').on('change', function() {
 				if ($(this).is(':checked')) {
 					// 親要素の中にある隠しフィールドから画像のURLを取得
-					const newImageSrc = $(this).closest('.diary-location-item').find('.location-img').val();
+					const newImageSrc = $(this).closest('.diary-location-item').find('.location-img-url').val();
 					$frontContent.find('.diary-image').fadeOut(300, function() { // フェードアウト
 						$(this).attr('src', newImageSrc).fadeIn(600); // srcを更新し、フェードイン
 					});
@@ -232,9 +232,9 @@ document.addEventListener('DOMContentLoaded', function() {
 			$('#id_date').val(diary.date);
 			const form_comment = $('#id_comment');	//先にfield取得を行わなければdiaryEdit内にあったときに消える
 
-			var locations_html = '';
+			var diaryEditHtml = '';
 			locations.forEach((location, index) => {
-				var location_base = $('#empty-form-locations');
+				var location_base = $('#empty-form-locations').clone();
 				location_base.find('input').each(function() {
 					let $input = $(this);
 					let name = $input.attr('name');
@@ -242,24 +242,26 @@ document.addEventListener('DOMContentLoaded', function() {
 					const value = searchKeys(location,name);
 					// 値を取得して設定する
 					if (value) {
-						$input.val(value);
+						$input.val(value);	
 					}
+					$input.attr('type', 'hidden');
 				});
-				locations_html += `
-					<div class="diary-location-item">
-						<input class="diary-location-radiobutton visually-hidden" 
-							type="radio" id="location-edit${index}" 
-							name="location-edit" value="${location.label}"
-							${index === 0 ? 'checked' : ''}>
-						<label for="location-edit${index}" class="location-label w-100 text-start">
-							<text>${location.label}</text>
-						</label>
-						<input type="hidden" value="${location.image}" class="location-img">
-						<div class="location-form-hidden" style="display:none;">
-							${location_base.html().replace(/__prefix__/g, index)}
-						</div>
-					</div>
+				var isChecked = location.is_thumbnail ? 'checked' : '';
+				var radioButtonHtml = `
+				    <input class="diary-location-radiobutton visually-hidden" 
+						type="radio" id="location-edit-__prefix__" 
+						name="locationRadiobuttonEdit" ${isChecked}>
+					<label for="location-edit-__prefix__" class="location-label w-100 text-start"></label>
 				`;
+				location_base.find('.diary-location-item').append(radioButtonHtml);
+				location_base.find('.location-img-url').val(location.image);
+				location_base.find('.location-label').html(`<text>${location.label}</text>`);
+				if (location.is_thumbnail) {
+					location_base.find('.diary-location-radiobutton').prop('checked', true);
+					$backContent.find('.diary-image').attr('src', location.image);
+				}
+
+				diaryEditHtml += location_base.html().replace(/__prefix__/g, `${index}`);
 				function searchKeys(obj, keyToFind) {
 					let result = undefined;
 					function search(o) {
@@ -280,31 +282,22 @@ document.addEventListener('DOMContentLoaded', function() {
 					return result;
 				}
 			});
-
-			const diaryEditHtml = `
-				<div class="diary-comment-field mb-3"></div>
-				<div class="diary-thumbnail-field mx-auto">
-					<img class="diary-image" loading="lazy" src="${locations[0].image}">
-					<button type="button" class="diary-img-rotate-button icon-in-button mb-auto mx-0">
-						<i class="icon-rotate"></i>
-					</button>
-				</div>
-				<div class="diary-locations-field mt-3">
-					${locations_html}
-				</div>
-			`;
 			
-			$backContent.find('.diary-edit-container').html(diaryEditHtml);
+			$backContent.find('.diary-locations-field').html(diaryEditHtml);
 			$backContent.find('.diary-comment-field').html(form_comment);
 
 			$backContent.find('.diary-location-radiobutton').on('change', function() {
-				// 回転させる
 				var $checkedLocation = $(this).closest('.diary-location-item');
+				// サムネイル変更 (全部falseにしてから選択したものをtrueに)
+				$backContent.find('[id*="is_thumbnail"]').val(false);
+				$checkedLocation.find('[id*="is_thumbnail"]').val(true);
+
+				// 回転させる
                 var $angle = $checkedLocation.find('[id*="rotate_angle"]');
                 var angle = parseInt($angle.val(), 10) % 360;
 				$angle.val(angle);
 				// 親要素の中にある隠しフィールドから画像のURLを取得
-				const newImageSrc = $(this).closest('.diary-location-item').find('.location-img').val();
+				const newImageSrc = $checkedLocation.find('.location-img-url').val();
 
 				var $img = $backContent.find('.diary-image')
 				$img.css({'transition': 'opacity 0.3s ease'}).css('opacity', 0); // 透明にする（スペースは保持）
@@ -332,6 +325,8 @@ document.addEventListener('DOMContentLoaded', function() {
 			});
 			$backContent.find('form').on('submit', function(event) {
 				event.preventDefault();
+				var formData = $(this).serialize();
+				console.log('Form Data:', formData);
 				// sendDiaryEdit();
 				flip_card(this);
 			});
