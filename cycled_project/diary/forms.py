@@ -185,7 +185,6 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
         widget=forms.TextInput(attrs={"placeholder":" 地名・施設名・駅名など",'type':'search'},)
     )
     
-
     def __init__(self, *args, **kwargs):
         # viewsでrequestを使用可能にする
         self.request = kwargs.pop('request', None)

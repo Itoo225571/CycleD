@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import Location,Diary
 
+import datetime
+
 class LocationSerializer(serializers.ModelSerializer):
     # image = serializers.ImageField(source='image.url', required=False)
     class Meta:

@@ -140,17 +140,17 @@ document.addEventListener('DOMContentLoaded', function() {
 						return event.startStr === info.dateStr;
 					});
 					if (eventsOnDate.length > 0) {
-						let event = eventsOnDate[0]
-						showDiaryModal(event);
+						let event_calendar = eventsOnDate[0]
+						showDiaryModal(event_calendar);
 					}
 				}
 			},
 
 			// イベントのクリック
 			eventClick: function(info) {
-				const event = info.event;
-				if (event.classNames.includes('diary-event')) {
-					showDiaryModal(event);
+				const event_calendar = info.event;
+				if (event_calendar.classNames.includes('diary-event')) {
+					showDiaryModal(event_calendar);
 				}
 			},
 			viewDidMount: function(info) {
@@ -163,11 +163,17 @@ document.addEventListener('DOMContentLoaded', function() {
 			},
 		});
 		// Diary表示
-		function showDiaryModal(event) {
+		function showDiaryModal(event_calendar) {
+			var diary = event_calendar.extendedProps.diary;
+			initDiaryContent(event_calendar,diary);
 			const modal = new bootstrap.Modal(document.getElementById('diaryModal'));
-			const $frontContent = $('#diaryModal').find('.modal-content.flip-front');
 			modal.show();
-			var diary = event.extendedProps.diary;
+		}
+		function initDiaryContent(event_calendar,diary) {
+			// カレンダーを更新
+			event_calendar.setExtendedProp('diary', diary);
+
+			const $frontContent = $('#diaryModal').find('.modal-content.flip-front');
 			// タイトル用
 			var title = $frontContent.find('.modal-title');
 			title.html(`<span id="selectedDate">${formatDateJapanese(diary.date)}</span>`);
@@ -213,14 +219,14 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 			});
 			$frontContent.find('.button-to-edit').off('click').on('click', function() {
-				initDiaryEdit(event);
+				initDiaryEdit(event_calendar,diary);
 				flip_card(this);
 			});
 		}
-		function initDiaryEdit(event) {
+		function initDiaryEdit(event_calendar,diary) {
 			const $backContent = $('#diaryModal').find('.modal-content.flip-back');
+			$backContent.find('.diary-image').css({'transform': `rotate(0deg)`,});	//角度を初期化
 
-			const diary = event.extendedProps.diary;
 			$backContent.find('.modal-title').html(`<span id="selectedDate">${formatDateJapanese(diary.date)}</span>`);
 			var locations = diary.locations;
 			var loc_thumbnail = locations.filter(location => location.is_thumbnail === true)[0];
@@ -231,6 +237,9 @@ document.addEventListener('DOMContentLoaded', function() {
 			$('#id_comment').val(diary.comment);
 			$('#id_date').val(diary.date);
 			const form_comment = $('#id_comment');	//先にfield取得を行わなければdiaryEdit内にあったときに消える
+			// Management関連
+			$('#id_locations-TOTAL_FORMS').val(diary.locations.length);
+			$('#id_locations-INITIAL_FORMS').val(diary.locations.length);
 
 			var diaryEditHtml = '';
 			locations.forEach((location, index) => {
@@ -323,15 +332,31 @@ document.addEventListener('DOMContentLoaded', function() {
 			$backContent.find('.button-cancel').off('click').on('click', function() {
 				flip_card(this);
 			});
-			$backContent.find('form').on('submit', function(event) {
-				event.preventDefault();
-				var formData = $(this).serialize();
-				console.log('Form Data:', formData);
-				// sendDiaryEdit();
-				flip_card(this);
+			$backContent.find('form').off('submit').on('submit', function(event_form) {
+				event_form.preventDefault();
+				const $form = $(this);
+				$.ajax({
+					method: $form.prop("method"),
+					url: $form.prop("action"),
+					data: $form.serialize(), //nameをくっつける
+					dataType: 'json',
+					timeout:6000,
+					headers: {
+						"X-CSRFToken": getCookie('csrftoken')  // CSRFトークンも必要な場合
+					},
+				})
+				.done(function(data) {
+					console.log(data);
+					var $button = $(document.activeElement);
+					diary.locations = data.locations;
+					initDiaryContent(event_calendar,diary);
+					flip_card($button);
+				})
+				.fail(function(jqXHR, textStatus, errorThrown) {
+					console.log("AJAXリクエストが失敗しました。");
+				})
 			});
 		}
-		
 		// カレンダーを表示
 		calendar.render();
 	});

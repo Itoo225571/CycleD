@@ -55,10 +55,10 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body h-100">
-                                <form method="post" id="id_diary-form">
+                                <form method="post" id="id_diary-form" action="{% url 'diary:diary_edit_noPK' %}">
                                     {% csrf_token %}
                                     <div id="diary-form-hidden" style="display:none;">
-                                        {% for field in form %}
+                                        {% for field in diary %}
                                             {{ field }}
                                         {% endfor %}
                                     </div>
@@ -70,6 +70,7 @@
                                                 <i class="icon-rotate"></i>
                                             </button>
                                         </div>
+                                        <div id="diary-locations-management-field">{{ diary.formset.management_form }}</div>
                                         <div class="diary-locations-field mt-3"></div>
                                     </div>
                                     <div class="diary-edit-buttons-field row mt-3">
@@ -88,7 +89,7 @@
         <div class="diary-location-item">
             <input type="hidden" class="location-img-url" name="location">
             <div class="location-form-hidden" style="display:none;">
-                {% for field in form.formset.empty_form %}
+                {% for field in diary.formset.empty_form %}
                     {{ field }}
                 {% endfor %}
             </div>

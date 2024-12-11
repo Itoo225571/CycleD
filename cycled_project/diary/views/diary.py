@@ -76,12 +76,23 @@ class HomeView(LoginRequiredMixin,generic.ListView):
         ]
         context['diaries_public'] = diaries_data
         return context
-    
+
 class CalendarView(LoginRequiredMixin,generic.ListView):
     template_name="diary/calendar.html"
     model = Diary
-    context_object_name = 'diaries'  # テンプレートで使用するコンテキスト変数の名前
-    
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return  super().form_valid(form)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['mock_uuid'] = uuid.uuid4() # 仮のPK
+        context['diary'] = DiaryForm()
+        form_errors = self.request.session.pop('diary_form_errors', None)   # セッションからエラー情報を取得
+        if form_errors:
+            # エラー情報を辞書形式に変換してコンテキストに追加(リストにするのは複数ある他と合わせるため)
+            context['form_errors'] = [json.loads(form_errors)]
+        return context
+
 # ajaxでDiary日情報を送る用の関数
 @api_view(['GET'])
 @login_required
@@ -110,125 +121,50 @@ def delete_all_diaries(request):
         msg = '日記が存在しませんでした'
     return Response({"status": "success", "message": msg})
 
-# 日記作成・編集共通のクラス
-class DiaryMixin(object):
-    # template_name = "diary/calendar_edit.html"
-    template_name = "diary/calendar.html"
-    form_class = DiaryForm
-    success_url = reverse_lazy("diary:calendar")
-    model = Diary
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        return  super().form_valid(form)
+@api_view(['POST'])
+@login_required
+def diary_edit(request):
+    date = request.POST.get('date')
+    diary = get_object_or_404(Diary, date=date, user=request.user)
+    form = DiaryForm(request.POST, instance=diary, request=request)
+    formset = LocationFormSet(request.POST, queryset=diary.locations.all(), instance=diary)
+    # formset = LocationFormSet(request.POST,  )
 
-    def form_invalid(self, form):
-        # エラーをセッションに保存(Editでも使えるようにする)
-        self.request.session['diary_form_errors'] = json.dumps(form.errors,ensure_ascii=False)
-        print(form.errors)
-        # 新規作成画面にリダイレクト
-        return redirect(reverse_lazy('diary:calendar'))
-    
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        # ユーザーをフォームに渡す
-        kwargs['request'] = self.request
-        return kwargs
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # 仮のPK
-        context['mock_uuid'] = uuid.uuid4()
-        # セッションからエラー情報を取得
-        form_errors = self.request.session.pop('diary_form_errors', None)
-        if form_errors:
-            # エラー情報を辞書形式に変換してコンテキストに追加(リストにするのは複数ある他と合わせるため)
-            context['form_errors'] = [json.loads(form_errors)]
-        return context
+    if form.is_valid() and formset.is_valid():
+        diary = form.save(commit=False)
+        diary.save()  # Diaryを更新して保存
 
-class DiaryNewView(LoginRequiredMixin,DiaryMixin,generic.CreateView):
-    def post(self, request, *args: str, **kwargs) -> HttpResponse:
-        if "address-search-form" in request.POST:
-            return self.handle_address_search(request)
-        elif "address-select-form" in request.POST:
-            return self.handle_address_select(request)
-            # return self.form_invalid(None)
-        elif "get-current-address-form" in request.POST:
-            return self.handle_get_current_address(request)
-        elif "diary-new-form" in request.POST:
-            return self.handle_diary_new(request)
-        elif "diary-edit-form" in request.POST:
-            # return self.handle_diary_edit(request)
-            pass
-        else:
-            print(f"post name error: {request.POST}")
-            return self.form_invalid(None)
+        for location_form in formset:
+            location = location_form.save(commit=False)
+            angle = location_form.cleaned_data.get("rotate_angle",0) % 360  # 回転角度を取得
+            if angle != 0:
+                org_img = PILImage.open(location.image)
+                ret_img = org_img.rotate(-angle,expand=True)
+                buffer = io.BytesIO()
+                ret_img.save(fp=buffer, format=org_img.format)
+                buffer.seek(0)  # バッファの先頭に戻す
+                location.image.save(name=os.path.basename(location.image.name), content=buffer, save=True)
+            location.save()
+        location_data = LocationSerializer(diary.locations, many=True).data
+        return JsonResponse({"success": True, "message": "更新が完了しました。","locations":location_data})
+        # return JsonResponse({"success": None})
+    else:
+        error = {}
+        error['Diary'] = form.errors
+        error['Locations'] = formset.errors
+        return JsonResponse({"success": False, "errors": error})
 
-    def handle_address_search(self, request):
-        form = AddressSearchForm(request.POST)
-        if form.is_valid():
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                keyword = form.cleaned_data.get('keyword')
-                response = {"data_list":geocode(request,keyword)}
-                return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
-            # return self.form_valid(form)
-        return self.form_invalid(form)
-
-    def handle_address_select(self, request):
-        form = LocationForm(request.POST)
-        if form.is_valid():
-            return self.form_valid(form)
-        return self.form_invalid(form)
-
-    def handle_get_current_address(self, request):
-        form = LocationCoordForm(request.POST)
-        if form.is_valid():
-            loc = form.save(commit=False)
-            lat = form.cleaned_data["lat"]
-            lon = form.cleaned_data["lon"]
-            # 住所情報の取得
-            geo = regeocode(request,lat, lon)
-            loc.state = geo.address.state
-            loc.display = geo.address.display
-            loc.label = geo.address.label
-            loc.location_id = None
-            response = {
-                "data": loc.to_dict(),
-            }
-            return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
-        else:
-            # 最初のフォームが無効な場合
-            return self.form_invalid(form)
-
-    def handle_diary_new(self, request):
-        form = DiaryForm(request.POST, request=request)
-        if form.is_valid():
-            return self.form_valid(form)
-        return self.form_invalid(form)
-
-class DiaryEditView(LoginRequiredMixin,DiaryMixin,generic.UpdateView):
-    is_update_view = True
-    def get(self, request, *args, **kwargs):
-        return redirect(reverse_lazy('diary:calendar'))
-
-    def post(self, request, pk):
-        diary = get_object_or_404(Diary, pk=pk, user=request.user)
-        form = DiaryForm(request.POST, instance=diary, request=request)
-        if form.is_valid():
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
-
-class DiaryDeleteView(LoginRequiredMixin, generic.DeleteView):
-    template_name = "diary/calendar_edit.html"
-    success_url = reverse_lazy("diary:calendar")
-    model = Diary
-    
-    def get(self, request, *args, **kwargs):
-        return redirect(reverse_lazy('diary:calendar'))
-    def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        # print(f"Deleted object with ID: {self.kwargs['pk']}")
-        return response
+@api_view(['POST'])
+@login_required
+def diary_delete(request):
+    pk = request.POST.get('')
+    diary = get_object_or_404(Diary, pk=pk, user=request.user)
+    if diary:
+        msg = f'{diary.date}の日記を削除しました'
+        diary.delete()  # 日記を全て削除
+    else:
+        msg = '日記が存在しませんでした'
+    return Response({"status": "success", "message": msg})
 
 class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
     template_name ="diary/diary_photo.html"
