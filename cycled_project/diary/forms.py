@@ -115,8 +115,11 @@ class LocationForm(forms.ModelForm):
     rotate_angle = forms.IntegerField(required=False, widget=forms.HiddenInput())
     class Meta:
         model = Location
-        fields = ["lat","lon","state","display","label","is_thumbnail",
-                  "date_of_Diary","id_of_image","rank","rotate_angle",]
+        fields = [
+            "lat","lon","state","display",
+            "label","is_thumbnail",
+            "date_of_Diary","id_of_image","rank","rotate_angle",
+        ]
         labels = {
             "label": "表示名",
         }

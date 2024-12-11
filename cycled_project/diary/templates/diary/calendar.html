@@ -55,13 +55,23 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body h-100">
-                                <form method="post" id="id_diary-form" name="diary-form">
+                                <form method="post" id="id_diary-form">
+                                    {% csrf_token %}
                                     <div id="diary-form-hidden" style="display:none;">
                                         {% for field in form %}
                                             {{ field }}
                                         {% endfor %}
                                     </div>
-                                    <div class="diary-edit-container text-center"></div>
+                                    <div class="diary-edit-container text-center">
+                                        <div class="diary-comment-field mb-3"></div>
+                                        <div class="diary-thumbnail-field mx-auto">
+                                            <img class="diary-image" loading="lazy">
+                                            <button type="button" class="diary-img-rotate-button icon-in-button mb-auto mx-0">
+                                                <i class="icon-rotate"></i>
+                                            </button>
+                                        </div>
+                                        <div class="diary-locations-field mt-3"></div>
+                                    </div>
                                     <div class="diary-edit-buttons-field row mt-3">
                                         <button type="button" class="btn btn-outline-secondary button-cancel col mx-3">Cancel</button>
                                         <button type="submit" class="btn btn-primary button-OK col mx-3">OK</button>
@@ -75,9 +85,14 @@
         </div>
     </div>
     <div id="empty-form-locations" style="display:none;">
-        {% for field in form.formset.empty_form %}
-            {{ field }}
-        {% endfor %}
+        <div class="diary-location-item">
+            <input type="hidden" class="location-img-url" name="location">
+            <div class="location-form-hidden" style="display:none;">
+                {% for field in form.formset.empty_form %}
+                    {{ field }}
+                {% endfor %}
+            </div>
+        </div>
     </div>
 {% endblock content %}
 
