@@ -145,8 +145,8 @@ def diary_edit(request):
                 buffer.seek(0)  # バッファの先頭に戻す
                 location.image.save(name=os.path.basename(location.image.name), content=buffer, save=True)
             location.save()
-        location_data = LocationSerializer(diary.locations, many=True).data
-        return JsonResponse({"success": True, "message": "更新が完了しました。","locations":location_data})
+        diary_data = DiarySerializer(diary).data
+        return JsonResponse({"success": True, "message": "更新が完了しました。","diary":diary_data})
         # return JsonResponse({"success": None})
     else:
         error = {}
