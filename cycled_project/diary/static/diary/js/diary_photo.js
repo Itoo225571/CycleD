@@ -360,7 +360,7 @@ $(document).ready(function() {
                     return $(this).val() === 'true'; // 値が 'true' のものをフィルタ
                 }).closest('.locations-form-wrapper');
                 var $angle = $checkedLocation.find('[id*="rotate_angle"]');
-                var angle = parseInt($angle.val(), 10) % 360;
+                var angle = parseInt($angle.val(), 10);
                 angle += 90; // ボタンがクリックされるたびに90度回転
                 $diaryNewForm.find('.thumbnail-image').css({'transform': `rotate(${angle}deg)`,'transition':'transform 0.5s ease',}); // CSSのtransformを更新
                 $angle.val(angle);

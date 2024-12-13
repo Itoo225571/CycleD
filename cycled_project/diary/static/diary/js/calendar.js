@@ -219,6 +219,8 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 			});
 			$frontContent.find('.button-to-edit').off('click').on('click', function() {
+				const editContent = this.getAttribute('data-edit-content');
+				limit_display(editContent);
 				initDiaryEdit(event_calendar,diary);
 				flip_card(this);
 			});
@@ -394,4 +396,24 @@ function flip_card(button){
 
 function convertLineBreaks(text) {
     return text.replace(/\n/g, "<br>");  // 改行文字を <br> に変換
+}
+
+function limit_display(content_name) {
+	const $editContainer = $('#diaryModal').find('.modal-content.flip-back').find('.diary-edit-container');
+	if ($editContainer) {
+		$editContainer.children().each(function(index, element) {
+			const $child = $(element);
+			if ($child.data('edit-content') === content_name) {
+				$child.show();
+			}
+			else {
+				$child.hide();
+			}
+		});
+	}
+	else {
+		console.log('全ての要素を表示します');
+		$editContainer.children().show();
+	}
+
 }
