@@ -315,11 +315,13 @@ document.addEventListener('DOMContentLoaded', function() {
 				setTimeout(function(){
 					$img.css({'transform': `rotate(${angle}deg)`,});
 					$backContent.find('.diary-image').attr('src', newImageSrc);					
-				},100);
+				},500);
 				setTimeout(function(){
 					$img.css('opacity', 1); // srcを更新し、フェードイン
-					$img.css({'transition': 'transform 0.5s ease'})
-				},500);
+				},700);
+				setTimeout(function(){
+					$img.css({'transition': 'transform 0.5s ease'});
+				},800);
 			});
 			$backContent.find('.diary-img-rotate-button').off('click').on('click', function() {
                 var $checkedLocation = $('.diary-location-radiobutton:checked').closest('.diary-location-item');
@@ -415,5 +417,4 @@ function limit_display(content_name) {
 		console.log('全ての要素を表示します');
 		$editContainer.children().show();
 	}
-
 }
