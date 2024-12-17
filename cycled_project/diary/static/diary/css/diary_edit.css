@@ -71,7 +71,7 @@
     width: 250px;
     position: relative; /* 画像の親要素を相対位置に設定 */
     display: flex;
-    justify-content: center; /* 水平方向の中央揃え */
+    justify-content: space-between; /* 画像を中央に、ボタンを右端に配置 */
     align-items: center;    /* 垂直方向の中央揃え */
 }
 .diary-edit-container .diary-image {
@@ -95,7 +95,7 @@
 /**** アイコン ****/
 .icon-in-button {
     margin: 0 .5rem;
-    font-size: 1.5rem;
+    font-size: 2.0rem;
     border: none;
     background-color: transparent;
 }
