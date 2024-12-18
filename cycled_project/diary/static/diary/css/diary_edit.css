@@ -74,14 +74,16 @@
     justify-content: space-between; /* 画像を中央に、ボタンを右端に配置 */
     align-items: center;    /* 垂直方向の中央揃え */
 }
+.diary-edit-container .diary-image-background {
+    transition: transform 0.5s ease; /* opacityとtranslateXを同時にアニメーション */
+    transform-origin: center; /* 回転の基準点を中心に設定 */
+}
 .diary-edit-container .diary-image {
     max-height: 100%;
     max-width: 100%;
     aspect-ratio: 1/1;
     object-fit: contain;
-
-    transition: transform 0.5s ease; /* opacityとtranslateXを同時にアニメーション */
-    transform-origin: center; /* 回転の基準点を中心に設定 */
+    transition: opacity 0.3s ease;
 }
 .diary-edit-container .diary-img-rotate-button {
     align-items: start;

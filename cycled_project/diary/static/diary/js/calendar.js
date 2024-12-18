@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 		function initDiaryEdit(event_calendar,diary) {
 			const $backContent = $('#diaryModal').find('.modal-content.flip-back');
-			$backContent.find('.diary-image').css({'transform': `rotate(0deg)`,});	//角度を初期化
+			$backContent.find('.diary-image-background').css({'transform': `rotate(0deg)`,});	//角度を初期化
 
 			$backContent.find('.modal-title').html(`<span id="selectedDate">${formatDateJapanese(diary.date)}</span>`);
 			var locations = diary.locations;
@@ -310,27 +310,25 @@ document.addEventListener('DOMContentLoaded', function() {
 				// 親要素の中にある隠しフィールドから画像のURLを取得
 				const newImageSrc = $checkedLocation.find('.location-img-url').val();
 
-				var $img = $backContent.find('.diary-image')
-				$img.css({'transition': 'opacity 0.3s ease'}).css('opacity', 0); // 透明にする（スペースは保持）
+				var $img = $backContent.find('.diary-image');
+				var $img_background = $backContent.find('.diary-image-background');
+				$img.css('opacity', 0); // 透明にする（スペースは保持）
 				setTimeout(function(){
-					$img.css({'transform': `rotate(${angle}deg)`,});
+					$img_background.css({'transform': `rotate(${angle}deg)`,});
 					$backContent.find('.diary-image').attr('src', newImageSrc);					
-				},500);
+				},300);
 				setTimeout(function(){
 					$img.css('opacity', 1); // srcを更新し、フェードイン
-				},700);
-				setTimeout(function(){
-					$img.css({'transition': 'transform 0.5s ease'});
 				},800);
 			});
 			$backContent.find('.diary-img-rotate-button').off('click').on('click', function() {
                 var $checkedLocation = $('.diary-location-radiobutton:checked').closest('.diary-location-item');
 
-                var img = $backContent.find('.diary-image');
+                var $img_background = $backContent.find('.diary-image-background');
                 var $angle = $checkedLocation.find('[id*="rotate_angle"]');
                 var angle = parseInt($angle.val(), 10);
                 angle += 90; // ボタンがクリックされるたびに90度回転
-                img.css({'transform': `rotate(${angle}deg)`,}); // CSSのtransformを更新
+                $img_background.css({'transform': `rotate(${angle}deg)`,}); // CSSのtransformを更新
                 $angle.val(angle);
             });
 			$backContent.find('.button-cancel').off('click').on('click', function() {
