@@ -1,3 +1,8 @@
+/**** 共通 ****/
+.diary-image {
+    object-fit: contain;
+    transition: opacity 0.3s ease;
+}
 /**** 表示側 ****/
 .diary-content .diary-image {
     max-width: 100%;
@@ -72,21 +77,16 @@
     position: relative; /* 画像の親要素を相対位置に設定 */
     display: flex;
     justify-content: space-between; /* 画像を中央に、ボタンを右端に配置 */
-    align-items: center;    /* 垂直方向の中央揃え */
 }
-.diary-edit-container .diary-image-background {
-    transition: transform 0.5s ease; /* opacityとtranslateXを同時にアニメーション */
-    transform-origin: center; /* 回転の基準点を中心に設定 */
-}
+.diary-edit-container .diary-image-background,
 .diary-edit-container .diary-image {
     max-height: 100%;
     max-width: 100%;
     aspect-ratio: 1/1;
-    object-fit: contain;
-    transition: opacity 0.3s ease;
 }
-.diary-edit-container .diary-img-rotate-button {
-    align-items: start;
+.diary-edit-container .diary-image-background {
+    transition: transform 0.5s ease; /* opacityとtranslateXを同時にアニメーション */
+    transform-origin: center; /* 回転の基準点を中心に設定 */
 }
 .diary-edit-container .location-label {
     white-space: nowrap;         /* テキストを1行に制限 */

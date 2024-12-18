@@ -213,9 +213,13 @@ document.addEventListener('DOMContentLoaded', function() {
 				if ($(this).is(':checked')) {
 					// 親要素の中にある隠しフィールドから画像のURLを取得
 					const newImageSrc = $(this).closest('.diary-location-item').find('.location-img-url').val();
-					$frontContent.find('.diary-image').fadeOut(500, function() { // フェードアウト
-						$(this).attr('src', newImageSrc).fadeIn(500); // srcを更新し、フェードイン
-					});
+					$frontContent.find('.diary-image').css('opacity', 0); // フェードアウト
+					setTimeout(() => {
+						$frontContent.find('.diary-image').attr('src', newImageSrc); // 画像を切り替え
+						setTimeout(() => {
+							$frontContent.find('.diary-image').css('opacity', 1); // フェードイン
+						}, 200); // 0.1秒待機
+					}, 500); // フェードアウト時間に合わせる
 				}
 			});
 			$frontContent.find('.button-to-edit').off('click').on('click', function() {
@@ -319,7 +323,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				},300);
 				setTimeout(function(){
 					$img.css('opacity', 1); // srcを更新し、フェードイン
-				},800);
+				},500);
 			});
 			$backContent.find('.diary-img-rotate-button').off('click').on('click', function() {
                 var $checkedLocation = $('.diary-location-radiobutton:checked').closest('.diary-location-item');
