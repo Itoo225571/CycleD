@@ -67,6 +67,7 @@
                                         {% endfor %}
                                     </div>
                                     <div class="diary-edit-container text-center">
+                                        <div id="diary-locations-management-field">{{ diary.formset.management_form }}</div>
                                         <div class="diary-comment-field my-3" data-edit-content="comment"></div>
                                         <div class="diary-thumbnail-field mx-auto" data-edit-content="thumbnail">
                                             <div class="diary-image-background">
@@ -76,12 +77,11 @@
                                                 <i class="icon-rotate text-muted"></i>
                                             </button>
                                         </div>
-                                        <div id="diary-locations-management-field">{{ diary.formset.management_form }}</div>
                                         <div class="diary-locations-field mt-3" data-edit-content="thumbnail"></div>
                                     </div>
                                     <div class="diary-edit-buttons-field row mt-3">
                                         <button type="button" class="btn btn-outline-secondary button-cancel col mx-3">Cancel</button>
-                                        <button type="submit" class="btn btn-primary button-OK col mx-3">OK</button>
+                                        <button type="submit" class="btn btn-primary button-OK col mx-3">変更</button>
                                     </div>
                                 </form>
                             </div>
