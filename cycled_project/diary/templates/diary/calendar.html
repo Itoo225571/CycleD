@@ -42,7 +42,7 @@
                                     <ul class="dropdown-menu">
                                         <li><button class="dropdown-item button-to-edit" data-edit-content="comment">コメント編集</button></li>
                                         <li><button class="dropdown-item button-to-edit" data-edit-content="thumbnail">サムネイルを変更</button></li>
-                                        {% comment %} <li><button class="dropdown-item button-to-edit" data-edit-content="locations">場所の変更・削除</button></li> {% endcomment %}
+                                        <li><button class="dropdown-item button-to-edit" data-edit-content="label">場所の変更・削除</button></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li><a class="dropdown-item text-danger" href="#">削除</a></li>
                                     </ul>
@@ -69,7 +69,7 @@
                                     <div class="diary-edit-container text-center">
                                         <div id="diary-locations-management-field">{{ diary.formset.management_form }}</div>
                                         <div class="diary-comment-field my-3" data-edit-content="comment"></div>
-                                        <div class="diary-thumbnail-field mx-auto" data-edit-content="thumbnail">
+                                        <div class="diary-thumbnail-field mx-auto" data-edit-content="thumbnail label">
                                             <div class="diary-image-background">
                                                 <img class="diary-image" loading="lazy">
                                             </div>
@@ -77,7 +77,8 @@
                                                 <i class="icon-rotate text-muted"></i>
                                             </button>
                                         </div>
-                                        <div class="diary-locations-field mt-3" data-edit-content="thumbnail"></div>
+                                        <div class="diary-locations-field mt-3" data-edit-content="thumbnail label"></div>
+                                        <div class="diary-locations-label-field mt-3" data-edit-content="locations-label"></div>
                                     </div>
                                     <div class="diary-edit-buttons-field row mt-3">
                                         <button type="button" class="btn btn-outline-secondary button-cancel col mx-3">Cancel</button>
