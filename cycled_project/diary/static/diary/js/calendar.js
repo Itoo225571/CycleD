@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			// 日付マスのクリック
 			dateClick: function(info) {
 				if (info.dayEl.classList.contains("fc-day-future")) {
-					alert("選択できません。");
+					// alert("選択できません。");
 					return;
 				} else {
 					// その日付にイベントがあるかチェック
@@ -165,6 +165,10 @@ document.addEventListener('DOMContentLoaded', function() {
 		// Diary表示
 		function showDiaryModal(event_calendar) {
 			var diary = event_calendar.extendedProps.diary;
+			// 表示を表にする
+			const $flipContainer = $('#diaryModal').find('.flip');
+			$flipContainer.removeClass('flipped');
+			
 			initDiaryContent(event_calendar,diary);
 			const modal = new bootstrap.Modal(document.getElementById('diaryModal'));
 			modal.show();
