@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					<text>${convertLineBreaks(diary.comment)}</text>
 				</div>
 				<div class="diary-thumbnail-field">
-					<img class="diary-image" loading="lazy" src="${locations[0].image}">
+					<img class="diary-image fade-anime" loading="lazy" src="${locations[0].image}">
 				</div>
 				<div class="diary-locations-field mt-3">
 					${locations.map((location, index) => `
@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 		function initDiaryEdit(event_calendar,diary) {
 			const $backContent = $('#diaryModal').find('.modal-content.flip-back');
-			$backContent.find('.diary-image-background').css({'transform': `rotate(0deg)`,});	//角度を初期化
+			$backContent.find('.diary-thumbnail-background').css({'transform': `rotate(0deg)`,});	//角度を初期化
 
 			$backContent.find('.modal-title').html(`<span id="selectedDate">${formatDateJapanese(diary.date)}</span>`);
 			var locations = diary.locations;
@@ -268,16 +268,16 @@ document.addEventListener('DOMContentLoaded', function() {
 				var isChecked = location.is_thumbnail ? 'checked' : '';
 				var radioButtonHtml = `
 				    <input class="diary-location-radiobutton visually-hidden" 
-						type="radio" id="location-edit-__prefix__" 
+						type="radio" id="location-edit-__prefix__-thumbnail" 
 						name="locationRadiobuttonEdit" ${isChecked}>
-					<label for="location-edit-__prefix__" class="location-label w-100 text-start"></label>
+					<label for="location-edit-__prefix__-thumbnail" class="location-label w-100 text-start"></label>
 				`;
 				location_base.find('.diary-location-item').append(radioButtonHtml);
 				location_base.find('.location-img-url').val(location.image);
 				location_base.find('.location-label').html(`<text>${location.label}</text>`);
 				if (location.is_thumbnail) {
 					location_base.find('.diary-location-radiobutton').prop('checked', true);
-					$backContent.find('.diary-image').attr('src', location.image);
+					$backContent.find('.diary-thumbnail').attr('src', location.image);
 				}
 
 				diaryEditHtml += location_base.html().replace(/__prefix__/g, `${index}`);
@@ -304,6 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			
 			$backContent.find('.diary-locations-field').html(diaryEditHtml);
 			$backContent.find('.diary-comment-field').html(form_comment);
+			set_label_field(); //label編集周りの初期化
 
 			$backContent.find('.diary-location-radiobutton').on('change', function() {
 				var $checkedLocation = $(this).closest('.diary-location-item');
@@ -318,21 +319,21 @@ document.addEventListener('DOMContentLoaded', function() {
 				// 親要素の中にある隠しフィールドから画像のURLを取得
 				const newImageSrc = $checkedLocation.find('.location-img-url').val();
 
-				var $img = $backContent.find('.diary-image');
-				var $img_background = $backContent.find('.diary-image-background');
+				var $img = $backContent.find('.diary-thumbnail');
+				var $img_background = $backContent.find('.diary-thumbnail-background');
 				$img.css('opacity', 0); // 透明にする（スペースは保持）
 				setTimeout(function(){
 					$img_background.css({'transform': `rotate(${angle}deg)`,});
-					$backContent.find('.diary-image').attr('src', newImageSrc);					
+					$backContent.find('.diary-thumbnail').attr('src', newImageSrc);					
 				},300);
 				setTimeout(function(){
 					$img.css('opacity', 1); // srcを更新し、フェードイン
-				},500);
+				},800);
 			});
 			$backContent.find('.diary-img-rotate-button').off('click').on('click', function() {
                 var $checkedLocation = $('.diary-location-radiobutton:checked').closest('.diary-location-item');
 
-                var $img_background = $backContent.find('.diary-image-background');
+                var $img_background = $backContent.find('.diary-thumbnail-background');
                 var $angle = $checkedLocation.find('[id*="rotate_angle"]');
                 var angle = parseInt($angle.val(), 10);
                 angle += 90; // ボタンがクリックされるたびに90度回転
@@ -380,6 +381,32 @@ document.addEventListener('DOMContentLoaded', function() {
 					console.log("AJAXリクエストが失敗しました。");
 				})
 			});
+			function set_label_field() {
+				const $locations_field = $backContent.find('.diary-locations-field');
+				const $labels_field = $backContent.find('.diary-labels-field');
+				var $label_field_html = $(); // 空の jQuery オブジェクトで初期化
+				$locations_field.children().each(function (index, child) {
+					var isThumbnail = $(child).find('*[id^="id_locations"][id$="is_thumbnail"]').val();
+					var isChecked = '';
+					if (isThumbnail) {
+						const imageSrc = $(child).find('.location-img-url').val();
+						isChecked = 'checked';
+						$labels_field.find('.diary-image').attr('src', imageSrc);
+					}
+					var $label_input = $(child).find('*[id^="id_locations"][id$="label"]');
+					var radioButtonHtml = `
+						<input class="diary-location-radiobutton visually-hidden" 
+							type="radio" id="location-edit-${index}-label" 
+							name="locationRadiobuttonEditLabel" ${isChecked}>
+						<label for="location-edit-${index}-label" class="location-label location-label-edit w-100 text-start">
+							<text>${$label_input.val()}</text>
+						</label>
+					`;
+					$label_field_html = $label_field_html.add(radioButtonHtml);
+					$label_field_html.append($label_input);
+				});
+				$backContent.find('.diary-location-labels').html($label_field_html);
+			}
 		}
 		// カレンダーを表示
 		calendar.render();
