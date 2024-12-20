@@ -267,10 +267,15 @@ document.addEventListener('DOMContentLoaded', function() {
 				});
 				var isChecked = location.is_thumbnail ? 'checked' : '';
 				var radioButtonHtml = `
+<<<<<<< HEAD
 				    <input class="diary-location-radiobutton visually-hidden" 
 						type="radio" id="location-edit-__prefix__-thumbnail" 
 						name="locationRadiobuttonEdit" ${isChecked}>
 					<label for="location-edit-__prefix__-thumbnail" class="location-label w-100 text-start"></label>
+=======
+					<input class="diary-location-radiobutton visually-hidden" type="radio" id="location-edit-__prefix__" name="locationRadiobuttonEdit" ${isChecked}>
+					<label for="location-edit-__prefix__" class="location-label w-100 text-start"></label>
+>>>>>>> 642b352dd7256935f8fe8ccb58788e922c81b92f
 				`;
 				location_base.find('.diary-location-item').append(radioButtonHtml);
 				location_base.find('.location-img-url').val(location.image);
@@ -438,7 +443,8 @@ function limit_display(content_name) {
 	if ($editContainer) {
 		$editContainer.children().each(function(index, element) {
 			const $child = $(element);
-			if ($child.data('edit-content') === content_name) {
+			// content name がedit contentに含まれているかチェック
+			if ($child.data('edit-content') && $child.data('edit-content').includes(content_name)) {
 				$child.show();
 			}
 			else {
