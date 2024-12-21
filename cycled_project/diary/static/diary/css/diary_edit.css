@@ -38,7 +38,6 @@
 .location-label::before,
 .location-label::after {
     content: "";
-    display: block; 
     border-radius: 50%;
     position: absolute;
     transform: translateY(-50%);
@@ -59,16 +58,17 @@
     left: 10px;
 }
 /* ラジオボタン(チェック) */
-.diary-location-radiobutton:checked + .location-label {
+.diary-location-radiobutton:checked + .location-label,
+.diary-location-label-radiobutton:checked + .location-label {
     top: 1px;
     box-shadow: 0 0 rgba(0, 0, 0, 0);
     border: 1px solid deepskyblue;
 } 
-.diary-location-radiobutton:checked + .location-label::after {
+.diary-location-radiobutton:checked + .location-label::after,
+.diary-location-label-radiobutton:checked + .location-label::after {
     background-color: deepskyblue;
     opacity: 1;
 }
-
 
 /**** 編集 ****/
 .diary-edit-container .diary-thumbnail-field {
@@ -101,7 +101,7 @@
 /**** アイコン ****/
 .icon-in-button {
     margin: 0 .5rem;
-    font-size: 2.0rem;
+    font-size: 1.5rem;
     border: none;
     background-color: transparent;
 }

@@ -128,7 +128,6 @@ def diary_edit(request):
     diary = get_object_or_404(Diary, date=date, user=request.user)
     form = DiaryForm(request.POST, instance=diary, request=request)
     formset = LocationFormSet(request.POST, queryset=diary.locations.all(), instance=diary)
-    # formset = LocationFormSet(request.POST,  )
 
     if form.is_valid() and formset.is_valid():
         diary = form.save(commit=False)
@@ -145,6 +144,8 @@ def diary_edit(request):
                 buffer.seek(0)  # バッファの先頭に戻す
                 location.image.save(name=os.path.basename(location.image.name), content=buffer, save=True)
             location.save()
+        # フォームセットの保存処理
+        formset.save()
         diary_data = DiarySerializer(diary).data
         return JsonResponse({"success": True, "message": "更新が完了しました。","diary":diary_data})
         # return JsonResponse({"success": None})
