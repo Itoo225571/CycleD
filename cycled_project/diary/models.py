@@ -38,6 +38,11 @@ class Location(models.Model):
             if diary:
                 # 同じDiary内の他のLocationのis_thumbnailをFalseにする
                 Location.objects.filter(diary=diary).exclude(location_id=self.location_id).update(is_thumbnail=False)
+        # 他にis_thumbnail=Trueがなかったらself.is_thumbnailをTrueにする
+        else:
+            existing_thumbnail = self.diary.locations.filter(is_thumbnail=True).exclude(location_id=self.location_id).first()
+            if not existing_thumbnail:
+                self.is_thumbnail = True
         super().save(*args, **kwargs)
     def clean(self):
         super().clean()

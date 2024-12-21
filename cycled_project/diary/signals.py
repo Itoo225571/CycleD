@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save,post_delete,pre_delete
+from django.db.models.signals import post_save,pre_save,post_delete,pre_delete
 from django.contrib.auth.signals import user_logged_in
 from django.dispatch import receiver
 from django.core.exceptions import ObjectDoesNotExist
@@ -28,7 +28,6 @@ def set_thumbnail_on_delete(sender, instance, **kwargs):
                 if new_thumbnail_location:
                     new_thumbnail_location.is_thumbnail = True
                     new_thumbnail_location.save()
-                    # new_thumbnail_location.refresh_from_db()  # キャッシュをリフレッシュ
     except ObjectDoesNotExist:
         return
     
@@ -39,7 +38,7 @@ def delete_file(sender, instance, **kwargs):
             instance.image.delete(False)
         except Exception as e:
             print(f"Error deleting file {instance.image.name}: {e}")
-
+    
 @receiver(post_save, sender=Diary)
 def update_cache_on_create_or_update(sender, instance, created, **kwargs):
     # キャッシュを削除または更新する

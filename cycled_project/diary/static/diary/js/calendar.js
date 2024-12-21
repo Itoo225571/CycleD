@@ -443,6 +443,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 					$radioButtonHtml.find('.button-delete-location').off('click').on('click', function(){
 						$delete_input.val(true);
+						$radioButtonHtml.hide();
+						// チェック移動
+						if ($radioButtonHtml.find('.diary-location-label-radiobutton').is(':checked')) {
+							var $nextRadiobutton = $labels_field.find('.diary-location-label-item').not($radioButtonHtml).eq(0).find('.diary-location-label-radiobutton');
+							$nextRadiobutton.prop('checked', true);
+							$nextRadiobutton.trigger('change');
+						}
 					});
 					$label_input.on('keypress', function(event) {
 						if (event.key === "Enter") {
