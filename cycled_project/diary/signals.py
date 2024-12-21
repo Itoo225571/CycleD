@@ -17,9 +17,9 @@ def delete_file(sender, instance, **kwargs):
         except Exception as e:
             print(f"Error deleting file {instance.image.name}: {e}")
 # Location削除直前に他にis_thumbnailを移動
-@receiver(pre_delete, sender=Location)
+@receiver(post_delete, sender=Location)
 def set_thumbnail_on_delete(sender, instance, **kwargs):
-    instance.refresh_from_db()
+    # instance.refresh_from_db()
     try:
         diary = instance.diary
         if instance.is_thumbnail:
@@ -28,6 +28,7 @@ def set_thumbnail_on_delete(sender, instance, **kwargs):
                 if new_thumbnail_location:
                     new_thumbnail_location.is_thumbnail = True
                     new_thumbnail_location.save()
+                    # new_thumbnail_location.refresh_from_db()  # キャッシュをリフレッシュ
     except ObjectDoesNotExist:
         return
     
