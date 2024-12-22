@@ -187,17 +187,14 @@
       </div>
 
       <footer class="text-center bg-light text-dark">
-        
-        <section class="fs-6 d-flex justify-content-between p-3">
-          <a class="text-reset fw-bold " href="{% url 'diary:home' %}">ホーム</a>
-          <a class="text-reset fw-bold " href="#">プライバシーポリシー</a>
-          <a class="text-reset fw-bold " href="#">お問い合わせ</a>
-        </section>
 
-        <div class="text-center p-3">
-          © 2024 Copyright : 
-          <a class="text-reset fw-bold" href="{% url 'diary:home' %}">ちゃりにっき</a>
-        </div>
+        <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+          <li class="nav-item"><a href="{% url 'diary:home' %}" class="nav-link px-2 text-body-secondary">ホーム</a></li>
+          <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">意見フォーム</a></li>
+          <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">お問い合わせ</a></li>
+        </ul>
+
+        <p class="text-center text-body-secondary">© 2024 Copyright : ちゃりにっき</p>
         
       </footer>
     </div>
