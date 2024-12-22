@@ -232,6 +232,20 @@ document.addEventListener('DOMContentLoaded', function() {
 				initDiaryEdit(event_calendar,diary);
 				flip_card(this);
 			});
+			$frontContent.find('form').off('submit').on('submit', function(event) {
+				event.preventDefault();
+				var actionURL = $(this).attr('action');
+				if (actionURL.includes('delete-diary')) {
+					if (actionURL.includes(mockUuid)){
+						var uuid = diary.diary_id;
+						actionURL = actionURL.replace(mockUuid, uuid);
+						$(this).attr('action', actionURL);
+						this.submit();  // フォームを送信する
+					} else {
+						console.error('mockIDが含まれていません');
+					}
+				}
+			})
 		}
 		function initDiaryEdit(event_calendar,diary) {
 			const $backContent = $('#diaryModal').find('.modal-content.flip-back');

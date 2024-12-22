@@ -30,7 +30,8 @@ urlpatterns = [
     path("diary/photos2Locations",views.Photos2LocationsView.as_view(),name="photos2Locations"),
     path('diary/delete-all-diaries/', views.delete_all_diaries, name='delete_all_diaries'),
 
-    path('diary/edit-diary/', views.diary_edit, name='diary_edit_noPK'),
-    path('diary/delete-diary/', views.diary_delete, name='diary_delete_noPK'),
+    path('diary/edit-diary-noPK/', views.diary_edit_noPK, name='editDiary_noPK'),
+    path('diary/delete-diary-noPK/', views.diary_delete_noPK, name='deleteDiary_noPK'),
+    path('diary/delete-diary/<uuid:pk>', views.DiaryDeleteView.as_view(), name='deleteDiary'),
 ]
 

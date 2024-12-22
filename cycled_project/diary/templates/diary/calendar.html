@@ -44,7 +44,12 @@
                                         <li><button class="dropdown-item button-to-edit" data-edit-content="thumbnail">サムネイルを変更</button></li>
                                         <li><button class="dropdown-item button-to-edit" data-edit-content="labels">場所の変更・削除</button></li>
                                         <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item text-danger" href="#">削除</a></li>
+                                        <li>
+                                            <form action="{% url 'diary:deleteDiary' mock_uuid %}" method="post" onsubmit="return confirm('本当に削除しますか？');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="dropdown-item text-danger">削除</button>
+                                            </form>
+                                        </li>
                                     </ul>
                                 </div>
                                 <button type="button" class="btn-close ms-1" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -59,7 +64,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body h-100">
-                                <form method="post" id="id_diary-form" action="{% url 'diary:diary_edit_noPK' %}">
+                                <form method="post" id="id_diary-form" action="{% url 'diary:editDiary_noPK' %}">
                                     {% csrf_token %}
                                     <div id="diary-form-hidden" style="display:none;">
                                         {% for field in diary %}
@@ -68,7 +73,7 @@
                                     </div>
                                     <div class="diary-edit-container text-center">
                                         <div id="diary-locations-management-field">{{ diary.formset.management_form }}</div>
-                                        <div class="diary-comment-field my-3" data-edit-content="comment"></div>
+                                        <div class="diary-comment-field mt-3 mb-5" data-edit-content="comment"></div>
                                         <div class="diary-thumbnail-field mx-auto" data-edit-content="thumbnail">
                                             <div class="diary-thumbnail-background">
                                                 <img class="diary-thumbnail fade-anime" loading="lazy">
@@ -113,6 +118,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
     <script>
         const url_sendDiaries = "{% url 'diary:sendDiaries' %}";
+        const mockUuid = "{{ mock_uuid }}"; 
     </script>
     <script src="{% static 'diary/js/calendar.js' %}"></script>
 

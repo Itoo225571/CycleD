@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponseForbidden
 from django.utils.timezone import now
 from django.core.files import File
 from django.core.files.base import ContentFile
@@ -123,7 +123,7 @@ def delete_all_diaries(request):
 
 @api_view(['POST'])
 @login_required
-def diary_edit(request):
+def diary_edit_noPK(request):
     date = request.POST.get('date')
     diary = get_object_or_404(Diary, date=date, user=request.user)
     form = DiaryForm(request.POST, instance=diary, request=request)
@@ -157,7 +157,7 @@ def diary_edit(request):
 
 @api_view(['POST'])
 @login_required
-def diary_delete(request):
+def diary_delete_noPK(request):
     pk = request.POST.get('')
     diary = get_object_or_404(Diary, pk=pk, user=request.user)
     if diary:
@@ -166,6 +166,13 @@ def diary_delete(request):
     else:
         msg = '日記が存在しませんでした'
     return Response({"status": "success", "message": msg})
+
+class DiaryDeleteView(LoginRequiredMixin,generic.DeleteView):
+    success_url = reverse_lazy('diary:calendar')
+    model = Diary
+    def get_queryset(self):
+        # ログインユーザーが所有している日記だけを取得
+        return Diary.objects.filter(user=self.request.user)
 
 class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
     template_name ="diary/diary_photo.html"
