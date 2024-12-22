@@ -236,13 +236,15 @@ document.addEventListener('DOMContentLoaded', function() {
 				event.preventDefault();
 				var actionURL = $(this).attr('action');
 				if (actionURL.includes('delete-diary')) {
-					if (actionURL.includes(mockUuid)){
-						var uuid = diary.diary_id;
-						actionURL = actionURL.replace(mockUuid, uuid);
-						$(this).attr('action', actionURL);
-						this.submit();  // フォームを送信する
-					} else {
-						console.error('mockIDが含まれていません');
+					if (confirm('本当に削除しますか？')) {
+						if (actionURL.includes(mockUuid)){
+							var uuid = diary.diary_id;
+							actionURL = actionURL.replace(mockUuid, uuid);
+							$(this).attr('action', actionURL);
+							this.submit();  // フォームを送信する
+						} else {
+							console.error('mockIDが含まれていません');
+						}
 					}
 				}
 			})
