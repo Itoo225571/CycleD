@@ -45,7 +45,7 @@
                                         <li><button class="dropdown-item button-to-edit" data-edit-content="labels">場所の変更・削除</button></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
-                                            <form action="{% url 'diary:deleteDiary' mock_uuid %}" method="post" onsubmit="return confirm('本当に削除しますか？');">
+                                            <form action="{% url 'diary:deleteDiary' mock_uuid %}" method="post">
                                                 {% csrf_token %}
                                                 <button type="submit" class="dropdown-item text-danger">削除</button>
                                             </form>
