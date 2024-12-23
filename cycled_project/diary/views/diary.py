@@ -51,7 +51,6 @@ class HomeView(LoginRequiredMixin,generic.ListView):
         
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        seven_days_ago = timezone.now() - timedelta(days=7)
         thumbnail_location = Prefetch(
             'locations',  # `locations` のリレーションを指定
             queryset=Location.objects.filter(is_thumbnail=True),  # サムネイル画像の場所のみ取得
@@ -59,7 +58,7 @@ class HomeView(LoginRequiredMixin,generic.ListView):
         )
         diaries = Diary.objects.filter(
             # is_publish=True,
-            date__gte=seven_days_ago.date(),  # `date`が7日以内の日記を取得
+            date__gte=timezone.now().date(),  # `date`が7日以内の日記を取得
             rank=0,
         ).order_by('-date_last_updated')[:10].prefetch_related(thumbnail_location, 'user')  # 全体で公開された日記
         # 必要な情報のみ抽出
