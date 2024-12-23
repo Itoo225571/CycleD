@@ -22,13 +22,13 @@
         </div>
 
         <div class="diary-list-field my-3">
-            <ul class="nav nav-tabs nav-fill">
-                <li class="nav-item">
+            <ul class="nav nav-tabs nav-fill d-flex flex-nowrap" role="tablist">
+                <li class="nav-item flex-shrink-0" role="presentation">
                     <button class="nav-link active" type="button" data-bs-toggle="tab" data-bs-target="#tab_diary-myself-field">
                         {{user.username}}さんの日記
                     </button>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item flex-shrink-0" role="presentation">
                     <button class="nav-link" type="button" data-bs-toggle="tab" data-bs-target="#tab_diary-public-field">
                         全ユーザーの日記
                     </button>
@@ -40,13 +40,13 @@
                     <div class="diary-myself-field mt-5">
                         <div class="diary-list row">
                             {% for diary in diaries_mine %}
-                                <div class="card-container col-12 col-md-6 col-lg-4 mb-3">
+                                <div class="card-container col-12 col-md-6 col-lg-4 my-2">
                                     {% for loc in diary.locations.all %}
                                         {% if loc.is_thumbnail %}
                                             <div class="card card-rank{{ diary.rank }}">
                                                 <div class="card-thumbnail">
                                                     <img src="{{ loc.image.url }}" alt="サムネイル" class="thumbnail-img" onclick="zoom_image('{{ loc.image.url }}')">  <!-- 画像を表示 -->
-                                                    <button type="button" class="diary-edit-button" onclick="diary_edit('{{diary}}')"></button>
+                                                    <a class="to-edit-button" href="{% url 'diary:calendar' %}"></a>
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="card-locations">
@@ -98,7 +98,7 @@
                             {% empty %}
                             <div class="row justify-content-center text-center">
                                 <img src="{% static 'diary/img/sabori_man.png' %}" class="col-4" alt="サボり人">
-                                <p>まだ日記が登録されていません</p>
+                                <p>今日は誰も日記を書いていないようです</p>
                                 <p>あなたが最初のユーザーになるチャンス！</p>
                                 <a href="{% url 'diary:diary_photo' %}">日記作成はここから</a>
                             </div>

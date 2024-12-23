@@ -73,7 +73,7 @@
     position: relative; 
     display: inline-block;
 }
-.diary-myself-field .diary-list .card .diary-edit-button{
+.diary-myself-field .diary-list .card .to-edit-button{
     position: absolute; 
     top: 5%;
     right: 5%;
@@ -84,14 +84,15 @@
     border: none;
     border-radius: 3px;
     background-color: black;
+    text-decoration: none; /* 青い下線を消す */
     /* コンテンツの中央揃え */
     display: flex;
     justify-content: center;
     align-items: center;
 }
-.diary-myself-field .diary-list .card .diary-edit-button::before {
-    font-family: 'bootstrap-icons';
-    content: '\F4CA'; /* Unicodeのアイコンや他の記号を指定 */
+.diary-myself-field .diary-list .card .to-edit-button::before {
+    font-family: 'Material Icons Outlined';
+    content: '\e742';
     color: #FFFFFF;
     background-color: black;
 }
