@@ -20,6 +20,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path("admin/", admin.site.urls),#admin(管理)画面用のURL
-    path("cycled/",include("diary.urls")),
+    path("",include("diary.urls")),
     path("__debug__/",include("debug_toolbar.urls")),#Debug-toolbar追加
+    path('social-auth/', include('allauth.urls')),
 ] +static(settings.STATIC_URL,document_root=settings.STATICFILES_DIRS) +static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
