@@ -1,12 +1,12 @@
 from typing import Any
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model,authenticate
 from django.contrib.auth.forms import UserCreationForm,UserChangeForm,AuthenticationForm
 from django.contrib.auth.hashers import make_password,check_password
 from django import forms
 from django.forms.renderers import BaseRenderer
 from django.forms.utils import ErrorList
 from django.core.exceptions import ValidationError
-from diary.models import Location,Diary,TempImage
+from diary.models import Location,Diary,User
 
 from pathlib import Path
 import os
@@ -45,9 +45,6 @@ class SignupForm(UserCreationForm):
         self.fields["password1"].widget.attrs={"placeholder":"パスワードを入力"}
         self.fields["password2"].widget.attrs={"placeholder":"パスワードを再入力"}
 
-        self.fields['password1'].label = 'パスワード'
-        self.fields['password2'].label = '確認用パスワード'
-
         self.fields['password1'].help_text = ''
         self.fields['password2'].help_text = ''
 
@@ -58,10 +55,6 @@ class SignupForm(UserCreationForm):
     class Meta:
         model = get_user_model()
         fields=["username","email","password1","password2"]
-        labels = {
-            "username": "ユーザー名",
-            "email": "メールアドレス",
-        }
         help_texts = {
             "username": "",
             "email": "",
@@ -74,31 +67,36 @@ class SignupForm(UserCreationForm):
         if len(value) < min_length:
             raise forms.ValidationError('%(min_length)s文字以上で入力してください', params={'min_length':min_length})
         return value
-    #email
     def clean_email(self):
         value = self.cleaned_data['email']
+        if '@' not in value:
+            raise forms.ValidationError('正しいメールアドレスを入力してください')
         return value
-    #password
     def clean_password(self):
         value = self.cleaned_data['password1']
+        if len(value) < 8:
+            raise forms.ValidationError('パスワードは8文字以上で入力してください')
         return value
-    #フォーム全体
     def clean(self):
-        password = self.cleaned_data['password1']
-        password2 = self.cleaned_data['password2']
+        password = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
         if password != password2:
             self.add_error('password2', 'パスワードと確認用パスワードが一致しません。')
         super().clean()
     
 class SigninForm(AuthenticationForm):
-    # username_or_email = CharField(label='ユーザー名またはメールアドレス')
-    class Meta:
-        model = get_user_model()
-        fields=["username","password",]
+    username_or_email = forms.CharField(label='ユーザー名またはメールアドレス',max_length=64)
     def __init__(self, *args, **kwargs):
         super(SigninForm, self).__init__(*args, **kwargs)
-        for field_name, field in self.fields.items():
+        self.fields.pop('username', None) #username除外
+        self.fields["username_or_email"].widget.attrs={"placeholder":"ユーザー名またはメールアドレスを入力"}
+        self.fields["password"].widget.attrs={"placeholder":"パスワードを入力"}
+        for _, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
+
+    class Meta:
+        model = get_user_model()
+        fields = ["username_or_email", "password"]
 
 """___Address関連___"""
 class AddressSearchForm(forms.Form):

@@ -78,7 +78,6 @@ class User(AbstractUser):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     username=models.CharField(max_length=8,unique=True,verbose_name="ユーザー名")
-    # email=None
     first_name = None
     last_name = None
     icon = models.CharField(

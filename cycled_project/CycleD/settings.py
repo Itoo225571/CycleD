@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import environ
 import os
+from django.urls import reverse
 
 #プロジェクトのベースフォルダを示す（今回の場合、/workspaces/MyDjango/CycleD_project）
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -58,6 +59,20 @@ INSTALLED_APPS = [
     'imagekit', #image周り
     'django_cleanup', #不要なファイルを削除
     'django_extensions', #仮のHttps
+    # google認証
+    'django.contrib.sites', # 追加
+    'allauth', # 追加
+    'allauth.account', # 追加
+    'allauth.socialaccount', # 追加
+    'allauth.socialaccount.providers.google', # 追加
+]
+
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+    'diary.auth_backends.UsernameOrEmailBackend',
 ]
 
 MIDDLEWARE = [
@@ -72,6 +87,7 @@ MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",#Debug-toolbar
 	'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',#session機能
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = "CycleD.urls"
@@ -139,9 +155,10 @@ USE_TZ = True
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 1
 SESSION_SAVE_EVERY_REQUEST = True
 
-LOGIN_URL='diary:signin'
-LOGIN_REDIRECT_URL='diary:home'
-LOGOUT_REDIRECT_URL='diary:signout'
+LOGIN_URL='/signin/'
+LOGIN_REDIRECT_URL= '/home/'
+LOGOUT_REDIRECT_URL= '/signout/'
+SOCIAL_AUTH_LOGIN_REDIRECT_URL= '/home/'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -170,3 +187,15 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env.list("CLIANT_ID_GOOGLE_OAUTH")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env.list("CLIANT_SECRET_KEY_GOOGLE_OAUTH")
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+    }
+}
+ACCOUNT_EMAIL_REQUIRED = True
+SOCIALACCOUNT_EMAIL_REQUIRED = True

@@ -1,6 +1,7 @@
 from typing import Any
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
 
 from ..forms import *
 
@@ -16,3 +17,8 @@ class BaseView(generic.TemplateView):
 
 class TopView(generic.TemplateView):
     template_name="diary/top.html"
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('diary:home')  # 'home' にリダイレクト
+        return super().get(request, *args, **kwargs)
