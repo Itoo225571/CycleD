@@ -33,6 +33,8 @@ class CustomSignupForm(SignupForm):
         min_length=3
         if len(value) < min_length:
             raise forms.ValidationError('%(min_length)s文字以上で入力してください', params={'min_length':min_length})
+        if get_user_model().objects.filter(username=value).exists():
+            raise forms.ValidationError("この名前は既に使用されています。他の名前を使用してください。")
         return value
     def clean_email(self):
         value = self.cleaned_data['email']
