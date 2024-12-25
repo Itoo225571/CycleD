@@ -1,11 +1,10 @@
 from allauth.account import views
 from django.urls import reverse_lazy
-from django.contrib.auth.views import LoginView,LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 
 class CustomSigninView(views.LoginView):
-    # template_name="diary/signin.html"
+    template_name="accounts/signin.html"
     # form_class=SigninForm
     success_url=reverse_lazy("diary:home")
     def get(self, request, *args, **kwargs):
@@ -18,6 +17,7 @@ class CustomSignoutView(LoginRequiredMixin,views.LogoutView):
     pass
 
 class CustomSignupView(views.SignupView):
+    template_name="accounts/signup.html"
     def form_valid(self, form):
         response = super().form_valid(form)
         # フォームが有効な場合の追加処理をここに記述

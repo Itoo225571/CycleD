@@ -156,9 +156,9 @@ USE_TZ = True
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 1
 SESSION_SAVE_EVERY_REQUEST = True
 
-# LOGIN_URL='/signin/'
+LOGIN_URL='/accounts/signin/'
 LOGIN_REDIRECT_URL= '/home/'
-# LOGOUT_REDIRECT_URL= '/signout/'
+LOGOUT_REDIRECT_URL = '/accounts/signin/'  # ログアウト後のリダイレクト先
 SOCIAL_AUTH_LOGIN_REDIRECT_URL= '/home/'
 
 # Static files (CSS, JavaScript, Images)
@@ -204,8 +204,8 @@ ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
 # ユーザー名の登録を不要にする
 ACCOUNT_USERNAME_REQUIRED = True
-# 登録後、メールアドレスに確認メールが送信される
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+# ACCOUNT_EMAIL_VERIFICATION = "mandatory"    # 登録後、メールアドレスに確認メールが送信される
+ACCOUNT_EMAIL_VERIFICATION = "none"         # メール確認を無効にする
 ACCOUNT_RATE_LIMITS = {
     'login_failed': '5/m',  # 例えば1分間に5回のログイン試行制限
 }

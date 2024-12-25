@@ -19,6 +19,7 @@
             {% csrf_token %}
             {% for field in form %}
                 <div class="form-group">
+                    {% comment %} <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label> {% endcomment %}
                     {{ field |add_class:"w-100 my-3"}}
                     {% if field.errors %}
                         <div class="text-danger">
@@ -39,7 +40,7 @@
 
         <div class="row my-3">
             <text>アカウントをお持ちでない方</text>
-            <a href="{% url 'diary:signup' %}">新規登録</a>
+            <a href="{% url 'accounts:signup' %}">新規登録</a>
         </div>
 
         <div class="row my-3">
