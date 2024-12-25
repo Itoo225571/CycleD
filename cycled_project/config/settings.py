@@ -91,7 +91,7 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
 ]
 
-ROOT_URLCONF = "CycleD.urls"
+ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
@@ -110,7 +110,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "CycleD.wsgi.application"
+WSGI_APPLICATION = "config.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -156,9 +156,9 @@ USE_TZ = True
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 1
 SESSION_SAVE_EVERY_REQUEST = True
 
-LOGIN_URL='/accounts/signin/'
+LOGIN_URL='/accounts/login/'
 LOGIN_REDIRECT_URL= '/home/'
-LOGOUT_REDIRECT_URL = '/accounts/signin/'  # ログアウト後のリダイレクト先
+LOGOUT_REDIRECT_URL = '/accounts/login/'  # ログアウト後のリダイレクト先
 SOCIAL_AUTH_LOGIN_REDIRECT_URL= '/home/'
 
 # Static files (CSS, JavaScript, Images)

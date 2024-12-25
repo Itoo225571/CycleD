@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model,authenticate
 from django.contrib.auth.forms import UserCreationForm,UserChangeForm,AuthenticationForm
-from allauth.account.forms import SignupForm
+from allauth.account.forms import SignupForm,LoginForm
 from django import forms
 
 class CustomSignupForm(SignupForm):
@@ -53,19 +53,23 @@ class CustomSignupForm(SignupForm):
             self.add_error('password2', 'パスワードと確認用パスワードが一致しません。')
         super().clean()
     
-class SigninForm(AuthenticationForm):
-    username_or_email = forms.CharField(label='ユーザー名またはメールアドレス',max_length=64)
-    def __init__(self, *args, **kwargs):
-        super(SigninForm, self).__init__(*args, **kwargs)
-        self.fields.pop('username', None) #username除外
-        self.fields["username_or_email"].widget.attrs={"placeholder":"ユーザー名またはメールアドレスを入力"}
-        self.fields["password"].widget.attrs={"placeholder":"パスワードを入力"}
-        for _, field in self.fields.items():
-            field.widget.attrs['class'] = 'form-control'
+# class LoginForm(AuthenticationForm):
+#     username_or_email = forms.CharField(label='ユーザー名またはメールアドレス',max_length=64)
+#     def __init__(self, *args, **kwargs):
+#         super(LoginForm, self).__init__(*args, **kwargs)
+#         self.fields.pop('username', None) #username除外
+#         self.fields["username_or_email"].widget.attrs={"placeholder":"ユーザー名またはメールアドレスを入力"}
+#         self.fields["password"].widget.attrs={"placeholder":"パスワードを入力"}
+#         for _, field in self.fields.items():
+#             field.widget.attrs['class'] = 'form-control'
 
-    class Meta:
-        model = get_user_model()
-        fields = ["username_or_email", "password"]
+#     class Meta:
+#         model = get_user_model()
+#         fields = ["username_or_email", "password"]
+
+class CustomLoginForm(LoginForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 class UserEditForm(UserChangeForm):
     class Meta:
