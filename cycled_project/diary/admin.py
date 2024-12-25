@@ -1,8 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth import get_user_model
 
-from .models import User,Diary,Location
+from .models import Diary,Location
 
+User = get_user_model()
 # インラインの設定
 # これをしないと、子要素の編集が同時にできないゾ
 class DiaryInline(admin.TabularInline):
