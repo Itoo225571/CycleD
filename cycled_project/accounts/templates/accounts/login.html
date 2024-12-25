@@ -20,14 +20,13 @@
             {% csrf_token %}
                 {% for field in form %}
                     {% if field.name == "remember" %}
-                    <div class="form-group field">
-                        <label for="{{ field.id_for_label }}">{{field.label}} {{ field }}</label>
-                    </div>
-                
+                        <div class="form-group field">
+                            <label for="{{ field.id_for_label }}">{{field.label}} {{ field }}</label>
+                        </div>
                     {% else %}
-                    <div class="form-group field">
-                        {{ field | add_class:"form-control"}}
-                    </div>
+                        <div class="form-group field">
+                            <label for="{{ field.id_for_label }}">{{ field | add_class:"form-control"}}</label>
+                        </div>
                     {% endif %}
                 {% endfor %}
 
@@ -61,3 +60,7 @@
         
     </div>
 {% endblock content %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'accounts/css/login.css' %}" type="text/css" >
+{% endblock extra_css %}
