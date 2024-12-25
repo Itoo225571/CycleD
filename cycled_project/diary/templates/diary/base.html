@@ -92,7 +92,7 @@
                         </li>
                         <li><hr class="dropdown-divider"></li><!-- 横仕切り線 -->
                         <li>
-                          <form action="{% url 'diary:signout' %}" method="post">
+                          <form action="{% url 'accounts:signout' %}" method="post">
                             {% csrf_token %}
                             <a class="dropdown-item" href="#" onclick="this.closest('form').submit();return false;">
                               <i class="fa-solid fa-right-to-bracket me-2"></i>ログアウト
@@ -102,7 +102,7 @@
                       </ul>
                     </div>
                   {% else %}
-                    <a class="btn btn-outline-primary rounded-pill px-3" href="{% url 'diary:signin' %}">Login</a>
+                    <a class="btn btn-outline-primary rounded-pill px-3" href="{% url 'accounts:signin' %}">Login</a>
                   {% endif %}
                     
                 </li>

@@ -4,7 +4,10 @@ from django.dispatch import receiver
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.cache import cache
 from django.utils import timezone
-from .models import User, Coin, Location, TempImage, Diary
+from .models import Coin, Location, TempImage, Diary
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 from datetime import timedelta
 

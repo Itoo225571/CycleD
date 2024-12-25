@@ -7,10 +7,6 @@ urlpatterns = [
     path("",views.TopView.as_view(),name="top"),
     path("home/",views.HomeView.as_view(),name="home"),
     
-    path("signin/",views.SigninView.as_view(),name="signin"),
-    path("signup/",views.SignupView.as_view(),name="signup"),
-    path("signout/",views.SignoutView.as_view(),name="signout"),
-    
     path("user/",views.UserProfileView.as_view(),name="user_profile"),
     path("user/edit/",views.UserEditView.as_view(),name="user_edit"),
     

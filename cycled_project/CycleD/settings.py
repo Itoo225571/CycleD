@@ -51,6 +51,7 @@ INSTALLED_APPS = [
 	'corsheaders',
     
     "diary.apps.DiaryConfig",
+    "accounts.apps.AccountsConfig", # アカウント管理用アプリ
     "django_bootstrap5",#Bootstrap5追加
     "debug_toolbar",#Debug-toolbar追加
 	# "subs",
@@ -60,10 +61,10 @@ INSTALLED_APPS = [
     'django_cleanup', #不要なファイルを削除
     'django_extensions', #仮のHttps
     # google認証
-    'django.contrib.sites', # 追加
-    'allauth', # 追加
-    'allauth.account', # 追加
-    'allauth.socialaccount', # 追加
+    'django.contrib.sites', # 複数のウェブサイトを1つのDjangoプロジェクトで管理するサイトフレームワーク
+    'allauth', # django-allauthの基本機能
+    'allauth.account', # メールアドレスとパスワードによる認証機能
+    'allauth.socialaccount', # ソーシャルアカウント認証機能
     'allauth.socialaccount.providers.google', # 追加
 ]
 
@@ -95,7 +96,7 @@ ROOT_URLCONF = "CycleD.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -155,9 +156,9 @@ USE_TZ = True
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 1
 SESSION_SAVE_EVERY_REQUEST = True
 
-LOGIN_URL='/signin/'
+# LOGIN_URL='/signin/'
 LOGIN_REDIRECT_URL= '/home/'
-LOGOUT_REDIRECT_URL= '/signout/'
+# LOGOUT_REDIRECT_URL= '/signout/'
 SOCIAL_AUTH_LOGIN_REDIRECT_URL= '/home/'
 
 # Static files (CSS, JavaScript, Images)
@@ -181,7 +182,7 @@ DEBUG_TOOLBAR_CONFIG={
 }
 
 # ユーザーモデル変更
-AUTH_USER_MODEL = 'diary.User'
+AUTH_USER_MODEL = 'accounts.User'
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = False
@@ -197,5 +198,18 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {'access_type': 'online'},
     }
 }
+# ユーザー認証にユーザー名とメールアドレスを使用
+ACCOUNT_AUTHENTICATION_METHOD = "username_email"
+# ユーザー登録にメールアドレスを必須にする
 ACCOUNT_EMAIL_REQUIRED = True
-SOCIALACCOUNT_EMAIL_REQUIRED = True
+# ユーザー名の登録を不要にする
+ACCOUNT_USERNAME_REQUIRED = True
+# 登録後、メールアドレスに確認メールが送信される
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_RATE_LIMITS = {
+    'login_failed': '5/m',  # 例えば1分間に5回のログイン試行制限
+}
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
