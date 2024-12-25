@@ -1,0 +1,6 @@
+/* placeholderのスタイル */
+input::placeholder {
+    color: gray;
+    font-size: 14px;
+    opacity: 0.8; /* 薄く表示 (0: 完全に透明, 1: 完全に不透明) */
+}
