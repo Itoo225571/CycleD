@@ -215,3 +215,5 @@ ACCOUNT_RATE_LIMITS = {
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
+
+ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'  # アダプターの設定
