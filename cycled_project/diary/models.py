@@ -31,20 +31,21 @@ class Location(models.Model):
         return self.label
     
     def save(self, *args, **kwargs):
-        if self.image and not self.image_hash:
-            self.image_hash = to_pHash(self.image)   # pHashの生成
-        # is_thumbnailがTrueの場合、同じDiary内の他のLocationのis_thumbnailをFalseにする
-        if self.is_thumbnail:
-            # Diaryを取得
-            diary = self.diary
-            if diary:
-                # 同じDiary内の他のLocationのis_thumbnailをFalseにする
-                Location.objects.filter(diary=diary).exclude(location_id=self.location_id).update(is_thumbnail=False)
-        # 他にis_thumbnail=Trueがなかったらself.is_thumbnailをTrueにする
-        else:
-            existing_thumbnail = self.diary.locations.filter(is_thumbnail=True).exclude(location_id=self.location_id).first()
-            if not existing_thumbnail:
-                self.is_thumbnail = True
+        if self.diary:  #日記作成の場合
+            if self.image and not self.image_hash:
+                self.image_hash = to_pHash(self.image)   # pHashの生成
+            # is_thumbnailがTrueの場合、同じDiary内の他のLocationのis_thumbnailをFalseにする
+            if self.is_thumbnail:
+                # Diaryを取得
+                diary = self.diary
+                if diary:
+                    # 同じDiary内の他のLocationのis_thumbnailをFalseにする
+                    Location.objects.filter(diary=diary).exclude(location_id=self.location_id).update(is_thumbnail=False)
+            # 他にis_thumbnail=Trueがなかったらself.is_thumbnailをTrueにする
+            else:
+                existing_thumbnail = self.diary.locations.filter(is_thumbnail=True).exclude(location_id=self.location_id).first()
+                if not existing_thumbnail:
+                    self.is_thumbnail = True
         super().save(*args, **kwargs)
     def clean(self):
         super().clean()
