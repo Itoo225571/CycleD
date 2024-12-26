@@ -3,7 +3,10 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.views import generic
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .forms import CustomLoginForm,CustomSignupForm
+from rest_framework.decorators import api_view
 
 class CustomLoginView(views.LoginView):
     template_name="accounts/login.html"
@@ -46,3 +49,11 @@ class UserEditView(LoginRequiredMixin,generic.UpdateView):
 
 class UserDeleteView(LoginRequiredMixin,generic.DeleteView):
     pass
+
+@api_view(['POST'])
+@login_required
+def user_delete(request):
+    user = request.user
+    user.delete()
+    messages.success(request, "アカウントは正常に削除されました。")
+    return redirect('diary:top')  # ログインページにリダイレクト
