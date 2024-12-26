@@ -9,58 +9,66 @@
 {% endblock title %}
 
 {% block page_title %}
-    <h2>ログイン</h2>
 {% endblock page_title %}
-
-    
-{% block content %}
-    <div class="container-fluid">
-        {{ form.certifications.errors }}
-        <form method="post">
-            {% csrf_token %}
-                {% for field in form %}
-                    {% if field.name == "remember" %}
-                        <div class="form-group field">
-                            <label for="{{ field.id_for_label }}">{{field.label}} {{ field }}</label>
-                        </div>
-                    {% else %}
-                        <div class="form-group field">
-                            <label for="{{ field.id_for_label }}">{{ field | add_class:"form-control"}}</label>
-                        </div>
-                    {% endif %}
-                {% endfor %}
-
-                {% for error in form.non_field_errors %}
-                    <div class="alert-message">
-                        <p>{{ error }}</p>
-                    </div>
-                {% endfor %}
-            
-            <div class="row">
-                <div class="col-auto">
-                    <button class="btn btn-primary" type="submit">送信</button>
-                </div>
-            </div>
-        </form>
-        <div>
-            <a href="{% url 'account_reset_password' %}">{% trans "パスワードを忘れましたか？" %}</a>
-        </div>
-        <div class="row my-3">
-            <text>アカウントをお持ちでない方</text>
-            <a href="{% url 'accounts:signup' %}">新規登録</a>
-        </div>
-
-        <div class="row my-3">
-            <a href="{% provider_login_url 'google'%}?next=/" class="btn btn-outline-info py-3">
-                <strong>
-                    <i class="bi bi-google me-3"></i>Googleでログイン
-                </strong>
-            </a>
-        </div>
-        
-    </div>
-{% endblock content %}
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'accounts/css/login.css' %}" type="text/css" >
 {% endblock extra_css %}
+    
+{% block content %}
+    <div class="row d-flex justify-content-center align-items-center mb-5">
+        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="card bg-light-subtle text-dark" style="border-radius: 1rem;">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-md-5 mt-md-4 pb-3">
+                        <p class="opacity-50">Login</p>
+                        <form method="post">
+                            {% csrf_token %}
+                            {% for field in form %}
+                                <div class="mb-2">
+                                    {% if field.name == "remember" %}
+                                        <label for="{{ field.id_for_label }}">{{ field }} {{ field.label }}</label>
+                                    {% else %}
+                                        <label for="{{ field.id_for_label }}" class="d-none"></label>
+                                        <div class="input-group">
+                                            {{ field | add_class:"form-control form-control-lg" }}
+                                            {% if field == form.password %}
+                                                <button class="btn btn-outline-secondary togglePassword" type="button">
+                                                    <i class="bi bi-eye-slash password-icon"></i> <!-- 目のアイコン -->
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}                        
+
+                            {% for error in form.non_field_errors %}
+                                <div class="alert-message">
+                                    <p>{{ error }}</p>
+                                </div>
+                            {% endfor %}
+                            <p class="small pb-lg-2 mt-4"><a class="text-dark" href="#!">パスワードがわからない?</a></p>
+                            <button class="btn btn-outline-dark btn-lg w-100 mt-3" type="submit">ログイン</button>
+                            <hr>
+                            <div class="mt-4 pt-1">
+                                <a href="{% provider_login_url 'google'%}?next=/" class="btn btn-outline-info py-3 w-100">
+                                    <strong>
+                                        <i class="bi bi-google me-3"></i>Googleでログイン
+                                    </strong>
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div>
+                        <a href="{% url 'accounts:signup' %}" class="text-dark">アカウントを作成</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block extra_js %}
+    <script src="{% static 'accounts/js/password_eye.js' %}"></script>
+{% endblock %}

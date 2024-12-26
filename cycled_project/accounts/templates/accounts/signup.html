@@ -1,39 +1,70 @@
 {% extends "base.html" %}
-{% load django_bootstrap5 %}
 {% load i18n static %}
+{% load django_bootstrap5 %}
+{% load socialaccount %}
 {% load widget_tweaks %}
-
-{% block extra_css %}
-    <link rel="stylesheet" href="{% static 'diary/css/signup.css' %}" type="text/css" >
-{% endblock extra_css %}
 
 {% block title %}
     {% trans "新規アカウント作成" %}
 {% endblock title %}
 
 {% block page_title %}
-    <h2>新規アカウント作成</h2>
 {% endblock page_title %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'accounts/css/signup.css' %}" type="text/css" >
+{% endblock extra_css %}
     
 {% block content %}
-    {{ form.certifications.errors }}
-    <form method="post">
-        {% csrf_token %}
-        {% for field in form %}
-            <div class="mb-3 col-md-4">
-                <label for="{{ field.id_for_label }}" class="form-label">
-                    {{ field }}
-                </label>
-                {% if field.help_text %}
-                    <small class="form-text text-muted">{{ field.help_text }}</small>
-                {% endif %}
-                {% if field.errors %}
-                    <div class="invalid-feedback">
-                        {{ field.errors }}
+    <div class="row d-flex justify-content-center align-items-center mb-5">
+        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="card bg-light-subtle text-dark" style="border-radius: 1rem;">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-md-5 mt-md-4 pb-3">
+                        <p class="opacity-50">Signup</p>
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ form.certifications.errors }}
+                            {% for field in form %}
+                                <div class="form-outline form-dark mb-2">
+                                    <label for="{{ field.id_for_label }}" class="d-none"></label>
+                                    <div class="input-group">
+                                        {{ field | add_class:"form-control form-control-lg" }}
+                                        {% if field == form.password1 %}
+                                        <button class="btn btn-outline-secondary togglePassword" type="button">
+                                            <i class="bi bi-eye-slash password-icon"></i> <!-- 目のアイコン -->
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                            {% for error in form.non_field_errors %}
+                                <div class="alert-message">
+                                    <p>{{ error }}</p>
+                                </div>
+                            {% endfor %}
+                            <button class="btn btn-outline-dark btn-lg w-100 mt-5" type="submit">新規作成</button>
+                            <hr>
+                            <div class="mt-4 pt-1">
+                                <a href="{% provider_login_url 'google'%}?next=/" class="btn btn-outline-info py-3 w-100">
+                                    <strong>
+                                        <i class="bi bi-google me-3"></i>Googleで始める
+                                    </strong>
+                                </a>
+                            </div>
+                        </form>
                     </div>
-                {% endif %}
+
+                    <div>
+                        <a href="{% url 'accounts:login' %}" class="text-dark">既にアカウントを持っている</a>
+                    </div>
+                </div>
             </div>
-        {% endfor %}
-        <button type="submit" class="btn btn-primary">送信</button>
-    </form>
+        </div>
+    </div>
 {% endblock content %}
+
+{% block extra_js %}
+    <script src="{% static 'accounts/js/password_eye.js' %}"></script>
+{% endblock %}
