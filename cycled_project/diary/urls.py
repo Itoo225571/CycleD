@@ -7,9 +7,6 @@ urlpatterns = [
     path("",views.TopView.as_view(),name="top"),
     path("home/",views.HomeView.as_view(),name="home"),
     
-    path("user/",views.UserProfileView.as_view(),name="user_profile"),
-    path("user/edit/",views.UserEditView.as_view(),name="user_edit"),
-    
     # path("diary/",views.DiaryNewView.as_view(),name="diary"),
     path("diary/photo/",views.DiaryPhotoView.as_view(),name="diary_photo"),
 

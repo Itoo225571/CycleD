@@ -47,17 +47,20 @@
                                     <p>{{ error }}</p>
                                 </div>
                             {% endfor %}
-                            <p class="small pb-lg-2 mt-4"><a class="text-dark" href="#!">パスワードがわからない?</a></p>
+                            <p class="small pb-lg-2 mt-4"><a class="text-dark" href="{% url 'account_reset_password' %}">パスワードがわからない?</a></p>
                             <button class="btn btn-outline-dark btn-lg w-100 mt-3" type="submit">ログイン</button>
-                            <hr>
-                            <div class="mt-4 pt-1">
-                                <a href="{% provider_login_url 'google'%}?next=/" class="btn btn-outline-info py-3 w-100">
+                        </form>
+                        <hr>
+                        <div class="mt-4 pt-1">
+                            <form action="{% provider_login_url 'google' method='POST' %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-info py-3 w-100">
                                     <strong>
                                         <i class="bi bi-google me-3"></i>Googleでログイン
                                     </strong>
-                                </a>
-                            </div>
-                        </form>
+                                </button>
+                            </form>
+                        </div>
                     </div>
 
                     <div>

@@ -2,6 +2,7 @@ from allauth.account import views
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
+from django.views import generic
 from .forms import CustomLoginForm,CustomSignupForm
 
 class CustomLoginView(views.LoginView):
@@ -14,8 +15,7 @@ class CustomLoginView(views.LoginView):
         return super().get(request, *args, **kwargs)
 
 class CustomLogoutView(LoginRequiredMixin,views.LogoutView):
-    # template_name="diary/logout.html"
-    pass
+    template_name="accounts/logout.html"
 
 class CustomSignupView(views.SignupView):
     form_class = CustomSignupForm
@@ -32,3 +32,14 @@ class CustomSignupView(views.SignupView):
     def get_success_url(self):
         # サインアップ成功後のリダイレクト先をカスタマイズする場合はここで設定
         return super().get_success_url()
+    
+class UserProfileView(LoginRequiredMixin,generic.TemplateView):
+    template_name="accounts/user_profile.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user  # 現在ログインしているユーザーを取得
+        context['user'] = user  # ユーザー情報をテンプレートに渡す
+        return context
+
+class UserEditView(LoginRequiredMixin,generic.UpdateView):
+    pass
