@@ -7,7 +7,7 @@ function template(dataArray){
             </span>`;
         var html = 
             `<form method="post" class="address-select" name="address-select-form">
-                <button type="button" class="address-select-button list-group-item list-group-item-action boder border-3 border-light rounded-3 m-1 p-2" name="${index}">
+                <button type="button" class="address-select-button list-group-item list-group-item-action border border-3 border-light rounded-3 m-1 p-2" name="${index}">
                     ${locationIcon}
                     ${data.address.label}
                 </button>

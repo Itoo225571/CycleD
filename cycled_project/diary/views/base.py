@@ -12,7 +12,6 @@ class BaseView(generic.TemplateView):
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context["user"]=request.user # type: ignore
-        # context["home"] = request.user.home
         return context
 
 class TopView(generic.TemplateView):

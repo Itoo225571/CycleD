@@ -10,6 +10,7 @@ from django.forms.models import model_to_dict
 from django.shortcuts import redirect
 
 from ..forms import AddressSearchForm,LocationForm,LocationCoordForm
+from ..models import Location
 
 from subs.get_location import geocode_gsi,geocode_yahoo,regeocode_gsi,regeocode_HeartTails,regeocode_yahoo
 from subs.get_location import regeocode_gsi_async,regeocode_HeartTails_async,regeocode_yahoo_async
@@ -148,11 +149,12 @@ class AddressUserView(LoginRequiredMixin,generic.FormView):
                 loc = form.save(commit=False)
                 # Homeの場合Trueにする
                 loc.is_home = True
+                existing_location = Location.objects.filter(user=request.user)
+                if existing_location.exists():
+                    existing_location.delete()
+                    
+                loc.user = request.user
                 loc.save()
-                if request.user.home:
-                    request.user.home.delete()
-                request.user.home = loc
-                request.user.save()
             else:
                 return self.form_invalid(form)
         
@@ -169,12 +171,12 @@ class AddressUserView(LoginRequiredMixin,generic.FormView):
                 loc.display = geo.address.display
                 # Homeの場合Trueにする
                 loc.is_home = True
+                existing_location = Location.objects.filter(user=request.user)
+                if existing_location.exists():
+                    existing_location.delete()
+
+                loc.user = request.user
                 loc.save()
-                
-                if request.user.home:
-                    request.user.home.delete()
-                request.user.home = loc
-                request.user.save()
             else:
                 return self.form_invalid(form)
 

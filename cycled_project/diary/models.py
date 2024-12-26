@@ -10,6 +10,9 @@ from subs.photo_info.photo_info import to_pHash
 User = get_user_model()
 
 class Location(models.Model):
+    # homeの場合のuser
+    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True, verbose_name="ユーザー")
+
     location_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     lat = models.FloatField()
     lon = models.FloatField()
@@ -105,6 +108,8 @@ class Diary(models.Model):
             raise ValidationError("日記の日付は今日以前の日付でなければなりません。")
 
 class Coin(models.Model):
+    coin_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # UUIDを主キーとして設定
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="ユーザー")
     num = models.IntegerField(default=0)
     num_continue = models.IntegerField(default=0)
     timestamp = models.DateTimeField(null=True)

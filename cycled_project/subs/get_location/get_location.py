@@ -312,7 +312,7 @@ def geocode_gsi(place_name:str):
 			location = {
 				"lon":future["geometry"]["coordinates"][0],
 				"lat":future["geometry"]["coordinates"][1],
-				"address":address_user,
+				"address":address,
 			}
 
 			if _have_word(place_name,address["name"]):
@@ -365,7 +365,7 @@ def geocode_yahoo(place_name,cliant_id):
 			location = {
 				"lon":future["Geometry"]["Coordinates"].split(',')[0],
 				"lat":future["Geometry"]["Coordinates"].split(',')[1],
-				"address":address_user,
+				"address":address,
 			}
 
 			loc = LocationData(**location)
