@@ -18,6 +18,7 @@ class CustomLogoutView(LoginRequiredMixin,views.LogoutView):
     pass
 
 class CustomSignupView(views.SignupView):
+    form_class = CustomSignupForm
     template_name="accounts/signup.html"
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -26,8 +27,6 @@ class CustomSignupView(views.SignupView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # 必要に応じて追加のコンテキストデータをここで設定
-        context["extra_data"] = "Some extra data"
         return context
 
     def get_success_url(self):

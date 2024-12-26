@@ -4,28 +4,17 @@ from allauth.account.forms import SignupForm,LoginForm
 from django import forms
 
 class CustomSignupForm(SignupForm):
-    '''     定義文      '''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields.pop('password2', None)  # パスワード確認欄を削除
+
         self.fields["username"].widget.attrs={"placeholder":"ユーザー名を入力"}
         self.fields["email"].widget.attrs={"placeholder":"メールアドレスを入力"}
-        self.fields["password1"].widget.attrs={"placeholder":"パスワードを入力"}
-        self.fields["password2"].widget.attrs={"placeholder":"パスワードを再入力"}
-
-        self.fields['password1'].help_text = ''
-        self.fields['password2'].help_text = ''
+        self.fields["password1"].widget.attrs={"placeholder":"パスワードを入力",'data-toggle': 'password','autocomplete': 'off'}
 
         self.fields['email'].required = True
         for _, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
-
-    class Meta:
-        model = get_user_model()
-        fields=["username","email","password1","password2"]
-        help_texts = {
-            "username": "",
-            "email": "",
-        }
 
     '''     以下検証       '''
     def clean_username(self):
@@ -46,28 +35,24 @@ class CustomSignupForm(SignupForm):
         if len(value) < 8:
             raise forms.ValidationError('パスワードは8文字以上で入力してください')
         return value
-    def clean(self):
-        password = self.cleaned_data.get('password1')
-        password2 = self.cleaned_data.get('password2')
-        if password != password2:
-            self.add_error('password2', 'パスワードと確認用パスワードが一致しません。')
-        super().clean()
     
 class CustomLoginForm(LoginForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['login'].label = 'ユーザー名またはメールアドレス'  # ラベルを変更
+        self.fields['remember'].label = '次回以降自動でログインする'  # ラベルを変更
 
-class UserEditForm(UserChangeForm):
-    class Meta:
-        model = get_user_model()
-        fields = ["username","email","password"]
-        labels = {
-            "username": "ユーザー名",
-            "email": "メールアドレス",
-            "password": "パスワード",
-        }
-        help_texts = {
-            "username": "",
-            "email": "",
-            "password": "",
-        }
+# class UserEditForm(UserChangeForm):
+#     class Meta:
+#         model = get_user_model()
+#         fields = ["username","email","password"]
+#         labels = {
+#             "username": "ユーザー名",
+#             "email": "メールアドレス",
+#             "password": "パスワード",
+#         }
+#         help_texts = {
+#             "username": "",
+#             "email": "",
+#             "password": "",
+#         }
