@@ -43,3 +43,6 @@ class UserProfileView(LoginRequiredMixin,generic.TemplateView):
 
 class UserEditView(LoginRequiredMixin,generic.UpdateView):
     pass
+
+class UserDeleteView(LoginRequiredMixin,generic.DeleteView):
+    pass

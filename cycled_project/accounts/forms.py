@@ -41,18 +41,3 @@ class CustomLoginForm(LoginForm):
         super().__init__(*args, **kwargs)
         self.fields['login'].label = 'ユーザー名またはメールアドレス'  # ラベルを変更
         self.fields['remember'].label = '次回以降自動でログインする'  # ラベルを変更
-
-# class UserEditForm(UserChangeForm):
-#     class Meta:
-#         model = get_user_model()
-#         fields = ["username","email","password"]
-#         labels = {
-#             "username": "ユーザー名",
-#             "email": "メールアドレス",
-#             "password": "パスワード",
-#         }
-#         help_texts = {
-#             "username": "",
-#             "email": "",
-#             "password": "",
-#         }
