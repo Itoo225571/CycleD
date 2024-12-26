@@ -158,7 +158,7 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 LOGIN_URL='/accounts/login/'
 LOGIN_REDIRECT_URL= '/home/'
-LOGOUT_REDIRECT_URL = '/accounts/login/'  # ログアウト後のリダイレクト先
+LOGOUT_REDIRECT_URL = '/'  # ログアウト後のリダイレクト先
 SOCIAL_AUTH_LOGIN_REDIRECT_URL= '/home/'
 
 # Static files (CSS, JavaScript, Images)
@@ -166,6 +166,7 @@ SOCIAL_AUTH_LOGIN_REDIRECT_URL= '/home/'
 
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / "staticfiles"  # 本番環境で `collectstatic` 実行時に使用
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

@@ -28,10 +28,10 @@
 {% endblock content %}
 
 {% block extra_js %}
-    <script src="{% static 'diary/js/getCookie.js' %}"></script>
+    <script src="{% static 'js/getCookie.js' %}"></script>
     <script>
         const url_deleteAllDiaries = "{% url 'diary:delete_all_diaries' %}";
     </script>
-    <script src="{% static 'diary/js/user_profile.js' %}"></script>
+    <script src="{% static 'accounts/js/user_profile.js' %}"></script>
 
 {% endblock %}
