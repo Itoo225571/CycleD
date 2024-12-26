@@ -12,7 +12,7 @@
 
 {% block content %}
     <div class="container">
-        {% if not user.home %}
+        {% if not user.location %}
         <div>
             <p>住所が登録されていません</p>
             <p>住所を登録することで天気を見ることができます</p>
@@ -23,8 +23,8 @@
         <div class="row">
             <div class="col-auto">
                 <div class="justify-content-md-center">
-                    <div class="row"><h3>{{user.home.display}}</h3></div>
-                    <div class="row"><h4>{{user.home.state}}</h4></div>
+                    <div class="row"><h3>{{user.location.display}}</h3></div>
+                    <div class="row"><h4>{{user.location.state}}</h4></div>
                     <button class="button_inverse" onclick="location.href='{% url "diary:address_user" %}'">住所を変更する</button>
                 </div>
             </div>
@@ -48,8 +48,8 @@
     <script src="{% static 'js/getCookie.js' %}"></script>
     <script src="{% static 'js/loading_overlay.js' %}"></script>
     <script>
-        {% if user.home %}
-        $(document).ready(sendLocationToServer({{ user.home.lat }}, {{ user.home.lon }}));
+        {% if user.location %}
+        $(document).ready(sendLocationToServer({{ user.location.lat }}, {{ user.location.lon }}));
         {% endif %}
 
         function sendLocationToServer(lat,lon) {
