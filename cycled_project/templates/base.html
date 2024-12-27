@@ -33,7 +33,7 @@
 
 		<div class="wrapper-whole">
 			<header class="sticky-top">
-				<nav class="navbar bd-navbar navbar-expand-lg navbar-light bg-light p-3">
+				<nav class="navbar bd-navbar navbar-expand-lg navbar-light bg-light py-2">
 					<div class="container-fluid">
 						<!-- オフキャンバスをトリガーするボタン -->
 						<button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,15 +46,15 @@
 						<!-- サイドバー (オフキャンバス) -->
 						<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel" style="width: 280px;">
 							<div class="offcanvas-header border-bottom">
-								<h5 class="offcanvas-title nav-item" id="offcanvasSidebarLabel">
-									<a class="navbar-brand mb-0 h1" href="{% url 'diary:top' %}">ホーム</a>
-								</h5>
+								<a href="{% url 'diary:top' %}" class="navbar-brand mb-0 h1 w-100 d-block">
+									<h5 class="offcanvas-title nav-item m-0">ホーム</h5>
+								</a>
 							</div>
 							<div class="offcanvas-body">
 								<ul class="navbar-nav nav-pills">
 									<li class="nav-item mx-2 d-lg-none">
-										<a class="nav-link" href="{% url 'diary:calendar' %}">
-											<img src="{% static 'diary/img/diary.png' %}" alt="calendar" width="30" height="30" class="d-inline-block align-text-bottom">
+										<a class="nav-link" href="{% url 'diary:diary_photo' %}">
+											<img src="{% static 'diary/img/diary.png' %}" alt="diary" width="30" height="30" class="d-inline-block align-text-bottom">
 											にっき作成
 										</a>
 									</li>
@@ -88,19 +88,18 @@
 							</div>
 						</div>
 						<!-- ユーザーアイコン -->
-						<div class="d-flex align-items-center ms-auto">
-							<div class="me-2">
-								<a class="btn btn-outline-secondary rounded-pill py-2" href="{% url 'diary:diary_photo' %}">
-									<i class="bi bi-journal-plus me-1"></i>
-									にっき
-								</a>
-							</div>
-							
+						<div class="d-flex align-items-center ms-auto">							
 							{% if user and user.is_authenticated %}
-								<div class="dropdown">
-									<a type="button" class="dropdown-toggle d-flex align-items-center hidden-arrow" href="#" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-										<img src="{{ user.icon_url }}" class="rounded-circle" width="50" height="50" alt="icon" loading="lazy">
+								<div class="me-2">
+									<a class="btn btn-outline-secondary rounded-pill py-2" href="{% url 'diary:diary_photo' %}">
+										<i class="bi bi-journal-plus me-1"></i>
+										にっき
 									</a>
+								</div>
+								<div class="dropdown">
+									<button type="button" class="user-icon" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+										<img src="{{ user.icon_url }}" class="rounded-circle" width="50" height="50" alt="icon" loading="lazy">
+									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
 										<li>
 											<a class="dropdown-item" href="{% url 'accounts:user_profile' %}">ぷろふぃ～る</a>

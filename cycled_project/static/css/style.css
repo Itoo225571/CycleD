@@ -94,3 +94,8 @@ footer {
 .hidden {
     display: none; /* hiddenクラスが適用されると要素が非表示になります */
 }
+
+.user-icon {
+    border: none;
+    background-color: transparent;
+}
