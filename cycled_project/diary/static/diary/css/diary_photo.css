@@ -47,7 +47,7 @@
 }
 .icon-upload::before {
     font-family: 'Material Icons';
-    content: '\f09b'; /* Unicodeのアイコンや他の記号を指定 */
+    content: '\e439'; /* Unicodeのアイコンや他の記号を指定 */
     position: absolute; /* 絶対位置を指定 */
     left: 0; /* 左側に配置 */
     top: 50%; /* 上部から50%の位置に配置 */
