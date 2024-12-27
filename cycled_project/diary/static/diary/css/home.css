@@ -73,7 +73,7 @@
     position: relative; 
     display: inline-block;
 }
-.diary-myself-field .diary-list .card .to-edit-button{
+.diary-myself-field .diary-list .card .to-calendar-button{
     position: absolute; 
     top: 5%;
     right: 5%;
@@ -90,7 +90,7 @@
     justify-content: center;
     align-items: center;
 }
-.diary-myself-field .diary-list .card .to-edit-button::before {
+.diary-myself-field .diary-list .card .to-calendar-button::before {
     font-family: 'Material Icons Outlined';
     content: '\e742';
     color: #FFFFFF;

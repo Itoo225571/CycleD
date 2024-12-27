@@ -78,15 +78,24 @@ function formatDateJapanese(dateStr) {
     return `${year}年${month}月${day}日`;
 }
 
+// URLクエリパラメータを取得する関数
+function getQueryParam(param) {
+	const urlParams = new URLSearchParams(window.location.search);
+	return urlParams.get(param);
+}
+
 // 読み込まれたら実行する関数
 document.addEventListener('DOMContentLoaded', function() {
 	var diaryModal = document.getElementById('diaryModal');
+	const month = getQueryParam('month');
+	const initialDate = month ? month : new Date().toISOString().split('T')[0]; // クエリがなければ今日の日付
+
 	// 祝日データを取得してからカレンダーを初期化
 	addEventsToCalendar().then(allEvents => {
 		const calendarEl = document.getElementById('mycalendar');
 		// カレンダーの初期設定
 		const calendar = new FullCalendar.Calendar(calendarEl, {
-			initialDate: sessionStorage.getItem('diaryDate') || new Date().toISOString().split('T')[0], // なかったら今日にする			,
+			initialDate: initialDate,
 			// カレンダーの種類
 			initialView: "dayGridMonth",
 			// 祝日イベントを追加

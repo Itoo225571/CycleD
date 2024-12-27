@@ -307,23 +307,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         else:  
             return self.formset_invalid(diary_formset,location_formset)
 
-# async def regeocode_addImage(request, img_data):
-#     geo_data = await regeocode_async(request, img_data.lat, img_data.lon)
-#     geo_data['image'] = img_data.image.url
-#     geo_data['id_of_image'] = img_data.id
-#     geo_data['date'] = img_data.date  # 日付も格納
-#     return geo_data
-
 executor = ThreadPoolExecutor(max_workers=4)
-
-# async def to_jpeg_async(file):
-#     loop = asyncio.get_event_loop()
-#     image_file = await loop.run_in_executor(executor, to_jpeg, file)
-#     jpeg_file = InMemoryUploadedFile(
-#         image_file, field_name=None, name='temp.jpg', content_type='image/jpg',
-#         size=image_file.getbuffer().nbytes, charset=None
-#     )
-#     return jpeg_file
 
 async def to_pHash_async(file):
     loop = asyncio.get_event_loop()
