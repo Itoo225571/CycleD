@@ -410,6 +410,7 @@ $(document).ready(function() {
             }
         }
     });
+    $('input.filepond').show(); //読み込みが終わったら見せる
 
     $('#id_diary-new-form').submit(function(event) {  
         var error = false;

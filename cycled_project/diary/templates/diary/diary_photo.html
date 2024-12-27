@@ -18,94 +18,92 @@
 
 {% block content %}
     <div class="container-diary-photo">
-        <div class="row"> 
-            <form method="post" id="id_photos-form" name="photos-form" enctype="multipart/form-data" >
-                {% csrf_token %}
-                <div id="photo_form">
-                    <div class="row my-3 justify-content-center">
-                        <div class="col-10">
-                            <input type="file" class="filepond" name="{{ photo_form.images.name }}" multiple>
-                            {% if field.errors %}
-                                <div class="error">{{ photo_form.images.errors }}</div>
-                            {% endif %}
-                        </div>
+        <form method="post" id="id_photos-form" name="photos-form" enctype="multipart/form-data" >
+            {% csrf_token %}
+            <div id="photo_form">
+                <div class="row my-3 mx-auto justify-content-center">
+                    <div class="col-10">
+                        <input type="file" class="filepond" name="{{ photo_form.images.name }}" multiple style="display: none;">
+                        {% if field.errors %}
+                            <div class="error">{{ photo_form.images.errors }}</div>
+                        {% endif %}
                     </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="row diary-photo-container" style="display: none;">
+            <form method="post" id="id_diary-new-form" enctype="multipart/form-data" onsubmit="return false;">
+                {% csrf_token %}
+                <div class="row" id="diary_form">
+                    <div id="diary-management">{{ diary_formset.management_form }}</div>
+                    <div id="location-management">{{ diary_formset.empty_form.formset.management_form }}</div>
+                    <div id="diary-formset-body"></div>
+                </div>
+
+                <div class="row py-3 justify-content-center">
+                    <button type="submit" class="diary-new-button" name="diary-new-form" style="display: none;">
+                        <span class="text">日記作成!</span>
+                    </button>
                 </div>
             </form>
+        </div>
 
-            <div class="row diary-photo-container" style="display: none;">
-                <form method="post" id="id_diary-new-form" enctype="multipart/form-data" onsubmit="return false;">
-                    {% csrf_token %}
-                    <div class="row" id="diary_form">
-                        <div id="diary-management">{{ diary_formset.management_form }}</div>
-                        <div id="location-management">{{ diary_formset.empty_form.formset.management_form }}</div>
-                        <div id="diary-formset-body"></div>
+        <div id="empty-form-diary" style="display:none;">
+            {{ diary_formset.empty_form.date }}
+            {{ diary_formset.empty_form.diary_id }}
+            <div class="card" id="id_form-__prefix__-card">
+                <div class="card-header justify-content-center align-items-center">
+                    <h5 class="card-diary-date text-center"></h5>
+                    <div id="id_form-__prefix__-diary-errors"></div>
+                </div>
+                
+                <div class="card-body">
+                    <h5 class="card-title col-auto">
+                        写真で得られた地域一覧
+                    </h5>
+                    <div class="explanation">
+                        地域を選択すると日記のサムネイルを変更できます
                     </div>
-
-                    <div class="row py-3 justify-content-center">
-                        <button type="submit" class="diary-new-button" name="diary-new-form" style="display: none;">
-                            <span class="text">日記作成!</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <div id="empty-form-diary" style="display:none;">
-                {{ diary_formset.empty_form.date }}
-                {{ diary_formset.empty_form.diary_id }}
-                <div class="card" id="id_form-__prefix__-card">
-                    <div class="card-header justify-content-center align-items-center">
-                        <h5 class="card-diary-date text-center"></h5>
-                        <div id="id_form-__prefix__-diary-errors"></div>
-                    </div>
-                    
-                    <div class="card-body">
-                        <h5 class="card-title col-auto">
-                            写真で得られた地域一覧
-                        </h5>
-                        <div class="explanation">
-                            地域を選択すると日記のサムネイルを変更できます
-                        </div>
-                        <div class="row">
-                            <div class="col order-md-2 py-1">
-                                <input type="hidden" id="id_form-__prefix__-rotate_angle" class="rotate_angle" value="0">
-                                {{ diary_formset.empty_form.rotate_angle}}
-                                <div class="d-flex justify-content-end">
-                                    <button class="btn class_img-rotate-button" type="button">
-                                        <i class="class_img-rotate-icon"></i>
-                                    </button>
-                                </div>
-                                <div id="id_form-__prefix__-thumbnail" class="diary-thumbnail d-flex justify-content-center align-items-center"></div>
+                    <div class="row">
+                        <div class="col order-md-2 py-1">
+                            <input type="hidden" id="id_form-__prefix__-rotate_angle" class="rotate_angle" value="0">
+                            {{ diary_formset.empty_form.rotate_angle}}
+                            <div class="d-flex justify-content-end">
+                                <button class="btn class_img-rotate-button" type="button">
+                                    <i class="class_img-rotate-icon"></i>
+                                </button>
                             </div>
-                            <div class="col-12 col-md-7 order-md-1">
-                                <ul id="id_form-__prefix__-location-formset-body" class="list-group"></ul>
-                            </div>
+                            <div id="id_form-__prefix__-thumbnail" class="diary-thumbnail d-flex justify-content-center align-items-center"></div>
                         </div>
-                        <div class="mt-4">
-                            <label for="{{ diary_formset.empty_form.comment.id_for_label }}" class="form-label">{{ diary_formset.empty_form.comment.label }}</label>
-                            {{ diary_formset.empty_form.comment}}
+                        <div class="col-12 col-md-7 order-md-1">
+                            <ul id="id_form-__prefix__-location-formset-body" class="list-group"></ul>
                         </div>
+                    </div>
+                    <div class="mt-4">
+                        <label for="{{ diary_formset.empty_form.comment.id_for_label }}" class="form-label">{{ diary_formset.empty_form.comment.label }}</label>
+                        {{ diary_formset.empty_form.comment}}
                     </div>
                 </div>
             </div>
-            <div id="empty-form-location" style="display:none;">
-                {% for field in diary_formset.empty_form.formset.empty_form %}
-                    {% if field.name != 'label' %}
-                        {{ field }}
-                    {% endif %}
-                {% endfor %}
-                <div class="input-group d-flex flex-row align-items-center">
-                    <div class="location-list-label-display w-100"></div>
-                    {{ diary_formset.empty_form.formset.empty_form.label|add_class:"w-100 form-control class_locations-label"}}
-                </div>
-                <div class="d-flex align-items-center">
-                    <button type="button" class="btn p-0" onclick="edit_location(this)">
-                        <i class="bi bi-pencil-square icon-location text-muted"></i>
-                    </button> 
-                    <button type="button" class="btn p-0" onclick="delete_location(this)">
-                        <i class="bi bi-trash icon-location text-danger" alt="icon-trash"></i>
-                    </button> 
-                </div>
+        </div>
+        <div id="empty-form-location" style="display:none;">
+            {% for field in diary_formset.empty_form.formset.empty_form %}
+                {% if field.name != 'label' %}
+                    {{ field }}
+                {% endif %}
+            {% endfor %}
+            <div class="input-group d-flex flex-row align-items-center">
+                <div class="location-list-label-display w-100"></div>
+                {{ diary_formset.empty_form.formset.empty_form.label|add_class:"w-100 form-control class_locations-label"}}
+            </div>
+            <div class="d-flex align-items-center">
+                <button type="button" class="btn p-0" onclick="edit_location(this)">
+                    <i class="bi bi-pencil-square icon-location text-muted"></i>
+                </button> 
+                <button type="button" class="btn p-0" onclick="delete_location(this)">
+                    <i class="bi bi-trash icon-location text-danger" alt="icon-trash"></i>
+                </button> 
             </div>
         </div>
     </div>

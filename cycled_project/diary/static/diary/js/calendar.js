@@ -466,14 +466,23 @@ document.addEventListener('DOMContentLoaded', function() {
 					// ラベル編集関連
 					$radioButtonHtml.find('.button-edit-label').off('click').on('click', change_label_edit);
 
+					// Location削除
 					$radioButtonHtml.find('.button-delete-location').off('click').on('click', function(){
-						$delete_input.val(true);
-						$radioButtonHtml.hide();
-						// チェック移動
-						if ($radioButtonHtml.find('.diary-location-label-radiobutton').is(':checked')) {
-							var $nextRadiobutton = $labels_field.find('.diary-location-label-item').not($radioButtonHtml).eq(0).find('.diary-location-label-radiobutton');
-							$nextRadiobutton.prop('checked', true);
-							$nextRadiobutton.trigger('change');
+						const $delete_inputs = $labels_field.find('*[id^="id_locations"][id$="DELETE"]');
+						const count = $delete_inputs.filter(function() {
+							return $(this).val() === 'true'; // val() が true のものをフィルタリング
+						  }).length;
+						if (count + 1 < diary.locations.length) {
+							$delete_input.val(true);
+							$radioButtonHtml.hide();
+							// チェック移動
+							if ($radioButtonHtml.find('.diary-location-label-radiobutton').is(':checked')) {
+								var $nextRadiobutton = $labels_field.find('.diary-location-label-item').not($radioButtonHtml).eq(0).find('.diary-location-label-radiobutton');
+								$nextRadiobutton.prop('checked', true);
+								$nextRadiobutton.trigger('change');
+							}
+						} else {
+							alert('これ以上は削除できませんよ');
 						}
 					});
 					$label_input.on('keypress', function(event) {
