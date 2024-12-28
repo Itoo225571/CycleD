@@ -99,3 +99,31 @@ footer {
     border: none;
     background-color: transparent;
 }
+.with-icon {
+    display: inline-flex;
+    align-items: center; /* アイコンとテキストを垂直方向に中央揃え */
+}
+.with-icon::before {
+    margin-right: 10px;
+    font-size: 1.4em;
+}
+.button-logout::before {
+    font-family: 'Material Icons';
+    content: "\e9ba";
+    opacity: .7;
+}
+.button-mypage::before {
+    font-family: 'bootstrap-icons';
+    content: '\F4D7';
+    opacity: .7;
+}
+.button-setting::before {
+    font-family: 'bootstrap-icons';
+    content: '\F3E5';
+    opacity: .7;
+}
+.button-diary::before {
+    font-family: 'Material Icons';
+    content: '\e439';
+    margin-right: 5px;
+}

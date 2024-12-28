@@ -1,7 +1,7 @@
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy,reverse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
 from django.http import JsonResponse,HttpResponseForbidden
@@ -38,6 +38,8 @@ import logging
 from datetime import datetime
 from PIL import Image as PILImage
 import io
+from urllib.parse import urlencode
+from pprint import pprint
 logger = logging.getLogger(__name__)
 
 """______Diary関係______"""
@@ -167,11 +169,15 @@ def diary_delete_noPK(request):
     return Response({"status": "success", "message": msg})
 
 class DiaryDeleteView(LoginRequiredMixin,generic.DeleteView):
-    success_url = reverse_lazy('diary:calendar')
     model = Diary
     def get_queryset(self):
         # ログインユーザーが所有している日記だけを取得
         return Diary.objects.filter(user=self.request.user)
+    def get_success_url(self):
+        # ここで get_object を使用して month を取得
+        diary = self.get_object()
+        query_params = urlencode({'month': diary.date})
+        return f"{reverse('diary:calendar')}?{query_params}"    
 
 class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
     template_name ="diary/diary_photo.html"
@@ -206,7 +212,6 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
             with transaction.atomic():
                 for diary, form in zip(diaries, diary_formset.forms):
                     diary.user = self.request.user  # 現在のユーザーを設定
-                    # angles[diary.date] = form.cleaned_data.get("rotate_angle")  # フォームから値を取得
                     diary.save()  # 保存
                 for form in location_formset.forms:
                     # locationがすでに存在しているか確認
@@ -233,6 +238,9 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                             )
                             form.instance.image = image
                             temp_image.delete()
+                        # DELETEがtrueの場合スキップ(新規作成時)
+                        if form.cleaned_data.get('DELETE', False):
+                            continue
                     # Location編集の場合
                     else:
                         print(location.location_id)
@@ -262,7 +270,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
             return self.formset_invalid(diary_formset, location_formset)
 
     def formset_invalid(self, diary_formset=None, location_formset=None,errors=None):
-        print(self.request.POST)
+        pprint(self.request.POST)
         # diary_formset が提供されている場合のエラー処理
         if diary_formset:
             for form in diary_formset:
@@ -374,26 +382,37 @@ async def process_image_file(img_file, image_hash_list, request):
             await sync_to_async(temp_image.save)()  # 保存
             # await temp_image.asave()
         except ValidationError as e:
-            # print("Validation errors:", e.message_dict)
-            # messages['temp_image'] = e.message_dict.values()
             error_values = []
             for field, errors in e.message_dict.items():
                 for error in errors:
                     messages.error(request, f"{field}: {error}")
                     error_values.append(error)
             return {'error':error_values}
-        try:
-            geo_data = await regeocode_async(request, temp_image.lat, temp_image.lon)
-        except Exception as e:
-            messages.error(request, e)
-            return {'error':e}
-        if geo_data:
-            geo_data['image'] = temp_image.image.url
-            geo_data['id_of_image'] = temp_image.id
-            geo_data['date'] = temp_image.date_photographed.strftime('%Y-%m-%d')  # 日付も格納
-        else:
-            logger.error(f"住所取得に失敗しました。")
-            return {'error':"住所取得に失敗しました。"}
+        retry_count = 3  # 最大リトライ回数
+        attempt = 0  # 現在の試行回数
+
+        while attempt < retry_count:
+            try:
+                geo_data = await regeocode_async(request, temp_image.lat, temp_image.lon)
+                if geo_data:
+                    if geo_data['address']['locality'] == '（その他）':
+                        # 'その他'の場合は再試行
+                        attempt += 1
+                        logger.info(f"試行 {attempt}/{retry_count}: 'その他'が返されたため再試行します。")
+                        continue  # 再試行
+                    else:
+                        geo_data['image'] = temp_image.image.url
+                        geo_data['id_of_image'] = temp_image.id
+                        geo_data['date'] = temp_image.date_photographed.strftime('%Y-%m-%d')  # 日付も格納
+                        return geo_data  # 成功した場合は結果を返す
+                else:
+                    logger.error("住所取得に失敗しました。geo_data が None です。")
+                    return {'error': "住所取得に失敗しました。geo_data が None です。"}
+            except Exception as e:
+                # エラー時はメッセージを表示
+                messages.error(request, f"エラー: {e}")
+                logger.error(f"エラー: {e}")
+                return {'error': str(e)}
         
         if lastModifiedDate:
             if datetime.now().date() == temp_image.date_photographed.date() == temp_image.date_lastModified.date():

@@ -528,9 +528,9 @@ function delete_location(button) {
             }, 500); // 0.5秒（500ms）待つ
         });        
         // totalformを変更
-        const locationTotalForms = $('#id_locations-TOTAL_FORMS');
-        const currentTotal = parseInt(locationTotalForms.val(), 10) || 1; // NaN の場合は 1 にする
-        locationTotalForms.val(currentTotal - 1); // 更新された値をセット
+        // const locationTotalForms = $('#id_locations-TOTAL_FORMS');
+        // const currentTotal = parseInt(locationTotalForms.val(), 10) || 1; // NaN の場合は 1 にする
+        // locationTotalForms.val(currentTotal - 1); // 更新された値をセット
 
         var locationNumInDiary = $diaryForm.find('.locations-form-wrapper').length;
         if (locationNumInDiary > MAX_LOCATIONS) {
