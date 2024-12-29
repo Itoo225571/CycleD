@@ -477,7 +477,7 @@ document.addEventListener('DOMContentLoaded', function() {
 							$radioButtonHtml.hide();
 							// チェック移動
 							if ($radioButtonHtml.find('.diary-location-label-radiobutton').is(':checked')) {
-								var $nextRadiobutton = $labels_field.find('.diary-location-label-item').not($radioButtonHtml).eq(0).find('.diary-location-label-radiobutton');
+								var $nextRadiobutton = $labels_field.find('.diary-location-label-item').filter(':visible').not($radioButtonHtml).eq(0).find('.diary-location-label-radiobutton');
 								$nextRadiobutton.prop('checked', true);
 								$nextRadiobutton.trigger('change');
 							}

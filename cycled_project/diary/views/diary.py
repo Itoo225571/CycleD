@@ -189,6 +189,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         context = super().get_context_data(**kwargs)
         context['photo_form'] = context.pop('form', None)
         context['diary_formset'] = DiaryFormSet(queryset=Diary.objects.none())
+        context['location_formset'] = LocationFormSet(queryset=Location.objects.none())
         context['MAX_LOCATIONS'] = Diary.MAX_LOCATIONS
         return context
     
@@ -207,6 +208,12 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
             return self.form_invalid(None)
         
     def form_valid(self, diary_formset, location_formset):
+        for key, value in self.request.POST.items():
+            if 'form-' in key:
+                print(f"{key}: {value}")
+        for key, value in self.request.POST.items():
+            if 'locations-' in key:
+                print(f"{key}: {value}")
         diaries = diary_formset.save(commit=False)
         try:
             with transaction.atomic():
@@ -270,27 +277,28 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
             return self.formset_invalid(diary_formset, location_formset)
 
     def formset_invalid(self, diary_formset=None, location_formset=None,errors=None):
-        pprint(self.request.POST)
+        for key, value in self.request.POST.items():
+            if 'form-' in key:
+                print(f"{key}: {value}")
+        for key, value in self.request.POST.items():
+            if 'locations-' in key:
+                print(f"{key}: {value}")
         # diary_formset が提供されている場合のエラー処理
         if diary_formset:
             for form in diary_formset:
                 if form.errors:  # エラーがある場合
-                    model_id = getattr(form.instance, 'id', '不明なID')  # モデルのIDを取得
-                    print(form.instance)
                     for field, error_list in form.errors.items():
                         for error in error_list:
-                            message = f"Diary ID {model_id} のフィールド '{field}' にエラー: {error}"
+                            message = f"{form.instance} のフィールド '{field}' にエラー: {error}"
                             print(message)
                             messages.error(self.request, message)
         # location_formset が提供されている場合のエラー処理
         if location_formset:
             for form in location_formset:
                 if form.errors:  # エラーがある場合
-                    model_id = getattr(form.instance, 'id', '不明なID')  # モデルのIDを取得
-                    print(form.instance)
                     for field, error_list in form.errors.items():
                         for error in error_list:
-                            message = f"Location ID {model_id} のフィールド '{field}' にエラー: {error}"
+                            message = f"{form.instance} のフィールド '{field}' にエラー: {error}"
                             print(message)
                             messages.error(self.request, message)
         if errors:
@@ -305,11 +313,12 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
         return kwargs
     
     def handle_diary_formset(self, request):
-        diaries = Diary.objects.filter(user=request.user)
+        dates = [request.POST.get(f"form-{i}-date") for i in range(int(request.POST.get("form-TOTAL_FORMS", 0)))]
+        diaries = Diary.objects.filter(user=request.user,date__in=dates)
         locations = Location.objects.filter(diary__in=diaries)
-        diary_formset = DiaryFormSet(request.POST, request=request, queryset=diaries)
-        location_formset = LocationFormSet(request.POST,request.FILES, queryset=locations)
-
+        diary_formset = DiaryFormSet(request.POST, request=request, queryset=diaries, prefix='form')
+        location_formset = LocationFormSet(request.POST,request.FILES, queryset=locations, prefix='locations')
+        
         if diary_formset.is_valid() and location_formset.is_valid():
             return self.form_valid(diary_formset,location_formset)
         else:  
