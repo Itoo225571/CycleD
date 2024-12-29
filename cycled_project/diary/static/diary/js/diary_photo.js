@@ -9,6 +9,7 @@ $(document).ready(function() {
     $('#id_form-INITIAL_FORMS').val(0);
     $('#id_locations-INITIAL_FORMS').val(0);
     let diaryEntries = [];
+    let formEntries = [];
     remove_error();
 
     // FilePondを初期化
@@ -58,13 +59,16 @@ $(document).ready(function() {
                             file_errors.push(response.error);
                             return;
                         }
-                        let $diaryForm = set_diary(response.diary); //diary初期化
-                        set_locationInDiary($diaryForm, response.location_new); //locationsをセット
-                        // ツールチップ初期化
-                        var tooltipTriggerList = $diaryForm.find('[data-bs-toggle="tooltip"]');
-                        var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-                        // $diaryFormsetBody.append($diaryForm);
-                        diaryEntries.push({ form: $diaryForm, date: response.diary.date });
+                        // let $diaryForm = set_diary(response.diary); //diary初期化
+                        // diaryEntries.push({ form: $diaryForm, date: response.diary.date,});
+                        // locationNewEntries.push({form: $diaryForm, location: response.location_new}); //locationは新規は後から設置
+                        // diary,locationは後から設置
+                        formEntries.push({ 
+                             diary: response.diary,
+                             is_edit: response.diary.diary_id ? true : false,
+                             date: response.diary.date,
+                             location: response.location_new
+                        });
                         
                         return ;
                     },
@@ -146,6 +150,19 @@ $(document).ready(function() {
                     file_errors = [];
                 }
                 else {
+                    formEntries.sort((a, b) => {
+                        return a.is_edit === b.is_edit ? 0 : a.is_edit ? -1 : 1;
+                    });
+                    formEntries.forEach(entry => {
+                        let $diaryForm = set_diary(entry.diary);
+                        // set_locationInDiary($diaryForm, entry.location);
+                        diaryEntries.push({ form: $diaryForm, date: entry.diary.date,})
+                        entry.form = $diaryForm;
+                    });
+                    formEntries.forEach(entry => {
+                        set_locationInDiary(entry.form, entry.location);
+                    });
+
                     diaryEntries.sort((a, b) => new Date(a.date) - new Date(b.date));
                     // ソートされた順にフォームを追加
                     diaryEntries.forEach(entry => {
@@ -519,21 +536,14 @@ function delete_location(button) {
             nextThumbnail.val(true);
         }
         $deleteInput.val(true);
-        $locationForm.addClass('scale-out-hor-left');
-        // アニメーション終了後に要素を非表示
-        $locationForm.on('animationend', function() {
-            setTimeout(() => {
-                $locationForm.hide(); // 非表示にする
-                $locationForm.off('animationend'); // イベントリスナーを解除
-            }, 500); // 0.5秒（500ms）待つ
-        });        
+        $locationForm.hide(); // 非表示にする
         // totalformを変更
         // const locationTotalForms = $('#id_locations-TOTAL_FORMS');
         // const currentTotal = parseInt(locationTotalForms.val(), 10) || 1; // NaN の場合は 1 にする
         // locationTotalForms.val(currentTotal - 1); // 更新された値をセット
 
-        var locationNumInDiary = $diaryForm.find('.locations-form-wrapper').length;
-        if (locationNumInDiary > MAX_LOCATIONS) {
+        var locationNumInDiary = $diaryForm.find('.locations-form-wrapper:visible').length;
+        if (locationNumInDiary <= MAX_LOCATIONS) {
             $('button[name="diary-new-form"]').prop('disabled', false);
             $diaryForm.find(`.diary_locationNum_error`).remove();
         }
