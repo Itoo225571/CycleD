@@ -208,12 +208,6 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
             return self.form_invalid(None)
         
     def form_valid(self, diary_formset, location_formset):
-        for key, value in self.request.POST.items():
-            if 'form-' in key:
-                print(f"{key}: {value}")
-        for key, value in self.request.POST.items():
-            if 'locations-' in key:
-                print(f"{key}: {value}")
         diaries = diary_formset.save(commit=False)
         try:
             with transaction.atomic():
@@ -250,7 +244,7 @@ class DiaryPhotoView(LoginRequiredMixin,generic.FormView):
                             continue
                     # Location編集の場合
                     else:
-                        print(location.location_id)
+                        # print(location.location_id)
                         pass
 
                     location.diary = get_object_or_404(Diary, user=self.request.user, date=date)
