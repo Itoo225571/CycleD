@@ -87,8 +87,7 @@ function getQueryParam(param) {
 // 読み込まれたら実行する関数
 document.addEventListener('DOMContentLoaded', function() {
 	var diaryModal = document.getElementById('diaryModal');
-	const month = getQueryParam('month');
-	const initialDate = month ? month : new Date().toISOString().split('T')[0]; // クエリがなければ今日の日付
+	const initialDate = getQueryParam('diary_date');
 
 	// 祝日データを取得してからカレンダーを初期化
 	addEventsToCalendar().then(allEvents => {
@@ -517,6 +516,26 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 		// カレンダーを表示
 		calendar.render();
+		showDiaryModalByDate(initialDate);
+
+		function showDiaryModalByDate(dateStr) {
+			if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+				return; // dateまで指定していない形式は無視
+			}
+			// 全イベントを取得
+			const allEvents = calendar.getEvents();
+			// 日記イベントをフィルタリング
+			const diaryEvents = allEvents.filter(event => event.classNames.includes('diary-event'));
+			// 指定された日付のイベントを検索
+			const eventsOnDate = diaryEvents.filter(event => event.startStr === dateStr);
+			if (eventsOnDate.length > 0) {
+				// 最初のイベントに対して処理を実行
+				const event_calendar = eventsOnDate[0];
+				showDiaryModal(event_calendar);
+			} else {
+				console.log("指定された日付にイベントがありません");
+			}
+		}
 	});
 
 	diaryModal.addEventListener('hidden.bs.modal', function () {
