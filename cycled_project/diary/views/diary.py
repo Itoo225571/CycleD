@@ -174,9 +174,9 @@ class DiaryDeleteView(LoginRequiredMixin,generic.DeleteView):
         # ログインユーザーが所有している日記だけを取得
         return Diary.objects.filter(user=self.request.user)
     def get_success_url(self):
-        # ここで get_object を使用して month を取得
+        # ここで get_object を使用して diary_date を取得
         diary = self.get_object()
-        query_params = urlencode({'month': diary.date})
+        query_params = urlencode({'diary_date': diary.date.strftime("%Y-%m")})
         return f"{reverse('diary:calendar')}?{query_params}"    
 
 class DiaryPhotoView(LoginRequiredMixin,generic.FormView):

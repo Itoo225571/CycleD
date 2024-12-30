@@ -47,7 +47,7 @@
                                             <div class="card card-rank{{ diary.rank }}">
                                                 <div class="card-thumbnail">
                                                     <img src="{{ loc.image.url }}" alt="サムネイル" class="thumbnail-img" onclick="zoom_image('{{ loc.image.url }}')">  <!-- 画像を表示 -->
-                                                    <a class="to-calendar-button" href="{% url 'diary:calendar' %}?month={{ diary.date|date:"Y-m" }}"></a>
+                                                    <a class="to-calendar-button" href="{% url 'diary:calendar' %}?diary_date={{ diary.date|date:"Y-m-d" }}"></a>
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="card-locations">
