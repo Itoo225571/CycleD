@@ -44,7 +44,6 @@ from pprint import pprint
 logger = logging.getLogger(__name__)
 
 """______Diary関係______"""
-# class HomeView(LoginRequiredMixin,CacheMixin,BaseContextMixin,generic.ListView):
 class HomeView(LoginRequiredMixin,BaseContextMixin,generic.ListView):
     template_name="diary/home.html"
     model = Diary
@@ -80,7 +79,7 @@ class HomeView(LoginRequiredMixin,BaseContextMixin,generic.ListView):
         context['diaries_public'] = diaries_data
         return context
 
-class CalendarView(LoginRequiredMixin,CacheMixin,BaseContextMixin,generic.ListView):
+class CalendarView(LoginRequiredMixin,BaseContextMixin,generic.ListView):
     template_name="diary/calendar.html"
     model = Diary
     def form_valid(self, form):

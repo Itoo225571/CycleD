@@ -28,5 +28,4 @@ class BaseContextMixin:
         context = super().get_context_data(**kwargs)
         # ユーザーエージェント情報をコンテキストに追加
         context['user_agent'] = get_user_agent(self.request)
-        print(get_user_agent(self.request))
         return context
