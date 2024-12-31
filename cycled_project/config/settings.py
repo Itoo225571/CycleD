@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'allauth.account', # メールアドレスとパスワードによる認証機能
     'allauth.socialaccount', # ソーシャルアカウント認証機能
     'allauth.socialaccount.providers.google', # 追加
+    'django_user_agents', # user-agents導入
 ]
 
 SITE_ID = 1
@@ -89,6 +90,7 @@ MIDDLEWARE = [
 	'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',#session機能
     'allauth.account.middleware.AccountMiddleware',
+    'django_user_agents.middleware.UserAgentMiddleware', # user-agent機能
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -217,3 +219,15 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
 
 ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'  # アダプターの設定
+
+# キャッシュ
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+        "LOCATION": "127.0.0.1:11211",
+    }
+}
+# settings.pyにてセッションエンジンをキャッシュ使用を宣言する
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+#　キャッシュを使わない場合はNoneと記述。キャッシュを使う場合は基本的には'default'を使う
+USER_AGENTS_CACHE = 'default'

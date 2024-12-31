@@ -7,6 +7,22 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import CustomLoginForm,CustomSignupForm
 from rest_framework.decorators import api_view
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+from django_user_agents.utils import get_user_agent
+
+class CacheMixin:
+    @method_decorator(cache_page(60 * 15))  # 15分間キャッシュ
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+class BaseContextMixin:
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # ユーザーエージェント情報をコンテキストに追加
+        context['user_agent'] = get_user_agent(self.request)
+        print(get_user_agent(self.request))
+        return context
 
 class CustomLoginView(views.LoginView):
     template_name="accounts/login.html"
@@ -36,7 +52,7 @@ class CustomSignupView(views.SignupView):
         # サインアップ成功後のリダイレクト先をカスタマイズする場合はここで設定
         return super().get_success_url()
     
-class UserProfileView(LoginRequiredMixin,generic.TemplateView):
+class UserProfileView(LoginRequiredMixin,BaseContextMixin,generic.TemplateView):
     template_name="accounts/user_profile.html"
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

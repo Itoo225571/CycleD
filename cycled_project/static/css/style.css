@@ -98,6 +98,9 @@ footer {
 .user-icon {
     border: none;
     background-color: transparent;
+    box-shadow: none;
+    -webkit-tap-highlight-color:transparent;
+    cursor:pointer;
 }
 .with-icon {
     display: inline-flex;
