@@ -130,3 +130,13 @@ footer {
     content: '\e439';
     margin-right: 5px;
 }
+
+.navbar .fixed-bottom .is_there {
+    color: black; /* 現在のページ用のスタイル（黒） */
+    font-weight: bold; /* 強調表示 */
+}
+
+.navbar .fixed-bottom .is_not_there {
+    color: gray; /* 他のページ用のスタイル（薄いグレー） */
+    font-weight: normal;
+}
