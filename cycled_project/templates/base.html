@@ -71,6 +71,36 @@
 					</div>
 				</nav>
 			</header>
+			<!-- スマホ用のナビゲーションバー -->
+			<nav class="navbar fixed-bottom bg-light">
+				<div class="container-fluid d-flex justify-content-around">
+					<a class="navbar-brand" href="{% url 'diary:home' %}">
+						<span class="{% if request.resolver_match.url_name == 'home' %}material-icons{% else %}material-icons-outlined{% endif %}">
+							home
+						</span>
+					</a>
+			
+					<a class="navbar-brand" href="{% url 'diary:diary_photo' %}">
+						<span class="{% if request.resolver_match.url_name == 'diary_photo' %}material-icons{% else %}material-icons-outlined{% endif %}">
+							add_a_photo
+						</span>
+					</a>
+			
+					<a class="navbar-brand" href="{% url 'diary:calendar' %}">
+						<span class="{% if request.resolver_match.url_name == 'calendar' %}material-icons{% else %}material-icons-outlined{% endif %}">
+							calendar_month
+						</span>
+					</a>
+			
+					<a class="navbar-brand" href="{% url 'diary:weather_report' %}">
+						<span class="{% if request.resolver_match.url_name == 'weather_report' %}material-icons{% else %}material-icons-outlined{% endif %}">
+							wb_sunny
+						</span>
+					</a>
+				</div>
+			</nav>
+			
+			
 			{% else %}
 			<header class="sticky-top">
 				<nav class="navbar bd-navbar navbar-expand-lg navbar-light bg-light py-2">
