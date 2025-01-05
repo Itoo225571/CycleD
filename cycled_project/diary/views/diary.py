@@ -21,7 +21,6 @@ from django.contrib.auth.decorators import login_required
 from ..forms import DiaryForm,AddressSearchForm,LocationForm,LocationCoordForm,LocationFormSet,DiaryFormSet,PhotosForm
 from ..models import Diary,Location,TempImage
 from ..serializers import DiarySerializer,LocationSerializer
-from .base import BaseContextMixin,CacheMixin
 
 from .address import geocode,regeocode,regeocode_async
 from subs.photo_info.photo_info import get_photo_info,to_jpeg,to_pHash
@@ -44,7 +43,7 @@ from pprint import pprint
 logger = logging.getLogger(__name__)
 
 """______Diary関係______"""
-class HomeView(LoginRequiredMixin,BaseContextMixin,generic.ListView):
+class HomeView(LoginRequiredMixin, generic.ListView):
     template_name="diary/home.html"
     model = Diary
     context_object_name = 'diaries_mine'  # テンプレートで使用するコンテキスト変数の名前
@@ -79,7 +78,7 @@ class HomeView(LoginRequiredMixin,BaseContextMixin,generic.ListView):
         context['diaries_public'] = diaries_data
         return context
 
-class CalendarView(LoginRequiredMixin,BaseContextMixin,generic.ListView):
+class CalendarView(LoginRequiredMixin, generic.ListView):
     template_name="diary/calendar.html"
     model = Diary
     def form_valid(self, form):
@@ -180,7 +179,7 @@ class DiaryDeleteView(LoginRequiredMixin,generic.DeleteView):
         query_params = urlencode({'diary_date': diary.date.strftime("%Y-%m")})
         return f"{reverse('diary:calendar')}?{query_params}"    
 
-class DiaryPhotoView(LoginRequiredMixin,BaseContextMixin,generic.FormView):
+class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
     template_name ="diary/diary_photo.html"
     success_url = reverse_lazy("diary:home")
     redirect_url = reverse_lazy('diary:diary_photo')

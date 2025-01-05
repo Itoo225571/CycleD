@@ -11,13 +11,6 @@ from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from django_user_agents.utils import get_user_agent
 
-class BaseContextMixin:
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        # ユーザーエージェント情報をコンテキストに追加
-        context['user_agent'] = get_user_agent(self.request)
-        return context
-
 class CustomLoginView(views.LoginView):
     template_name="accounts/login.html"
     form_class=CustomLoginForm
@@ -46,7 +39,7 @@ class CustomSignupView(views.SignupView):
         # サインアップ成功後のリダイレクト先をカスタマイズする場合はここで設定
         return super().get_success_url()
     
-class UserProfileView(LoginRequiredMixin,BaseContextMixin,generic.TemplateView):
+class UserProfileView(LoginRequiredMixin,generic.TemplateView):
     template_name="accounts/user_profile.html"
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

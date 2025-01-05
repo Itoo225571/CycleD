@@ -31,7 +31,47 @@
 		</div>
 
 		<div class="wrapper-whole">
-			{% if user_agent.is_pc %}
+			{% if user_agent.is_mobile %}
+			<header>
+				<nav class="navbar bd-navbar navbar-expand-lg navbar-light bg-light">
+					<div class="container-fluid">
+						<!-- タイトル -->
+						<a class="navbar-brand mb-0 h1 ms-3 " href="{% url 'diary:top' %}">
+							ちゃりにっき
+						</a>
+						<!-- ユーザーアイコン -->
+						<div class="d-flex align-items-center ms-auto">					
+							{% if user and user.is_authenticated %}
+								<div class="dropdown-container mx-2">
+									<button type="button" class="user-icon" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+										<img src="{{ user.icon_url }}" class="rounded-circle" width="35" height="35" alt="icon" loading="lazy">
+									</button>
+									<ul class="dropdown-menu dropdown-menu-end">
+										<li>
+											<a class="dropdown-item button-mypage with-icon" href="{% url 'accounts:user_profile' %}">マイページ</a>
+										</li>
+										<li>
+											<a class="dropdown-item button-setting with-icon" href="#">設定</a>
+										</li>
+										<li><hr class="dropdown-divider"></li>
+										<li>
+											<form action="{% url 'accounts:logout' %}" method="post">
+												{% csrf_token %}
+												<button class="dropdown-item button-logout with-icon" onclick="if(confirm('ログアウトしますか？')) { this.closest('form').submit(); } return false;">
+													ログアウト
+												</button>
+											</form>
+										</li>
+									</ul>
+								</div>
+							{% else %}
+								<a class="btn btn-outline-primary rounded-pill px-3" href="{% url 'accounts:login' %}">Login</a>
+							{% endif %}
+						</div>
+					</div>
+				</nav>
+			</header>
+			{% else %}
 			<header class="sticky-top">
 				<nav class="navbar bd-navbar navbar-expand-lg navbar-light bg-light py-2">
 					<div class="container-fluid">
@@ -99,46 +139,6 @@
 								<div class="dropdown-container mx-2">
 									<button type="button" class="user-icon" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside">
 										<img src="{{ user.icon_url }}" class="rounded-circle" width="50" height="50" alt="icon" loading="lazy">
-									</button>
-									<ul class="dropdown-menu dropdown-menu-end">
-										<li>
-											<a class="dropdown-item button-mypage with-icon" href="{% url 'accounts:user_profile' %}">マイページ</a>
-										</li>
-										<li>
-											<a class="dropdown-item button-setting with-icon" href="#">設定</a>
-										</li>
-										<li><hr class="dropdown-divider"></li>
-										<li>
-											<form action="{% url 'accounts:logout' %}" method="post">
-												{% csrf_token %}
-												<button class="dropdown-item button-logout with-icon" onclick="if(confirm('ログアウトしますか？')) { this.closest('form').submit(); } return false;">
-													ログアウト
-												</button>
-											</form>
-										</li>
-									</ul>
-								</div>
-							{% else %}
-								<a class="btn btn-outline-primary rounded-pill px-3" href="{% url 'accounts:login' %}">Login</a>
-							{% endif %}
-						</div>
-					</div>
-				</nav>
-			</header>
-			{% else %}
-			<header>
-				<nav class="navbar bd-navbar navbar-expand-lg navbar-light bg-light">
-					<div class="container-fluid">
-						<!-- タイトル -->
-						<a class="navbar-brand mb-0 h1 ms-3 " href="{% url 'diary:top' %}">
-							ちゃりにっき
-						</a>
-						<!-- ユーザーアイコン -->
-						<div class="d-flex align-items-center ms-auto">					
-							{% if user and user.is_authenticated %}
-								<div class="dropdown-container mx-2">
-									<button type="button" class="user-icon" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-										<img src="{{ user.icon_url }}" class="rounded-circle" width="35" height="35" alt="icon" loading="lazy">
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
 										<li>

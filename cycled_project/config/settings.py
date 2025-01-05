@@ -107,6 +107,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "django.template.context_processors.media",#メディア追加
+                'accounts.context_processors.user_agent_processor', # user-agent情報をbase.htmlに渡す
             ],
         },
     },
