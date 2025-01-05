@@ -11,7 +11,6 @@ from django.shortcuts import redirect
 
 from ..forms import AddressSearchForm,LocationForm,LocationCoordForm
 from ..models import Location
-from .base import BaseContextMixin
 
 from subs.get_location import geocode_gsi,geocode_yahoo,regeocode_gsi,regeocode_HeartTails,regeocode_yahoo
 from subs.get_location import regeocode_gsi_async,regeocode_HeartTails_async,regeocode_yahoo_async
@@ -108,7 +107,7 @@ async def regeocode_async(request,lat,lon,count=0):
         await asyncio.sleep(1)
     return geocode_data.model_dump()
 
-class AddressUserView(LoginRequiredMixin,BaseContextMixin,generic.FormView):
+class AddressUserView(LoginRequiredMixin,generic.FormView):
     template_name = "diary/address.html"
     # ↓二つは後で変える
     form_class = AddressSearchForm
