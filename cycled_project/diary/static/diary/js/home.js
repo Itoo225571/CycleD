@@ -6,7 +6,7 @@ function zoom_image(imageUrl) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    $('#imageModalContainer .modal-body').on('click', function() {
+    $('#imageModalContainer .modal-content').on('click', function() {
         $('#imageModalContainer').modal('hide');
     });
 });

@@ -95,6 +95,7 @@ body {
     box-shadow: none;
     -webkit-tap-highlight-color:transparent;
     cursor:pointer;
+    outline: none; /* タップ時のアウトラインを無効化 */
 }
 .with-icon {
     display: inline-flex;
