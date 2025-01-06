@@ -14,12 +14,6 @@ body {
     margin-top: 20px;
     margin-bottom: 100px;
 }
-footer {
-    width: 100%;
-    height: 130px;
-    text-align: center;
-    margin-top: auto; /* 自動で下に配置される */
-}
 
 #loading-overlay {
 	background: rgba(0, 0, 0, .5);
@@ -131,12 +125,56 @@ footer {
     margin-right: 5px;
 }
 
-.navbar .fixed-bottom .is_there {
+/* スマホ用のナビゲーションバー */
+.navbar-mobile {
+    width: 100%;
+    height: 60px;
+    align-items: center;
+    border-top-left-radius: 20px; /* 左上角を丸く */
+    border-top-right-radius: 20px; /* 右上角を丸く */
+}
+.navbar-mobile .button-to-diary {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    background: deeppink;
+    border: 5px solid #f8f9fa;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+    transform: translateY(-15px);
+}
+.navbar-mobile .fab-space{
+    width: 50px;
+}
+.navbar-mobile .button-to-diary::before {
+    font-family: 'bootstrap-icons';
+    content: '\F64D';
+    position: absolute;
+    font-size: 2em;
+    color: #fff;
+}
+.navbar-mobile .button-to-diary.selected::before {
+    color: darkgray;
+}
+.navbar-mobile .is_there {
     color: black; /* 現在のページ用のスタイル（黒） */
     font-weight: bold; /* 強調表示 */
 }
-
-.navbar .fixed-bottom .is_not_there {
+.navbar-mobile .is_not_there {
     color: gray; /* 他のページ用のスタイル（薄いグレー） */
     font-weight: normal;
+}
+.navbar-mobile .icon-text {
+    display: flex;
+    flex-direction: column; /* アイコンと文字を縦に並べる */
+    justify-content: center;
+    align-items: center;
+}
+.navbar-mobile .icon-text .icon-label {
+    margin-top: 5px; /* アイコンと文字の間隔を調整 */
+    font-size: 0.5em; /* 文字のサイズ */
+    text-align: center;
 }

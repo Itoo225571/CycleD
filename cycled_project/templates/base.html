@@ -72,34 +72,49 @@
 				</nav>
 			</header>
 			<!-- スマホ用のナビゲーションバー -->
-			<nav class="navbar fixed-bottom bg-light">
-				<div class="container-fluid d-flex justify-content-around">
+			{% if user.is_authenticated %}
+			<nav class="navbar navbar-mobile fixed-bottom bg-light">
+				<div class="container-fluid d-flex justify-content-around position-absolute">
+					<!-- ボタンを中央に配置 -->
+					<a 	href="{% url 'diary:diary_photo' %}" 
+						class="button-to-diary position-absolute {% if request.resolver_match.url_name == 'diary_photo' %}selected{% endif %}">
+					</a>
 					<a class="navbar-brand" href="{% url 'diary:home' %}">
-						<span class="{% if request.resolver_match.url_name == 'home' %}material-icons{% else %}material-icons-outlined{% endif %}">
-							home
-						</span>
+						<div class="icon-text">
+							<span class="{% if request.resolver_match.url_name == 'home' %}material-icons{% else %}material-icons-outlined{% endif %}">
+								home
+							</span>
+							<span class="icon-label">ホーム</span>
+						</div>
 					</a>
-			
-					<a class="navbar-brand" href="{% url 'diary:diary_photo' %}">
-						<span class="{% if request.resolver_match.url_name == 'diary_photo' %}material-icons{% else %}material-icons-outlined{% endif %}">
-							add_a_photo
-						</span>
-					</a>
-			
-					<a class="navbar-brand" href="{% url 'diary:calendar' %}">
-						<span class="{% if request.resolver_match.url_name == 'calendar' %}material-icons{% else %}material-icons-outlined{% endif %}">
-							calendar_month
-						</span>
-					</a>
-			
 					<a class="navbar-brand" href="{% url 'diary:weather_report' %}">
-						<span class="{% if request.resolver_match.url_name == 'weather_report' %}material-icons{% else %}material-icons-outlined{% endif %}">
-							wb_sunny
-						</span>
+						<div class="icon-text">
+							<span class="{% if request.resolver_match.url_name == 'weather_report' %}material-icons{% else %}material-icons-outlined{% endif %}">
+								wb_sunny
+							</span>
+							<span class="icon-label">天気予報</span>
+						</div>
+					</a>
+					<div class="fab-space"></div>
+					<a class="navbar-brand" href="{% url 'diary:calendar' %}">
+						<div class="icon-text">
+							<span class="{% if request.resolver_match.url_name == 'calendar' %}material-icons{% else %}material-icons-outlined{% endif %}">
+								calendar_month
+							</span>
+							<span class="icon-label">カレンダー</span>
+						</div>
+					</a>
+					<a class="navbar-brand" href="#">
+						<div class="icon-text">
+							<span class="{% if request.resolver_match.url_name == 'map' %}material-icons{% else %}material-icons-outlined{% endif %}">
+								map
+							</span>
+							<span class="icon-label">マップ</span>
+						</div>
 					</a>
 				</div>
 			</nav>
-			
+			{% endif %}
 			
 			{% else %}
 			<header class="sticky-top">
@@ -273,15 +288,6 @@
 					{{ content }}
 				{% endblock %}
 			</div>
-
-			<footer class="footer text-center bg-light text-dark">
-				<ul class="nav justify-content-center border-bottom pb-3 mb-3">
-					<li class="nav-item"><a href="{% url 'diary:home' %}" class="nav-link px-2 text-body-secondary">ホーム</a></li>
-					<li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">意見フォーム</a></li>
-					<li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary">お問い合わせ</a></li>
-				</ul>
-				<p class="text-center text-body-secondary">© 2024 Copyright : ちゃりにっき</p>
-			</footer>
 		</div>
 		
 		{% comment %} エラー表示用 {% endcomment %}
