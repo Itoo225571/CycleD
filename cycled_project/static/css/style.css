@@ -146,9 +146,6 @@ body {
     z-index: 50;
     transform: translateY(-15px);
 }
-.navbar-mobile .fab-space{
-    width: 50px;
-}
 .navbar-mobile .button-to-diary::before {
     font-family: 'bootstrap-icons';
     content: '\F64D';
@@ -159,19 +156,19 @@ body {
 .navbar-mobile .button-to-diary.selected::before {
     color: darkgray;
 }
-.navbar-mobile .is_there {
-    color: black; /* 現在のページ用のスタイル（黒） */
-    font-weight: bold; /* 強調表示 */
+.navbar-mobile .material-icons-outlined {
+    font-size: 1.5em;
 }
-.navbar-mobile .is_not_there {
-    color: gray; /* 他のページ用のスタイル（薄いグレー） */
-    font-weight: normal;
+.navbar-mobile .material-icons-outlined.selected {
+    font-family: 'Material Icons';
+    color: red;
 }
 .navbar-mobile .icon-text {
     display: flex;
     flex-direction: column; /* アイコンと文字を縦に並べる */
     justify-content: center;
     align-items: center;
+    text-align: center; /* テキストの中央揃え */
 }
 .navbar-mobile .icon-text .icon-label {
     margin-top: 5px; /* アイコンと文字の間隔を調整 */

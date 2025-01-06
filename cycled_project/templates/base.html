@@ -73,40 +73,40 @@
 			</header>
 			<!-- スマホ用のナビゲーションバー -->
 			{% if user.is_authenticated %}
-			<nav class="navbar navbar-mobile fixed-bottom bg-light">
+			<nav class="nav nav-justified navbar-mobile fixed-bottom bg-light">
 				<div class="container-fluid d-flex justify-content-around position-absolute">
 					<!-- ボタンを中央に配置 -->
 					<a 	href="{% url 'diary:diary_photo' %}" 
 						class="button-to-diary position-absolute {% if request.resolver_match.url_name == 'diary_photo' %}selected{% endif %}">
 					</a>
-					<a class="navbar-brand" href="{% url 'diary:home' %}">
+					<a class="navbar-brand nav-item" href="{% url 'diary:home' %}">
 						<div class="icon-text">
-							<span class="{% if request.resolver_match.url_name == 'home' %}material-icons{% else %}material-icons-outlined{% endif %}">
+							<span class="material-icons-outlined {% if request.resolver_match.url_name == 'home' %}selected{% endif %}">
 								home
 							</span>
 							<span class="icon-label">ホーム</span>
 						</div>
 					</a>
-					<a class="navbar-brand" href="{% url 'diary:weather_report' %}">
+					<a class="navbar-brand nav-item" href="{% url 'diary:weather_report' %}">
 						<div class="icon-text">
-							<span class="{% if request.resolver_match.url_name == 'weather_report' %}material-icons{% else %}material-icons-outlined{% endif %}">
+							<span class="material-icons-outlined {% if request.resolver_match.url_name == 'weather_report' %}selected{% endif %}">
 								wb_sunny
 							</span>
 							<span class="icon-label">天気予報</span>
 						</div>
 					</a>
-					<div class="fab-space"></div>
-					<a class="navbar-brand" href="{% url 'diary:calendar' %}">
+					<div class="fab-space nav-item"></div>
+					<a class="navbar-brand nav-item" href="{% url 'diary:calendar' %}">
 						<div class="icon-text">
-							<span class="{% if request.resolver_match.url_name == 'calendar' %}material-icons{% else %}material-icons-outlined{% endif %}">
+							<span class="material-icons-outlined {% if request.resolver_match.url_name == 'calendar' %}selected{% endif %}">
 								calendar_month
 							</span>
 							<span class="icon-label">カレンダー</span>
 						</div>
 					</a>
-					<a class="navbar-brand" href="#">
+					<a class="navbar-brand nav-item" href="#">
 						<div class="icon-text">
-							<span class="{% if request.resolver_match.url_name == 'map' %}material-icons{% else %}material-icons-outlined{% endif %}">
+							<span class="material-icons-outlined {% if request.resolver_match.url_name == 'map' %}selected{% endif %}">
 								map
 							</span>
 							<span class="icon-label">マップ</span>
