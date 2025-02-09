@@ -10,6 +10,7 @@ from rest_framework.decorators import api_view
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from django_user_agents.utils import get_user_agent
+from diary.models import Diary,Coin  # diaryアプリから
 
 class CustomLoginView(views.LoginView):
     template_name="accounts/login.html"
@@ -40,11 +41,13 @@ class CustomSignupView(views.SignupView):
         return super().get_success_url()
     
 class UserProfileView(LoginRequiredMixin,generic.TemplateView):
-    template_name="accounts/user_profile.html"
+    template_name="accounts/mypage.html"
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user  # 現在ログインしているユーザーを取得
         context['user'] = user  # ユーザー情報をテンプレートに渡す
+        context['diary_count'] = Diary.objects.filter(user=user).count()  # ユーザーの持っている日記の数をカウント
+        context['coin'] = Coin.objects.filter(user=user).first()  # ユーザーに関連するCoinを取得（1つだけ）
         return context
 
 class UserEditView(LoginRequiredMixin,generic.UpdateView):

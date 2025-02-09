@@ -1,0 +1,32 @@
+.usericon-field {
+    text-align: center;
+}
+.usericon-field img {
+    width: 100%;  /* 親要素に収まる */
+    height: auto;  /* アスペクト比を維持 */
+    object-fit: cover;  /* はみ出しを防ぐ */
+    border-radius: 50%;  /* 丸い画像を維持 */
+}
+.usericon-field .usericon-edit-button {
+    position:absolute;
+    bottom: 1px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 30px;
+    padding: 3px 10px;
+}
+
+.container-mypage .field-label {
+    color: #6c757d;       /* Bootstrap の text-muted */
+    font-weight: 600;      /* Bootstrap の fw-semibold */
+    font-size: 1rem;       /* Bootstrap の fs-6 (16px) */
+    margin: 0;
+}
+.container-mypage .field-value {
+    font-size: 1.4rem;
+    font-weight: bolder;
+}

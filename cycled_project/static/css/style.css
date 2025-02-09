@@ -176,3 +176,11 @@ body {
     font-size: 0.5em; /* 文字のサイズ */
     text-align: center;
 }
+
+/**** アイコン ****/
+.icon-in-button {
+    margin: 0 .5rem;
+    font-size: 1.5rem;
+    border: none;
+    background-color: transparent;
+}

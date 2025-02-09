@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}
+    マイページ
+{% endblock title %}
+    
+{% block page_title %}
+{% endblock page_title %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'accounts/css/mypage.css' %}" type="text/css">
+{% endblock extra_css %}
+
+{% block content %}
+    <div class="container-mypage">
+        <div class="userprofile-field mt-3 mb-5">
+            <div class="text-center row">
+                <div class="usericon-field col-md-3 col-12 mb-2">
+                    <div class="position-relative d-inline-block">
+                        <img src="{{user.icon_url}}" class="border border-dark" alt="icon" loading="lazy">
+                        <button class="usericon-edit-button">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- ユーザー情報（リスト形式） -->
+                <div class="userinformation-field col-md-9 col-12">
+                    <div class="list-group list-group-flush text-start">
+                        <button type="button" class="list-group-item list-group-item-action">
+                            <div class="field-label">
+                                {{user|verbose_name:"username"}}
+                            </div>
+                            <div class="field-value">
+                                {{ user.username }}
+                            </div>
+                        </button>
+                        <button type="button" class="list-group-item list-group-item-action">
+                            <div class="field-label">
+                                {{user|verbose_name:"email"}}
+                            </div>
+                            <div class="field-value">{{ user.email }}</div>
+                        </button>
+                        <button type="button" class="list-group-item list-group-item-action">
+                            <div class="field-label">
+                                {{user|verbose_name:"date_joined"}}
+                            </div>
+                            <div class="field-value">{{ user.date_joined|date:"Y年m月d日" }}</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="diaryinformation-field mb-4 mx-auto col-lg-9 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>
+                        <strong>日記情報</strong>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="field-label">
+                                日記総数
+                            </div>
+                            <div class="field-value">{{ diary_count }}</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="field-label">
+                                連続日記作成日数
+                            </div>
+                            <div class="field-value">{{ coin.num }}日</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="setting-field">
+            <div class="mb-3">
+                <div class="text-center">
+                    <button type="button" id="delete-all-diaries" class="btn btn-outline-danger">日記をすべて削除</button>
+                </div>
+            </div>
+            <div class="mb-3">
+                <div class="text-center">
+                    <form action="{% url 'accounts:user_delete' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" id="delete-user" class="btn btn-outline-danger">退会する</button>
+                    </form>
+                </div>       
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block extra_js %}
+    <script src="{% static 'js/getCookie.js' %}"></script>
+    <script>
+        const url_deleteAllDiaries = "{% url 'diary:delete_all_diaries' %}";
+    </script>
+    <script src="{% static 'accounts/js/mypage.js' %}"></script>
+
+{% endblock %}
