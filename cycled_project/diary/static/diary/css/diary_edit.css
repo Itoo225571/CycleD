@@ -98,14 +98,6 @@
     text-overflow: ellipsis;     /* 溢れたテキストに省略記号（...）を表示 */
 }
 
-/**** アイコン ****/
-.icon-in-button {
-    margin: 0 .5rem;
-    font-size: 1.5rem;
-    border: none;
-    background-color: transparent;
-}
-
 /* 回転ボタン */
 .icon-rotate::before {
     content: "\eaab";
