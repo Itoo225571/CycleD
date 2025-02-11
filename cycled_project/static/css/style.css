@@ -123,7 +123,14 @@ body {
 .button-diary::before {
     font-family: 'Material Icons';
     content: '\e439';
-    margin-right: 5px;
+}
+.button-calendar::before {
+    font-family: 'Material Icons';
+    content: '\ebcc';
+}
+.button-weather::before {
+    font-family: 'Material Icons';
+    content: '\e430';
 }
 
 /* スマホ用のナビゲーションバー */
@@ -176,6 +183,17 @@ body {
     font-size: 0.5em; /* 文字のサイズ */
     text-align: center;
 }
+
+.navbar-pc .nav-link {
+    width: 100%;
+}
+.navbar-pc .nav-link:hover,
+.navbar-pc .nav-link:focus {
+
+    background-color: #e0e0e0; /* 好きな色に変更 */
+    transition: background-color 0.3s ease; /* なめらかに変化 */
+}
+
 
 /**** アイコン ****/
 .icon-in-button {

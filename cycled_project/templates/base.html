@@ -20,7 +20,7 @@
 		<link rel="stylesheet" href="{% static 'diary/css/animations.css' %}">
 		{% block extra_css %}{% endblock %}
 
-		<title>{% block title %}ちゃりにっき{% endblock %}</title>
+		<title>{% block title %}ちゃりニキ{% endblock %}</title>
 	</head>
 
 	<body>
@@ -37,12 +37,12 @@
 					<div class="container-fluid">
 						<!-- タイトル -->
 						<a class="navbar-brand mb-0 h1 ms-3 " href="{% url 'diary:top' %}">
-							ちゃりにっき
+							ちゃりニキ
 						</a>
 						<!-- ユーザーアイコン -->
 						<div class="d-flex align-items-center ms-auto">					
 							{% if user and user.is_authenticated %}
-								<div class="dropdown-container mx-2">
+								<div class="dropdown-container ms-2">
 									<button type="button" class="user-icon" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside">
 										<img src="{{ user.icon_url }}" class="rounded-circle" width="35" height="35" alt="icon" loading="lazy">
 									</button>
@@ -116,60 +116,57 @@
 			</nav>
 			{% endif %}
 			
+			{% comment %} PC用 {% endcomment %}
 			{% else %}
 			<header class="sticky-top">
-				<nav class="navbar bd-navbar navbar-expand-lg navbar-light bg-light py-2">
+				<nav class="navbar navbar-pc navbar-light bg-light py-2">
 					<div class="container-fluid">
 						<!-- オフキャンバスをトリガーするボタン -->
 						<button class="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar" aria-expanded="false" aria-label="Toggle navigation">
 							<span class="navbar-toggler-icon"></span>
 						</button>
 						<!-- タイトル -->
-						<a class="navbar-brand mb-0 h1 ms-3 d-none d-lg-block " href="{% url 'diary:top' %}">
-							ちゃりにっき
+						<a class="navbar-brand mb-0 h1 ms-3 " href="{% url 'diary:top' %}">
+							ちゃりニキ
 						</a>
 						<!-- サイドバー (オフキャンバス) -->
 						<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel" style="width: 280px;">
 							<div class="offcanvas-header border-bottom">
-								<a href="{% url 'diary:top' %}" class="navbar-brand mb-0 h1 w-100 d-block">
-									<h5 class="offcanvas-title nav-item m-0">ホーム</h5>
+								<button class="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar" aria-expanded="false" aria-label="Toggle navigation">
+									<span class="navbar-toggler-icon"></span>
+								</button>
+								<a href="{% url 'diary:top' %}" class="navbar-brand mb-0 h1 ms-3 w-100">
+									<h5 class="offcanvas-title nav-item m-0">ちゃりニキ</h5>
 								</a>
 							</div>
-							<div class="offcanvas-body">
+
+							<div class="offcanvas-body px-2">
 								<ul class="navbar-nav nav-pills">
-									<li class="nav-item mx-2 d-lg-none">
-										<a class="nav-link" href="{% url 'diary:diary_photo' %}">
-											<img src="{% static 'diary/img/diary.png' %}" alt="diary" width="30" height="30" class="d-inline-block align-text-bottom">
-											にっき作成
-										</a>
+									<li class="nav-item ms-2">
+										<a class="nav-link button-diary with-icon ps-2" href="{% url 'diary:diary_photo' %}">日記作成</a>
 									</li>
-									<li class="nav-item mx-2">
-										<a class="nav-link" href="{% url 'diary:calendar' %}">
-											<img src="{% static 'diary/img/calendar.png' %}" alt="calendar" width="30" height="30" class="d-inline-block align-text-bottom"> カレンダー
-										</a>
+									<li class="nav-item ms-2">
+										<a class="nav-link button-calendar with-icon ps-2" href="{% url 'diary:calendar' %}">カレンダー</a>
 									</li>
-									<li class="nav-item mx-2">
-										<a class="nav-link" href="{% url 'diary:weather_report' %}">
-											<img src="{% static 'diary/img/hareotoko.png' %}" alt="weather" width="30" height="30" class="d-inline-block align-text-bottom"> 天気予報
-										</a>
+									<li class="nav-item ms-2">
+										<a class="nav-link button-weather with-icon ps-2" href="{% url 'diary:weather_report' %}">天気予報</a>
 									</li>
+									
 									<li class="bd-links-span-all my-2 border-top"></li>
-									<div class="d-lg-none">
-										<li class="nav-item mx-2">
-											<a class="nav-link button-mypage with-icon" href="{% url 'accounts:mypage' %}">マイページ</a>
-										</li>
-										<li class="nav-item mx-2">
-											<a class="nav-link button-setting with-icon" href="#">設定</a>
-										</li>
-										<li class="nav-item mx-2">
-											<form action="{% url 'accounts:logout' %}" method="post">
-												{% csrf_token %}
-												<button class="nav-link dropdown-item button-logout with-icon" onclick="if(confirm('ログアウトしますか？')) { this.closest('form').submit(); } return false;">
-													ログアウト
-												</button>
-											</form>
-										</li>
-									</div>
+									<li class="nav-item ms-2">
+										<a class="nav-link button-mypage with-icon ps-2" href="{% url 'accounts:mypage' %}">マイページ</a>
+									</li>
+									<li class="nav-item ms-2">
+										<a class="nav-link button-setting with-icon ps-2" href="#">設定</a>
+									</li>
+									<li class="nav-item ms-2">
+										<form action="{% url 'accounts:logout' %}" method="post">
+											{% csrf_token %}
+											<button class="nav-link dropdown-item button-logout with-icon ps-2" onclick="if(confirm('ログアウトしますか？')) { this.closest('form').submit(); } return false;">
+												ログアウト
+											</button>
+										</form>
+									</li>
 								</ul>
 							</div>
 						</div>
@@ -181,7 +178,7 @@
 										にっき
 									</a>
 								</div>
-								<div class="dropdown-container mx-2">
+								<div class="dropdown-container ms-2">
 									<button type="button" class="user-icon" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside">
 										<img src="{{ user.icon_url }}" class="rounded-circle" width="50" height="50" alt="icon" loading="lazy">
 									</button>
