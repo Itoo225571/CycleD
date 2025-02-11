@@ -71,7 +71,7 @@
 /* ランク0の表示方法 */
 #mycalendar .diary-event.diary-rank-0 .fc-event-title::before {
     text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
-    color: gold;
+    color: red;
 }
 /* スマートフォンや小さい画面用のスタイル */
 @media (max-width: 767px) {
@@ -81,7 +81,7 @@
         padding: 0;
     }
     #mycalendar .fc-daygrid-day-number {
-        padding: 2px;
+        padding: 1px;
     }
     #mycalendar .fc-event {
         font-size: 10px;  /* イベントの文字サイズを小さくする */
