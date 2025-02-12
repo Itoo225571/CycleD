@@ -48,10 +48,7 @@
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
 										<li>
-											<a class="dropdown-item button-mypage with-icon" href="{% url 'accounts:mypage' %}">マイページ</a>
-										</li>
-										<li>
-											<a class="dropdown-item button-setting with-icon" href="#">設定</a>
+											<a class="dropdown-item button-setting with-icon" href="{% url 'accounts:setting' %}">設定</a>
 										</li>
 										<li><hr class="dropdown-divider"></li>
 										<li>
@@ -140,35 +137,34 @@
 								</a>
 							</div>
 
-							<div class="offcanvas-body px-2">
-								<ul class="navbar-nav nav-pills">
-									<li class="nav-item ms-2">
-										<a class="nav-link button-diary with-icon ps-2" href="{% url 'diary:diary_photo' %}">日記作成</a>
-									</li>
-									<li class="nav-item ms-2">
-										<a class="nav-link button-calendar with-icon ps-2" href="{% url 'diary:calendar' %}">カレンダー</a>
-									</li>
-									<li class="nav-item ms-2">
-										<a class="nav-link button-weather with-icon ps-2" href="{% url 'diary:weather_report' %}">天気予報</a>
-									</li>
-									
-									<li class="bd-links-span-all my-2 border-top"></li>
-									<li class="nav-item ms-2">
-										<a class="nav-link button-mypage with-icon ps-2" href="{% url 'accounts:mypage' %}">マイページ</a>
-									</li>
-									<li class="nav-item ms-2">
-										<a class="nav-link button-setting with-icon ps-2" href="#">設定</a>
-									</li>
-									<li class="nav-item ms-2">
-										<form action="{% url 'accounts:logout' %}" method="post">
-											{% csrf_token %}
-											<button class="nav-link dropdown-item button-logout with-icon ps-2" onclick="if(confirm('ログアウトしますか？')) { this.closest('form').submit(); } return false;">
-												ログアウト
-											</button>
-										</form>
-									</li>
-								</ul>
-							</div>
+							{% if user and user.is_authenticated %}
+								<div class="offcanvas-body px-2">
+									<ul class="navbar-nav nav-pills">
+										<li class="nav-item ms-2">
+											<a class="nav-link button-diary with-icon ps-2" href="{% url 'diary:diary_photo' %}">日記作成</a>
+										</li>
+										<li class="nav-item ms-2">
+											<a class="nav-link button-calendar with-icon ps-2" href="{% url 'diary:calendar' %}">カレンダー</a>
+										</li>
+										<li class="nav-item ms-2">
+											<a class="nav-link button-weather with-icon ps-2" href="{% url 'diary:weather_report' %}">天気予報</a>
+										</li>
+										
+										<li class="bd-links-span-all my-2 border-top"></li>
+										<li class="nav-item ms-2">
+											<a class="nav-link button-setting with-icon ps-2" href="{% url 'accounts:setting' %}">設定</a>
+										</li>
+										<li class="nav-item ms-2">
+											<form action="{% url 'accounts:logout' %}" method="post">
+												{% csrf_token %}
+												<button class="nav-link dropdown-item button-logout with-icon ps-2" onclick="if(confirm('ログアウトしますか？')) { this.closest('form').submit(); } return false;">
+													ログアウト
+												</button>
+											</form>
+										</li>
+									</ul>
+								</div>
+							{% endif %}
 						</div>
 						<!-- ユーザーアイコン -->
 						<div class="d-flex align-items-center ms-auto">							
@@ -184,10 +180,7 @@
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
 										<li>
-											<a class="dropdown-item button-mypage with-icon" href="{% url 'accounts:mypage' %}">マイページ</a>
-										</li>
-										<li>
-											<a class="dropdown-item button-setting with-icon" href="#">設定</a>
+											<a class="dropdown-item button-setting with-icon" href="{% url 'accounts:setting' %}">設定</a>
 										</li>
 										<li><hr class="dropdown-divider"></li>
 										<li>

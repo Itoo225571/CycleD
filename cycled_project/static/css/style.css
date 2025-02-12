@@ -110,11 +110,6 @@ body {
     content: "\e9ba";
     opacity: .7;
 }
-.button-mypage::before {
-    font-family: 'bootstrap-icons';
-    content: '\F4D7';
-    opacity: .7;
-}
 .button-setting::before {
     font-family: 'bootstrap-icons';
     content: '\F3E5';
@@ -189,7 +184,6 @@ body {
 }
 .navbar-pc .nav-link:hover,
 .navbar-pc .nav-link:focus {
-
     background-color: #e0e0e0; /* 好きな色に変更 */
     transition: background-color 0.3s ease; /* なめらかに変化 */
 }

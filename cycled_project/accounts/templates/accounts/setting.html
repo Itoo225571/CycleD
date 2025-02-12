@@ -11,12 +11,12 @@
 {% endblock page_title %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'accounts/css/mypage.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'accounts/css/setting.css' %}" type="text/css">
 {% endblock extra_css %}
 
 {% block content %}
-    <div class="container-mypage">
-        <div class="userprofile-field mt-3 mb-5">
+    <div class="container-setting mx-2">
+        <div class="userprofile-field my-3">
             <div class="text-center row">
                 <div class="usericon-field col-md-3 col-12 mb-2">
                     <div class="position-relative d-inline-block">
@@ -26,30 +26,41 @@
                         </button>
                     </div>
                 </div>
-                <!-- ユーザー情報（リスト形式） -->
+                <!-- ユーザー情報（table形式） -->
                 <div class="userinformation-field col-md-9 col-12">
-                    <div class="list-group list-group-flush text-start">
-                        <button type="button" class="list-group-item list-group-item-action">
-                            <div class="field-label">
-                                {{user|verbose_name:"username"}}
-                            </div>
-                            <div class="field-value">
-                                {{ user.username }}
-                            </div>
-                        </button>
-                        <button type="button" class="list-group-item list-group-item-action">
-                            <div class="field-label">
-                                {{user|verbose_name:"email"}}
-                            </div>
-                            <div class="field-value">{{ user.email }}</div>
-                        </button>
-                        <button type="button" class="list-group-item list-group-item-action">
-                            <div class="field-label">
-                                {{user|verbose_name:"date_joined"}}
-                            </div>
-                            <div class="field-value">{{ user.date_joined|date:"Y年m月d日" }}</div>
-                        </button>
-                    </div>
+                    <table class="table text-start">
+                        <tbody>
+                            <tr>
+                                <th>{{user|verbose_name:"username"}}</th>
+                                <td rowspan="2" class="align-middle">
+                                    <button class="usericon-edit-button">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>{{ user.username }}</td>
+                            </tr>
+                            <tr>
+                                <th>{{user|verbose_name:"email"}}</th>
+                                <td rowspan="2" class="align-middle">
+                                    <button class="usericon-edit-button">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>{{ user.email }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">{{user|verbose_name:"date_joined"}}</th>
+                                <td rowspan="2"></td>
+                            </tr>
+                            <tr>
+                                <td>{{ user.date_joined|date:"Y年m月d日" }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -57,22 +68,22 @@
             <div class="card">
                 <div class="card-header">
                     <h5>
-                        <strong>日記情報</strong>
+                        <strong>作成した日記の数</strong>
                     </h5>
                 </div>
                 <div class="card-body">
                     <div class="row text-center">
                         <div class="col-6">
                             <div class="field-label">
-                                日記総数
+                                総合計
                             </div>
-                            <div class="field-value">{{ diary_count }}</div>
+                            <div class="field-value">{{ diary_count }} コ</div>
                         </div>
                         <div class="col-6">
                             <div class="field-label">
-                                連続日記作成日数
+                                当日作成
                             </div>
-                            <div class="field-value">{{ coin.num }}日</div>
+                            <div class="field-value">{{ diary_count_ontheday }} コ</div>
                         </div>
                     </div>
                 </div>
@@ -101,6 +112,6 @@
     <script>
         const url_deleteAllDiaries = "{% url 'diary:delete_all_diaries' %}";
     </script>
-    <script src="{% static 'accounts/js/mypage.js' %}"></script>
+    <script src="{% static 'accounts/js/setting.js' %}"></script>
 
 {% endblock %}
