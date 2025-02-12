@@ -1,0 +1,62 @@
+.usericon-field {
+    text-align: center;
+}
+.usericon-field img {
+    width: 100%;  /* 親要素に収まる */
+    height: auto;  /* アスペクト比を維持 */
+    object-fit: cover;  /* はみ出しを防ぐ */
+    border-radius: 50%;  /* 丸い画像を維持 */
+}
+.usericon-field .usericon-edit-button {
+    position:absolute;
+    bottom: 1px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 30px;
+    padding: 3px 10px;
+}
+
+.userinformation-field th {
+    color: #6c757d;       /* Bootstrap の text-muted */
+    font-weight: 600;      /* Bootstrap の fw-semibold */
+    font-size: .8rem;       /* Bootstrap の fs-6 (16px) */
+    border-bottom: none;
+}
+.userinformation-field td {
+    font-size: 1rem;
+    font-weight: bolder;
+}
+@media (min-width: 768px) {
+    .userinformation-field th {
+        font-size: 1rem;       /* Bootstrap の fs-6 (16px) */
+    }
+    .userinformation-field td {
+        font-size: 1.4rem;  /* 中画面 (md) 以上 */
+    }
+}
+.userinformation-field .usericon-edit-button {
+    background-color: transparent;
+    color: #6c757d;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    /* padding: 3px 10px; */
+    padding: 0;
+    font-size: 1.5rem;
+}
+
+.diaryinformation-field .card {
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08);
+}
+.diaryinformation-field .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e1e1e1;
+}
+.diaryinformation-field .card-body {
+    background-color: #fff;
+    border-radius: 5px;
+}
