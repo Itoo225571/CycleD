@@ -13,15 +13,32 @@
 
 {% block content %}
     <div class="container-home">
-        {% if user.coin.num > 0 %}
-        <div class="diary-count-field d-flex text-center justify-content-center row">
-            <div class="col-12">当日に日記を投稿した回数が表示されます。</div>
-            <div class="continue-count-container col-12 col-md-6">
-                <div>日記を書いた回数: <strong>{{user.coin.num}}回</strong></div>
-                <div>継続日数: <strong>{{ user.coin.num_continue }}日</strong></div>
+        <div class="diaryinformation-field mb-4 mx-auto col-lg-9 col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>
+                        <strong>作成した日記の数</strong>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="field-label">
+                                総合計
+                            </div>
+                            <div class="field-value">{{ diary_count }} コ</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="field-label">
+                                当日作成
+                            </div>
+                            <div class="field-value">{{ diary_count_ontheday }} コ</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        {% endif %}
+
         <div class="diary-list-field my-3">
             <ul class="nav nav-tabs nav-fill d-flex flex-nowrap" role="tablist">
                 <li class="nav-item flex-shrink-0" role="presentation">

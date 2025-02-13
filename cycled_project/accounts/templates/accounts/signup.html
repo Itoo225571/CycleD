@@ -32,7 +32,7 @@
                                     <div class="input-group">
                                         {{ field | add_class:"form-control" }}
                                         {% if field == form.password1 %}
-                                        <button class="btn btn-outline-secondary togglePassword" type="button">
+                                        <button class="btn btn-outline-secondary togglePassword" type="button" tabindex="-1">
                                             <i class="bi bi-eye-slash password-icon"></i> <!-- 目のアイコン -->
                                         </button>
                                         {% endif %}

@@ -13,6 +13,7 @@ from pathlib import Path
 import environ
 import os
 from django.urls import reverse
+from django.contrib.messages import constants as messages
 
 #プロジェクトのベースフォルダを示す（今回の場合、/workspaces/MyDjango/CycleD_project）
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -239,3 +240,13 @@ CACHES = {
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 #　キャッシュを使わない場合はNoneと記述。キャッシュを使う場合は基本的には'default'を使う
 USER_AGENTS_CACHE = 'default'
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+# Bootstrap に対応したメッセージタグの設定
+MESSAGE_TAGS = {
+    messages.DEBUG: 'secondary',
+    messages.INFO: 'info',
+    messages.SUCCESS: 'success',
+    messages.WARNING: 'warning',
+    messages.ERROR: 'danger',
+}
