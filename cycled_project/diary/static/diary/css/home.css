@@ -1,17 +1,16 @@
 /* 日記日数 */
-.continue-count-container {
-    border-radius: 5px;       
-    background-color: #e9f7ff; 
-    padding: 20px 10px;
-    margin: 10px 0;          
-    font-size: 1.2em;        
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 影を追加 */
-    transition: transform 0.2s; /* ホバー時のアニメーション */
-    text-align: center;
+.diaryinformation-field .card {
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1), 0px 1px 3px rgba(0, 0, 0, 0.08);
 }
-.continue-count-container:hover {
-    transform: scale(1.02); /* ホバー時に少し拡大 */
+.diaryinformation-field .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e1e1e1;
 }
+.diaryinformation-field .card-body {
+    background-color: #fff;
+    border-radius: 5px;
+}
+
 
 /* タブ */
 .nav-tabs .nav-link {

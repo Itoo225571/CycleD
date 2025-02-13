@@ -22,6 +22,9 @@ class CustomLoginView(views.LoginView):
         if request.user.is_authenticated:
             return redirect('diary:home')  # 'home' にリダイレクト
         return super().get(request, *args, **kwargs)
+    def form_valid(self, form):
+        
+        return super().form_valid(form)
 
 class CustomLogoutView(LoginRequiredMixin,views.LogoutView):
     template_name="accounts/logout.html"
@@ -29,11 +32,6 @@ class CustomLogoutView(LoginRequiredMixin,views.LogoutView):
 class CustomSignupView(views.SignupView):
     form_class = CustomSignupForm
     template_name="accounts/signup.html"
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        # フォームが有効な場合の追加処理をここに記述
-        return response
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
@@ -59,15 +57,15 @@ class UserSettingView(LoginRequiredMixin,generic.UpdateView):
     fields = ['username', 'email', 'icon']
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.request.user  # 現在ログインしているユーザーを取得
-        context['user'] = user  # ユーザー情報をテンプレートに渡す
-        diary_all = Diary.objects.filter(user=user)
-        context['diary_count'] = diary_all.count()  # ユーザーの持っている日記の数をカウント
-        context['diary_count_ontheday'] = diary_all.filter(rank=0).count()
         return context
     def get_object(self, queryset=None):
         # 常に現在ログイン中のユーザーを返す
         return self.request.user
+
+class CustomPasswordChangeView(LoginRequiredMixin, views.PasswordChangeView):
+    template_name = "accounts/password_change.html"
+    success_url = reverse_lazy('accounts:setting')
+    success_message = 'パスワードの変更に成功'
 
 class UserEditView(LoginRequiredMixin,generic.UpdateView):
     pass

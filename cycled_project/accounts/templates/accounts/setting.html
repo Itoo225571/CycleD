@@ -16,93 +16,75 @@
 
 {% block content %}
     <div class="container-setting mx-2">
-        <div class="userprofile-field my-3">
-            <div class="text-center row">
-                <div class="usericon-field col-md-3 col-12 mb-2">
-                    <div class="position-relative d-inline-block">
-                        <img src="{{user.icon_url}}" class="border border-dark" alt="icon" loading="lazy">
-                        <button class="usericon-edit-button">
-                            <i class="bi bi-pencil-square"></i>
-                        </button>
-                    </div>
-                </div>
-                <!-- ユーザー情報（table形式） -->
-                <div class="userinformation-field col-md-9 col-12">
-                    <table class="table text-start">
-                        <tbody>
-                            <tr>
-                                <th>{{user|verbose_name:"username"}}</th>
-                                <td rowspan="2" class="align-middle">
-                                    <button class="usericon-edit-button">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>{{ user.username }}</td>
-                            </tr>
-                            <tr>
-                                <th>{{user|verbose_name:"email"}}</th>
-                                <td rowspan="2" class="align-middle">
-                                    <button class="usericon-edit-button">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>{{ user.email }}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">{{user|verbose_name:"date_joined"}}</th>
-                                <td rowspan="2"></td>
-                            </tr>
-                            <tr>
-                                <td>{{ user.date_joined|date:"Y年m月d日" }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <div class="userprofile-field my-3 row">
+            <div class="usericon-field col-md-3 col-12 mb-2">
+                <div class="position-relative d-inline-block">
+                    <img src="{{user.icon_url}}" class="border border-dark" alt="icon" loading="lazy">
+                    <button class="usericon-edit-button">
+                        <i class="bi bi-pencil-square"></i>
+                    </button>
                 </div>
             </div>
-        </div>
-        <div class="diaryinformation-field mb-4 mx-auto col-lg-9 col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5>
-                        <strong>作成した日記の数</strong>
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-6">
-                            <div class="field-label">
-                                総合計
-                            </div>
-                            <div class="field-value">{{ diary_count }} コ</div>
-                        </div>
-                        <div class="col-6">
-                            <div class="field-label">
-                                当日作成
-                            </div>
-                            <div class="field-value">{{ diary_count_ontheday }} コ</div>
-                        </div>
-                    </div>
-                </div>
+            <!-- ユーザー情報（table形式） -->
+            <div class="userinformation-field col-md-9 col-12">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th>{{user|verbose_name:"username"}}</th>
+                            <td rowspan="2" class="align-middle">
+                                <button class="usericon-edit-button">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ user.username }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{user|verbose_name:"email"}}</th>
+                            <td rowspan="2" class="align-middle">
+                                <button class="usericon-edit-button">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{ user.email }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">{{user|verbose_name:"date_joined"}}</th>
+                            <td rowspan="2"></td>
+                        </tr>
+                        <tr>
+                            <td>{{ user.date_joined|date:"Y年m月d日" }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
         <div class="setting-field">
-            <div class="mb-3">
-                <div class="text-center">
-                    <button type="button" id="delete-all-diaries" class="btn btn-outline-danger">日記をすべて削除</button>
-                </div>
-            </div>
-            <div class="mb-3">
-                <div class="text-center">
-                    <form action="{% url 'accounts:user_delete' %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit" id="delete-user" class="btn btn-outline-danger">退会する</button>
-                    </form>
-                </div>       
-            </div>
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td>
+                            <a href="{% url 'accounts:password_change' %}">パスワードを変更する</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-danger fw-bold" onclick="deleteAllDiaries()" role="button">
+                            日記をすべて削除する
+                        </td>
+                    </tr>
+                    <tr>
+                        <form action="{% url 'accounts:user_delete' %}" method="post" id="delete-user-form">
+                            {% csrf_token %}
+                            <td class="text-danger fw-bold" onclick="confirmDelete()" role="button">
+                                退会する
+                            </td>
+                        </form>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 {% endblock content %}

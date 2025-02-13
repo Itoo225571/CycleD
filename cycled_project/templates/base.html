@@ -228,8 +228,9 @@
 									{% if form.non_field_errors %}
 										{% for error in form.non_field_errors %}
 											<li class="list-group-item list-group-item-danger">
-												<i class="bi bi-exclamation-circle me-2"></i>
-												{{ field.name }} : {{ error }}
+												{{ field.label }}:
+												<br>
+												{{ error }}
 											</li>
 										{% endfor %}
 									{% endif %}
@@ -237,8 +238,9 @@
 										{% if field.errors %}
 											{% for error in field.errors %}
 												<li class="list-group-item list-group-item-danger">
-													<i class="bi bi-exclamation-circle me-2"></i>
-													{{ field.name }} : {{ error }}
+													{{ field.label }}:
+													<br>
+													{{ error }}
 												</li>
 											{% endfor %}
 										{% endif %}
@@ -250,7 +252,9 @@
 										{% if form.errors %}
 										{% for error in form.errors %}
 											<li class="list-group-item list-group-item-danger">
-											{{ field.name }} : {{ error }}
+											{{ field.label }}:
+											<br>
+											{{ error }}
 											</li>
 										{% endfor %}
 										{% endif %}
@@ -258,11 +262,10 @@
 							
 									{% if messages %}
 										{% for message in messages %}
-											{% if message.tags == 'error' %}
-											<li class="list-group-item list-group-item-danger">
-												<i class="bi bi-exclamation-circle me-2"></i>
-												{{ message }}
-											</li>
+											{% if message.level_tag == 'danger' %}
+												<li class="list-group-item list-group-item-danger">
+													{{ message }}
+												</li>
 											{% endif %}
 										{% endfor %}
 									{% endif %}
@@ -282,6 +285,19 @@
 		
 		{% comment %} エラー表示用 {% endcomment %}
 		<script src="{% static 'diary/js/error_lib.js' %}"></script>
+		{% comment %} messages表示(error以外) {% endcomment %}
+		<script>
+			document.addEventListener('DOMContentLoaded', function() {
+				{% if messages %}
+					{% for message in messages %}
+						{% if message.level_tag != 'danger' %}  {# error 以外を対象にする #}
+							window.alert("{{ message|escapejs }}");
+						{% endif %}
+					{% endfor %}
+				{% endif %}
+			});
+		</script>
+		
 		{% block extra_js %}{% endblock %}
 	</body>
 </html>

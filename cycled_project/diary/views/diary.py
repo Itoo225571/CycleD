@@ -43,27 +43,37 @@ from pprint import pprint
 logger = logging.getLogger(__name__)
 
 """______Diary関係______"""
-class HomeView(LoginRequiredMixin, generic.ListView):
+class HomeView(LoginRequiredMixin, generic.TemplateView):
     template_name="diary/home.html"
-    model = Diary
-    context_object_name = 'diaries_mine'  # テンプレートで使用するコンテキスト変数の名前
-    def get_queryset(self, **kwargs):
-        diaries = Diary.objects.filter(user=self.request.user).order_by('-date_last_updated').order_by('-date')[:5] #自分の日記
-        return diaries
-        
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # ユーザー自身の日記を一度だけ取得
+        diary_all_myself = Diary.objects.filter(user=self.request.user)
+        # カウントをキャッシュ
+        diary_count = diary_all_myself.count()
+        diary_count_ontheday = diary_all_myself.filter(rank=0).count()
+
+        # サムネイルのプレフェッチ
         thumbnail_location = Prefetch(
-            'locations',  # `locations` のリレーションを指定
-            queryset=Location.objects.filter(is_thumbnail=True),  # サムネイル画像の場所のみ取得
-            to_attr='thumbnail_locations'  # 新しい属性名に保存
+            'locations',
+            queryset=Location.objects.filter(is_thumbnail=True),
+            to_attr='thumbnail_locations'
         )
-        diaries = Diary.objects.filter(
-            # is_publish=True,
-            date__gte=timezone.now().date(),  # `date`が7日以内の日記を取得
-            rank=0,
-        ).order_by('-date_last_updated')[:10].prefetch_related(thumbnail_location, 'user')  # 全体で公開された日記
-        # 必要な情報のみ抽出
+
+        # 公開された日記を取得
+        diaries = (
+            Diary.objects.filter(
+                # is_pulish=True,
+                # date__gte=timezone.now().date(),
+                rank=0
+            )
+            .order_by('-date_last_updated')  # 日付の降順で取得
+            .prefetch_related(thumbnail_location, 'user')  # プレフェッチを最後に呼び出し
+            [:10]  # 10 件に絞り込み
+        )
+
+        # 必要な情報をリストに格納
         diaries_data = [
             {
                 "user": {
@@ -71,12 +81,20 @@ class HomeView(LoginRequiredMixin, generic.ListView):
                     "icon_url": diary.user.icon_url,
                 },
                 "date": diary.date,
-                "image": diary.thumbnail_locations[0].image.url if diary.thumbnail_locations else None,  # サムネイルがある場合のみURLを取得
+                # サムネイルの画像URLを `.first()` を使って取得
+                "image": diary.thumbnail_locations[0].image.url if diary.thumbnail_locations else None,
+                # "good" : diary.good,
             }
             for diary in diaries
         ]
+
         context['diaries_public'] = diaries_data
+        context['diaries_mine'] = diary_all_myself.order_by('-date_last_updated', '-date')[:5]
+        context['diary_count'] = diary_count  # キャッシュを利用
+        context['diary_count_ontheday'] = diary_count_ontheday  # キャッシュを利用
+
         return context
+
 
 class CalendarView(LoginRequiredMixin, generic.ListView):
     template_name="diary/calendar.html"
