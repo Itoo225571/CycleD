@@ -15,23 +15,20 @@ from .models import User
 from diary.models import Diary,Coin  # diaryアプリから
 
 class CustomLoginView(views.LoginView):
-    template_name="accounts/login.html"
+    template_name="account/login.html"
     form_class=CustomLoginForm
     success_url=reverse_lazy("diary:home")
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect('diary:home')  # 'home' にリダイレクト
         return super().get(request, *args, **kwargs)
-    def form_valid(self, form):
-        
-        return super().form_valid(form)
 
 class CustomLogoutView(LoginRequiredMixin,views.LogoutView):
-    template_name="accounts/logout.html"
+    template_name="account/logout.html"
 
 class CustomSignupView(views.SignupView):
     form_class = CustomSignupForm
-    template_name="accounts/signup.html"
+    template_name="account/signup.html"
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
@@ -39,21 +36,10 @@ class CustomSignupView(views.SignupView):
     def get_success_url(self):
         # サインアップ成功後のリダイレクト先をカスタマイズする場合はここで設定
         return super().get_success_url()
-    
-# class UserProfileView(LoginRequiredMixin,generic.TemplateView):
-#     template_name="accounts/mypage.html"
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         user = self.request.user  # 現在ログインしているユーザーを取得
-#         context['user'] = user  # ユーザー情報をテンプレートに渡す
-#         diary_all = Diary.objects.filter(user=user)
-#         context['diary_count'] = diary_all.count()  # ユーザーの持っている日記の数をカウント
-#         context['diary_count_ontheday'] = diary_all.filter(rank=0).count()
-#         return context
 
 class UserSettingView(LoginRequiredMixin,generic.UpdateView):
     model = User
-    template_name="accounts/setting.html"
+    template_name="account/setting.html"
     fields = ['username', 'email', 'icon']
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -63,7 +49,7 @@ class UserSettingView(LoginRequiredMixin,generic.UpdateView):
         return self.request.user
 
 class CustomPasswordChangeView(LoginRequiredMixin, views.PasswordChangeView):
-    template_name = "accounts/password_change.html"
+    template_name = "account/password_change.html"
     success_url = reverse_lazy('accounts:setting')
     success_message = 'パスワードの変更に成功'
 

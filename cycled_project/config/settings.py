@@ -216,7 +216,6 @@ ACCOUNT_EMAIL_VERIFICATION = "none"         # メール確認を無効にする
 ACCOUNT_RATE_LIMITS = {
     'login_failed': '5/m',  # 例えば1分間に5回のログイン試行制限
 }
-
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
