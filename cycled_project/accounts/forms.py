@@ -44,12 +44,18 @@ class CustomLoginForm(LoginForm):
         self.fields['login'].label = 'ユーザー名またはメールアドレス'  # ラベルを変更
         self.fields['remember'].label = '次回以降自動でログインする'  # ラベルを変更
 
-class UserSettingForm(forms.ModelForm):
+class UserDynamicForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['icon', 'username', 'email']  # 必要なフィールドを指定
+        fields = ['icon', 'username', 'email']
+
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # 全てのフィールドを required=False にする
-        for field in self.fields.values():
-            field.required = False
+        dynamic_fields = kwargs.pop('dynamic_fields', None)
+        super(UserDynamicForm, self).__init__(*args, **kwargs)
+        if dynamic_fields:
+            self.fields = {field: self.fields[field] for field in dynamic_fields}
+
+class UserIconForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['icon',]
