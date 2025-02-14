@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load allauth %}
+
+{% block head_title %}
+    {% trans "アカウント接続" %}
+{% endblock head_title %}
+
+{% block content %}
+    <h1>{% trans "アカウント接続" %}</h1>
+
+    {% if form.accounts %}
+        <p>
+            {% trans "以下の外部アカウントを使って、あなたのアカウントにサインインできます：" %}
+        </p>
+
+        {% url 'socialaccount_connections' as action_url %}
+        <form method="post" action="{{ action_url }}">
+            {% csrf_token %}
+            
+            <!-- 接続されているアカウントのループ -->
+            <div class="form-group">
+                {% for acc in form.fields.account.choices %}
+                    {% with account=acc.0.instance.get_provider_account %}
+                        <div class="form-check">
+                            <input type="radio" 
+                                   class="form-check-input" 
+                                   id="account_{{ account.account.pk }}" 
+                                   name="account" 
+                                   value="{{ account.account.pk }}">
+
+                            <label class="form-check-label" for="account_{{ account.account.pk }}">
+                                {{ account }}
+                                <span class="badge badge-primary">{{ account.get_brand.name }}</span>
+                            </label>
+                        </div>
+                    {% endwith %}
+                {% endfor %}
+            </div>
+
+            <!-- アクション（アカウント削除ボタン） -->
+            <div class="form-group">
+                <button type="submit" class="btn btn-danger">
+                    {% trans "削除" %}
+                </button>
+            </div>
+        </form>
+    {% else %}
+        <p>
+            {% trans "現在、あなたのアカウントには外部アカウントが接続されていません。" %}
+        </p>
+    {% endif %}
+
+    <h2>{% trans '外部アカウントを追加' %}</h2>
+    {% include "socialaccount/snippets/provider_list.html" with process="connect" %}
+    {% include "socialaccount/snippets/login_extra.html" %}
+{% endblock content %}

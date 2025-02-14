@@ -1,0 +1,4 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block notification_message %}{% blocktrans %}A third-party account from {{ provider }} has been connected to your account.{% endblocktrans %}{% endblock notification_message %}
