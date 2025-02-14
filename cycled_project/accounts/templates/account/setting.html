@@ -62,26 +62,37 @@
                 </table>
             </div>
         </div>
-        <div class="setting-field">
-            <table class="table">
-                <tbody>
+        <div class="setting-field pt-3">
+            <table class="table table-hover">
+                <tbody class="fs-6 fw-bold">
                     <tr>
                         <td>
-                            <a href="{% url 'accounts:password_change' %}">パスワードを変更する</a>
+                            <a href="{% url 'accounts:password_change' %}" class="text-decoration-none text-dark w-100 d-block">
+                                パスワードを変更する
+                            </a>
                         </td>
                     </tr>
                     <tr>
-                        <td class="text-danger fw-bold" onclick="deleteAllDiaries()" role="button">
+                        <td>
+                            <a href="{% url "diary:address_user" %}" class="text-decoration-none text-dark w-100 d-block">
+                                お気に入りの場所の登録・変更
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="" onclick="logout('{% url 'accounts:logout' %}')" role="button">
+                            ログアウト
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-danger" onclick="deleteAllDiaries('{% url 'diary:delete_all_diaries' %}')" role="button">
                             日記をすべて削除する
                         </td>
                     </tr>
                     <tr>
-                        <form action="{% url 'accounts:user_delete' %}" method="post" id="delete-user-form">
-                            {% csrf_token %}
-                            <td class="text-danger fw-bold" onclick="confirmDelete()" role="button">
-                                退会する
-                            </td>
-                        </form>
+                        <td class="text-danger" onclick="confirmDelete()" role="button">
+                            退会する
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -91,9 +102,6 @@
 
 {% block extra_js %}
     <script src="{% static 'js/getCookie.js' %}"></script>
-    <script>
-        const url_deleteAllDiaries = "{% url 'diary:delete_all_diaries' %}";
-    </script>
     <script src="{% static 'accounts/js/setting.js' %}"></script>
 
 {% endblock %}

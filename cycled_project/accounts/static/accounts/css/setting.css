@@ -1,3 +1,15 @@
+.userprofile-field {
+    position: relative;  /* 位置の調整 */
+    border-radius: 10px;  /* 角を丸く */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  /* 影を付けて浮かせる */
+    padding: 15px;
+    background-color: #fff; /* 背景色 */
+    transition: box-shadow 0.3s ease-in-out;  /* ホバー時の影の変化 */
+}
+.userprofile-field:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);  /* ホバー時に影を強調 */
+}
+
 .usericon-field {
     text-align: center;
 }
@@ -16,8 +28,21 @@
     border: none;
     border-radius: 3px;
     cursor: pointer;
-    font-size: 30px;
     padding: 3px 10px;
+    width: 20%;  /* 親要素の20%の幅 */
+    height: 20%; /* 親要素の20%の高さ */
+    min-width: 30px;  /* 最小の幅 */
+    min-height: 30px; /* 最小の高さ */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+}
+/* 768px以上の画面幅でフォントサイズを変更 */
+@media (min-width: 768px) {
+    .usericon-field .usericon-edit-button {
+        font-size: 2vw; /* md 以上でのフォントサイズ */
+    }
 }
 
 .userinformation-field th {
@@ -50,3 +75,6 @@
     font-size: 1.5rem;
 }
 
+.setting-field td {
+    padding: 10px 15px;
+}

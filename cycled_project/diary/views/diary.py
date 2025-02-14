@@ -9,7 +9,7 @@ from django.utils.timezone import now
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError,ObjectDoesNotExist
 from django.contrib import messages
 from django.core.cache import cache
 from rest_framework.decorators import api_view
@@ -17,6 +17,7 @@ from rest_framework.response import Response
 from django.utils import timezone
 from django.db.models import Prefetch
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_protect
 
 from ..forms import DiaryForm,AddressSearchForm,LocationForm,LocationCoordForm,LocationFormSet,DiaryFormSet,PhotosForm
 from ..models import Diary,Location,TempImage
@@ -131,16 +132,31 @@ def sendDairies(request):
 # ログインしているユーザー本人のすべての日記を削除
 @api_view(['POST'])
 @login_required
+@csrf_protect  # CSRF保護を追加
 def delete_all_diaries(request):
-    diaries = Diary.objects.filter(user=request.user)
-    if diaries:
-        diaries.delete()  # 日記を全て削除
-        msg = '全ての日記を削除しました'
-    else:
-        msg = '日記が存在しませんでした'
-    return Response({"status": "success", "message": msg})
+    try:
+        # リクエストユーザーのすべての日記を取得
+        diaries = Diary.objects.filter(user=request.user)
+        if diaries.exists():
+            # 日記があれば削除
+            diaries.delete()
+            msg = '全ての日記を削除しました'
+            status = 'success'
+        else:
+            # 日記が存在しない場合
+            msg = '日記が存在しませんでした'
+            status = 'error'
+        return JsonResponse({"status": status, "message": msg})
+
+    except ObjectDoesNotExist:
+        # オブジェクトが見つからないエラー処理
+        return JsonResponse({"status": "error", "message": "データベースエラーが発生しました"})
+    except Exception as e:
+        # その他の例外処理
+        return JsonResponse({"status": "error", "message": str(e)})
 
 @api_view(['POST'])
+@csrf_protect  # CSRF保護を追加
 @login_required
 def diary_edit_noPK(request):
     date = request.POST.get('date')
@@ -175,6 +191,7 @@ def diary_edit_noPK(request):
         return JsonResponse({"success": False, "errors": error})
 
 @api_view(['POST'])
+@csrf_protect  # CSRF保護を追加
 @login_required
 def diary_delete_noPK(request):
     pk = request.POST.get('')

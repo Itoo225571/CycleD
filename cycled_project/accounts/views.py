@@ -5,10 +5,13 @@ from django.shortcuts import redirect
 from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth import logout
 from rest_framework.decorators import api_view
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from django_user_agents.utils import get_user_agent
+from django.views.decorators.csrf import csrf_protect
+from django.http import JsonResponse
 
 from .forms import CustomLoginForm,CustomSignupForm
 from .models import User
@@ -25,6 +28,10 @@ class CustomLoginView(views.LoginView):
 
 class CustomLogoutView(LoginRequiredMixin,views.LogoutView):
     template_name="account/logout.html"
+    def post(self, request, *args, **kwargs):
+        """AJAX用のログアウト処理"""
+        logout(request)  # ユーザーをログアウト
+        return JsonResponse({"status": "success", "message": ""})
 
 class CustomSignupView(views.SignupView):
     form_class = CustomSignupForm
@@ -60,6 +67,7 @@ class UserDeleteView(LoginRequiredMixin,generic.DeleteView):
     pass
 
 @api_view(['POST'])
+@csrf_protect  # CSRF保護を追加
 @login_required
 def user_delete(request):
     user = request.user
