@@ -78,3 +78,32 @@
 .setting-field td {
     padding: 10px 15px;
 }
+
+/* モーダルウィンドウ */
+.modal.scale-up {
+    transform: scale(0); /* モーダルは最初は小さく表示 */
+    transition: transform 0.5s ease-in-out; /* アニメーションのスムーズな遷移 */
+    opacity: 0; /* 最初は透明にしておく */
+}
+/* モーダルが表示されるときのアニメーション */
+.modal.scale-up.show {
+    transform: scale(1.1); /* まず少し拡大 */
+    opacity: 1; /* 表示する */
+}
+/* 拡大後、元のサイズに戻る */
+.modal.scale-up.show {
+    animation: scale-back 0.5s ease-in-out forwards; /* 拡大後に元に戻るアニメーション */
+}
+/* アニメーションの定義 */
+@keyframes scale-back {
+0% {
+    transform: scale(1.1); /* 最初は拡大状態 */
+}
+50% {
+    transform: scale(1.2); /* 少し拡大 */
+}
+100% {
+    transform: scale(1); /* 元のサイズに戻る */
+}
+}
+  
