@@ -13,7 +13,7 @@ from django_user_agents.utils import get_user_agent
 from django.views.decorators.csrf import csrf_protect
 from django.http import JsonResponse, HttpResponseRedirect
 
-from .forms import CustomLoginForm,CustomSignupForm,UserSettingForm
+from .forms import CustomLoginForm,CustomSignupForm,UserDynamicForm,UserIconForm
 from .models import User
 from diary.models import Diary,Coin  # diaryアプリから
 
@@ -47,7 +47,7 @@ class CustomSignupView(views.SignupView):
 class UserSettingView(LoginRequiredMixin,generic.UpdateView):
     model = User
     template_name="account/setting.html"
-    form_class = UserSettingForm
+    fields = ['icon', 'username', 'email']
     success_url = reverse_lazy('accounts:setting')
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -56,24 +56,27 @@ class UserSettingView(LoginRequiredMixin,generic.UpdateView):
         # 常に現在ログイン中のユーザーを返す
         return self.request.user
     def post(self, request, *args, **kwargs):
-        # アイコン変更フォームが送信された場合
-        form = UserSettingForm(request.POST, instance=request.user)
-        if 'form-icon' in request.POST:  # アイコン変更フォームが送信された場合
+        # fields の各フィールドに 'form-' をつけて request.POST に含まれるかをチェック
+        matched_field = next((f"form-{field}" for field in self.fields if f"form-{field}" in request.POST), None)
+
+        if matched_field:
+            field_name = matched_field.replace('form-', '') #formを取り除く
+            form = UserDynamicForm(request.POST, dynamic_fields=[field_name], instance=request.user)
             if form.is_valid():
-                request.user.save(update_fields=['icon'])  # icon フィールドだけ保存
+                # request.user.save(update_fields=[field_name])  # 一致したフィールドだけ保存
+                request.user.save()  # 一致したフィールドだけ保存
                 return HttpResponseRedirect(self.success_url)
             else:
                 # フォームのエラーを表示
                 for field, errors in form.errors.items():
                     for error in errors:
                         messages.error(self.request, f"{field} のエラー: {error}")
-                return HttpResponseRedirect(self.success_url)
+                return self.form_invalid(form)
         else:
-            # 他のフォームが送信された場合
-            messages.error(self.request, 'フォームが正しくありません')
+            # fields に含まれない場合はエラーを表示
+            messages.error(self.request, '不正なリクエストです')
             return HttpResponseRedirect(self.success_url)
-    # def post(self, request, *args, **kwargs):
-    #     return super().post(request, *args, **kwargs)
+
 
 class CustomPasswordChangeView(LoginRequiredMixin, views.PasswordChangeView):
     template_name = "account/password_change.html"
