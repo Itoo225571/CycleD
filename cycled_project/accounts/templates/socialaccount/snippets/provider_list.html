@@ -1,0 +1,29 @@
+{% load i18n %}
+{% load allauth socialaccount %}
+{% get_providers as socialaccount_providers %}
+{% if socialaccount_providers %}
+    <div class="provider-list">
+        {% for provider in socialaccount_providers %}
+            {% if provider.id == "openid" %}
+                {% for brand in provider.get_brands %}
+                    {% provider_login_url provider openid=brand.openid_url process=process as href %}
+                    <div class="provider-item">
+                        <a href="{{ href }}" class="provider-link" id="provider-{{ provider.id }}-{{ brand.name }}">
+                            <img src="{{ brand.logo_url }}" alt="{{ brand.name }} logo" class="provider-logo">
+                            <span class="provider-name">{{ brand.name }}</span>
+                        </a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                {% provider_login_url provider process=process scope=scope auth_params=auth_params as href %}
+                <div class="provider-item">
+                    <a href="{{ href }}" class="provider-link" id="provider-{{ provider.id }}">
+                        <span class="provider-name">{{ provider.name }}</span>
+                    </a>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% else %}
+    <p>{% trans "現在利用可能なサードパーティログインプロバイダーはありません。" %}</p>
+{% endif %}
