@@ -11,9 +11,9 @@ from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from django_user_agents.utils import get_user_agent
 from django.views.decorators.csrf import csrf_protect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 
-from .forms import CustomLoginForm,CustomSignupForm
+from .forms import CustomLoginForm,CustomSignupForm,UserSettingForm
 from .models import User
 from diary.models import Diary,Coin  # diaryアプリから
 
@@ -47,13 +47,33 @@ class CustomSignupView(views.SignupView):
 class UserSettingView(LoginRequiredMixin,generic.UpdateView):
     model = User
     template_name="account/setting.html"
-    fields = ['username', 'email', 'icon']
+    form_class = UserSettingForm
+    success_url = reverse_lazy('accounts:setting')
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
     def get_object(self, queryset=None):
         # 常に現在ログイン中のユーザーを返す
         return self.request.user
+    def post(self, request, *args, **kwargs):
+        # アイコン変更フォームが送信された場合
+        form = UserSettingForm(request.POST, instance=request.user)
+        if 'form-icon' in request.POST:  # アイコン変更フォームが送信された場合
+            if form.is_valid():
+                request.user.save(update_fields=['icon'])  # icon フィールドだけ保存
+                return HttpResponseRedirect(self.success_url)
+            else:
+                # フォームのエラーを表示
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        messages.error(self.request, f"{field} のエラー: {error}")
+                return HttpResponseRedirect(self.success_url)
+        else:
+            # 他のフォームが送信された場合
+            messages.error(self.request, 'フォームが正しくありません')
+            return HttpResponseRedirect(self.success_url)
+    # def post(self, request, *args, **kwargs):
+    #     return super().post(request, *args, **kwargs)
 
 class CustomPasswordChangeView(LoginRequiredMixin, views.PasswordChangeView):
     template_name = "account/password_change.html"

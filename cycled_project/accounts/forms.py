@@ -3,6 +3,8 @@ from django.contrib.auth.forms import UserCreationForm,UserChangeForm,Authentica
 from allauth.account.forms import SignupForm,LoginForm
 from django import forms
 
+from .models import User
+
 class CustomSignupForm(SignupForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -41,3 +43,13 @@ class CustomLoginForm(LoginForm):
         super().__init__(*args, **kwargs)
         self.fields['login'].label = 'ユーザー名またはメールアドレス'  # ラベルを変更
         self.fields['remember'].label = '次回以降自動でログインする'  # ラベルを変更
+
+class UserSettingForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['icon', 'username', 'email']  # 必要なフィールドを指定
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 全てのフィールドを required=False にする
+        for field in self.fields.values():
+            field.required = False

@@ -111,8 +111,8 @@ body {
     opacity: .7;
 }
 .button-setting::before {
-    font-family: 'bootstrap-icons';
-    content: '\F3E5';
+    font-family: 'Material Icons Two Tone';
+    content: '\e8b8';
     opacity: .7;
 }
 .button-diary::before {

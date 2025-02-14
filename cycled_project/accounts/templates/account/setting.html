@@ -20,7 +20,7 @@
             <div class="usericon-field col-md-3 col-12 mb-2">
                 <div class="position-relative d-inline-block">
                     <img src="{{user.icon_url}}" class="border border-dark" alt="icon" loading="lazy">
-                    <button class="usericon-edit-button">
+                    <button class="usericon-edit-button" data-bs-toggle="modal" data-bs-target="#usericonModal">
                         <i class="bi bi-pencil-square"></i>
                     </button>
                 </div>
@@ -98,6 +98,26 @@
             </table>
         </div>
     </div>
+    <div class="modal scale-up" id="usericonModal" tabindex="-1" aria-labelledby="usericonModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="usericonModalLabel">アイコンを選択</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    {{ form.icon }} <!-- アイコン変更フォームのフィールドのみ -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" name="form-icon">アイコンを変更</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
 {% endblock content %}
 
 {% block extra_js %}

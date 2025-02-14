@@ -6,7 +6,9 @@ import uuid
 
 class User(AbstractUser):
     ICON_CHOICES = [
-        ('accounts/img/user_icons/user_icon_default_man.png', 'User Image1'),
+        ('accounts/img/user_icons/user_icon_1.png', 'User Image1'),
+        ('accounts/img/user_icons/user_icon_2.png', 'User Image2'),
+        ('accounts/img/user_icons/user_icon_3.png', 'User Image3'),
         # ('user_icons/default2.jpg', 'User Image 2'),
     ]
 
@@ -17,7 +19,7 @@ class User(AbstractUser):
     icon = models.CharField(
         max_length=100,
         choices=ICON_CHOICES,
-        default='accounts/img/user_icons/user_icon_default_man.png',  # ここでデフォルト画像を指定
+        default='accounts/img/user_icons/user_icon_1.png',  # ここでデフォルト画像を指定
         verbose_name="アイコン",
     )
     # home = models.OneToOneField('diary.Location',on_delete=models.CASCADE,blank=True,null=True,verbose_name="お気に入りの場所")
