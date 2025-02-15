@@ -13,7 +13,7 @@ from django_user_agents.utils import get_user_agent
 from django.views.decorators.csrf import csrf_protect
 from django.http import JsonResponse, HttpResponseRedirect
 
-from .forms import CustomLoginForm,CustomSignupForm,UserDynamicForm
+from .forms import CustomLoginForm,CustomSignupForm,UserSettingForm,UserDynamicForm
 from .models import User
 from diary.models import Diary,Coin  # diaryアプリから
 
@@ -47,7 +47,7 @@ class CustomSignupView(views.SignupView):
 class UserSettingView(LoginRequiredMixin,generic.UpdateView):
     model = User
     template_name="account/setting.html"
-    fields = ['icon', 'username', 'email']
+    form_class = UserSettingForm
     success_url = reverse_lazy('accounts:setting')
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -57,7 +57,10 @@ class UserSettingView(LoginRequiredMixin,generic.UpdateView):
         return self.request.user
     def post(self, request, *args, **kwargs):
         # fields の各フィールドに 'form-' をつけて request.POST に含まれるかをチェック
-        matched_field = next((f"form-{field}" for field in self.fields if f"form-{field}" in request.POST), None)
+        form = self.get_form()  # フォームインスタンスを取得
+        matched_field = next(
+            (f"form-{field}" for field in form.fields if f"form-{field}" in request.POST), None
+        )
 
         if matched_field:
             field_name = matched_field.replace('form-', '') #formを取り除く

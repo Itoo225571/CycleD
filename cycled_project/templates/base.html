@@ -54,7 +54,7 @@
 										<li>
 											<form action="{% url 'accounts:logout' %}" method="post">
 												{% csrf_token %}
-												<button class="dropdown-item button-logout with-icon" onclick="if(confirm('ログアウトしますか？')) { this.closest('form').submit(); } return false;">
+												<button type="button" class="dropdown-item button-logout with-icon" onclick="logout('{% url 'accounts:logout' %}')">
 													ログアウト
 												</button>
 											</form>
@@ -157,7 +157,7 @@
 										<li class="nav-item ms-2">
 											<form action="{% url 'accounts:logout' %}" method="post">
 												{% csrf_token %}
-												<button class="nav-link dropdown-item button-logout with-icon ps-2" onclick="if(confirm('ログアウトしますか？')) { this.closest('form').submit(); } return false;">
+												<button type="button" class="nav-link dropdown-item button-logout with-icon ps-2" onclick="logout('{% url 'accounts:logout' %}')">
 													ログアウト
 												</button>
 											</form>
@@ -186,7 +186,7 @@
 										<li>
 											<form action="{% url 'accounts:logout' %}" method="post">
 												{% csrf_token %}
-												<button class="dropdown-item button-logout with-icon" onclick="if(confirm('ログアウトしますか？')) { this.closest('form').submit(); } return false;">
+												<button type="button" class="dropdown-item button-logout with-icon" onclick="logout('{% url 'accounts:logout' %}')">
 													ログアウト
 												</button>
 											</form>
@@ -228,8 +228,6 @@
 									{% if form.non_field_errors %}
 										{% for error in form.non_field_errors %}
 											<li class="list-group-item list-group-item-danger">
-												{{ field.label }}:
-												<br>
 												{{ error }}
 											</li>
 										{% endfor %}
@@ -297,6 +295,8 @@
 				{% endif %}
 			});
 		</script>
+		{% comment %} logout用 {% endcomment %}
+		<script src="{% static 'js/logout.js' %}"></script>
 		
 		{% block extra_js %}{% endblock %}
 	</body>
