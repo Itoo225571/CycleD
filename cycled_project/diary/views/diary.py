@@ -79,7 +79,7 @@ class HomeView(LoginRequiredMixin, generic.TemplateView):
             {
                 "user": {
                     "username": diary.user.username,
-                    "icon_url": diary.user.icon_url,
+                    # "icon_url": diary.user.icon_url,
                 },
                 "date": diary.date,
                 # サムネイルの画像URLを `.first()` を使って取得

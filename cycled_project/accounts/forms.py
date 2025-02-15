@@ -56,7 +56,6 @@ class UserSettingForm(forms.ModelForm):
         fields = ['icon', 'username', 'email']
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # ラジオボタンの選択肢の表示内容を変更（画像付き）
 
 
 class UserDynamicForm(forms.ModelForm):

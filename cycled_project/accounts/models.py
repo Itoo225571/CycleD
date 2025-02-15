@@ -1,14 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.templatetags.static import static
+from django.conf import settings
 
 import uuid
 
 class User(AbstractUser):
+    ICON_BASE_PATH = f'{settings.STATIC_URL}accounts/img/user_icons/'
     ICON_CHOICES = [
-        ('accounts/img/user_icons/user_icon_1.png', 'User Image1'),
-        ('accounts/img/user_icons/user_icon_2.png', 'User Image2'),
-        ('accounts/img/user_icons/user_icon_3.png', 'User Image3'),
+        (f'{ICON_BASE_PATH}user_icon_1.png', 'User Image1'),
+        (f'{ICON_BASE_PATH}user_icon_2.png', 'User Image2'),
+        (f'{ICON_BASE_PATH}user_icon_3.png', 'User Image3'),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
@@ -31,5 +33,3 @@ class User(AbstractUser):
         verbose_name_plural = 'Users'
     def __str__(self):
         return self.username
-    def icon_url(self):
-        return static(self.icon)

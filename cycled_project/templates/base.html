@@ -44,7 +44,7 @@
 							{% if user and user.is_authenticated %}
 								<div class="dropdown-container ms-2">
 									<button type="button" class="user-icon" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-										<img src="{{ user.icon_url }}" class="rounded-circle" width="35" height="35" alt="icon" loading="lazy">
+										<img src="{{ user.icon }}" class="rounded-circle" width="35" height="35" alt="icon" loading="lazy">
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
 										<li>
@@ -176,7 +176,7 @@
 								</div>
 								<div class="dropdown-container ms-2">
 									<button type="button" class="user-icon" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-										<img src="{{ user.icon_url }}" class="rounded-circle" width="50" height="50" alt="icon" loading="lazy">
+										<img src="{{ user.icon }}" class="rounded-circle" width="50" height="50" alt="icon" loading="lazy">
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
 										<li>
@@ -285,7 +285,7 @@
 		<script src="{% static 'diary/js/error_lib.js' %}"></script>
 		{% comment %} messages表示(error以外) {% endcomment %}
 		<script>
-			document.addEventListener('DOMContentLoaded', function() {
+			$(document).ready(function() {
 				{% if messages %}
 					{% for message in messages %}
 						{% if message.level_tag != 'danger' %}  {# error 以外を対象にする #}
