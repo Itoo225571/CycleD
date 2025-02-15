@@ -9,7 +9,6 @@ class User(AbstractUser):
         ('accounts/img/user_icons/user_icon_1.png', 'User Image1'),
         ('accounts/img/user_icons/user_icon_2.png', 'User Image2'),
         ('accounts/img/user_icons/user_icon_3.png', 'User Image3'),
-        # ('user_icons/default2.jpg', 'User Image 2'),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)

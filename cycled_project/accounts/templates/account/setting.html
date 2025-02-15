@@ -5,7 +5,7 @@
 {% load widget_tweaks %}
 
 {% block title %}
-    マイページ
+    せってい
 {% endblock title %}
     
 {% block page_title %}
@@ -91,7 +91,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="" onclick="logout('{% url 'accounts:logout' %}')" role="button">
+                        <td onclick="logout('{% url 'accounts:logout' %}')" role="button">
                             ログアウト
                         </td>
                     </tr>
@@ -119,7 +119,7 @@
             <form method="post">
                 {% csrf_token %}
                 <div class="modal-body">
-                    {{ form.icon }} <!-- アイコン変更フォームのフィールドのみ -->
+                    {{ form.icon }}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
@@ -134,5 +134,5 @@
 {% block extra_js %}
     <script src="{% static 'js/getCookie.js' %}"></script>
     <script src="{% static 'accounts/js/setting.js' %}"></script>
-
+    <script src="{% static 'accounts/js/add_photo_to_choice.js' %}"></script>
 {% endblock %}

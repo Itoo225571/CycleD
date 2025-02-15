@@ -44,6 +44,21 @@ class CustomLoginForm(LoginForm):
         self.fields['login'].label = 'ユーザー名またはメールアドレス'  # ラベルを変更
         self.fields['remember'].label = '次回以降自動でログインする'  # ラベルを変更
 
+class UserSettingForm(forms.ModelForm):
+    # アイコンの選択肢をラジオボタンで表示
+    icon = forms.ChoiceField(
+        widget=forms.RadioSelect,
+        choices=User.ICON_CHOICES,
+        label="アイコン画像"
+    )
+    class Meta:
+        model = User
+        fields = ['icon', 'username', 'email']
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # ラジオボタンの選択肢の表示内容を変更（画像付き）
+
+
 class UserDynamicForm(forms.ModelForm):
     class Meta:
         model = User
