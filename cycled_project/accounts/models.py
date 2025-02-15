@@ -14,6 +14,7 @@ class User(AbstractUser):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     username=models.CharField(max_length=8,unique=True,verbose_name="ユーザー名")
+    email = models.EmailField(unique=True, verbose_name="メールアドレス")  # メールアドレスを一意に設定
     first_name = None
     last_name = None
     icon = models.CharField(
@@ -24,7 +25,7 @@ class User(AbstractUser):
     )
     # home = models.OneToOneField('diary.Location',on_delete=models.CASCADE,blank=True,null=True,verbose_name="お気に入りの場所")
     # coin = models.OneToOneField('diary.Coin',on_delete=models.CASCADE, blank=True, null=True, verbose_name="サイクルコイン")
-    REQUIRED_FIELDS = ["email",]
+    # REQUIRED_FIELDS = ["email",]
     class Meta:
         db_table = 'CycleDiary_User'
         verbose_name = 'User'

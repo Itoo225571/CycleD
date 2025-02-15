@@ -54,8 +54,3 @@ class UserDynamicForm(forms.ModelForm):
         super(UserDynamicForm, self).__init__(*args, **kwargs)
         if dynamic_fields:
             self.fields = {field: self.fields[field] for field in dynamic_fields}
-
-class UserIconForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['icon',]
