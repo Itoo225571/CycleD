@@ -19,7 +19,7 @@
     object-fit: cover;  /* はみ出しを防ぐ */
     border-radius: 50%;  /* 丸い画像を維持 */
 }
-.usericon-field .usericon-edit-button {
+.usericon-field .user-edit-button {
     position:absolute;
     bottom: 1px;
     right: 10px;
@@ -40,7 +40,7 @@
 }
 /* 768px以上の画面幅でフォントサイズを変更 */
 @media (min-width: 768px) {
-    .usericon-field .usericon-edit-button {
+    .usericon-field .user-edit-button {
         font-size: 2vw; /* md 以上でのフォントサイズ */
     }
 }
@@ -64,7 +64,8 @@
         font-size: 1.4rem;  /* 中画面 (md) 以上 */
     }
 }
-.userinformation-field .usericon-edit-button {
+.userinformation-field .user-edit-button,
+.userinformation-field .user-submit-button {
     background-color: transparent;
     color: #6c757d;
     border: none;
@@ -73,6 +74,16 @@
     /* padding: 3px 10px; */
     padding: 0;
     font-size: 1.5rem;
+}
+.userinformation-field .user-edit-button::before {
+    font-family: bootstrap-icons;
+    content: '\F4CA';
+    color: #6c757d;
+}
+.userinformation-field .user-submit-button::before {
+    font-family: bootstrap-icons;
+    content: '\F6B9';
+    color: #2196F3;
 }
 
 .setting-field td {

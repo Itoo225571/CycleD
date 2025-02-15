@@ -2,6 +2,7 @@
 {% load django_bootstrap5 %}
 {% load static %}
 {% load accounts_filters %}
+{% load widget_tweaks %}
 
 {% block title %}
     マイページ
@@ -20,46 +21,56 @@
             <div class="usericon-field col-md-3 col-12 mb-2">
                 <div class="position-relative d-inline-block">
                     <img src="{{user.icon_url}}" class="border border-dark" alt="icon" loading="lazy">
-                    <button class="usericon-edit-button" data-bs-toggle="modal" data-bs-target="#usericonModal">
+                    <button class="user-edit-button" data-bs-toggle="modal" data-bs-target="#usericonModal" onclick="resetAllEditButtons()">
                         <i class="bi bi-pencil-square"></i>
                     </button>
                 </div>
             </div>
             <!-- ユーザー情報（table形式） -->
             <div class="userinformation-field col-md-9 col-12">
-                <table class="table">
-                    <tbody>
-                        <tr>
-                            <th>{{user|verbose_name:"username"}}</th>
-                            <td rowspan="2" class="align-middle">
-                                <button class="usericon-edit-button">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>{{ user.username }}</td>
-                        </tr>
-                        <tr>
-                            <th>{{user|verbose_name:"email"}}</th>
-                            <td rowspan="2" class="align-middle">
-                                <button class="usericon-edit-button">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>{{ user.email }}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">{{user|verbose_name:"date_joined"}}</th>
-                            <td rowspan="2"></td>
-                        </tr>
-                        <tr>
-                            <td>{{ user.date_joined|date:"Y年m月d日" }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <form method="post">
+                    {% csrf_token %}
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th>{{ user |verbose_name:"username" }}</th>
+                            </tr>
+                            <tr>
+                                <td style="width: 90%;">
+                                    <span class="user-info">{{ user.username }}</span>
+                                    {{ form.username|add_class:"form-control w-100 d-none" }}
+                                </td>
+                                <td>
+                                    <button type="button" class="user-edit-button" onclick="toEdit(this)"></button>
+                                    <button type="submit" class="user-submit-button d-none" name="form-username" id="form-username"></button>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <th>{{user|verbose_name:"email"}}</th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="user-info">{{ user.email }}</span>
+                                    {{ form.email |add_class:"form-control w-100 d-none" }}
+                                </td>
+                                <td>
+                                    <button type="button" class="user-edit-button" onclick="toEdit(this)"></button>
+                                    <button type="submit" class="user-submit-button d-none" name="form-email" id="form-email"></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row">{{user|verbose_name:"date_joined"}}</th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="user-info">{{ user.date_joined|date:"Y年m月d日" }}</span>
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
             </div>
         </div>
         <div class="setting-field pt-3">
@@ -112,7 +123,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" name="form-icon">アイコンを変更</button>
+                    <button type="submit" class="btn btn-primary" name="form-icon" id="submit-icon">アイコンを変更</button>
                 </div>
             </form>
           </div>

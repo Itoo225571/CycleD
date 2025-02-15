@@ -13,7 +13,7 @@ from django_user_agents.utils import get_user_agent
 from django.views.decorators.csrf import csrf_protect
 from django.http import JsonResponse, HttpResponseRedirect
 
-from .forms import CustomLoginForm,CustomSignupForm,UserDynamicForm,UserIconForm
+from .forms import CustomLoginForm,CustomSignupForm,UserDynamicForm
 from .models import User
 from diary.models import Diary,Coin  # diaryアプリから
 
@@ -71,7 +71,7 @@ class UserSettingView(LoginRequiredMixin,generic.UpdateView):
                 for field, errors in form.errors.items():
                     for error in errors:
                         messages.error(self.request, f"{field} のエラー: {error}")
-                return self.form_invalid(form)
+                return HttpResponseRedirect(self.success_url)
         else:
             # fields に含まれない場合はエラーを表示
             messages.error(self.request, '不正なリクエストです')
