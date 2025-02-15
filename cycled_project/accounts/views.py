@@ -20,11 +20,8 @@ from diary.models import Diary,Coin  # diaryアプリから
 class CustomLoginView(views.LoginView):
     template_name="account/login.html"
     form_class=CustomLoginForm
-    success_url=reverse_lazy("diary:home")
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect('diary:home')  # 'home' にリダイレクト
-        return super().get(request, *args, **kwargs)
+    next_page = 'diary:home'    # success_url (名前での指定が可)
+    redirect_authenticated_user = True  # ログイン後にアクセスしたらnext_pageに飛ぶ
 
 class CustomLogoutView(LoginRequiredMixin,views.LogoutView):
     template_name="account/logout.html"
