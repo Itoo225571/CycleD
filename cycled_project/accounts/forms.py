@@ -57,7 +57,6 @@ class UserSettingForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-
 class UserDynamicForm(forms.ModelForm):
     class Meta:
         model = User

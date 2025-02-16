@@ -188,11 +188,15 @@ body {
     transition: background-color 0.3s ease; /* なめらかに変化 */
 }
 
-
 /**** アイコン ****/
 .icon-in-button {
     margin: 0 .5rem;
     font-size: 1.5rem;
     border: none;
     background-color: transparent;
+}
+
+/* 透明なボーダー */
+.border-transparent {
+    border-color: transparent !important;
 }

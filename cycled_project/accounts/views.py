@@ -77,7 +77,6 @@ class UserSettingView(LoginRequiredMixin,generic.UpdateView):
             messages.error(self.request, '不正なリクエストです')
             return HttpResponseRedirect(self.success_url)
 
-
 class CustomPasswordChangeView(LoginRequiredMixin, views.PasswordChangeView):
     template_name = "account/password_change.html"
     success_url = reverse_lazy('accounts:setting')
