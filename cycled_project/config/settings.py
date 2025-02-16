@@ -209,6 +209,8 @@ SOCIALACCOUNT_PROVIDERS = {
 ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 # ユーザー登録にメールアドレスを必須にする
 ACCOUNT_EMAIL_REQUIRED = True
+# メールをユーザー固有のものにする
+ACCOUNT_EMAIL_UNIQUE = True
 # ユーザー名の登録を不要にする
 ACCOUNT_USERNAME_REQUIRED = True
 # ACCOUNT_EMAIL_VERIFICATION = "mandatory"    # 登録後、メールアドレスに確認メールが送信される

@@ -21,12 +21,9 @@ class User(AbstractUser):
     icon = models.CharField(
         max_length=100,
         choices=ICON_CHOICES,
-        default='accounts/img/user_icons/user_icon_1.png',  # ここでデフォルト画像を指定
+        default=f'{ICON_BASE_PATH}user_icon_1.png',  # ここでデフォルト画像を指定
         verbose_name="アイコン",
     )
-    # home = models.OneToOneField('diary.Location',on_delete=models.CASCADE,blank=True,null=True,verbose_name="お気に入りの場所")
-    # coin = models.OneToOneField('diary.Coin',on_delete=models.CASCADE, blank=True, null=True, verbose_name="サイクルコイン")
-    # REQUIRED_FIELDS = ["email",]
     class Meta:
         db_table = 'CycleDiary_User'
         verbose_name = 'User'

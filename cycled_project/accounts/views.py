@@ -33,13 +33,6 @@ class CustomLogoutView(LoginRequiredMixin,views.LogoutView):
 class CustomSignupView(views.SignupView):
     form_class = CustomSignupForm
     template_name="account/signup.html"
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
-
-    def get_success_url(self):
-        # サインアップ成功後のリダイレクト先をカスタマイズする場合はここで設定
-        return super().get_success_url()
 
 class UserSettingView(LoginRequiredMixin,generic.UpdateView):
     model = User
