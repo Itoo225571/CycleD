@@ -118,8 +118,18 @@
             </div>
             <form method="post">
                 {% csrf_token %}
-                <div class="modal-body">
-                    {{ form.icon }}
+                <div class="modal-body d-flex justify-content-around">
+                    {% for radio in form.icon %}
+                        <label class="w-25">
+                            <div class="d-none">
+                                {{ radio.tag }}
+                            </div>
+                            <img 
+                                class="icon-img-radio rounded-circle w-100 p-1 border border-3 border-transparent" 
+                                src="{{ radio.data.value }}" 
+                                alt="{{ radio.choice_label }}" style="cursor: pointer;">
+                        </label>
+                    {% endfor %}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
