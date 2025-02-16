@@ -71,7 +71,7 @@
 .scale-up-center {
 	-webkit-animation: scale-up-center 0.4s cubic-bezier(0.680, -0.550, 0.265, 1.550) both;
 	        animation: scale-up-center 0.4s cubic-bezier(0.680, -0.550, 0.265, 1.550) both;
-    z-index: 1000;
+        z-index: 1060;
 }
 .scale-down-center {
 	-webkit-animation: scale-up-center 0.4s cubic-bezier(0.680, -0.550, 0.265, 1.550) reverse both;
