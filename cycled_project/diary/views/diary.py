@@ -65,7 +65,7 @@ class HomeView(LoginRequiredMixin, generic.TemplateView):
         # 公開された日記を取得
         diaries = (
             Diary.objects.filter(
-                # is_pulish=True,
+                is_public=True,
                 # date__gte=timezone.now().date(),
                 rank=0
             )

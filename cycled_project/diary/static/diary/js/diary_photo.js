@@ -197,16 +197,14 @@ $(document).ready(function() {
             }
             // フィールド入力
             let prefix = `form-${diaryNum}-`;
-            $diaryNewForm.find('input, textarea').each(function() {
+            $diaryNewForm.find('input').each(function() {
                 let inputName = $(this).attr('name'); // inputのname属性を取得
                 if (inputName && inputName.includes(prefix)) {
                     inputName = inputName.replace(prefix, '');
                     if (diary.hasOwnProperty(inputName)) {
                         $(this).val(diary[inputName]); // 対応するデータをinputにセット
                     }
-                    if (inputName === "date") {
-                        $(this).attr('type', 'hidden');
-                    }
+                    $(this).attr('type', 'hidden');
                 }
             });
 

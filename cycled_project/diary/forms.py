@@ -106,12 +106,12 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
         # viewsでrequestを使用可能にする
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
-        for _, field in self.fields.items():
-            field.widget.attrs['class'] = 'form-control'
+        # for _, field in self.fields.items():
+        #     field.widget.attrs['class'] = 'form-control'
 
     class Meta:
         model=Diary
-        fields=["date","comment",]
+        fields=["date","comment","is_public"]
         labels = {
             "date": "サイクリング日時",
             "comment": "コメント",

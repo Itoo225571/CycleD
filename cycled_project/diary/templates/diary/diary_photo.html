@@ -16,7 +16,7 @@
 {% endblock extra_css %}
 
 {% block content %}
-    <div class="container-diary-photo">
+    <div class="container-diary-photo">        
         <form method="post" id="id_photos-form" name="photos-form" enctype="multipart/form-data" >
             {% csrf_token %}
             <div id="photo_form">
@@ -48,9 +48,10 @@
             </form>
         </div>
 
-        <div id="empty-form-diary" style="display:none;">
+        <div id="empty-form-diary" class="d-none">
             {{ diary_formset.empty_form.date }}
             {{ diary_formset.empty_form.diary_id }}
+            {{ diary_formset.empty_form.is_public }}
             <div class="card" id="id_form-__prefix__-card">
                 <div class="card-header justify-content-center align-items-center">
                     <h5 class="card-diary-date text-center"></h5>
@@ -81,7 +82,7 @@
                     </div>
                     <div class="mt-4">
                         <label for="{{ diary_formset.empty_form.comment.id_for_label }}" class="form-label">{{ diary_formset.empty_form.comment.label }}</label>
-                        {{ diary_formset.empty_form.comment}}
+                        {{ diary_formset.empty_form.comment |add_class:"form-control" }}
                     </div>
                 </div>
             </div>
