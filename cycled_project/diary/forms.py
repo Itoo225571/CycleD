@@ -124,7 +124,7 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
             'comment': forms.Textarea(attrs={
                 'rows': 3,
                 'placeholder': 'コメントを入力してください',  # placeholderを追加
-                'style': 'resize: none;',  # resizeを無効化
+                'style': 'resize: none; width: 100%;',  # resizeを無効化、幅を100%に設定
                 'oninput': 'checkLineLimit(this)',  # 入力ごとに行数をチェック
             }),
         }

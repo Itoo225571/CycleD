@@ -202,7 +202,6 @@
     transform: scaleX(0); /* 背景アニメーションを無効化 */
 }
 
-
 /* サムネイル */
 .thumbnail-image {
     max-width: 100%;
@@ -269,4 +268,14 @@
 .location-editing {
     /* transform: scale(1.1); */
     z-index: 1000;
+}
+
+.diary-form-wrapper .field-is_public label,
+.diary-form-wrapper .field-is_public input {
+    cursor: pointer;
+}
+@media (min-width: 768px) {
+    .diary-form-wrapper .field-is_public {
+        margin: 1rem !important;
+    }
 }

@@ -48,7 +48,7 @@
                 </li>
                 <li class="nav-item flex-shrink-0" role="presentation">
                     <button class="nav-link" type="button" data-bs-toggle="tab" data-bs-target="#tab_diary-public-field">
-                        全ユーザーの日記
+                        みんなの日記
                     </button>
                 </li>
             </ul>
@@ -95,14 +95,14 @@
                     <div class="diary-public-field mt-5">
                         <div class="diary-list row">
                             {% for diary in diaries_public %}
-                                <div class="card-container col-12 col-md-6 col-lg-4 mb-3">
+                                <div class="card-container col-12 col-md-6 col-lg-4 my-2">
                                     <div class="card">
                                         <div class="card-thumbnail" onclick="zoom_image('{{ diary.image }}')">
                                             <img src="{{ diary.image }}" alt="サムネイル" class="thumbnail-img">  <!-- 画像を表示 -->
                                         </div>
                                         <div class="card-body">
                                             <div class="card-user">
-                                                <img src="{{ diary.user.icon_url}}" class="rounded-circle bg-white" width="30" height="30" alt="icon" loading="lazy">
+                                                <img src="{{ diary.user.icon_url}}" class="rounded-circle bg-white border" width="30" height="30" alt="icon" loading="lazy">
                                                 <span class="card-explanation px-2">{{ diary.user.username }}</span>
                                             </div>
                                             <div class="card-date">

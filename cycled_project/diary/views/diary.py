@@ -62,12 +62,14 @@ class HomeView(LoginRequiredMixin, generic.TemplateView):
             to_attr='thumbnail_locations'
         )
 
+        one_week_ago = timezone.now() - timedelta(weeks=1)
         # 公開された日記を取得
         diaries = (
             Diary.objects.filter(
                 is_public=True,
-                # date__gte=timezone.now().date(),
-                rank=0
+                # date__gte=one_week_ago.date(),  # 1週間以内の写真
+                date_created__gte=one_week_ago  # 1週間以内の作成日
+                # rank=0
             )
             .order_by('-date_last_updated')  # 日付の降順で取得
             .prefetch_related(thumbnail_location, 'user')  # プレフェッチを最後に呼び出し
@@ -79,7 +81,7 @@ class HomeView(LoginRequiredMixin, generic.TemplateView):
             {
                 "user": {
                     "username": diary.user.username,
-                    # "icon_url": diary.user.icon_url,
+                    "icon_url": diary.user.icon,
                 },
                 "date": diary.date,
                 # サムネイルの画像URLを `.first()` を使って取得

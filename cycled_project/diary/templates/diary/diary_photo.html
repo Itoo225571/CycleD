@@ -49,32 +49,37 @@
         </div>
 
         <div id="empty-form-diary" class="d-none">
-            {{ diary_formset.empty_form.date }}
-            {{ diary_formset.empty_form.diary_id }}
-            {{ diary_formset.empty_form.is_public }}
             <div class="card" id="id_form-__prefix__-card">
                 <div class="card-header justify-content-center align-items-center">
                     <h5 class="card-diary-date text-center"></h5>
                     <div id="id_form-__prefix__-diary-errors"></div>
                 </div>
-                
                 <div class="card-body">
+                    {{ diary_formset.empty_form.date }}
+                    {{ diary_formset.empty_form.diary_id }}
+                    {{ diary_formset.empty_form.rotate_angle}}
                     <h5 class="card-title col-auto">
                         写真で得られた地域一覧
                     </h5>
                     <div class="explanation">
                         地域を選択すると日記のサムネイルを変更できます
                     </div>
+                    {% comment %} 公開設定 {% endcomment %}
+                    <div class="field-is_public form-check form-switch">
+                        {{ diary_formset.empty_form.is_public|add_class:"form-check-input" }}
+                        <label class="form-check-label" for="{{ diary_formset.empty_form.is_public.id_for_label }}">
+                            {{ diary_formset.empty_form.is_public.label }}
+                        </label>
+                    </div>
                     <div class="row">
-                        <div class="col order-md-2 py-1">
+                        <div class="col order-md-2">
                             <input type="hidden" id="id_form-__prefix__-rotate_angle" class="rotate_angle" value="0">
-                            {{ diary_formset.empty_form.rotate_angle}}
-                            <div class="d-flex justify-content-end">
+                            <div class="d-flex justify-content-end align-items-center">                                
                                 <button class="btn class_img-rotate-button" type="button">
                                     <i class="class_img-rotate-icon"></i>
                                 </button>
                             </div>
-                            <div id="id_form-__prefix__-thumbnail" class="diary-thumbnail d-flex justify-content-center align-items-center"></div>
+                            <div id="id_form-__prefix__-thumbnail" class="diary-thumbnail d-flex justify-content-center align-items-center mb-1"></div>
                         </div>
                         <div class="col-12 col-md-7 order-md-1">
                             <ul id="id_form-__prefix__-location-formset-body" class="list-group"></ul>

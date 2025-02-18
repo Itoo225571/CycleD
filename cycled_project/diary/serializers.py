@@ -31,4 +31,5 @@ class DiarySerializer(serializers.ModelSerializer):
             'comment', 
             'locations',
             'rank',
+            'is_public',
         ]
