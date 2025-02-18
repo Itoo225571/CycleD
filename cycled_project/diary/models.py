@@ -84,7 +84,7 @@ class Diary(models.Model):
     comment = models.TextField(blank=True,verbose_name="コメント")
     user = models.ForeignKey(User,on_delete=models.CASCADE,)
     MAX_LOCATIONS = 3  # 最大Location数
-    is_public = models.BooleanField(default=False, verbose_name="公開設定")
+    is_public = models.BooleanField(default=False, verbose_name="日記を公開する")
 
     RANK_CHOICES = [
         (0, 'Gold'),

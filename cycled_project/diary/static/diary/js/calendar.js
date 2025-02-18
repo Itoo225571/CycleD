@@ -188,7 +188,11 @@ document.addEventListener('DOMContentLoaded', function() {
 			const $frontContent = $('#diaryModal').find('.modal-content.flip-front');
 			// タイトル用
 			var title = $frontContent.find('.modal-title');
-			title.html(`<span id="selectedDate">${formatDateJapanese(diary.date)}</span>`);
+			title.html(`
+				<span id="selectedDate" class="d-flex align-items-center">
+					${formatDateJapanese(diary.date)}
+				</span>
+			`);
 
 			var locations = diary.locations;
 			var loc_thumbnail = locations.filter(location => location.is_thumbnail === true)[0];
@@ -270,6 +274,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			// 初期値
 			$('#id_comment').val(diary.comment);
 			$('#id_date').val(diary.date);
+			$('#id_is_public').val(diary.is_public);
 			const form_comment = $('#id_comment');	//先にfield取得を行わなければdiaryEdit内にあったときに消える
 			// Management関連
 			$('#id_locations-TOTAL_FORMS').val(diary.locations.length);

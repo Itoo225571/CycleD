@@ -183,6 +183,9 @@ $(document).ready(function() {
         });
 
         function set_diary(diary){
+            // 見せるfields
+            var fields_show = ['is_public','comment'];
+
             // 同じ日のDiaryがないか確認
             const $diaryFormSameDict = diaryEntries.find(entry => entry.date === diary.date);
             if ($diaryFormSameDict){
@@ -204,7 +207,9 @@ $(document).ready(function() {
                     if (diary.hasOwnProperty(inputName)) {
                         $(this).val(diary[inputName]); // 対応するデータをinputにセット
                     }
-                    $(this).attr('type', 'hidden');
+                    if (!fields_show.includes(inputName)) {
+                        $(this).attr('type', 'hidden');
+                    }                    
                 }
             });
 
