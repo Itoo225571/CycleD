@@ -37,9 +37,7 @@
                                 <h5 class="modal-title"></h5>
                                 <div class="ms-auto btn-group">
                                     <button type="button" class="icon-in-button d-flex align-items-center">
-                                        <i class="material-icons-outlined text-muted">
-                                            visibility_off
-                                        </i>
+                                        <i class="material-icons-outlined icon-visibility text-muted" data-visible='false'></i>
                                     </button>
                                     <button type="button" class="icon-in-button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="bi bi-pencil-square text-muted"></i>
@@ -71,14 +69,14 @@
                             <div class="modal-body h-100">
                                 <form method="post" id="id_diary-form" action="{% url 'diary:editDiary_noPK' %}">
                                     {% csrf_token %}
-                                    <div id="diary-form-hidden" style="display:none;">
-                                        {% for field in diary %}
-                                            {{ field }}
-                                        {% endfor %}
-                                    </div>
                                     <div class="diary-edit-container text-center">
                                         <div id="diary-locations-management-field">{{ diary.formset.management_form }}</div>
-                                        <div class="diary-comment-field mt-3 mb-5" data-edit-content="comment"></div>
+                                        {% for field in diary %}
+                                            <div class="diary-{{field.name}}-content mt-3 mb-5" data-edit-content="{{field.name}}">
+                                                {{ field }}
+                                            </div>
+                                        {% endfor %}
+
                                         <div class="diary-thumbnail-field mx-auto" data-edit-content="thumbnail">
                                             <div class="diary-thumbnail-background">
                                                 <img class="diary-thumbnail fade-anime" loading="lazy">
@@ -90,9 +88,11 @@
                                         <div class="diary-locations-field mt-3" data-edit-content="thumbnail"></div>
                                         <div class="diary-labels-field mx-auto" data-edit-content="labels"></div>
                                     </div>
-                                    <div class="diary-edit-buttons-field row mt-3">
+                                    <div class="diary-edit-buttons row mt-3">
                                         <button type="button" class="btn btn-outline-secondary button-cancel col mx-3">Cancel</button>
-                                        <button type="submit" class="btn btn-primary button-OK col mx-3">OK</button>
+                                        <button type="submit" class="btn btn-primary button-OK col mx-3">
+                                            OK
+                                        </button>
                                     </div>
                                 </form>
                             </div>

@@ -19,7 +19,8 @@ from django.db.models import Prefetch
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
 
-from ..forms import DiaryForm,AddressSearchForm,LocationForm,LocationCoordForm,LocationFormSet,DiaryFormSet,PhotosForm
+from ..forms import DiaryForm,DiaryDynamicForm
+from ..forms import AddressSearchForm,LocationForm,LocationCoordForm,LocationFormSet,DiaryFormSet,PhotosForm
 from ..models import Diary,Location,TempImage
 from ..serializers import DiarySerializer,LocationSerializer
 
@@ -98,13 +99,9 @@ class HomeView(LoginRequiredMixin, generic.TemplateView):
 
         return context
 
-
-class CalendarView(LoginRequiredMixin, generic.ListView):
+class CalendarView(LoginRequiredMixin, generic.TemplateView):
     template_name="diary/calendar.html"
-    model = Diary
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        return  super().form_valid(form)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['mock_uuid'] = uuid.uuid4() # 仮のPK
@@ -114,6 +111,48 @@ class CalendarView(LoginRequiredMixin, generic.ListView):
             # エラー情報を辞書形式に変換してコンテキストに追加(リストにするのは複数ある他と合わせるため)
             context['form_errors'] = [json.loads(form_errors)]
         return context
+
+@api_view(['POST'])
+@csrf_protect  # CSRF保護を追加
+@login_required
+def diary_edit_noPK(request):
+    date = request.POST.get('date')
+    if not date:
+         return JsonResponse({"success": False, "errors": "日にちが含まれていません"})
+    
+    form_diary = DiaryForm()
+    field_names_diary = [field for field in form_diary.fields if field in request.POST]
+    
+    diary = get_object_or_404(Diary, date=date, user=request.user)
+    # form = DiaryForm(request.POST, instance=diary, request=request)
+    form = DiaryDynamicForm(request.POST, dynamic_fields=field_names_diary, instance=diary)
+    formset = LocationFormSet(request.POST, queryset=diary.locations.all(), instance=diary)
+
+    if form.is_valid() and formset.is_valid():
+        diary = form.save(commit=False)
+        diary.save()  # Diaryを更新して保存
+
+        for location_form in formset:
+            location = location_form.save(commit=False)
+            angle = location_form.cleaned_data.get("rotate_angle",0) % 360  # 回転角度を取得
+            if angle != 0:
+                org_img = PILImage.open(location.image)
+                ret_img = org_img.rotate(-angle,expand=True)
+                buffer = io.BytesIO()
+                ret_img.save(fp=buffer, format=org_img.format)
+                buffer.seek(0)  # バッファの先頭に戻す
+                location.image.save(name=os.path.basename(location.image.name), content=buffer, save=True)
+            # location.save()
+        # フォームセットの保存処理
+        formset.save()
+        diary_data = DiarySerializer(diary).data
+        return JsonResponse({"success": True, "message": "更新が完了しました。","diary":diary_data})
+        # return JsonResponse({"success": None})
+    else:
+        error = {}
+        error['Diary'] = form.errors
+        error['Locations'] = formset.errors
+        return JsonResponse({"success": False, "errors": error})
 
 # ajaxでDiary日情報を送る用の関数
 @api_view(['GET'])
@@ -156,41 +195,6 @@ def delete_all_diaries(request):
     except Exception as e:
         # その他の例外処理
         return JsonResponse({"status": "error", "message": str(e)})
-
-@api_view(['POST'])
-@csrf_protect  # CSRF保護を追加
-@login_required
-def diary_edit_noPK(request):
-    date = request.POST.get('date')
-    diary = get_object_or_404(Diary, date=date, user=request.user)
-    form = DiaryForm(request.POST, instance=diary, request=request)
-    formset = LocationFormSet(request.POST, queryset=diary.locations.all(), instance=diary)
-
-    if form.is_valid() and formset.is_valid():
-        diary = form.save(commit=False)
-        diary.save()  # Diaryを更新して保存
-
-        for location_form in formset:
-            location = location_form.save(commit=False)
-            angle = location_form.cleaned_data.get("rotate_angle",0) % 360  # 回転角度を取得
-            if angle != 0:
-                org_img = PILImage.open(location.image)
-                ret_img = org_img.rotate(-angle,expand=True)
-                buffer = io.BytesIO()
-                ret_img.save(fp=buffer, format=org_img.format)
-                buffer.seek(0)  # バッファの先頭に戻す
-                location.image.save(name=os.path.basename(location.image.name), content=buffer, save=True)
-            # location.save()
-        # フォームセットの保存処理
-        formset.save()
-        diary_data = DiarySerializer(diary).data
-        return JsonResponse({"success": True, "message": "更新が完了しました。","diary":diary_data})
-        # return JsonResponse({"success": None})
-    else:
-        error = {}
-        error['Diary'] = form.errors
-        error['Locations'] = formset.errors
-        return JsonResponse({"success": False, "errors": error})
 
 @api_view(['POST'])
 @csrf_protect  # CSRF保護を追加
