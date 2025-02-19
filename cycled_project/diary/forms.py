@@ -106,8 +106,6 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
         # viewsでrequestを使用可能にする
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
-        # for _, field in self.fields.items():
-        #     field.widget.attrs['class'] = 'form-control'
 
     class Meta:
         model=Diary
@@ -157,6 +155,15 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
             self.add_error(None, "少なくとも1つのロケーションを追加してください。")
         return cleaned_data
 
+class DiaryDynamicForm(forms.ModelForm):
+    class Meta:
+        model=Diary
+        fields=["comment","is_public"]
+    def __init__(self, *args, **kwargs):
+        dynamic_fields = kwargs.pop('dynamic_fields', None)
+        super(DiaryDynamicForm, self).__init__(*args, **kwargs)
+        if dynamic_fields:
+            self.fields = {field: self.fields.get(field) for field in dynamic_fields if field in self.fields}
 
 class BaseDiaryFormSet(forms.BaseModelFormSet):
     def __init__(self, *args, **kwargs):

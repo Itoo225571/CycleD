@@ -85,7 +85,7 @@ function getQueryParam(param) {
 }
 
 // 読み込まれたら実行する関数
-document.addEventListener('DOMContentLoaded', function() {
+$(document).ready(function() {
 	var diaryModal = document.getElementById('diaryModal');
 	const initialDate = getQueryParam('diary_date');
 
@@ -238,10 +238,18 @@ document.addEventListener('DOMContentLoaded', function() {
 					}, 500); // フェードアウト時間に合わせる
 				}
 			});
+
+			// 編集部分を初期化
+			initDiaryEdit(event_calendar,diary);
 			$frontContent.find('.button-to-edit').off('click').on('click', function() {
 				const editContent = this.getAttribute('data-edit-content');
 				limit_display(editContent);
 				initDiaryEdit(event_calendar,diary);
+
+				// submitのnameを編集対象にする
+				var $backContent = $('#diaryModal').find('.modal-content.flip-back');
+				$backContent.find('.button-OK').attr('name', editContent);
+
 				flip_card(this);
 			});
 			$frontContent.find('form').off('submit').on('submit', function(event) {
@@ -261,7 +269,9 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 			})
 		}
+		
 		function initDiaryEdit(event_calendar,diary) {
+			const $frontContent = $('#diaryModal').find('.modal-content.flip-front');
 			const $backContent = $('#diaryModal').find('.modal-content.flip-back');
 			$backContent.find('.diary-thumbnail-background').css({'transform': `rotate(0deg)`,});	//角度を初期化
 
@@ -274,7 +284,10 @@ document.addEventListener('DOMContentLoaded', function() {
 			// 初期値
 			$('#id_comment').val(diary.comment);
 			$('#id_date').val(diary.date);
+			// 表のアイコンも合わせる
 			$('#id_is_public').val(diary.is_public);
+			$frontContent.find('.icon-visibility').attr('data-visible', diary.is_public);
+
 			const form_comment = $('#id_comment');	//先にfield取得を行わなければdiaryEdit内にあったときに消える
 			// Management関連
 			$('#id_locations-TOTAL_FORMS').val(diary.locations.length);
@@ -332,7 +345,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			});
 			
 			$backContent.find('.diary-locations-field').html(diaryEditHtml);
-			$backContent.find('.diary-comment-field').html(form_comment);
+			// $backContent.find('.diary-comment-field').html(form_comment);
 			set_label_field(); //label編集周りの初期化
 
 			$backContent.find('.diary-location-radiobutton').on('change', function() {
@@ -570,7 +583,8 @@ function limit_display(content_name) {
 		$editContainer.children().each(function(index, element) {
 			const $child = $(element);
 			// content name がedit contentに含まれているかチェック
-			if ($child.data('edit-content') && $child.data('edit-content').includes(content_name)) {
+			var name = $child.data('edit-content');
+			if (name && name.includes(content_name)) {
 				$child.show();
 			}
 			else {

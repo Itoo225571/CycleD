@@ -107,3 +107,11 @@
     transform: rotate(135deg); /* 傾ける */
     transform-origin: center; /* 回転の基点を中央に設定 */
 }
+
+/* 表示・非表示アイコン(data-visibleの値で判断) */
+.icon-visibility::before {
+    content: 'visibility_off';
+}
+.icon-visibility[data-visible="true"]::before {
+    content: 'visibility';
+}
