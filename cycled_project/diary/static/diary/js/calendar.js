@@ -223,6 +223,7 @@ $(document).ready(function() {
 								<text>${location.label}</text>
 							</label>
 							<input type="hidden" value="${location.image}" class="location-img-url">
+							<input type="hidden" value="${location.rotate_angle}" class="location-rotate_angle">
 						</div>
 					`).join('')}
 				</div>
@@ -256,6 +257,29 @@ $(document).ready(function() {
 
 				flip_card(this);
 			});
+
+			// 公開・非公開設定の切り替え
+			let lastExecuted = 0;
+			const throttleInterval = 1000;  // 1秒
+			$frontContent.find('.button-to-toggle-ispublic').off('click').on('click', function() {
+				const $form = $('#id_diary-form');
+				const $is_public = $('#id_is_public');
+
+				// 現在の値を取得して逆にする
+				const now = Date.now();
+				if (now - lastExecuted < throttleInterval) {
+					// スロットリング処理：指定したインターバル内に実行されることを防ぐ
+					alert('しばらくお待ちください')
+					return;
+				}
+				lastExecuted = now;
+				console.log(`今：${$is_public.val()}`)
+				$is_public.val($is_public.val() === 'true' ? 'false' : 'true');
+				$is_public.prop('checked', !$is_public.prop('checked'));
+				console.log(`変更後:${$is_public.val()}`)
+				$form.attr('name', 'form-is_public');  // 'is_public' を name 属性に設定
+				send_form_ajax($form,event_calendar,false);
+			});		
 			$frontContent.find('form').off('submit').on('submit', function(event) {
 				event.preventDefault();
 				var actionURL = $(this).attr('action');
@@ -389,42 +413,9 @@ $(document).ready(function() {
 				flip_card(this);
 			});
 			$backContent.find('form').off('submit').on('submit', function(event_form) {
-				event_form.preventDefault();
 				const $form = $(this);
-				$.ajax({
-					method: $form.prop("method"),
-					url: $form.prop("action"),
-					data: $form.serialize(), //nameをくっつける
-					dataType: 'json',
-					timeout:6000,
-					headers: {
-						"X-CSRFToken": getCookie('csrftoken')  // CSRFトークンも必要な場合
-					},
-				})
-				.done(function(data) {
-					if (data.success){
-						var $button = $backContent.find('.button-OK');
-						diary = data.diary;		// DiaryをDB反映後のものに変更
-						initDiaryContent(event_calendar,diary);
-						flip_card($button);
-					}
-					else {
-						alert('リクエストが失敗しました');
-						// Diaryのエラーを表示
-						if (data.errors.Diary) {
-							console.log("Diary Errors:");
-							console.log(data.errors.Diary);
-						}
-						// Locationsのエラーを表示
-						if (data.errors.Locations) {
-							console.log("Locations Errors:");
-							console.log(data.errors.Locations);
-						}
-					}
-				})
-				.fail(function(jqXHR, textStatus, errorThrown) {
-					console.log("AJAXリクエストが失敗しました。");
-				})
+				event_form.preventDefault();
+				send_form_ajax($form,event_calendar);
 			});
 			function set_label_field() {
 				const $locations_field = $backContent.find('.diary-locations-field');
@@ -491,7 +482,7 @@ $(document).ready(function() {
 						const $delete_inputs = $labels_field.find('*[id^="id_locations"][id$="DELETE"]');
 						const count = $delete_inputs.filter(function() {
 							return $(this).val() === 'true'; // val() が true のものをフィルタリング
-						  }).length;
+						}).length;
 						if (count + 1 < diary.locations.length) {
 							$delete_input.val(true);
 							$radioButtonHtml.hide();
@@ -535,6 +526,48 @@ $(document).ready(function() {
 				});
 			}
 		}
+		
+		function send_form_ajax($form, event_calendar, is_flip_card = true) {
+			const $backContent = $('#diaryModal').find('.modal-content.flip-back');
+
+			$.ajax({
+				method: $form.prop("method"),
+				url: $form.prop("action"),
+				data: $form.serialize(), //nameをくっつける
+				dataType: 'json',
+				timeout: 6000,
+				headers: {
+					"X-CSRFToken": getCookie('csrftoken')  // CSRFトークンも必要な場合
+				},
+			})
+			.done(function (data) {
+				if (data.success) {
+					var $button = $backContent.find('.button-OK');
+					diary = data.diary;        // DiaryをDB反映後のものに変更
+					initDiaryContent(event_calendar, diary);
+					initDiaryEdit(event_calendar,diary);
+					if (is_flip_card) {
+						flip_card($button);
+					}
+				} else {
+					alert('リクエストが失敗しました');
+					// Diaryのエラーを表示
+					if (data.errors.Diary) {
+						console.log("Diary Errors:");
+						console.log(data.errors.Diary);
+					}
+					// Locationsのエラーを表示
+					if (data.errors.Locations) {
+						console.log("Locations Errors:");
+						console.log(data.errors.Locations);
+					}
+				}
+			})
+			.fail(function (jqXHR, textStatus, errorThrown) {
+				console.log("AJAXリクエストが失敗しました。");
+			});
+		}
+		
 		// カレンダーを表示
 		calendar.render();
 		showDiaryModalByDate(initialDate);

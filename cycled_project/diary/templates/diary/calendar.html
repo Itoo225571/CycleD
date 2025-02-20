@@ -41,8 +41,9 @@
                                         <i class="bi bi-pencil-square text-muted"></i>
                                     </button>
                                     <ul class="dropdown-menu">
+                                        <li><button class="dropdown-item button-to-toggle-ispublic">公開・非公開の切り替え</button></li>
                                         <li><button class="dropdown-item button-to-edit" data-edit-content="comment">コメント編集</button></li>
-                                        <li><button class="dropdown-item button-to-edit" data-edit-content="thumbnail">サムネイルを変更</button></li>
+                                        <li><button class="dropdown-item button-to-edit" data-edit-content="rotate-thumbnail">サムネイルを変更</button></li>
                                         <li><button class="dropdown-item button-to-edit" data-edit-content="labels">場所の変更・削除</button></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
@@ -76,7 +77,7 @@
                                             </div>
                                         {% endfor %}
 
-                                        <div class="diary-thumbnail-field mx-auto" data-edit-content="thumbnail">
+                                        <div class="diary-thumbnail-field mx-auto" data-edit-content="rotate-thumbnail">
                                             <div class="diary-thumbnail-background">
                                                 <img class="diary-thumbnail fade-anime" loading="lazy">
                                             </div>
@@ -84,7 +85,7 @@
                                                 <i class="icon-rotate text-muted"></i>
                                             </button>
                                         </div>
-                                        <div class="diary-locations-field mt-3" data-edit-content="thumbnail"></div>
+                                        <div class="diary-locations-field mt-3" data-edit-content="rotate-thumbnail"></div>
                                         <div class="diary-labels-field mx-auto" data-edit-content="labels"></div>
                                     </div>
                                     <div class="diary-edit-buttons row mt-3">
