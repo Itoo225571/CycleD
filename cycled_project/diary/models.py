@@ -35,6 +35,8 @@ class Location(models.Model):
         return self.label
     
     def save(self, *args, **kwargs):
+        self.rotate_angle = self.rotate_angle % 360 # 360度以内にする
+
         if self.diary:  #日記作成の場合
             if self.image and not self.image_hash:
                 self.image_hash = to_pHash(self.image)   # pHashの生成
