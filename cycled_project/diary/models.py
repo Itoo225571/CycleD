@@ -24,6 +24,7 @@ class Location(models.Model):
     # 画像(日記作成の時につける)
     image = models.ImageField(upload_to="locations/",blank=True,null=True,verbose_name="サイクリング画像")
     image_hash = models.CharField(max_length=128,blank=True,null=True)
+    rotate_angle = models.IntegerField(default=0 , verbose_name="角度")
     
     diary = models.ForeignKey('Diary',on_delete=models.CASCADE,null=True,related_name="locations")
     

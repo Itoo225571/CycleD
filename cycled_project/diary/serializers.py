@@ -18,7 +18,8 @@ class LocationSerializer(serializers.ModelSerializer):
             'image_hash', 
             'diary', 
             'is_home', 
-            'is_thumbnail'
+            'is_thumbnail',
+            'rotate_angle',
         ]
 
 class DiarySerializer(serializers.ModelSerializer):

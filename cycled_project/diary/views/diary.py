@@ -118,31 +118,24 @@ class CalendarView(LoginRequiredMixin, generic.TemplateView):
 def diary_edit_noPK(request):
     date = request.POST.get('date')
     if not date:
-         return JsonResponse({"success": False, "errors": "日にちが含まれていません"})
+        return JsonResponse({"success": False, "errors": "日にちが含まれていません"})
     
     form_diary = DiaryForm()
     field_names_diary = [field for field in form_diary.fields if field in request.POST]
+
+    print(request.POST)
     
     diary = get_object_or_404(Diary, date=date, user=request.user)
     # form = DiaryForm(request.POST, instance=diary, request=request)
-    form = DiaryDynamicForm(request.POST, dynamic_fields=field_names_diary, instance=diary)
+    if field_names_diary:
+        form = DiaryDynamicForm(request.POST, dynamic_fields=field_names_diary, instance=diary)
     formset = LocationFormSet(request.POST, queryset=diary.locations.all(), instance=diary)
 
-    if form.is_valid() and formset.is_valid():
-        diary = form.save(commit=False)
-        diary.save()  # Diaryを更新して保存
+    if formset.is_valid():
+        if form.is_valid() and field_names_diary:
+            diary = form.save(commit=False)
+            diary.save()  # Diaryを更新して保存
 
-        for location_form in formset:
-            location = location_form.save(commit=False)
-            angle = location_form.cleaned_data.get("rotate_angle",0) % 360  # 回転角度を取得
-            if angle != 0:
-                org_img = PILImage.open(location.image)
-                ret_img = org_img.rotate(-angle,expand=True)
-                buffer = io.BytesIO()
-                ret_img.save(fp=buffer, format=org_img.format)
-                buffer.seek(0)  # バッファの先頭に戻す
-                location.image.save(name=os.path.basename(location.image.name), content=buffer, save=True)
-            # location.save()
         # フォームセットの保存処理
         formset.save()
         diary_data = DiarySerializer(diary).data
@@ -297,14 +290,6 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
                             location.diary.save()
                     location.full_clean()  # バリデーションを実行
                     location.save()
-                    angle = form.cleaned_data.get("rotate_angle",0) % 360  # 回転角度を取得
-                    if location.image:
-                        org_img = PILImage.open(location.image)
-                        ret_img = org_img.rotate(-angle,expand=True)
-                        buffer = io.BytesIO()
-                        ret_img.save(fp=buffer, format=org_img.format)
-                        buffer.seek(0)  # バッファの先頭に戻す
-                        location.image.save(name=os.path.basename(location.image.name),content=buffer)
 
                 return super().form_valid(diary_formset)
         except Exception as e:
