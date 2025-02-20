@@ -189,7 +189,7 @@ $(document).ready(function() {
 			// タイトル用
 			var title = $frontContent.find('.modal-title');
 			title.html(`
-				<span id="selectedDate" class="d-flex align-items-center">
+				<span id="selectedDate-front">
 					${formatDateJapanese(diary.date)}
 				</span>
 			`);
@@ -202,10 +202,14 @@ $(document).ready(function() {
 			locations.unshift(loc_thumbnail);
 
 			const diaryContentHtml = `
-				<div class="diary-comment-field">
-					<text>${convertLineBreaks(diary.comment)}</text>
+				<div class="diary-ispublic-field d-flex align-items-center px-2 py-1" data-visible="${diary.is_public}">
+					<i class="material-icons-outlined icon-visibility me-2 fs-3"></i>
+					<span class="text-muted">${diary.is_public ? "この日記は公開されています" : "この日記は非公開です"}</span>
 				</div>
-				<div class="diary-thumbnail-field">
+				<div class="diary-comment-field px-2 py-1 m-1 ${diary.comment ? '' : 'd-none'}">
+					${convertLineBreaks(diary.comment)}
+				</div>
+				<div class="diary-thumbnail-field text-center">
 					<img class="diary-image fade-anime" loading="lazy" src="${locations[0].image}">
 				</div>
 				<div class="diary-locations-field mt-3">
@@ -271,11 +275,10 @@ $(document).ready(function() {
 		}
 		
 		function initDiaryEdit(event_calendar,diary) {
-			const $frontContent = $('#diaryModal').find('.modal-content.flip-front');
 			const $backContent = $('#diaryModal').find('.modal-content.flip-back');
 			$backContent.find('.diary-thumbnail-background').css({'transform': `rotate(0deg)`,});	//角度を初期化
 
-			$backContent.find('.modal-title').html(`<span id="selectedDate">${formatDateJapanese(diary.date)}</span>`);
+			$backContent.find('.modal-title').html(`<span id="selectedDate-back">${formatDateJapanese(diary.date)}</span>`);
 			var locations = diary.locations;
 			var loc_thumbnail = locations.filter(location => location.is_thumbnail === true)[0];
 			locations = locations.filter(location => location.is_thumbnail !== true);
@@ -286,7 +289,7 @@ $(document).ready(function() {
 			$('#id_date').val(diary.date);
 			// 表のアイコンも合わせる
 			$('#id_is_public').val(diary.is_public);
-			$frontContent.find('.icon-visibility').attr('data-visible', diary.is_public);
+			// $frontContent.find('.icon-visibility').attr('data-visible', diary.is_public);
 
 			const form_comment = $('#id_comment');	//先にfield取得を行わなければdiaryEdit内にあったときに消える
 			// Management関連

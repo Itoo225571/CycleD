@@ -10,7 +10,8 @@
     border-radius: 10px;
 }
 /**** 通常 ****/
-.diary-content .diary-comment-field {
+.diary-content .diary-comment-field{
+    background-color: #f8f9fa;  /* 薄いグレー */
     vertical-align: top; /* 上揃え */
     text-align: left; /* 左揃え */
     overflow: hidden; /* はみ出た部分を隠す */
@@ -18,9 +19,21 @@
     -webkit-box-orient: vertical; /* 必須：縦方向にレイアウト */
     -webkit-line-clamp: 4; /* 最大4行で省略 */
     line-clamp: 4; /* 標準プロパティ */
-    padding: 0px 30px 10px 30px;
-    margin-bottom: 2px;
-    font-family: HGP創英角ﾎﾟｯﾌﾟ体,メイリオ,'ＭＳ Ｐゴシック',Osaka,sans-serif;
+    border: 1px solid #ccc; /* 薄いグレーのボーダー */
+    border-radius: 5px; /* 角を丸く */
+}
+.diary-content .diary-comment-field:empty {
+    display: none;
+}
+
+/* 表示・非表示アイコン(data-visibleの値で判断) */
+.diary-ispublic-field[data-visible="false"] .icon-visibility::before {
+    color: #6c757d;
+    content: 'visibility_off';
+}
+.diary-ispublic-field[data-visible="true"] .icon-visibility::before {
+    color: #007bff;
+    content: 'visibility';
 }
 /* ラジオボタン(通常) */
 .location-label {
@@ -71,6 +84,12 @@
 }
 
 /**** 編集 ****/
+.diary-edit-container .diary-comment-content textarea{
+    background-color: #f8f9fa; /* 薄い背景色 */
+    box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.1); /* 内側に影 */
+    border-radius: 5px; /* 角を丸く */
+    padding: 5px 7px;
+}
 .diary-edit-container .diary-thumbnail-field {
     height: 250px;
     width: 250px;
@@ -106,12 +125,4 @@
     display: inline-block; /* ブロック要素として扱う */
     transform: rotate(135deg); /* 傾ける */
     transform-origin: center; /* 回転の基点を中央に設定 */
-}
-
-/* 表示・非表示アイコン(data-visibleの値で判断) */
-.icon-visibility::before {
-    content: 'visibility_off';
-}
-.icon-visibility[data-visible="true"]::before {
-    content: 'visibility';
 }
