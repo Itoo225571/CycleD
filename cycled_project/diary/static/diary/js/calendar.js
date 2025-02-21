@@ -210,7 +210,7 @@ $(document).ready(function() {
 					${convertLineBreaks(diary.comment)}
 				</div>
 				<div class="diary-thumbnail-field text-center">
-					<img class="diary-image fade-anime" loading="lazy" src="${locations[0].image}">
+					<img class="diary-image fade-anime" loading="lazy" src="${locations[0].image}" style="transform: rotate(${loc_thumbnail.rotate_angle}deg)">
 				</div>
 				<div class="diary-locations-field mt-3">
 					${locations.map((location, index) => `
@@ -234,9 +234,11 @@ $(document).ready(function() {
 				if ($(this).is(':checked')) {
 					// 親要素の中にある隠しフィールドから画像のURLを取得
 					const newImageSrc = $(this).closest('.diary-location-item').find('.location-img-url').val();
+					const rotareAngle = $(this).closest('.diary-location-item').find('.location-rotate_angle').val();
 					$frontContent.find('.diary-image').css('opacity', 0); // フェードアウト
 					setTimeout(() => {
 						$frontContent.find('.diary-image').attr('src', newImageSrc); // 画像を切り替え
+						$frontContent.find('.diary-image').css({'transform': `rotate(${rotareAngle}deg)`,}); // 角度変更
 						setTimeout(() => {
 							$frontContent.find('.diary-image').css('opacity', 1); // フェードイン
 						}, 200); // 0.1秒待機
@@ -300,7 +302,7 @@ $(document).ready(function() {
 		
 		function initDiaryEdit(event_calendar,diary) {
 			const $backContent = $('#diaryModal').find('.modal-content.flip-back');
-			$backContent.find('.diary-thumbnail-background').css({'transform': `rotate(0deg)`,});	//角度を初期化
+			// $backContent.find('.diary-thumbnail-background').css({'transform': `rotate(0deg)`,});	//角度を初期化
 
 			$backContent.find('.modal-title').html(`<span id="selectedDate-back">${formatDateJapanese(diary.date)}</span>`);
 			var locations = diary.locations;
@@ -347,6 +349,7 @@ $(document).ready(function() {
 				if (location.is_thumbnail) {
 					location_base.find('.diary-location-radiobutton').prop('checked', true);
 					$backContent.find('.diary-thumbnail').attr('src', location.image);
+					$backContent.find('.diary-thumbnail-background').css({'transform': `rotate(${location.rotate_angle}deg)`,});	//角度を初期化
 				}
 
 				diaryEditHtml += location_base.html().replace(/__prefix__/g, `${index}`);
@@ -389,11 +392,10 @@ $(document).ready(function() {
 				const newImageSrc = $checkedLocation.find('.location-img-url').val();
 
 				var $img = $backContent.find('.diary-thumbnail');
-				var $img_background = $backContent.find('.diary-thumbnail-background');
 				$img.css('opacity', 0); // 透明にする（スペースは保持）
 				setTimeout(function(){
-					$img_background.css({'transform': `rotate(${angle}deg)`,});
-					$backContent.find('.diary-thumbnail').attr('src', newImageSrc);					
+					$backContent.find('.diary-thumbnail-background').css({'transform': `rotate(${angle}deg)`,});
+					$img.attr('src', newImageSrc);					
 				},300);
 				setTimeout(function(){
 					$img.css('opacity', 1); // srcを更新し、フェードイン
@@ -427,12 +429,14 @@ $(document).ready(function() {
 				$locations_field.children().each(function (index, child) {
 					const imgSrc = $(child).find('.location-img-url').val();
 					const isThumbnail = $(child).find('*[id^="id_locations"][id$="is_thumbnail"]').val();
+					const rotateAngle = $(child).find('*[id^="id_locations"][id$="rotate_angle"]').val();
 
 					var isChecked = '';
 					if (isThumbnail) {
 						const imageSrc = $(child).find('.location-img-url').val();
 						isChecked = 'checked';
 						$labels_field.find('.diary-image').attr('src', imageSrc);
+						$labels_field.find('.diary-image').css({'transform': `rotate(${rotateAngle}deg)`,});	//角度を初期化
 					}
 					var $label_input = $(child).find('*[id^="id_locations"][id$="label"]');
 					$label_input.addClass('w-100');
@@ -469,6 +473,7 @@ $(document).ready(function() {
 						$img.css('opacity', 0); // フェードアウト
 						setTimeout(() => {
 							$img.attr('src', imgSrc); // 画像を切り替え
+							$img.css({'transform': `rotate(${rotateAngle}deg)`,});	//角度を合わせる
 							setTimeout(() => {
 								$img.css('opacity', 1); // フェードイン
 							}, 200); // 0.1秒待機
