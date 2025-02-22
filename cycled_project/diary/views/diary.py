@@ -87,6 +87,7 @@ class HomeView(LoginRequiredMixin, generic.TemplateView):
                 "date": diary.date,
                 # サムネイルの画像URLを `.first()` を使って取得
                 "image": diary.thumbnail_locations[0].image.url if diary.thumbnail_locations else None,
+                "rotate_angle": diary.thumbnail_locations[0].rotate_angle if diary.thumbnail_locations else 0,
                 # "good" : diary.good,
             }
             for diary in diaries
