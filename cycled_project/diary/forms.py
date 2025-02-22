@@ -121,6 +121,7 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
                 'style': 'resize: none; width: 100%;',  # resizeを無効化、幅を100%に設定
                 'oninput': 'checkLineLimit(this)',  # 入力ごとに行数をチェック
             }),
+            "is_public": forms.HiddenInput(), #checkboxだと変更が反映されない
         }
 
     def clean_date(self):

@@ -124,6 +124,8 @@ def diary_edit_noPK(request):
     form_diary = DiaryForm()
     field_names_diary = [field for field in form_diary.fields if field in request.POST]
 
+    is_public = request.POST.get('is_public')
+    print(is_public)
     print(request.POST)
     
     diary = get_object_or_404(Diary, date=date, user=request.user)

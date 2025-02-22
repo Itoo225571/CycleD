@@ -263,27 +263,13 @@ $(document).ready(function() {
 			});
 
 			// 公開・非公開設定の切り替え
-			let lastExecuted = 0;
-			const throttleInterval = 1000;  // 1秒
-			$frontContent.find('.button-to-toggle-ispublic').off('click').on('click', function() {
-				const $form = $('#id_diary-form');
+			$frontContent.find('.button-to-toggle-ispublic').off('click').on('click', function(event) {
 				const $is_public = $('#id_is_public');
-
-				// 現在の値を取得して逆にする
-				const now = Date.now();
-				if (now - lastExecuted < throttleInterval) {
-					// スロットリング処理：指定したインターバル内に実行されることを防ぐ
-					alert('しばらくお待ちください')
-					return;
-				}
-				lastExecuted = now;
-				console.log(`今：${$is_public.val()}`)
 				$is_public.val($is_public.val() === 'true' ? 'false' : 'true');
-				$is_public.prop('checked', !$is_public.prop('checked'));
-				console.log(`変更後:${$is_public.val()}`)
-				$form.attr('name', 'form-is_public');  // 'is_public' を name 属性に設定
-				send_form_ajax($form,event_calendar,false);
-			});		
+
+				const $form = $('#id_diary-form');
+				send_form_ajax($form, event_calendar, false);
+			});
 			$frontContent.find('form').off('submit').on('submit', function(event) {
 				event.preventDefault();
 				var actionURL = $(this).attr('action');
