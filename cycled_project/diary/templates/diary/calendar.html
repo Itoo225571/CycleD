@@ -41,15 +41,40 @@
                                         <i class="bi bi-pencil-square text-muted"></i>
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li><button class="dropdown-item button-to-toggle-ispublic">公開・非公開の切り替え</button></li>
-                                        <li><button class="dropdown-item button-to-edit" data-edit-content="comment">コメント編集</button></li>
-                                        <li><button class="dropdown-item button-to-edit" data-edit-content="rotate-thumbnail">サムネイルを変更</button></li>
-                                        <li><button class="dropdown-item button-to-edit" data-edit-content="labels">場所の変更・削除</button></li>
+                                        <li><button class="dropdown-item button-to-toggle-ispublic">
+                                            <i class="material-icons-outlined align-text-bottom text-muted fs-5 me-1">
+                                                public
+                                            </i>
+                                            公開設定の変更
+                                        </button></li>
+                                        <li><button class="dropdown-item button-to-edit" data-edit-content="comment">
+                                            <i class="material-icons-outlined align-text-bottom text-muted fs-5 me-1">
+                                                edit
+                                            </i>
+                                            コメント編集
+                                        </button></li>
+                                        <li><button class="dropdown-item button-to-edit" data-edit-content="rotate-thumbnail">
+                                            <i class="material-icons-outlined align-text-bottom text-muted fs-5 me-1">
+                                                filter
+                                            </i>
+                                            サムネイル編集
+                                        </button></li>
+                                        <li><button class="dropdown-item button-to-edit" data-edit-content="labels">
+                                            <i class="material-icons-outlined align-text-bottom text-muted fs-5 me-1">
+                                                edit_location_alt
+                                            </i>
+                                            場所の編集・削除
+                                        </button></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
                                             <form action="{% url 'diary:deleteDiary' mock_uuid %}" method="post">
                                                 {% csrf_token %}
-                                                <button type="submit" class="dropdown-item text-danger">削除</button>
+                                                <button type="submit" class="dropdown-item text-danger">
+                                                    <i class="material-icons align-text-bottom fs-5 me-1">
+                                                        delete
+                                                    </i>
+                                                    削除
+                                                </button>
                                             </form>
                                         </li>
                                     </ul>
