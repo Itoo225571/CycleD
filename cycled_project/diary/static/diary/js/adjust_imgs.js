@@ -50,4 +50,5 @@ function adjust_image(img,minmax='min') {
     var scale = calc_scale($(img), angle, minmax);
     // 画像のスケールを変更
     $(img).css('transform', `scale(${scale}) rotate(${angle}deg)`);
+    // console.log('transform', `scale(${scale}) rotate(${angle}deg)`);
 }
