@@ -36,7 +36,7 @@
                 {% csrf_token %}
                 <div class="row" id="diary_form">
                     <div id="diary-management">{{ diary_formset.management_form }}</div>
-                    <div id="location-management">{{ location_formset.management_form }}</div>
+                    <div id="location-management">{{ location_formset.management_form }}</div>                      
                     <div id="diary-formset-body"></div>
                 </div>
 
@@ -65,12 +65,14 @@
                         地域を選択すると日記のサムネイルを変更できます
                     </div>
                     {% comment %} 公開設定 {% endcomment %}
-                    <div class="field-is_public form-check form-switch">
+                    <div class="field-is_public form-check form-switch fs-5 mx-0">
                         {{ diary_formset.empty_form.is_public|add_class:"form-check-input" }}
-                        <label class="form-check-label" for="{{ diary_formset.empty_form.is_public.id_for_label }}">
+                        <label class="form-check-label ms-2" for="{{ diary_formset.empty_form.is_public.id_for_label }}">
                             {{ diary_formset.empty_form.is_public.label }}
                         </label>
                     </div>
+                    
+                    
                     <div class="row">
                         <div class="col order-md-2">
                             <div class="d-flex justify-content-end align-items-center">                                

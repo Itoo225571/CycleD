@@ -276,6 +276,6 @@
 }
 @media (min-width: 768px) {
     .diary-form-wrapper .field-is_public {
-        margin: 1rem !important;
+        margin: 10px 5px !important;
     }
 }

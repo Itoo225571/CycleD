@@ -95,17 +95,21 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
         label="",
         max_length=64,
         required=False,
-        widget=forms.TextInput(attrs={"placeholder":" 地名・施設名・駅名など",'type':'search'},)
+        widget=forms.TextInput(attrs={"placeholder": "地名・施設名・駅名など", 'type': 'search'}),
     )
-    
-    def __init__(self, *args, **kwargs):
-        # viewsでrequestを使用可能にする
+
+    def __init__(self, *args, widgets=None, **kwargs):
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
+        # `widgets` が渡された場合、それを適用
+        if widgets:
+            for field_name, widget in widgets.items():
+                if field_name in self.fields:
+                    self.fields[field_name].widget = widget
 
     class Meta:
-        model=Diary
-        fields=["date","comment","is_public"]
+        model = Diary
+        fields = ["date", "comment", "is_public"]
         labels = {
             "date": "サイクリング日時",
             "comment": "コメント",
@@ -117,11 +121,10 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
         widgets = {
             'comment': forms.Textarea(attrs={
                 'rows': 3,
-                'placeholder': 'コメントを入力してください',  # placeholderを追加
-                'style': 'resize: none; width: 100%;',  # resizeを無効化、幅を100%に設定
-                'oninput': 'checkLineLimit(this)',  # 入力ごとに行数をチェック
+                'placeholder': 'コメントを入力してください',
+                'style': 'resize: none; width: 100%;',
+                'oninput': 'checkLineLimit(this)',
             }),
-            "is_public": forms.HiddenInput(), #checkboxだと変更が反映されない
         }
 
     def clean_date(self):

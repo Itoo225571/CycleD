@@ -18,6 +18,7 @@ from django.utils import timezone
 from django.db.models import Prefetch
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
+from django.forms import HiddenInput
 
 from ..forms import DiaryForm,DiaryDynamicForm
 from ..forms import AddressSearchForm,LocationForm,LocationCoordForm,LocationFormSet,DiaryFormSet,PhotosForm
@@ -106,7 +107,8 @@ class CalendarView(LoginRequiredMixin, generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['mock_uuid'] = uuid.uuid4() # 仮のPK
-        context['diary'] = DiaryForm()
+        # is_public を HiddenInput にする
+        context['diary'] = DiaryForm(widgets={"is_public": HiddenInput()})
         form_errors = self.request.session.pop('diary_form_errors', None)   # セッションからエラー情報を取得
         if form_errors:
             # エラー情報を辞書形式に変換してコンテキストに追加(リストにするのは複数ある他と合わせるため)
