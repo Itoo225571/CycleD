@@ -63,7 +63,7 @@
                                         {% if loc.is_thumbnail %}
                                             <div class="card card-rank{{ diary.rank }}">
                                                 <div class="card-thumbnail">
-                                                    <img src="{{ loc.image.url }}" alt="サムネイル" class="thumbnail-img" onclick="zoom_image('{{ loc.image.url }}')">  <!-- 画像を表示 -->
+                                                    <img src="{{ loc.image.url }}" alt="サムネイル" class="thumbnail-img" style="transform: rotate({{ loc.rotate_angle }}deg);" onclick="zoom_image('{{ loc.image.url }}','{{ loc.rotate_angle }}')">  <!-- 画像を表示 -->
                                                     <a class="to-calendar-button" href="{% url 'diary:calendar' %}?diary_date={{ diary.date|date:"Y-m-d" }}"></a>
                                                 </div>
                                                 <div class="card-body">
@@ -97,8 +97,8 @@
                             {% for diary in diaries_public %}
                                 <div class="card-container col-12 col-md-6 col-lg-4 my-2">
                                     <div class="card">
-                                        <div class="card-thumbnail" onclick="zoom_image('{{ diary.image }}')">
-                                            <img src="{{ diary.image }}" alt="サムネイル" class="thumbnail-img">  <!-- 画像を表示 -->
+                                        <div class="card-thumbnail" onclick="zoom_image('{{ diary.image }}','{{ diary.rotate_angle }}')">
+                                            <img src="{{ diary.image }}" alt="サムネイル" class="thumbnail-img" style="transform: rotate({{ diary.rotate_angle }}deg);">  <!-- 画像を表示 -->
                                         </div>
                                         <div class="card-body">
                                             <div class="card-user">
@@ -144,5 +144,6 @@
 {% block extra_js %}
     <script src="{% static 'js/getCookie.js' %}"></script>
     <script src="{% static 'js/loading_overlay.js' %}"></script>
+    <script src="{% static 'diary/js/adjust_imgs.js' %}"></script>
     <script src="{% static 'diary/js/home.js' %}"></script>
 {% endblock %}

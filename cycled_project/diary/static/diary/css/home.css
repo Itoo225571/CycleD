@@ -11,7 +11,6 @@
     border-radius: 5px;
 }
 
-
 /* タブ */
 .nav-tabs .nav-link {
     background-color:darkgray;
@@ -38,13 +37,22 @@
     height: 100%;  /* 高さを100%にして親要素に合わせる */
     border: none;
 }
-.diary-list .card .thumbnail-img {
+.diary-list .card .card-thumbnail {
     width: 100%;
-    aspect-ratio: 5/3;
-    object-fit: cover;  /* 画像を適切にトリミング */
+    aspect-ratio: 5 / 3;  /* 親要素のアスペクト比 */
     border-radius: 10px;
     cursor: pointer;
+    overflow: hidden;    /* 画像が親要素を超えないようにする */
+    position: relative;   /* 回転が親要素に収まるようにする */
 }
+.diary-list .card .card-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;    /* 画像が親要素に合わせてトリミングされる */
+    transform-origin: center; /* 回転の基準点を中央に設定 */
+}
+
+
 .diary-list .card .card-body {
     padding-top: 10px;
 }

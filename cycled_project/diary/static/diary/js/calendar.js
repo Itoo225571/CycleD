@@ -86,7 +86,7 @@ function getQueryParam(param) {
 
 // 読み込まれたら実行する関数
 $(document).ready(function() {
-	var diaryModal = document.getElementById('diaryModal');
+	var $diaryModal = $('#diaryModal');
 	const initialDate = getQueryParam('diary_date');
 
 	// 祝日データを取得してからカレンダーを初期化
@@ -210,7 +210,8 @@ $(document).ready(function() {
 					${convertLineBreaks(diary.comment)}
 				</div>
 				<div class="diary-thumbnail-field text-center">
-					<img class="diary-image fade-anime" loading="lazy" src="${locations[0].image}" style="transform: rotate(${loc_thumbnail.rotate_angle}deg)">
+					<img class="diary-image fade-anime" loading="lazy" src="${locations[0].image}"
+					style="transform: rotate(${loc_thumbnail.rotate_angle}deg)">
 				</div>
 				<div class="diary-locations-field mt-3">
 					${locations.map((location, index) => `
@@ -229,21 +230,22 @@ $(document).ready(function() {
 				</div>
 			`;
 			$frontContent.find('.diary-content').html(diaryContentHtml);
+			
 			// jQueryでラジオボタンの変更イベントを監視し、画像を更新
 			$frontContent.find('.diary-location-radiobutton').on('change', function() {
-				if ($(this).is(':checked')) {
-					// 親要素の中にある隠しフィールドから画像のURLを取得
-					const newImageSrc = $(this).closest('.diary-location-item').find('.location-img-url').val();
-					const rotareAngle = $(this).closest('.diary-location-item').find('.location-rotate_angle').val();
-					$frontContent.find('.diary-image').css('opacity', 0); // フェードアウト
+				// 親要素の中にある隠しフィールドから画像のURLを取得
+				const newImageSrc = $(this).closest('.diary-location-item').find('.location-img-url').val();
+				const rotateAngle = $(this).closest('.diary-location-item').find('.location-rotate_angle').val();
+				$frontContent.find('.diary-image').css('opacity', 0); // フェードアウト
+				var scale = calc_scale($frontContent.find('.diary-image'),rotateAngle)
+
+				setTimeout(() => {
+					$frontContent.find('.diary-image').attr('src', newImageSrc); // 画像を切り替え
+					$frontContent.find('.diary-image').css({'transform': `rotate(${rotateAngle}deg) scale(${scale})`,}); // 角度変更
 					setTimeout(() => {
-						$frontContent.find('.diary-image').attr('src', newImageSrc); // 画像を切り替え
-						$frontContent.find('.diary-image').css({'transform': `rotate(${rotareAngle}deg)`,}); // 角度変更
-						setTimeout(() => {
-							$frontContent.find('.diary-image').css('opacity', 1); // フェードイン
-						}, 200); // 0.1秒待機
-					}, 500); // フェードアウト時間に合わせる
-				}
+						$frontContent.find('.diary-image').css('opacity', 1); // フェードイン
+					}, 200); // 0.1秒待機
+				}, 500); // フェードアウト時間に合わせる
 			});
 
 			// 編集部分を初期化
@@ -386,7 +388,7 @@ $(document).ready(function() {
 
 				// 回転させる
                 var $angle = $checkedLocation.find('[id*="rotate_angle"]');
-                var angle = parseInt($angle.val(), 10) % 360;
+                var angle = parseInt($angle.val(), 10);
 				$angle.val(angle);
 				// 親要素の中にある隠しフィールドから画像のURLを取得
 				const newImageSrc = $checkedLocation.find('.location-img-url').val();
@@ -424,7 +426,7 @@ $(document).ready(function() {
 				const $labels_field = $backContent.find('.diary-labels-field');
 				// 既存のラベルフィールドをクリア
 				$labels_field.empty();
-				$labels_field.html('<img class="diary-image fade-anime mb-3" loading="lazy">');
+				$labels_field.html('<div class="text-center"><img class="diary-image fade-anime mb-3" loading="lazy"></div>');
 
 				$locations_field.children().each(function (index, child) {
 					const imgSrc = $(child).find('.location-img-url').val();
@@ -597,7 +599,12 @@ $(document).ready(function() {
 		}
 	});
 
-	diaryModal.addEventListener('hidden.bs.modal', function () {
+	$diaryModal.on('shown.bs.modal', function () {
+		// モーダルが開かれたときに実行したい処理
+		adjust_imgs($(this));
+	});	
+
+	$diaryModal.on('hidden.bs.modal', function () {
 		// 強制的にモーダルを閉じる
 		var backdrop = document.querySelector('.modal-backdrop');
 		if (backdrop) {
@@ -612,6 +619,7 @@ $(document).ready(function() {
 function flip_card(button){
     const $flipContainer = $(button).closest('.flip');  // ボタンから一番近い.flipコンテナを取得
 	$flipContainer.toggleClass('flipped');
+	adjust_imgs($('#diaryModal'))
 }
 
 function convertLineBreaks(text) {
