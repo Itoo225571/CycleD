@@ -97,15 +97,22 @@
                             {% for diary in diaries_public %}
                                 <div class="card-container col-12 col-md-6 col-lg-4 my-2">
                                     <div class="card">
-                                        <div class="card-thumbnail" onclick="zoom_image('{{ diary.image }}','{{ diary.rotate_angle }}')">
-                                            <img src="{{ diary.image }}" alt="サムネイル" class="thumbnail-img" style="transform: rotate({{ diary.rotate_angle }}deg);">  <!-- 画像を表示 -->
+                                        <div class="card-thumbnail">
+                                            <img src="{{ diary.image }}" alt="サムネイル" class="thumbnail-img" style="transform: rotate({{ diary.rotate_angle }}deg);" onclick="zoom_image('{{ diary.image }}','{{ diary.rotate_angle }}')">  <!-- 画像を表示 -->
                                         </div>
-                                        <div class="card-body">
-                                            <div class="card-user">
+                                        <div class="card-body row">
+                                            <div class="card-user col-9">
                                                 <img src="{{ diary.user.icon_url}}" class="rounded-circle bg-white border" width="30" height="30" alt="icon" loading="lazy">
                                                 <span class="card-explanation px-2">{{ diary.user.username }}</span>
                                             </div>
-                                            <div class="card-date">
+                                            <div class="card-good col-3">
+                                                <button class="icon-in-button" type="button">
+                                                    <i class="material-icons-outlined">
+                                                        thumb_up_alt
+                                                    </i>
+                                                </button>
+                                            </div>
+                                            <div class="card-date col-12">
                                                 <div class="card-explanation">
                                                     {{ diary.date|days_ago }}  <!-- 日付を「何日前」形式で表示 -->
                                                 </div>
