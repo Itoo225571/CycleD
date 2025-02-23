@@ -51,8 +51,6 @@
     object-fit: cover;    /* 画像が親要素に合わせてトリミングされる */
     transform-origin: center; /* 回転の基準点を中央に設定 */
 }
-
-
 .diary-list .card .card-body {
     padding-top: 10px;
 }
@@ -73,6 +71,35 @@
     color: black;       /* グレー系の薄い色 */
     margin: 5px 0;     /* 余白を小さく */
     line-height: 1.4;  /* 行間を少し広めに */
+}
+
+.diary-public-field .card .icon-liked::before {
+    font-family: "Material Icons Outlined";
+    content: "thumb_up_alt";  /* デフォルト（未いいね） */
+    display: inline-block;  /* アイコンの表示を安定させる */
+    font-style: normal;  /* イタリックを解除 */
+    color: #A9A9A9;
+    font-size: 2.0rem;
+    transition: color 0.3s ease;  /* 色のアニメーションはスムーズに */
+}
+.diary-public-field .card .icon-liked[data-liked="true"]::before {
+    font-family: "Material Icons";  /* いいね済み */
+    color: deeppink;
+    animation: scale-updown-center 0.6s ease forwards;
+}
+.diary-myself-field .card-good {
+    color: #A9A9A9;
+}
+.diary-myself-field .card-good .icon-goodcount::before {
+    font-family: "Material Icons";
+    content: "thumb_up_alt";
+    display: inline-block;  /* アイコンの表示を安定させる */
+    font-style: normal;  /* イタリックを解除 */
+    font-size: 2.0rem;
+}
+.diary-myself-field .card-good .good-count {
+    font-size: 1rem;  /* テキストのサイズを調整 */
+    margin-left: 5px;
 }
 
 /* ユーザーの画像の場合、画像内にEditボタンを追加する */

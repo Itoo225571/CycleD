@@ -6,12 +6,15 @@ from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import logout
-from rest_framework.decorators import api_view
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from django_user_agents.utils import get_user_agent
 from django.views.decorators.csrf import csrf_protect
 from django.http import JsonResponse, HttpResponseRedirect
+
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 from .forms import CustomLoginForm,CustomSignupForm,UserSettingForm,UserDynamicForm
 from .models import User
@@ -83,7 +86,8 @@ class UserDeleteView(LoginRequiredMixin,generic.DeleteView):
 
 @api_view(['POST'])
 @csrf_protect  # CSRF保護を追加
-@login_required
+@authentication_classes([SessionAuthentication])  # セッション認証
+@permission_classes([IsAuthenticated])  # ログイン必須
 def user_delete(request):
     user = request.user
     user.delete()

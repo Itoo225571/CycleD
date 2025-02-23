@@ -12,17 +12,20 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.exceptions import ValidationError,ObjectDoesNotExist
 from django.contrib import messages
 from django.core.cache import cache
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
 from django.utils import timezone
 from django.db.models import Prefetch
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
 from django.forms import HiddenInput
 
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
 from ..forms import DiaryForm,DiaryDynamicForm
 from ..forms import AddressSearchForm,LocationForm,LocationCoordForm,LocationFormSet,DiaryFormSet,PhotosForm
-from ..models import Diary,Location,TempImage
+from ..models import Diary,Location,TempImage,Good
 from ..serializers import DiarySerializer,LocationSerializer
 
 from .address import geocode,regeocode,regeocode_async
@@ -77,29 +80,77 @@ class HomeView(LoginRequiredMixin, generic.TemplateView):
             .prefetch_related(thumbnail_location, 'user')  # プレフェッチを最後に呼び出し
             [:10]  # 10 件に絞り込み
         )
+        # **一括取得: ユーザーが「いいね」した Diary の ID をセットにする**
+        liked_diary_ids = set(
+            Good.objects.filter(
+                user=self.request.user, 
+                diary__in=diaries  # 取得済みの日記だけ対象
+            ).values_list('diary_id', flat=True)  # IDのリストを取得
+        )
 
-        # 必要な情報をリストに格納
-        diaries_data = [
+        # 必要な情報をリストに格納(public用)
+        diaries_data_public = [
             {
                 "user": {
                     "username": diary.user.username,
                     "icon_url": diary.user.icon,
                 },
                 "date": diary.date,
+                "diary_id": diary.diary_id,
                 # サムネイルの画像URLを `.first()` を使って取得
                 "image": diary.thumbnail_locations[0].image.url if diary.thumbnail_locations else None,
                 "rotate_angle": diary.thumbnail_locations[0].rotate_angle if diary.thumbnail_locations else 0,
-                # "good" : diary.good,
+                "liked": diary.diary_id in liked_diary_ids,  # いいね済みか？
+                # "good_count": diary.good.count(),  # いいね数
             }
             for diary in diaries
         ]
 
-        context['diaries_public'] = diaries_data
-        context['diaries_mine'] = diary_all_myself.order_by('-date_last_updated', '-date')[:5]
+        diaries_data_mine = [
+            {
+                "diary": diary,
+                "good_count": diary.good.count()  # いいね数を追加
+            }
+            for diary in diary_all_myself.order_by('-date_last_updated', '-date')[:5]
+        ]
+
+        context['diaries_public'] = diaries_data_public
+        context['diaries_mine'] = diaries_data_mine
         context['diary_count'] = diary_count  # キャッシュを利用
         context['diary_count_ontheday'] = diary_count_ontheday  # キャッシュを利用
-
         return context
+    
+# good機能
+@api_view(['POST', 'DELETE'])
+@csrf_protect  # CSRF保護を追加
+@authentication_classes([SessionAuthentication])  # セッション認証
+@permission_classes([IsAuthenticated])  # ログイン必須
+def good_for_diary(request, pk):
+    try:
+        diary = get_object_or_404(Diary, diary_id=pk)
+        # 公開設定をチェック
+        if not diary.is_public and diary.user != request.user:
+            return JsonResponse({"status": "error", "message": "公開されていない日記にアクセスしています"}, status=403)
+        
+        liked, created = Good.objects.get_or_create(user=request.user, diary=diary)
+        if not created:
+            liked.delete()
+            liked = False
+        else:
+            liked = True
+
+        return JsonResponse({
+            "status": "success",
+            "liked": liked, 
+            "good_count": diary.good.count(),
+        })
+    
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        return JsonResponse({
+            "status": "error",
+            "message": str(e)
+        }, status=500)
 
 class CalendarView(LoginRequiredMixin, generic.TemplateView):
     template_name="diary/calendar.html"
@@ -117,7 +168,8 @@ class CalendarView(LoginRequiredMixin, generic.TemplateView):
 
 @api_view(['POST'])
 @csrf_protect  # CSRF保護を追加
-@login_required
+@authentication_classes([SessionAuthentication])  # セッション認証
+@permission_classes([IsAuthenticated])  # ログイン必須
 def diary_edit_noPK(request):
     date = request.POST.get('date')
     if not date:
@@ -170,7 +222,8 @@ def sendDairies(request):
 
 # ログインしているユーザー本人のすべての日記を削除
 @api_view(['POST'])
-@login_required
+@authentication_classes([SessionAuthentication])  # セッション認証
+@permission_classes([IsAuthenticated])  # ログイン必須
 @csrf_protect  # CSRF保護を追加
 def delete_all_diaries(request):
     try:
@@ -196,7 +249,8 @@ def delete_all_diaries(request):
 
 @api_view(['POST'])
 @csrf_protect  # CSRF保護を追加
-@login_required
+@authentication_classes([SessionAuthentication])  # セッション認証
+@permission_classes([IsAuthenticated])  # ログイン必須
 def diary_delete_noPK(request):
     pk = request.POST.get('')
     diary = get_object_or_404(Diary, pk=pk, user=request.user)
@@ -531,3 +585,4 @@ class Photos2LocationsView(generic.View):
         else:
             print('Photo Form Invalid')
             return JsonResponse({'error': '無効なフォームです。'}, status=400, json_dumps_params={'ensure_ascii': False})
+        
