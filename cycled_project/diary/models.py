@@ -129,3 +129,11 @@ class Coin(models.Model):
             self.timestamp = timezone.now()
             self.save()
         return self.num
+    
+class Good(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="good")
+    diary = models.ForeignKey(Diary, on_delete=models.CASCADE, related_name="good")
+    date_created = models.DateField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'diary')  # 同じユーザーが同じ投稿に複数回いいねできないようにする

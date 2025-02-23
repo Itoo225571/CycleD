@@ -26,6 +26,32 @@
         }
 }
 
+@-webkit-keyframes scale-updown-center {
+        0% {
+            -webkit-transform: scale(1);  /* 最初のサイズ */
+            transform: scale(1);  /* 最初のサイズ */
+        }
+        50% {
+            -webkit-transform: scale(1.5);  /* 拡大 */
+            transform: scale(1.5);  /* 拡大 */
+        }
+        100% {
+            -webkit-transform: scale(1);  /* 元のサイズに戻る */
+            transform: scale(1);  /* 元のサイズに戻る */
+        }
+}
+@keyframes scale-updown-center {
+        0% {
+                transform: scale(1);  /* 最初のサイズ */
+        }
+        50% {
+                transform: scale(1.5);  /* 拡大 */
+        }
+        100% {
+                transform: scale(1);  /* 元のサイズに戻る */
+        }
+}
+
 @-webkit-keyframes flip-scale-2-ver-left {
         0% {
                 -webkit-transform: translateX(0) rotateY(0) scale(1);
