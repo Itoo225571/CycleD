@@ -137,3 +137,9 @@ class Good(models.Model):
 
     class Meta:
         unique_together = ('user', 'diary')  # 同じユーザーが同じ投稿に複数回いいねできないようにする
+        
+    def clean(self):
+        super().clean()  # 既存のバリデーションを保持
+        # ユーザーが自分の日記に「いいね」できないようにする
+        if self.user == self.diary.user:
+            raise ValidationError("自分の日記にはいいねできません。")
