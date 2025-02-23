@@ -76,7 +76,9 @@ class HomeView(LoginRequiredMixin, generic.TemplateView):
                 date_created__gte=one_week_ago  # 1週間以内の作成日
                 # rank=0
             )
+            .exclude(user=self.request.user)  # 自分の日記を除外
             .order_by('-date_last_updated')  # 日付の降順で取得
+            .order_by('-date')
             .prefetch_related(thumbnail_location, 'user')  # プレフェッチを最後に呼び出し
             [:10]  # 10 件に絞り込み
         )
