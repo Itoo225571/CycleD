@@ -74,8 +74,8 @@ class TempImage(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     date_created = models.DateTimeField(verbose_name="作成日時",auto_now_add=True,null=True)
     image = models.ImageField(upload_to=upload_to)
-    lat = models.FloatField(null=True)
-    lon = models.FloatField(null=True)
+    lat = models.FloatField(null=True, blank=True)
+    lon = models.FloatField(null=True, blank=True)
     date_photographed = models.DateTimeField(verbose_name="撮影日時",null=True)
     date_lastModified = models.DateTimeField(verbose_name="ファイル更新日時",null=True)
     

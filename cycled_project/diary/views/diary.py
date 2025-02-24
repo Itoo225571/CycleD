@@ -180,10 +180,6 @@ def diary_edit_noPK(request):
     form_diary = DiaryForm()
     field_names_diary = [field for field in form_diary.fields if field in request.POST]
 
-    is_public = request.POST.get('is_public')
-    print(is_public)
-    print(request.POST)
-    
     diary = get_object_or_404(Diary, date=date, user=request.user)
     # form = DiaryForm(request.POST, instance=diary, request=request)
     if field_names_diary:
@@ -478,23 +474,27 @@ async def process_image_file(img_file, image_hash_list, request):
                     messages.error(request, f"{field}: {error}")
                     error_values.append(error)
             return {'error':error_values}
+        
         retry_count = 3  # 最大リトライ回数
         attempt = 0  # 現在の試行回数
-
+        geo_data = {
+            "image": temp_image.image.url,
+            "id_of_image": temp_image.id,
+            "date": temp_image.date_photographed.strftime('%Y-%m-%d'),
+        }
+        # GPS情報がない場合
+        if not (temp_image.lat and temp_image.lon):
+            return geo_data
+        
         while attempt < retry_count:
             try:
-                geo_data = await regeocode_async(request, temp_image.lat, temp_image.lon)
-                if geo_data:
-                    if geo_data['address']['locality'] == '（その他）':
-                        # 'その他'の場合は再試行
-                        attempt += 1
-                        logger.info(f"試行 {attempt}/{retry_count}: 'その他'が返されたため再試行します。")
+                result = await regeocode_async(request, temp_image.lat, temp_image.lon)
+                if result:
+                    if result.get("address", {}).get("locality") == "（その他）":
+                        logger.info(f"試行 {attempt + 1}/{retry_count}: 'その他' が返されたため再試行します。")
                         continue  # 再試行
-                    else:
-                        geo_data['image'] = temp_image.image.url
-                        geo_data['id_of_image'] = temp_image.id
-                        geo_data['date'] = temp_image.date_photographed.strftime('%Y-%m-%d')  # 日付も格納
-                        return geo_data  # 成功した場合は結果を返す
+                    geo_data.update(result)
+                    return geo_data  # 成功したら返す
                 else:
                     logger.error("住所取得に失敗しました。geo_data が None です。")
                     return {'error': "住所取得に失敗しました。geo_data が None です。"}
