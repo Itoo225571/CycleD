@@ -16,8 +16,14 @@
 
 		{% comment %} webアイコン {% endcomment %}
 		<link rel="icon" href="{% static 'diary/img/favicon.ico' %}" type="image/x-icon">
-		<link rel="stylesheet" href="{% static 'css/style.css' %}">
 		<link rel="stylesheet" href="{% static 'css/animations.css' %}">
+
+		{% comment %} フォント {% endcomment %}
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+
+		<link rel="stylesheet" href="{% static 'css/style.css' %}">
 		{% block extra_css %}{% endblock %}
 
 		<title>{% block title %}ちゃりニキ{% endblock %}</title>
@@ -36,7 +42,7 @@
 				<nav class="navbar bd-navbar navbar-expand-lg navbar-light bg-light">
 					<div class="container-fluid">
 						<!-- タイトル -->
-						<a class="navbar-brand mb-0 h1 ms-3 " href="{% url 'diary:top' %}">
+						<a class="navbar-brand mb-0 h1 ms-3" href="{% url 'diary:top' %}">
 							ちゃりニキ
 						</a>
 						<!-- ユーザーアイコン -->

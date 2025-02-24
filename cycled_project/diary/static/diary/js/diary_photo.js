@@ -466,6 +466,15 @@ $(document).ready(function() {
 
         this.submit();
     });
+
+    $('.publish-all-diary').off('click').on('click', function(e) {
+        $field_ispublic = $('.field-is_public');
+        $field_ispublic.each(function(index, element) {
+            let checkbox = $(element).find("input[type='checkbox']");
+            checkbox.prop('checked', true);
+        });
+        
+    });
 });
 
 function edit_location(button){
