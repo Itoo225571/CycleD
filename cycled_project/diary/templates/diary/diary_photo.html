@@ -36,7 +36,16 @@
                 {% csrf_token %}
                 <div class="row" id="diary_form">
                     <div id="diary-management">{{ diary_formset.management_form }}</div>
-                    <div id="location-management">{{ location_formset.management_form }}</div>                      
+                    <div id="location-management">{{ location_formset.management_form }}</div>
+                    <div class="mb-4 w-100 w-md-75 mx-auto">
+                        <button type="button" class="btn btn-outline-success publish-all-diary d-flex align-items-center justify-content-center mx-auto">
+                            <div class="px-2 d-flex align-items-center fs-3">
+                                <i class="material-icons me-2">public</i>
+                                <span class="kaisei-decol-regular">全日記を公開にする</span>
+                            </div>
+                        </button>                        
+                    </div>
+                    
                     <div id="diary-formset-body"></div>
                 </div>
 
