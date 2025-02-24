@@ -386,14 +386,17 @@ $(document).ready(function() {
                 $angle.val(angle);
             });
 
+            // diary内に許可した以上のlocがあった場合のエラー
             var locationNumInDiary = $diaryNewForm.find('.locations-form-wrapper').length;
             if (locationNumInDiary >= MAX_LOCATIONS) {
                 $('button[name="diary-new-form"]').prop('disabled', true);
                 const $diaryErrors = $diaryNewForm.find(`#id_form-${diaryNum}-diary-errors`);
+                var error_class = '.diary_locationNum_error';
+
                 // 同じメッセージがすでに存在するか確認
-                if ($diaryErrors.find('.diary_locationNum_error').length === 0) {
+                if ($diaryErrors.find(error_class).length === 0) {
                     var msg = $(
-                        `<div class="card-errors-element diary_locationNum_error">
+                        `<div class="card-errors-element ${error_class}">
                             日記に追加できる行先は${MAX_LOCATIONS}個まです。指定数になるまで削除してください。
                         </div>`
                     );
@@ -401,6 +404,24 @@ $(document).ready(function() {
                     $diaryErrors.show();
                 }
             }
+
+            // diary内にlat,lonが空のlocがあった場合
+            if (isNaN(location.lat) || isNaN(location.lon)) {
+                $('button[name="diary-new-form"]').prop('disabled', true);
+                const $diaryErrors = $diaryNewForm.find(`#id_form-${diaryNum}-diary-errors`);
+                var error_class = '.diary_noAddress_error';
+
+                // 同じメッセージがすでに存在するか確認
+                if ($diaryErrors.find(error_class).length === 0) {
+                    var msg = $(
+                        `<div class="card-errors-element ${error_class}">
+                            ボタンから写真の場所を入力してください。
+                        </div>`
+                    );
+                    $diaryErrors.append(msg);
+                    $diaryErrors.show();
+                }
+            }    
 
             locationsFormsetBody.append($locationNewForm);
             // totalformを変更

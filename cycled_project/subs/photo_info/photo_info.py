@@ -8,6 +8,7 @@ from pathlib import Path
 from io import BytesIO
 import base64
 import imagehash
+import logging
 
 from pprint import pprint
 
@@ -72,43 +73,57 @@ def get_values_from_photo(exif_data):
     def parse_dms_string(dms_string):
         """DMS形式の文字列をリストに変換する関数"""
         try:
-            # 文字列を分割し、数値に変換
             dms_list = dms_string.replace(' ', '').strip('[]').split(',')
-            dms_list = [float(Fraction(str)) for str in dms_list]
+            dms_list = [float(Fraction(value)) for value in dms_list]
             if len(dms_list) == 3:
                 return dms_list
             else:
                 raise ValueError("DMS形式が不正です。")
-        except ValueError:
-            print("DMS形式の文字列が正しくありません。")
+        except ValueError as e:
+            logging.error(f"DMS形式の文字列が正しくありません: {e}")
             return None
+
     try:
-        lat_ref = exif_data["GPS GPSLatitudeRef"].printable.strip()
-        lon_ref = exif_data["GPS GPSLongitudeRef"].printable.strip()
-        lat_dms = exif_data["GPS GPSLatitude"].printable
-        lon_dms = exif_data["GPS GPSLongitude"].printable
+        # GPS情報
+        lat_ref = exif_data.get("GPS GPSLatitudeRef")
+        lon_ref = exif_data.get("GPS GPSLongitudeRef")
+        lat_dms = exif_data.get("GPS GPSLatitude")
+        lon_dms = exif_data.get("GPS GPSLongitude")
+        pre_height = exif_data.get("GPS GPSAltitude")
 
-        pre_latitude = parse_dms_string(lat_dms)
-        pre_longitude = parse_dms_string(lon_dms)
-        pre_height = exif_data["GPS GPSAltitude"].printable
-        
-        if pre_latitude and pre_longitude:
-            latitude = dms_to_decimal(pre_latitude,lat_ref)
-            longitude = dms_to_decimal(pre_longitude,lon_ref)
-        else:
-            # print("緯度・軽度の情報がありません。")
-            return {}
-        if pre_height:
-            height = float(Fraction(pre_height))
-        
-        datetime_str = exif_data.get("Image DateTime").printable
-        dt = datetime.strptime(datetime_str, '%Y:%m:%d %H:%M:%S')
-        photo_info = {"dt":dt,"lat":latitude,"lon":longitude,"height":height}
+        # 日付情報
+        datetime_str = exif_data.get("Image DateTime")
+        dt = None
+        if datetime_str:
+            try:
+                dt = datetime.strptime(datetime_str.printable, '%Y:%m:%d %H:%M:%S')
+            except ValueError:
+                logging.error(f"日付の形式が不正です: {datetime_str.printable}")
 
-        return photo_info
-    except KeyError:
-        # print("必要なGPS情報が含まれていません。")
-        return {}
+        # GPSデータが存在しない場合でも日付だけは返す
+        if not all([lat_ref, lon_ref, lat_dms, lon_dms]):
+            logging.warning("緯度・経度の情報が含まれていません。")
+            return {"dt": dt } if dt else {}
+
+        # GPSデータの処理
+        lat_ref = lat_ref.printable.strip()
+        lon_ref = lon_ref.printable.strip()
+        pre_latitude = parse_dms_string(lat_dms.printable)
+        pre_longitude = parse_dms_string(lon_dms.printable)
+
+        if not pre_latitude or not pre_longitude:
+            return {"dt": dt} if dt else {}
+
+        latitude = dms_to_decimal(pre_latitude, lat_ref)
+        longitude = dms_to_decimal(pre_longitude, lon_ref)
+        height = float(Fraction(pre_height.printable)) if pre_height else None
+
+        return {"dt": dt, "lat": latitude, "lon": longitude, "height": height}
+
+    except Exception as e:
+        logging.error(f"EXIFデータの解析中にエラーが発生しました: {e}")
+        return {"dt": dt} if dt else {}
+
 
 def to_jpeg(original_file, quality=80, max_size=(1920, 1080)):
     pillow_heif.register_heif_opener()
@@ -132,6 +147,7 @@ def to_pHash(image):
 
 if __name__=="__main__":
     file = r"/Users/itoudaiki/Downloads/plus.png"
-    file= r"C:\Users\desig\Box\設計システム研究室\研究用データ\研究グループ\ロバスト設計\2024-_伊藤大貴\写真\IMG_0599.HEIC"
+    file= r"/Users/itoudaiki/Library/CloudStorage/OneDrive-MeijiMail/設計計画/写真/20240731_081808188_iOS.heic"
+    file = r"/Users/itoudaiki/Library/CloudStorage/OneDrive-MeijiMail/設計計画/写真/IMG_0907.jpg"
 
     info = get_photo_info(file)
