@@ -39,7 +39,7 @@ class AddressSearchForm(forms.Form):
                         label="",
                         max_length=64,
                         widget=forms.TextInput(attrs={"placeholder":" 地名・施設名・駅名など"})
-                        )
+                    )
     
 class LocationForm(forms.ModelForm):
     date_of_Diary = forms.DateField(required=False, widget=forms.HiddenInput())
@@ -91,12 +91,12 @@ class LocationCoordForm(forms.ModelForm):
 """___Diary関連___"""
 class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
     formset_class = LocationFormSet
-    keyword = forms.CharField(
-        label="",
-        max_length=64,
-        required=False,
-        widget=forms.TextInput(attrs={"placeholder": "地名・施設名・駅名など", 'type': 'search'}),
-    )
+    # keyword = forms.CharField(
+    #     label="",
+    #     max_length=64,
+    #     required=False,
+    #     widget=forms.TextInput(attrs={"placeholder": "地名・施設名・駅名など", 'type': 'search'}),
+    # )
 
     def __init__(self, *args, widgets=None, **kwargs):
         self.request = kwargs.pop('request', None)
