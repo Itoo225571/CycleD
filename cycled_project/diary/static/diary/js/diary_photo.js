@@ -494,7 +494,6 @@ $(document).ready(function() {
             let checkbox = $(element).find("input[type='checkbox']");
             checkbox.prop('checked', true);
         });
-        
     });
 });
 
