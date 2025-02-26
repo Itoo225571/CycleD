@@ -8,9 +8,16 @@ from django_ratelimit.exceptions import Ratelimited
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms.models import model_to_dict
 from django.shortcuts import redirect
+from django.core.exceptions import ValidationError
+
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from ..forms import AddressSearchForm,LocationForm,LocationCoordForm
 from ..models import Location
+from ..serializers import DiarySerializer,LocationSerializer
 
 from subs.get_location import geocode_gsi,geocode_yahoo,regeocode_gsi,regeocode_HeartTails,regeocode_yahoo
 from subs.get_location import regeocode_gsi_async,regeocode_HeartTails_async,regeocode_yahoo_async
@@ -181,3 +188,43 @@ class AddressUserView(LoginRequiredMixin,generic.FormView):
                 return self.form_invalid(form)
 
         return self.form_valid(form)
+
+@api_view(['POST'])
+@authentication_classes([SessionAuthentication])  # セッション認証
+@permission_classes([IsAuthenticated])  # ログイン必須
+def address_search(request):
+    form = AddressSearchForm(request.POST)
+    if form.is_valid():
+        keyword = form.cleaned_data.get('keyword')
+        data_list = geocode(request, keyword)  # geocode関数を呼び出す
+        response = {"data_list": data_list}
+        return Response(response, status=200)  # 正常にデータを返す
+
+    # フォームが無効な場合、エラーメッセージを返す
+    return Response({"error": "Invalid form data", "errors": form.errors}, status=400)
+
+@api_view(['POST'])
+@authentication_classes([SessionAuthentication])  # セッション認証
+@permission_classes([IsAuthenticated])  # ログイン必須
+def get_current_address(request):
+    form = LocationCoordForm(request.POST)
+    if form.is_valid():
+        loc = form.save(commit=False)
+        
+        lat = form.cleaned_data["lat"]
+        lon = form.cleaned_data["lon"]
+        geo = regeocode(request,lat,lon)
+        loc.state = geo.address.state
+        loc.display = geo.address.display
+
+        try:
+            loc.clean()  # モデルのバリデーションを実行
+        except ValidationError as e:
+            return Response({"error": "モデルバリデーションエラー", "details": e.messages}, status=400)
+        loc.save()
+        # シリアライズして返却
+        serializer = LocationSerializer(loc)
+        return Response(serializer.data, status=200)  # シリアライズしたデータを返す
+
+    # フォームが無効な場合、エラーメッセージを返す
+    return Response({"error": "Invalid form data", "errors": form.errors}, status=400)

@@ -15,7 +15,8 @@ urlpatterns = [
     path("location2weather/",views.ajax_location2weather,name="ajax_location2weather"), 
 
     path("address/",views.AddressUserView.as_view(),name= "address_user"),
-    
+    path("address-search/",views.address_search,name="address_search"),
+
     path("calendar/",views.CalendarView.as_view(),name="calendar"),
     # path("calendar_edit/",views.DiaryNewView.as_view(),name="calendar_edit"),   
 

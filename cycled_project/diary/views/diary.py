@@ -282,6 +282,9 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
         context['diary_formset'] = DiaryFormSet(queryset=Diary.objects.none())
         context['location_formset'] = LocationFormSet(queryset=Location.objects.none())
         context['MAX_LOCATIONS'] = Diary.MAX_LOCATIONS
+
+        context['addressseach_form'] = AddressSearchForm()
+        context['addressselect_form'] = LocationForm()
         return context
     
     def get(self, request: HttpRequest, *args: str, **kwargs) -> HttpResponse:
