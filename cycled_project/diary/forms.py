@@ -38,6 +38,7 @@ class AddressSearchForm(forms.Form):
     keyword = forms.CharField(
                         label="",
                         max_length=64,
+                        help_text="検索の使用上，検索結果が変わることがあります",
                         widget=forms.TextInput(attrs={"placeholder":" 地名・施設名・駅名など"})
                     )
     

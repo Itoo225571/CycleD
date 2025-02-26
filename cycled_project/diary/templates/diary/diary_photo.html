@@ -13,10 +13,18 @@
 {% block extra_css %}
     <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'diary/css/diary_photo.css' %}" type="text/css" >
+    
+    <link rel="stylesheet" href="{% static 'diary/css/address.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'diary/css/address_search.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'diary/css/address_search_modal.css' %}" type="text/css">
 {% endblock extra_css %}
 
 {% block content %}
-    <div class="container-diary-photo">        
+    <div class="container-diary-photo">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddressSearchModal">
+            Launch demo modal
+        </button>
+
         <form method="post" id="id_photos-form" name="photos-form" enctype="multipart/form-data" >
             {% csrf_token %}
             <div id="photo_form">
@@ -122,6 +130,21 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" id="AddressSearchModal" tabindex="-1" aria-labelledby="modalAddressSearch" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="modalAddressSearch">
+                        場所を検索して見つける
+                    </h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% include 'diary/address_search.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock content %}
 
 {% block extra_js %}
@@ -141,5 +164,8 @@
         const MAX_LOCATIONS = {{ MAX_LOCATIONS }};
     </script>    
     <script src="{% static 'diary/js/diary_photo.js' %}"></script>
+
+    <script src="{% static 'diary/js/pagination.js' %}"></script>
+    <script src="{% static 'diary/js/address_search.js' %}"></script>
     
 {% endblock %}

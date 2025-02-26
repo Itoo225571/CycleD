@@ -1,0 +1,29 @@
+{% load django_bootstrap5 %}
+{% load static %}
+{% load widget_tweaks %}
+
+<div class="address-form-content container h-100">
+    <div class="get-current-address-field mb-3">
+        <div class="d-flex justify-content-center">
+            <button type="button" class="btn btn-outline-primary get-current-address-button d-flex align-items-center justify-content-center w-100">
+                <i class="material-icons-outlined icon-mylocation me-2">my_location</i>
+                <span class="potta-one-regular">現在地から地域を取得する</span>
+            </button>
+        </div>
+    </div>    
+    
+    <div class="address-search-field">
+        <form method="post" class="address-search-form">
+            {% csrf_token %}
+            <div class="position-relative">
+                {{ addressseach_form.keyword| add_class:"form-control search-input" }}
+                <i class="material-icons icon-search">search</i>
+            </div>
+        </form>
+        <small class="text-muted m-1">{{ addressseach_form.keyword.help_text }}</small>
+    </div>
+
+    <div class="address-select-field"></div>
+
+    <div class="pager" id="address-list-pager"></div>
+</div>
