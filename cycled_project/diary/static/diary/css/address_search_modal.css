@@ -1,11 +1,5 @@
-#AddressSearchModal .modal-dialog {
-    height: 100vh; /* 画面の高さに合わせる */
-    max-height: 100vh; /* 最大高さも画面の高さに制限 */
-    margin-top: 0;
-    margin-bottom: 0;
-    /* overflow-y: auto; */
-}
 #AddressSearchModal .modal-content {
-    max-height: 90%;
-    height: 800px;
+    height: auto; /* コンテンツの高さに合わせて自動的に調整 */
+    min-height: 90vh; /* 最大高さを画面の高さの90%に制限 */
+    overflow-y: auto; /* 内容が多い場合、スクロールできるようにする */
 }

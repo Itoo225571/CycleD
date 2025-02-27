@@ -410,7 +410,6 @@ $(document).ready(function() {
                 $('button[name="diary-new-form"]').prop('disabled', true);
                 const $diaryErrors = $diaryNewForm.find(`#id_form-${diaryNum}-diary-errors`);
                 var error_class = '.diary_noAddress_error';
-
                 // 同じメッセージがすでに存在するか確認
                 if ($diaryErrors.find(error_class).length === 0) {
                     var msg = $(
@@ -421,6 +420,8 @@ $(document).ready(function() {
                     $diaryErrors.append(msg);
                     $diaryErrors.show();
                 }
+
+                $locationNewForm.find('.button-open-addressSearchModal').show();
             }    
 
             locationsFormsetBody.append($locationNewForm);
@@ -582,7 +583,8 @@ function delete_location(button) {
     }
 }
 
-$(document).on('keydown', 'input[type="text"]', function(e) {
+// enterキャンセルするのはdiaryに関するform入力中のみ
+$(document).on('keydown', '.diary-form-wrapper input[type="text"][name="keyword"]', function(e) {
     if (e.key === "Enter" || e.keyCode === 13) {
         e.preventDefault();  // Enterキーのデフォルト動作（submit）を無効化
     }

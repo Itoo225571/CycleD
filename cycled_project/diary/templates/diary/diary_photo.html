@@ -14,17 +14,13 @@
     <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'diary/css/diary_photo.css' %}" type="text/css" >
     
-    <link rel="stylesheet" href="{% static 'diary/css/address.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'diary/css/pagenation.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'diary/css/address_search.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'diary/css/address_search_modal.css' %}" type="text/css">
 {% endblock extra_css %}
 
 {% block content %}
     <div class="container-diary-photo">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddressSearchModal">
-            Launch demo modal
-        </button>
-
         <form method="post" id="id_photos-form" name="photos-form" enctype="multipart/form-data" >
             {% csrf_token %}
             <div id="photo_form">
@@ -116,9 +112,13 @@
                     {{ field }}
                 {% endif %}
             {% endfor %}
-            <div class="input-group d-flex flex-row align-items-center">
+            <div class="location-surface-field input-group d-flex flex-row align-items-center">
                 <div class="location-list-label-display w-100"></div>
                 {{ location_formset.empty_form.label|add_class:"w-100 form-control class_locations-label"}}
+                <button class="button-open-addressSearchModal btn btn-link" type="button"
+                        data-bs-toggle="modal" data-bs-target="#AddressSearchModal" style="display: none;">
+                    <span>場所を指定する</span>
+                </button>
             </div>
             <div class="d-flex align-items-center">
                 <button type="button" class="button-edit-location btn p-0" onclick="edit_location(this)">
@@ -167,5 +167,6 @@
 
     <script src="{% static 'diary/js/pagination.js' %}"></script>
     <script src="{% static 'diary/js/address_search.js' %}"></script>
+    <script src="{% static 'diary/js/address_in_diaryphoto.js' %}"></script>
     
 {% endblock %}

@@ -206,6 +206,17 @@ def address_search(request):
 @api_view(['POST'])
 @authentication_classes([SessionAuthentication])  # セッション認証
 @permission_classes([IsAuthenticated])  # ログイン必須
+def address_select(request):
+    form = LocationForm(request.POST)
+    if form.is_valid():
+        loc = form.save(commit=False)
+        # ここにチェック？
+        serializer = LocationSerializer(loc)
+        return Response(serializer.data, status=200)  # シリアライズしたデータを返す
+
+@api_view(['POST'])
+@authentication_classes([SessionAuthentication])  # セッション認証
+@permission_classes([IsAuthenticated])  # ログイン必須
 def get_current_address(request):
     form = LocationCoordForm(request.POST)
     if form.is_valid():
@@ -216,12 +227,14 @@ def get_current_address(request):
         geo = regeocode(request,lat,lon)
         loc.state = geo.address.state
         loc.display = geo.address.display
+        loc.image = form.cleaned_data["image"]
 
         try:
             loc.clean()  # モデルのバリデーションを実行
         except ValidationError as e:
             return Response({"error": "モデルバリデーションエラー", "details": e.messages}, status=400)
-        loc.save()
+        # saveはしない
+        # loc.save()
         # シリアライズして返却
         serializer = LocationSerializer(loc)
         return Response(serializer.data, status=200)  # シリアライズしたデータを返す

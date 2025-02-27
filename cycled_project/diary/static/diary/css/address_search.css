@@ -12,3 +12,7 @@
     transform: translateY(-50%);
     color: #888;
 }
+
+#id_location-list {
+    padding: 0;
+}

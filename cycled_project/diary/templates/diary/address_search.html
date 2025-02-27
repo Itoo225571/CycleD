@@ -2,10 +2,13 @@
 {% load static %}
 {% load widget_tweaks %}
 
-<div class="address-form-content container h-100">
+<div class="address-form-content h-100">
     <div class="get-current-address-field mb-3">
         <div class="d-flex justify-content-center">
-            <button type="button" class="btn btn-outline-primary get-current-address-button d-flex align-items-center justify-content-center w-100">
+            <button type="button" 
+                    class="btn btn-outline-primary get-current-address-button d-flex align-items-center justify-content-center w-100"
+                    data-url="{% url 'diary:get_current_address' %}"
+            >
                 <i class="material-icons-outlined icon-mylocation me-2">my_location</i>
                 <span class="potta-one-regular">現在地から地域を取得する</span>
             </button>
@@ -13,17 +16,19 @@
     </div>    
     
     <div class="address-search-field">
-        <form method="post" class="address-search-form">
+        <form method="post" class="address-search-form" action="{% url 'diary:address_search' %}">
             {% csrf_token %}
             <div class="position-relative">
                 {{ addressseach_form.keyword| add_class:"form-control search-input" }}
                 <i class="material-icons icon-search">search</i>
             </div>
+            <small class="text-muted m-1">{{ addressseach_form.keyword.help_text }}</small>
+            <button type="submit" style="display: none;">Submit</button> <!-- ボタンを追加 -->
         </form>
-        <small class="text-muted m-1">{{ addressseach_form.keyword.help_text }}</small>
     </div>
 
-    <div class="address-select-field"></div>
-
-    <div class="pager" id="address-list-pager"></div>
+    <div class="address-select-field my-3">
+        <ul id="id_location-list" class="list-group"></ul>
+    </div>
+    <div id="pagination"></div>
 </div>
