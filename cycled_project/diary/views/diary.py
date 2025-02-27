@@ -562,7 +562,13 @@ class Photos2LocationsView(generic.View):
                 await cache.aset(f'image_hash_list_{self.user.id}', image_hash_list, timeout=600)
 
             # TempImageの作成と添削
-            location_new = await process_image_file(files[0], image_hash_list, request)
+            # `files` が空でない場合にのみ処理を実行
+            if len(files) > 0:
+                location_new = await process_image_file(files[0], image_hash_list, request)
+            else:
+                # 何かエラーを返す
+                return JsonResponse({'error': 'No file found in the request'}, status=400)
+
             if location_new.get('error'):
                 return JsonResponse(location_new, json_dumps_params={'ensure_ascii': False})
 
