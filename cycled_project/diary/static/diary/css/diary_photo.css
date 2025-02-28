@@ -1,18 +1,3 @@
-/* ツールチップ */
-/* .tooltip-image {
-    max-width: 300px;
-    max-height: 300px;
-    width: auto;
-    height: auto;
-}
-.tooltip-inner {
-    max-width: none;
-    background-color: transparent;
-}
-.tooltip.show {
-    opacity: 1;
-} */
-
 /* ファイルinputデザイン */
 .filepond--root {
     cursor: pointer; /* フィールド全体をクリック可能に */
@@ -58,8 +43,8 @@
 /* ラジオボタン(通常) */
 .location-label {
     margin: .1em auto; 
-    padding: .7em 1em;
-    font-size: 114%;
+    padding: .8rem .5rem;
+    font-size: 100%;
     line-height: 1;
     position: relative;
     cursor: pointer;
@@ -114,12 +99,6 @@
 .class_location-radiobutton:checked + .location-label::after {
     background-color: deepskyblue;
     opacity: 1;
-}
-
-/* アイコン */
-.icon-location {
-    margin: 0 .5rem;
-    font-size: 1.5rem;
 }
 
 /* 作成ボタン */
@@ -278,4 +257,12 @@
     .diary-form-wrapper .field-is_public {
         margin: 10px 5px !important;
     }
+}
+
+.locations-form-wrapper .location-buttons-field {
+    display: flex;
+    align-items: center;
+}
+.locations-form-wrapper .location-buttons-field i {
+    font-size: 1.5rem;
 }
