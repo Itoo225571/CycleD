@@ -64,10 +64,10 @@ $(document).ready(function() {
                         // locationNewEntries.push({form: $diaryForm, location: response.location_new}); //locationは新規は後から設置
                         // diary,locationは後から設置
                         formEntries.push({ 
-                             diary: response.diary,
-                             is_edit: response.diary.diary_id ? true : false,
-                             date: response.diary.date,
-                             location: response.location_new
+                            diary: response.diary,
+                            is_edit: response.diary.diary_id ? true : false,
+                            date: response.diary.date,
+                            location: response.location_new
                         });
                         
                         return ;
@@ -420,9 +420,8 @@ $(document).ready(function() {
                     $diaryErrors.append(msg);
                     $diaryErrors.show();
                 }
-
                 $locationNewForm.find('.button-open-addressSearchModal').show();
-            }    
+            }
 
             locationsFormsetBody.append($locationNewForm);
             // totalformを変更

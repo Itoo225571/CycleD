@@ -1,10 +1,10 @@
 $(document).ready(function() {
     // 親要素にイベントデリゲーションを設定
-    $(document).on('click', '.button-open-addressSearchModal', function(e) {
+    $(document).on('click', '.button-open-addressSearchModal, .button-edit-addressSearchModal', function(e) {
         var $locationFormWrapper = $(this).closest('.locations-form-wrapper');
         var $img = $locationFormWrapper.find('[name$="image"]').first();
         var $modal = $('#AddressSearchModal');
-    
+
         $modal.find('.get-current-address-button').off('click').on('click', function(e) {
             const url = $(this).data('url');
             get_current_address(url)
@@ -72,7 +72,7 @@ $(document).ready(function() {
             var $button_openModal = $locationFormWrapper.find('.button-open-addressSearchModal');
             $button_openModal.hide();
             // $locationFormWrapper.find('.location-list-label-display').html(location.address.label);
-            $('#AddressSearchModal').modal('hide');
+            $('#AddressSearchModal').attr('aria-hidden', 'false').modal('hide');
         }
     });
 });

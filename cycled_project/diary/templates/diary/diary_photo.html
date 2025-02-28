@@ -115,18 +115,37 @@
             <div class="location-surface-field input-group d-flex flex-row align-items-center">
                 <div class="location-list-label-display w-100"></div>
                 {{ location_formset.empty_form.label|add_class:"w-100 form-control class_locations-label"}}
-                <button class="button-open-addressSearchModal btn btn-link" type="button"
-                        data-bs-toggle="modal" data-bs-target="#AddressSearchModal" style="display: none;">
+                <button class="button-open-addressSearchModal btn btn-link" type="button" data-bs-toggle="modal" data-bs-target="#AddressSearchModal" style="display: none;">
                     <span>場所を指定する</span>
                 </button>
             </div>
             <div class="location-buttons-field">
-                <button type="button" class="button-edit-location btn px-1 py-0" onclick="edit_location(this)">
-                    <i class="bi bi-pencil-square icon-location text-muted"></i>
-                </button> 
-                <button type="button" class="button-delete-location btn px-1 py-0" onclick="delete_location(this)">
-                    <i class="bi bi-trash icon-location text-danger" alt="icon-trash"></i>
-                </button> 
+
+                <div class="dropdown">
+                    <button class="btn" type="button" id="dropdownMenuButton-__prefix__" data-bs-toggle="dropdown" aria-expanded="false" style="border:none;">
+                        <i class="material-icons-outlined align-text-bottom">more_horiz</i>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton-__prefix__">
+                        <li>
+                            <button type="button" class="button-edit-addressSearchModal dropdown-item p-2 bt-0 d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#AddressSearchModal">
+                                <i class="material-icons-round text-muted pe-2">edit_location_alt</i>
+                                <span>場所を変更</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="button-edit-location dropdown-item p-2 bt-0 d-flex align-items-center" onclick="edit_location(this)">
+                                <i class="material-icons-outlined text-muted pe-2">edit</i>
+                                <span>名前を変更</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="button-delete-location dropdown-item p-2 bt-0 text-danger d-flex align-items-center" onclick="delete_location(this)">
+                                <i class="material-icons-outlined pe-2">delete</i>
+                                <span>削除</span>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
