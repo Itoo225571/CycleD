@@ -210,6 +210,7 @@ def address_select(request):
     form = LocationForm(request.POST)
     if form.is_valid():
         loc = form.save(commit=False)
+        loc.location_id = None  # 新規作成なのでidは空にする
         # ここにチェック？
         serializer = LocationSerializer(loc)
         return Response(serializer.data, status=200)  # シリアライズしたデータを返す
@@ -227,7 +228,8 @@ def get_current_address(request):
         geo = regeocode(request,lat,lon)
         loc.state = geo.address.state
         loc.display = geo.address.display
-        loc.image = form.cleaned_data["image"]
+        loc.label = geo.address.label
+        loc.location_id = None  # 新規作成なのでidは空にする
 
         try:
             loc.clean()  # モデルのバリデーションを実行

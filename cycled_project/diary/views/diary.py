@@ -305,7 +305,7 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
         diaries = diary_formset.save(commit=False)
         try:
             with transaction.atomic():
-                for diary, form in zip(diaries, diary_formset.forms):
+                for diary in diaries:
                     diary.user = self.request.user  # 現在のユーザーを設定
                     diary.save()  # 保存
                 for form in location_formset.forms:
@@ -320,6 +320,7 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
                         location = form.save(commit=False)
                     id = form.cleaned_data.get("id_of_image")
                     date = form.cleaned_data.get("date_of_Diary")
+                    print(id)
 
                     # tempImageの場合
                     if id:

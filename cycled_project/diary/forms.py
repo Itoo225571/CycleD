@@ -87,7 +87,7 @@ LocationFormSet = forms.inlineformset_factory(
 class LocationCoordForm(forms.ModelForm):
     class Meta:
         model = Location
-        fields = ["lat","lon","image"]
+        fields = ["lat","lon",]
 
 """___Diary関連___"""
 class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
