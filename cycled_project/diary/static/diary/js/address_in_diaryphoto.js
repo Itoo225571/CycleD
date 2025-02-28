@@ -52,12 +52,19 @@ $(document).ready(function() {
                     // オブジェクトの場合、そのプロパティを再帰的に処理
                     applyLocationInput(value, $inputs);
                 } else {
-                    // name属性がkeyと一致するinputを探してvalueを代入
+                    // 正規表現を使って、name属性がlocations-数字-固有の文字形式かつ固有の文字がkeyと一致するinputを探す
                     var $input = $inputs.filter(function() {
-                        return $(this).attr('name') && $(this).attr('name').endsWith(key);
+                        var name = $(this).attr('name');
+                        if (name) {
+                            // 正規表現で最後の部分がkeyと一致するかチェック
+                            var regex = new RegExp('locations-\\d+-' + key + '$');
+                            return regex.test(name);
+                        }
+                        return false;
                     });
                     if ($input.length > 0) {
                         $input.val(value);  // 値を代入
+                        $input.trigger('change');  // 手動でinputイベントを発火
                     }
                 }
             });
@@ -70,9 +77,12 @@ $(document).ready(function() {
         function post_processing() {
             var $diaryFormWrapper = $locationFormWrapper.closest('.diary-form-wrapper');
             var $button_openModal = $locationFormWrapper.find('.button-open-addressSearchModal');
+            var $button_dropdown = $locationFormWrapper.find('.button-location-dropdown');
+            $button_dropdown.focus();
             $button_openModal.hide();
+            
             // $locationFormWrapper.find('.location-list-label-display').html(location.address.label);
-            $('#AddressSearchModal').attr('aria-hidden', 'false').modal('hide');
+            $('#AddressSearchModal').modal('hide');
         }
     });
 });

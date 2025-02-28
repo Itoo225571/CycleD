@@ -391,12 +391,13 @@ $(document).ready(function() {
             if (locationNumInDiary >= MAX_LOCATIONS) {
                 $('button[name="diary-new-form"]').prop('disabled', true);
                 const $diaryErrors = $diaryNewForm.find(`#id_form-${diaryNum}-diary-errors`);
-                var error_class = '.diary_locationNum_error';
+                var error = 'diary_locationNum_error';
+                var error_class = '.' + error;
 
                 // 同じメッセージがすでに存在するか確認
                 if ($diaryErrors.find(error_class).length === 0) {
                     var msg = $(
-                        `<div class="card-errors-element ${error_class}">
+                        `<div class="card-errors-element ${error}">
                             日記に追加できる行先は${MAX_LOCATIONS}個まです。指定数になるまで削除してください。
                         </div>`
                     );
@@ -408,12 +409,13 @@ $(document).ready(function() {
             // diary内にlat,lonが空のlocがあった場合
             if (isNaN(location.lat) || isNaN(location.lon)) {
                 $('button[name="diary-new-form"]').prop('disabled', true);
-                const $diaryErrors = $diaryNewForm.find(`#id_form-${diaryNum}-diary-errors`);
-                var error_class = '.diary_noAddress_error';
+                var $diaryErrors = $diaryNewForm.find(`#id_form-${diaryNum}-diary-errors`);
+                var error = 'diary_noAddress_error';
+                var error_class = '.' + error;
                 // 同じメッセージがすでに存在するか確認
                 if ($diaryErrors.find(error_class).length === 0) {
                     var msg = $(
-                        `<div class="card-errors-element ${error_class}">
+                        `<div class="card-errors-element ${error}">
                             ボタンから写真の場所を入力してください。
                         </div>`
                     );
@@ -421,6 +423,25 @@ $(document).ready(function() {
                     $diaryErrors.show();
                 }
                 $locationNewForm.find('.button-open-addressSearchModal').show();
+
+                $locationNewForm.find('input').on('change', function(){
+                    var inputValue = $(this).val();  // input要素の値を取得
+                    var inputName = $(this).attr('name');  // input要素のname属性を取得
+                    if (inputName.includes('lat') || inputName.includes('lon')) {
+                        if (inputValue) {
+                            var $diaryForm = $locationNewForm.closest('.diary-form-wrapper');
+                            // lat,lonが空の要素が他にないかチェック
+                            var count = $diaryForm.find('[name$="lat"], [name$="lon"]').filter(function() {
+                                return $(this).val() === '';  // 値が文字列 '' の場合
+                            }).length;
+                            if (count === 0) {
+                                // errorを削除
+                                $('button[name="diary-new-form"]').prop('disabled', false);
+                                $diaryErrors.find(error_class).remove();
+                            }
+                        }
+                    }
+                });
             }
 
             locationsFormsetBody.append($locationNewForm);
