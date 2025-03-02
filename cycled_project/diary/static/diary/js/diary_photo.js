@@ -371,8 +371,17 @@ $(document).ready(function() {
                     $locationNewForm.removeClass('scale-down-center');
                     $locationNewForm.off('animationend'); // イベントリスナーを解除
                 });          
-
             });
+
+            $locationNewForm.find('button').off('click').on('click', function() {
+                var $radioButton = $locationNewForm.find('.class_location-radiobutton');
+                // ラジオボタンがチェックされていない場合のみチェックする
+                if (!$radioButton.prop('checked')) {
+                    $radioButton.prop('checked', true)  // ラジオボタンをチェック
+                               .trigger('change');     // change イベントを発生させる
+                }
+            });
+            
 
             // 写真を回転させるボタン
             $diaryNewForm.find('.class_img-rotate-button').off('click').on('click', function() {
@@ -443,6 +452,9 @@ $(document).ready(function() {
                     }
                 });
             }
+
+            // modal関係の関数
+            setup_addressModal($locationNewForm,location);
 
             locationsFormsetBody.append($locationNewForm);
             // totalformを変更

@@ -3,3 +3,10 @@
     min-height: 90vh; /* 最大高さを画面の高さの90%に制限 */
     overflow-y: auto; /* 内容が多い場合、スクロールできるようにする */
 }
+
+#AddressSearchModal .modal-diary-img {
+    height: auto;
+    width: auto;
+    max-width: 100%;
+    max-height: 100%;
+}

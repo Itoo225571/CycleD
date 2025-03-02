@@ -1,9 +1,9 @@
-$(document).ready(function() {
-    // 親要素にイベントデリゲーションを設定
-    $(document).on('click', '.button-open-addressSearchModal, .button-edit-addressSearchModal', function(e) {
-        var $locationFormWrapper = $(this).closest('.locations-form-wrapper');
-        var $img = $locationFormWrapper.find('[name$="image"]').first();
+function setup_addressModal($locationFormWrapper, location) {
+    $locationFormWrapper.find('.button-open-addressSearchModal, .button-edit-addressSearchModal').off('click').on('click',function(e) {
+        // e.preventDefault();
         var $modal = $('#AddressSearchModal');
+        pre_modalOpen();
+        $modal.modal('show');
 
         $modal.find('.get-current-address-button').off('click').on('click', function(e) {
             const url = $(this).data('url');
@@ -15,14 +15,14 @@ $(document).ready(function() {
                     var $display = $locationFormWrapper.find('.location-list-label-display');
                     applyLocationInput(location,$inputs);
                     applyLocationDisplay(location,$display);
-                    post_processing();
+                    pre_modalClose();
                 })
                 .catch(error => {
                     console.error('エラー:', error);
                 });
         });
     
-        $modal.find('.address-search-form').on("submit", function(event) {
+        $modal.find('.address-search-form').off("submit").on("submit", function(event) {
             event.preventDefault();
             var url = $(this).attr("action");
             var keyword = $(this).find("input[name='keyword']").val();
@@ -43,7 +43,7 @@ $(document).ready(function() {
             var $display = $locationFormWrapper.find('.location-list-label-display');
             applyLocationInput(location,$inputs);
             applyLocationDisplay(location,$display);
-            post_processing();
+            pre_modalClose();
         }
 
         function applyLocationInput(location,$inputs) {
@@ -73,19 +73,36 @@ $(document).ready(function() {
             var label = searchKeys(location, 'label') || searchKeys(location, 'display');
             $display.html(label);
         }
-        
-        function post_processing() {
-            var $diaryFormWrapper = $locationFormWrapper.closest('.diary-form-wrapper');
-            var $button_openModal = $locationFormWrapper.find('.button-open-addressSearchModal');
-            var $button_dropdown = $locationFormWrapper.find('.button-location-dropdown');
+
+        function pre_modalOpen() {
+            var imageSrc = window.location.origin + location.image;
+            const $imgField = $modal.find('.modal-diary-img-field');
+            const html = `<img src="${imageSrc}" class="modal-diary-img rounded" alt="場所の写真">`;
+            $imgField.html(html);
+
+            // 検索要素を初期化
+            $modal.find('#id_keyword').val('');
+            $modal.find('#id_location-list').empty();
+            $modal.find('#pagination').empty();
+        }
+
+        function pre_modalClose() {
+            const $diaryFormWrapper = $locationFormWrapper.closest('.diary-form-wrapper');
+            const $button_openModal = $locationFormWrapper.find('.button-open-addressSearchModal');
+            const $button_dropdown = $locationFormWrapper.find('.button-location-dropdown');
             $button_dropdown.focus();
             $button_openModal.hide();
-            
+
             // $locationFormWrapper.find('.location-list-label-display').html(location.address.label);
-            $('#AddressSearchModal').modal('hide');
+            $modal.modal('hide');
         }
+
+        // モーダルが閉じられたときのイベントリスナー
+        $modal.on('hidden.bs.modal', function () {
+            // delete $locationNewForm;
+        });
     });
-});
+}
 
 function searchKeys(obj, keyToFind) {
     let result = undefined;
