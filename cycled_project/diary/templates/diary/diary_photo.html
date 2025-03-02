@@ -14,7 +14,7 @@
     <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'diary/css/diary_photo.css' %}" type="text/css" >
     
-    <link rel="stylesheet" href="{% static 'diary/css/pagenation.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'diary/css/pagination.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'diary/css/address_search.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'diary/css/address_search_modal.css' %}" type="text/css">
 {% endblock extra_css %}
@@ -115,7 +115,7 @@
             <div class="location-surface-field input-group d-flex flex-row align-items-center">
                 <div class="location-list-label-display w-100"></div>
                 {{ location_formset.empty_form.label|add_class:"w-100 form-control class_locations-label"}}
-                <button class="button-open-addressSearchModal btn btn-link" type="button" data-bs-toggle="modal" data-bs-target="#AddressSearchModal" style="display: none;">
+                <button class="button-open-addressSearchModal btn btn-link" type="button" style="display: none;">
                     <span>場所を指定する</span>
                 </button>
             </div>
@@ -125,9 +125,9 @@
                     <button class="btn button-location-dropdown" type="button" id="dropdownMenuButton-__prefix__" data-bs-toggle="dropdown" aria-expanded="false" style="border:none;">
                         <i class="material-icons-outlined align-text-bottom">more_horiz</i>
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton-__prefix__">
+                    <ul class="dropdown-menu scale-in-ver-top" aria-labelledby="dropdownMenuButton-__prefix__">
                         <li>
-                            <button type="button" class="button-edit-addressSearchModal dropdown-item p-2 bt-0 d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#AddressSearchModal">
+                            <button type="button" class="button-edit-addressSearchModal dropdown-item p-2 bt-0 d-flex align-items-center">
                                 <i class="material-icons-round text-muted pe-2">edit_location_alt</i>
                                 <span>場所を変更</span>
                             </button>
@@ -158,8 +158,11 @@
                     </h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    {% include 'diary/address_search.html' %}
+                <div class="modal-body" style="height: 80vh;">
+                    <div class="modal-diary-img-field d-flex justify-content-center p-2 h-50"></div>
+                    <div class="modal-address-search-field">
+                        {% include 'diary/address_search.html' %}
+                    </div>
                 </div>
             </div>
         </div>
