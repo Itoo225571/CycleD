@@ -15,7 +15,7 @@ function setup_addressModal($locationFormWrapper, location) {
                     var $display = $locationFormWrapper.find('.location-list-label-display');
                     applyLocationInput(location,$inputs);
                     applyLocationDisplay(location,$display);
-                    pre_modalClose();
+                    modalClose();
                 })
                 .catch(error => {
                     console.error('エラー:', error);
@@ -26,6 +26,7 @@ function setup_addressModal($locationFormWrapper, location) {
             event.preventDefault();
             var url = $(this).attr("action");
             var keyword = $(this).find("input[name='keyword']").val();
+            
             search_address(url, keyword)
                 .then(location_list => {
                     // ここでレスポンスを処理
@@ -39,11 +40,16 @@ function setup_addressModal($locationFormWrapper, location) {
         function select_location(location_list, $button) {
             var index = $button.data('index');
             var location = location_list[index];
+            setLocation(location);
+            storeHistory(location);
+        }
+
+        function setLocation(location) {
             var $inputs = $locationFormWrapper.find('input');
             var $display = $locationFormWrapper.find('.location-list-label-display');
             applyLocationInput(location,$inputs);
             applyLocationDisplay(location,$display);
-            pre_modalClose();
+            modalClose();
         }
 
         function applyLocationInput(location,$inputs) {
@@ -80,13 +86,15 @@ function setup_addressModal($locationFormWrapper, location) {
             const html = `<img src="${imageSrc}" class="modal-diary-img rounded" alt="場所の写真">`;
             $imgField.html(html);
 
+            displayHistory($('#id_keyword'),setLocation);   // 履歴表示
+
             // 検索要素を初期化
             $modal.find('#id_keyword').val('');
             $modal.find('#id_location-list').empty();
             $modal.find('#pagination').empty();
         }
 
-        function pre_modalClose() {
+        function modalClose() {
             const $diaryFormWrapper = $locationFormWrapper.closest('.diary-form-wrapper');
             const $button_openModal = $locationFormWrapper.find('.button-open-addressSearchModal');
             const $button_dropdown = $locationFormWrapper.find('.button-location-dropdown');
@@ -104,22 +112,3 @@ function setup_addressModal($locationFormWrapper, location) {
     });
 }
 
-function searchKeys(obj, keyToFind) {
-    let result = undefined;
-    function search(o) {
-        for (const key in o) {
-            if (o.hasOwnProperty(key)) {
-                if (key === keyToFind) {
-                    result = o[key];
-                    return; // 結果が見つかった場合、検索を終了
-                }
-                if (typeof o[key] === 'object' && o[key] !== null) {
-                    search(o[key]);
-                    if (result !== undefined) return; // 結果が見つかった場合、早期リターン
-                }
-            }
-        }
-    }
-    search(obj);
-    return result;
-}
