@@ -177,9 +177,21 @@ function displayHistory($input,setLocation) {
         select: function(event, ui) {
             // ui.itemにはlabelとlocationが含まれている
             setLocation(ui.item.location);
-        }
-    })
-
+        },
+    }).data("ui-autocomplete")._renderItem = function (ul, item) {
+        return $("<li>")
+        .data("item.autocomplete", item)
+        .append(`
+            <div class="autocomplete-item">
+                <div class="d-flex align-content-center">
+                    <i class="material-icons-outlined me-2 text-body">history</i>
+                    <span class="text-body">${item.label}</span>
+                </div>
+            </div>
+        `)
+        .appendTo(ul);
+    };
+    
     // input が focus された時に強制的に履歴を表示
     $input.on('focus', function() {
         $(this).autocomplete("search", ""); // 空文字を検索してリストを表示
