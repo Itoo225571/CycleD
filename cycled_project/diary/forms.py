@@ -39,7 +39,10 @@ class AddressSearchForm(forms.Form):
                         label="",
                         max_length=64,
                         help_text="検索の使用上，検索結果が変わることがあります",
-                        widget=forms.TextInput(attrs={"placeholder":" 地名・施設名・駅名など"})
+                        widget=forms.TextInput(attrs={
+                            "placeholder": "地名・施設名・駅名など",
+                            "autocomplete": "off"  # 自動履歴機能を無効化
+                        })
                     )
     
 class LocationForm(forms.ModelForm):
