@@ -128,13 +128,13 @@
                     <ul class="dropdown-menu scale-in-ver-top" aria-labelledby="dropdownMenuButton-__prefix__">
                         <li>
                             <button type="button" class="button-edit-addressSearchModal dropdown-item p-2 bt-0 d-flex align-items-center">
-                                <i class="material-icons-round text-muted pe-2">edit_location_alt</i>
+                                <i class="material-icons-round pe-2">edit_location_alt</i>
                                 <span>場所を変更</span>
                             </button>
                         </li>
                         <li>
-                            <button type="button" class="button-edit-location dropdown-item p-2 bt-0 d-flex align-items-center" onclick="edit_location(this)">
-                                <i class="material-icons-outlined text-muted pe-2">edit</i>
+                            <button type="button" class="button-edit-location-label dropdown-item p-2 bt-0 d-flex align-items-center" onclick="edit_location(this)">
+                                <i class="material-icons-outlined pe-2">edit</i>
                                 <span>名前を変更</span>
                             </button>
                         </li>
@@ -188,6 +188,7 @@
     <script src="{% static 'diary/js/diary_photo.js' %}"></script>
 
     <script src="{% static 'diary/js/pagination.js' %}"></script>
+    <script src="{% static 'diary/js/searchHistory.js' %}"></script>
     <script src="{% static 'diary/js/address_search.js' %}"></script>
     <script src="{% static 'diary/js/address_in_diaryphoto.js' %}"></script>
     

@@ -432,7 +432,9 @@ $(document).ready(function() {
                     $diaryErrors.show();
                 }
                 $locationNewForm.find('.button-open-addressSearchModal').show();
+                $locationNewForm.find('.button-edit-location-label').addClass('disabled');
 
+                // locにvalが入った時
                 $locationNewForm.find('input').on('change', function(){
                     var inputValue = $(this).val();  // input要素の値を取得
                     var inputName = $(this).attr('name');  // input要素のname属性を取得
@@ -447,6 +449,8 @@ $(document).ready(function() {
                                 // errorを削除
                                 $('button[name="diary-new-form"]').prop('disabled', false);
                                 $diaryErrors.find(error_class).remove();
+                                // location-lanel編集ボタンを選択可能にする
+                                $locationNewForm.find('.button-edit-location-label').removeClass('disabled');
                             }
                         }
                     }
