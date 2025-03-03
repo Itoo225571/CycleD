@@ -134,6 +134,55 @@ function display_location_list(location_list,func_selected) {
     $('#id_location-list').find('.address-select-button').off('click').on('click', function() {
         func_selected(location_list, $(this));  // クリックされたボタンと location_list を渡す
     });
-    
     return;
+}
+
+// 履歴保存（最大10件まで）
+function storeHistory(location) {
+    let history = JSON.parse(localStorage.getItem('locationSelected')) || [];
+    
+    // 既に同じデータがある場合は削除
+    history = history.filter(item => JSON.stringify(item) !== JSON.stringify(location));
+    
+    // 配列の末尾に新しい履歴を追加
+    history.push(location);
+
+    // 10個を超えたら先頭の要素を削除
+    if (history.length > 10) {
+        history.shift();
+    }
+
+    localStorage.setItem('locationSelected', JSON.stringify(history));
+}
+
+// 履歴表示
+function displayHistory($input,setLocation) {
+    const history = JSON.parse(localStorage.getItem('locationSelected')) || [];
+    // 履歴のアイテムごとにlabelとlocationをペアで作成
+    const labelsWithLocation = history.map(item => ({
+        label: searchKeys(item, 'label'),
+        location: item
+    }));
+
+    $input.autocomplete({
+        source: labelsWithLocation,  // labelとlocationをペアとして渡す
+        autoFocus: false,
+        collapsible: true,
+        delay: 300,
+        minLength: 0, // 入力なしでも履歴を表示
+        position: {
+            my: "left top", // 自身の位置を入力フィールドの下部に設定
+            at: "left bottom+2"  // リストを上に10pxずらす（隙間を持たせる）
+        },
+        select: function(event, ui) {
+            // ui.itemにはlabelとlocationが含まれている
+            setLocation(ui.item.location);
+        }
+    })
+
+    // input が focus された時に強制的に履歴を表示
+    $input.on('focus', function() {
+        $(this).autocomplete("search", ""); // 空文字を検索してリストを表示
+    });
+
 }
