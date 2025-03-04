@@ -15,4 +15,5 @@ urlpatterns = [
     path("user/edit/",views.UserEditView.as_view(),name="user_edit"),
 
     path("password/change/",views.CustomPasswordChangeView.as_view(),name="password_change"),
+    path("password/set/",views.CustomPasswordSetView.as_view(),name="password_set"),
 ]

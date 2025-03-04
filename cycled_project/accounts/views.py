@@ -80,6 +80,11 @@ class CustomPasswordChangeView(LoginRequiredMixin, views.PasswordChangeView):
     success_url = reverse_lazy('accounts:setting')
     success_message = 'パスワードの変更に成功'
 
+class CustomPasswordSetView(LoginRequiredMixin, views.PasswordSetView):
+    template_name = "account/password_set.html"
+    success_url = reverse_lazy('accounts:setting')
+    success_message = 'パスワードの設定に成功'
+
 class UserEditView(LoginRequiredMixin,generic.UpdateView):
     pass
 
