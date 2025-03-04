@@ -16,4 +16,6 @@ urlpatterns = [
 
     path("password/change/",views.CustomPasswordChangeView.as_view(),name="password_change"),
     path("password/set/",views.CustomPasswordSetView.as_view(),name="password_set"),
+
+    path("3rdparty",views.CustomConnectionsView.as_view(),name="connections"),
 ]

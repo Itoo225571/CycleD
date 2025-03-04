@@ -1,4 +1,5 @@
-from allauth.account import views
+from allauth.account import views as account_views
+from allauth.socialaccount import views as socialaccount_views
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.hashers import check_password
@@ -23,20 +24,20 @@ from .forms import CustomLoginForm,CustomSignupForm,UserSettingForm,UserDynamicF
 from .models import User
 from diary.models import Diary,Coin  # diaryアプリから
 
-class CustomLoginView(views.LoginView):
+class CustomLoginView(account_views.LoginView):
     template_name="account/login.html"
     form_class=CustomLoginForm
     next_page = 'diary:home'    # success_url (名前での指定が可)
     redirect_authenticated_user = True  # ログイン後にアクセスしたらnext_pageに飛ぶ
 
-class CustomLogoutView(LoginRequiredMixin,views.LogoutView):
+class CustomLogoutView(LoginRequiredMixin,account_views.LogoutView):
     template_name="account/logout.html"
     def post(self, request, *args, **kwargs):
         """AJAX用のログアウト処理"""
         logout(request)  # ユーザーをログアウト
         return JsonResponse({"status": "success", "message": ""})
 
-class CustomSignupView(views.SignupView):
+class CustomSignupView(account_views.SignupView):
     form_class = CustomSignupForm
     template_name="account/signup.html"
 
@@ -75,12 +76,12 @@ class UserSettingView(LoginRequiredMixin,generic.UpdateView):
             messages.error(self.request, '不正なリクエストです')
             return HttpResponseRedirect(self.success_url)
 
-class CustomPasswordChangeView(LoginRequiredMixin, views.PasswordChangeView):
+class CustomPasswordChangeView(LoginRequiredMixin, account_views.PasswordChangeView):
     template_name = "account/password_change.html"
     success_url = reverse_lazy('accounts:setting')
     success_message = 'パスワードの変更に成功'
 
-class CustomPasswordSetView(LoginRequiredMixin, views.PasswordSetView):
+class CustomPasswordSetView(LoginRequiredMixin, account_views.PasswordSetView):
     template_name = "account/password_set.html"
     success_url = reverse_lazy('accounts:setting')
     success_message = 'パスワードの設定に成功'
@@ -88,7 +89,7 @@ class CustomPasswordSetView(LoginRequiredMixin, views.PasswordSetView):
 class UserEditView(LoginRequiredMixin,generic.UpdateView):
     pass
 
-class UserLeaveView(LoginRequiredMixin, views.FormView):
+class UserLeaveView(LoginRequiredMixin, account_views.FormView):
     template_name = "account/leave.html"
     form_class = UserLeaveForm  # デフォルトは通常のフォーム
 
@@ -127,3 +128,7 @@ class UserLeaveView(LoginRequiredMixin, views.FormView):
     def form_invalid(self, form):
         messages.error(self.request, "入力内容が正しくありません。")
         return self.render_to_response(self.get_context_data(form=form))
+    
+class CustomConnectionsView(socialaccount_views.ConnectionsView):
+    template_name = "socialaccount/connections.html"
+    pass

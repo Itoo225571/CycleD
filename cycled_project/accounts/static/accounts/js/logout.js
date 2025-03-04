@@ -24,6 +24,6 @@ function logout(url_logout) {
             error: function(xhr, errmsg, err) {
                 alert('エラーが発生しました。再度お試しください。');
             }
-        });     
+        });
     }    
 }

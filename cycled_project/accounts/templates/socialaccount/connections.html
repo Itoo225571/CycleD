@@ -1,17 +1,10 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load allauth %}
-
-{% block head_title %}
-    {% trans "アカウント接続" %}
-{% endblock head_title %}
-
 {% block content %}
-    <h1>{% trans "アカウント接続" %}</h1>
-
     {% if form.accounts %}
         <p>
-            {% trans "以下の外部アカウントを使って、あなたのアカウントにサインインできます：" %}
+            以下の外部アカウントを使って，あなたのアカウントにサインインできます：
         </p>
 
         {% url 'socialaccount_connections' as action_url %}
@@ -47,7 +40,7 @@
         </form>
     {% else %}
         <p>
-            {% trans "現在、あなたのアカウントには外部アカウントが接続されていません。" %}
+            現在，あなたのアカウントには外部アカウントが接続されていません
         </p>
     {% endif %}
 
