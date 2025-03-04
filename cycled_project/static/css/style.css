@@ -105,12 +105,12 @@ body {
     margin-right: 10px;
     font-size: 1.4em;
 }
-.navbar .button-logout::before {
+.user-icon-container .button-logout::before {
     font-family: 'Material Icons';
     content: "\e9ba";
     opacity: .7;
 }
-.navbar .button-setting::before {
+.user-icon-container .button-setting::before {
     font-family: 'Material Icons Two Tone';
     content: '\e8b8';
     opacity: .7;
