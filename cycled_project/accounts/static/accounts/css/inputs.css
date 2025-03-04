@@ -4,3 +4,10 @@ input::placeholder {
     font-size: 14px;
     opacity: 0.8; /* 薄く表示 (0: 完全に透明, 1: 完全に不透明) */
 }
+
+.card-form .explanation {
+    font-size: 0.8em;  /* 小さめのフォントサイズ */
+    color: #888;       /* グレー系の薄い色 */
+    margin: 5px 0;     /* 余白を小さく */
+    line-height: 1.4;  /* 行間を少し広めに */
+}

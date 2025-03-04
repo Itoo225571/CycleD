@@ -87,6 +87,19 @@ class UserLeaveView(LoginRequiredMixin,views.FormView):
     template_name = "account/leave.html"
     form_class = UserLeaveForm
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # 退会に際する注意事項のリストを追加
+        leave_warnings = [
+            # "退会後、アカウントは一時的に非アクティブ状態になります。",
+            "退会処理を行うと、すぐにログインができなくなります。",
+            "再入会をご希望の場合は、サポートまでご連絡ください。",
+            # "退会後、通知やメッセージの受信が停止します。",
+            "退会手続きは取り消しできませんので、十分ご確認の上、手続きを行ってください。"
+        ]
+        context['leave_warnings'] = leave_warnings
+        return context
+
     def form_valid(self, form):
         # 入力されたパスワードを取得
         password = form.cleaned_data['password']
