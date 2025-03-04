@@ -20,6 +20,12 @@ $(document).ready(function() {
             $submitButtonEmail.click();    // ボタンをクリックする
         }
     });
+    // 全日記を削除する
+    $('.button-delete-all-diaries').off('click').on('click',function(e) {
+        e.preventDefault();
+        var url = $(this).data('url')
+        deleteAllDiaries(url);
+    });
 });
 
 function resetAllEditButtons() {
@@ -68,17 +74,5 @@ function deleteAllDiaries(url_deleteAllDiaries) {
                 alert('エラーが発生しました。再度お試しください。');
             }
         });
-    }
-}
-
-function confirmDelete() {
-    // 確認ダイアログを表示
-    if (confirm("本当に退会しますか？")) {
-        if (confirm("本当に？")) {
-            if (confirm("後悔しない？")) {
-                // ユーザーが「OK」を押した場合、フォームを送信
-                $('#delete-user-form').submit();
-            }
-        }
     }
 }

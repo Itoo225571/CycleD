@@ -91,17 +91,17 @@
                         </td>
                     </tr>
                     <tr>
-                        <td onclick="logout('{% url 'accounts:logout' %}')" role="button">
+                        <td class="button-logout" role="button" data-url="{% url 'accounts:logout' %}">
                             ログアウト
                         </td>
                     </tr>
                     <tr>
-                        <td class="text-danger" onclick="deleteAllDiaries('{% url 'diary:delete_all_diaries' %}')" role="button">
+                        <td class="button-delete-all-diaries text-danger" role="button" data-url="{% url 'diary:delete_all_diaries' %}">
                             日記をすべて削除する
                         </td>
                     </tr>
                     <tr>
-                        <td class="text-danger" onclick="confirmDelete()" role="button">
+                        <td class="button-leave-user text-danger" role="button" onclick="location.href='{% url 'accounts:leave' %}'">
                             退会する
                         </td>
                     </tr>

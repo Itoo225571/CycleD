@@ -48,7 +48,6 @@ class UserDynamicForm(forms.ModelForm):
         if dynamic_fields:
             self.fields = {field: self.fields[field] for field in dynamic_fields}
 
-class DeleteUserForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['password']
+class UserLeaveForm(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'パスワードを入力','autocomplete': 'off'}))
+
