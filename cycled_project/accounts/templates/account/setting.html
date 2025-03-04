@@ -97,6 +97,13 @@
                         </td>
                     </tr>
                     <tr>
+                        <td>
+                            <a href="{% url "accounts:connections" %}" class="text-decoration-none text-dark w-100 d-block">
+                                アカウントの紐付け
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
                         <td class="button-logout" role="button" data-url="{% url 'accounts:logout' %}">
                             ログアウト
                         </td>
@@ -150,7 +157,6 @@
 {% endblock content %}
 
 {% block extra_js %}
-    <script src="{% static 'js/getCookie.js' %}"></script>
     <script src="{% static 'accounts/js/setting.js' %}"></script>
     <script src="{% static 'accounts/js/add_photo_to_choice.js' %}"></script>
 {% endblock %}
