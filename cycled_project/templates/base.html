@@ -64,7 +64,7 @@
 										<li>
 											<form action="{% url 'accounts:logout' %}" method="post">
 												{% csrf_token %}
-												<button type="button" class="dropdown-item button-logout with-icon" onclick="logout('{% url 'accounts:logout' %}')">
+												<button type="button" class="dropdown-item button-logout with-icon" data-url='{% url "accounts:logout" %}'>
 													ログアウト
 												</button>
 											</form>
@@ -167,7 +167,7 @@
 										<li class="nav-item ms-2">
 											<form action="{% url 'accounts:logout' %}" method="post">
 												{% csrf_token %}
-												<button type="button" class="nav-link dropdown-item button-logout with-icon ps-2" onclick="logout('{% url 'accounts:logout' %}')">
+												<button type="button" class="nav-link dropdown-item button-logout with-icon ps-2" data-url='{% url "accounts:logout" %}'>
 													ログアウト
 												</button>
 											</form>
@@ -196,7 +196,7 @@
 										<li>
 											<form action="{% url 'accounts:logout' %}" method="post">
 												{% csrf_token %}
-												<button type="button" class="dropdown-item button-logout with-icon" onclick="logout('{% url 'accounts:logout' %}')">
+												<button type="button" class="dropdown-item button-logout with-icon" data-url='{% url "accounts:logout" %}'>
 													ログアウト
 												</button>
 											</form>
@@ -306,7 +306,7 @@
 			});
 		</script>
 		{% comment %} logout用 {% endcomment %}
-		<script src="{% static 'js/logout.js' %}"></script>
+		<script src="{% static 'accounts/js/logout.js' %}"></script>
 		
 		{% block extra_js %}{% endblock %}
 	</body>

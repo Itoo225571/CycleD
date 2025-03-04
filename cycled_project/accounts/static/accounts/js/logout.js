@@ -1,3 +1,11 @@
+$(document).ready(function() {
+    $('.button-logout').off('click').on('click',function(e) {
+        e.preventDefault();
+        var url = $(this).data('url')
+        logout(url);
+    });
+});
+
 function logout(url_logout) {
     if (confirm('ログアウトしますか？')) {
         $.ajax({
