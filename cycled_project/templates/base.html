@@ -50,13 +50,23 @@
 							ちゃりニキ
 						</a>
 						<!-- ユーザーアイコン -->
-						<div class="d-flex align-items-center ms-auto">					
+						<div class="user-icon-container d-flex align-items-center ms-auto">					
 							{% if user and user.is_authenticated %}
 								<div class="dropdown-container ms-2">
 									<button type="button" class="user-icon" aria-expanded="false" data-bs-toggle="dropdown" data-bs-auto-close="outside">
 										<img src="{{ user.icon }}" class="rounded-circle" width="35" height="35" alt="icon" loading="lazy">
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
+										<li>
+											<h6 class="dropdown-header d-flex">
+												<img src="{{ user.icon }}" class="rounded-circle" width="50" height="50" alt="icon" loading="lazy">
+												<div class="ms-2">
+													<div class="fs-6 text-dark">{{ user.username }}</div>
+													<div class="small">{{ user.email }}</div>
+												</div>
+											</h6>											
+										</li>
+										<li><hr class="dropdown-divider"></li>
 										<li>
 											<a class="dropdown-item button-setting with-icon" href="{% url 'accounts:setting' %}">設定</a>
 										</li>
@@ -177,7 +187,7 @@
 							{% endif %}
 						</div>
 						<!-- ユーザーアイコン -->
-						<div class="d-flex align-items-center ms-auto">							
+						<div class="user-icon-container d-flex align-items-center ms-auto">							
 							{% if user and user.is_authenticated %}
 								<div class="me-2">
 									<a class="btn btn-outline-secondary rounded-pill py-2 button-diary with-icon" href="{% url 'diary:diary_photo' %}">
@@ -189,6 +199,16 @@
 										<img src="{{ user.icon }}" class="rounded-circle" width="50" height="50" alt="icon" loading="lazy">
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
+										<li>
+											<h6 class="dropdown-header d-flex">
+												<img src="{{ user.icon }}" class="rounded-circle" width="50" height="50" alt="icon" loading="lazy">
+												<div class="ms-2">
+													<div class="fs-6 text-dark">{{ user.username }}</div>
+													<div class="small">{{ user.email }}</div>
+												</div>
+											</h6>											
+										</li>
+										<li><hr class="dropdown-divider"></li>
 										<li>
 											<a class="dropdown-item button-setting with-icon" href="{% url 'accounts:setting' %}">設定</a>
 										</li>
