@@ -78,11 +78,17 @@
                 <tbody class="fs-6 fw-bold">
                     <tr>
                         <td>
-                            <a href="{% url 'accounts:password_change' %}" class="text-decoration-none text-dark w-100 d-block">
-                                パスワードを変更する
-                            </a>
+                            {% if user.has_usable_password %}
+                                <a href="{% url 'accounts:password_change' %}" class="text-decoration-none text-dark w-100 d-block">
+                                    パスワードを変更する
+                                </a>
+                            {% else %}
+                                <a href="{% url 'accounts:password_set' %}" class="text-decoration-none text-dark w-100 d-block">
+                                    パスワードを設定する
+                                </a>
+                            {% endif %}
                         </td>
-                    </tr>
+                    </tr>                    
                     <tr>
                         <td>
                             <a href="{% url "diary:address_user" %}" class="text-decoration-none text-dark w-100 d-block">
