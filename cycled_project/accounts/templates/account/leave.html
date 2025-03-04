@@ -29,17 +29,24 @@
                             {% csrf_token %}
                             {% for field in form %}
                                 <div class="mb-2">
-                                    <label for="{{ field.id_for_label }}" class="d-none"></label>
-                                    <div class="input-group">
-                                        {{ field | add_class:"form-control" }}
-                                        {% if field == form.password %}
-                                            <button class="btn btn-outline-secondary togglePassword" type="button" tabindex="-1">
-                                                <i class="bi bi-eye-slash password-icon"></i> <!-- 目のアイコン -->
-                                            </button>
-                                        {% endif %}
+                                    {% if field.name == "confirm" %}
+                                        <label for="{{ field.id_for_label }}">
+                                            {{ field }} {{ field.label }}
+                                        </label>
+                                    {% else %}
+                                        <label for="{{ field.id_for_label }}" class="d-none"></label>
+                                        <div class="input-group">
+                                            {{ field | add_class:"form-control" }}
+                                            {% if field == form.password %}
+                                                <button class="btn btn-outline-secondary togglePassword" type="button" tabindex="-1">
+                                                    <i class="bi bi-eye-slash password-icon"></i> <!-- 目のアイコン -->
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
                                     </div>
-                                </div>
                             {% endfor %}
+
                             <!-- 退会に際する注意事項 -->
                             <div class="mb-2">
                                 <ul class="list-unstyled">

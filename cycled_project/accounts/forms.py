@@ -49,5 +49,18 @@ class UserDynamicForm(forms.ModelForm):
             self.fields = {field: self.fields[field] for field in dynamic_fields}
 
 class UserLeaveForm(forms.Form):
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'パスワードを入力','autocomplete': 'off'}))
-
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'placeholder': 'パスワードを入力','autocomplete': 'off'}),
+        label="パスワード",
+    )
+    confirm = forms.BooleanField(
+        required=True,
+        label="退会することを確認しました",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+    )
+class AllauthUserLeaveForm(forms.Form):
+    confirm = forms.BooleanField(
+        required=True,
+        label="退会することを確認しました",
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+    )

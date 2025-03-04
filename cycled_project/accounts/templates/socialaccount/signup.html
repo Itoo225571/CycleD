@@ -1,24 +1,50 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load static %}
 {% load allauth %}
+{% load widget_tweaks %}
 
-{% block head_title %}
-    {% trans "Sign Up" %}
-{% endblock head_title %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'accounts/css/inputs.css' %}" type="text/css">
+{% endblock %}
 
 {% block content %}
-    <h1>{% trans "Sign Up" %}</h1>
+    <p>
+        {% blocktrans with provider_name=account.get_provider.name site_name=site.name %}
+            {{provider_name}}アカウントを使って{{site_name}}にログインしようとしています<br>
+            ユーザー登録のために，以下のフォームを記入してください
+        {% endblocktrans %}
+    </p>
 
-<p>{% blocktrans with provider_name=account.get_provider.name site_name=site.name %}You are about to use your {{provider_name}} account to login to
-{{site_name}}. As a final step, please complete the following form:{% endblocktrans %}</p>
+    <div class="row d-flex justify-content-center align-items-center my-2">
+        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="card card-form bg-light-subtle text-dark" style="border-radius: 1rem;">
+                <div class="card-body p-4 text-center">
+                    <div class="mb-md-5 mt-md-4 pb-3">
+                        <p class="opacity-50">Signup</p>
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ form.certifications.errors }}
+                            {% for field in form %}
+                                <div class="form-outline form-dark mb-2">
+                                    <label for="{{ field.id_for_label }}" class="d-none"></label>
+                                    <div class="input-group">
+                                        {{ field | add_class:"form-control" }}
+                                    </div>
+                                </div>
+                            {% endfor %}
 
-<form class="signup" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">
-    {% csrf_token %}
-        {{ form.as_p }}
-    {% if redirect_field_value %}
-        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-    {% endif %}
-    <button type="submit" class="btn btn-primary">{% trans "Sign Up" %} &raquo;</button>
-</form>
+                            {% for error in form.non_field_errors %}
+                                <div class="alert-message">
+                                    <p>{{ error }}</p>
+                                </div>
+                            {% endfor %}
+                            <button class="btn btn-outline-dark btn-lg w-100 mt-3" type="submit">新規作成</button>
+                        </form>
+                    </div>
 
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

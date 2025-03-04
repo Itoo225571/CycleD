@@ -19,7 +19,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
-from .forms import CustomLoginForm,CustomSignupForm,UserSettingForm,UserDynamicForm,UserLeaveForm
+from .forms import CustomLoginForm,CustomSignupForm,UserSettingForm,UserDynamicForm,UserLeaveForm,AllauthUserLeaveForm
 from .models import User
 from diary.models import Diary,Coin  # diaryアプリから
 
@@ -83,39 +83,42 @@ class CustomPasswordChangeView(LoginRequiredMixin, views.PasswordChangeView):
 class UserEditView(LoginRequiredMixin,generic.UpdateView):
     pass
 
-class UserLeaveView(LoginRequiredMixin,views.FormView):
+class UserLeaveView(LoginRequiredMixin, views.FormView):
     template_name = "account/leave.html"
-    form_class = UserLeaveForm
+    form_class = UserLeaveForm  # デフォルトは通常のフォーム
+
+    def dispatch(self, request, *args, **kwargs):
+        user = request.user
+        if user.is_authenticated:
+            if not user.has_usable_password():
+                # Allauthログインユーザーなら、パスワード不要のフォームに変更
+                self.form_class = AllauthUserLeaveForm
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # 退会に際する注意事項のリストを追加
-        leave_warnings = [
-            # "退会後、アカウントは一時的に非アクティブ状態になります。",
+        context["leave_warnings"] = [
             "退会処理を行うと、すぐにログインができなくなります。",
             "再入会をご希望の場合は、サポートまでご連絡ください。",
-            # "退会後、通知やメッセージの受信が停止します。",
-            "退会手続きは取り消しできませんので、十分ご確認の上、手続きを行ってください。"
+            "退会手続きは取り消しできませんので、十分ご確認の上、手続きを行ってください。",
         ]
-        context['leave_warnings'] = leave_warnings
         return context
 
     def form_valid(self, form):
-        # 入力されたパスワードを取得
-        password = form.cleaned_data['password']
         user = self.request.user
-        if user.check_password(password):
-            # パスワードが正しい場合、退会処理
-            user.is_active = False
-            user.save()
-            logout(self.request)
-            messages.success(self.request, '退会が完了しました。ご利用いただきありがとうございました。')
-            return redirect('diary:top')  # 退会後、topページにリダイレクト
-        else:
-            messages.error(self.request, 'パスワードが間違っています。')
-            return redirect('accounts:leave')  # 退会ページにリダイレクト
+        if isinstance(form, UserLeaveForm):
+            password = form.cleaned_data["password"]
+            if not user.check_password(password):
+                messages.error(self.request, "パスワードが間違っています。")
+                return redirect("accounts:leave")
+        
+        # 退会処理を実行
+        user.is_active = False
+        user.save()
+        logout(self.request)
+        messages.success(self.request, "退会が完了しました。ご利用いただきありがとうございました。")
+        return redirect("diary:top")
 
     def form_invalid(self, form):
-        # フォームが無効な場合（エラー時）
-        messages.error(self.request, 'パスワードが間違っています。')
-        return self.render_to_response({'form': form})
+        messages.error(self.request, "入力内容が正しくありません。")
+        return self.render_to_response(self.get_context_data(form=form))
