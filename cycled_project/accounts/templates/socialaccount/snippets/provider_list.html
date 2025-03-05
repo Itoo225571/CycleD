@@ -1,41 +1,61 @@
 {% load i18n %}
 {% load allauth socialaccount %}
 {% get_providers as socialaccount_providers %}
+{% get_social_accounts user as accounts %}
 
 {% if socialaccount_providers %}
-    <div class="provider-list">
-        {% for provider in socialaccount_providers %}
-            {% if provider.id == "openid" %}
-                {% for brand in provider.get_brands %}
-                    {% provider_login_url provider openid=brand.openid_url process=process as href %}
-                    <div class="provider-item">
-                        <a href="{{ href }}" class="provider-link" id="provider-{{ provider.id }}-{{ brand.name }}">
-                            <img src="{{ brand.logo_url }}" alt="{{ brand.name }} logo" class="provider-logo">
-                            <i class="bi bi-key"></i>  <!-- OpenID用のアイコン -->
-                            <span class="provider-name">{{ brand.name }}</span>
-                        </a>
-                    </div>
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5><strong>アカウントの紐付け</strong></h5>            
+        </div>
+        <div class="card-body">
+            <div class="provider-list">
+                {% for provider in socialaccount_providers %}
+                    {% if provider.id == "openid" %}
+                        {% for brand in provider.get_brands %}
+                            {% provider_login_url provider openid=brand.openid_url process=process as href %}
+                            <div class="provider-item">
+                                <a href="{{ href }}" class="provider-link" id="provider-{{ provider.id }}-{{ brand.name }}">
+                                    <img src="{{ brand.logo_url }}" alt="{{ brand.name }} logo" class="provider-logo">
+                                    <i class="bi bi-key"></i>  <!-- OpenID用のアイコン -->
+                                    <span class="provider-name">{{ brand.name }}</span>
+                                </a>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        {% provider_login_url provider process=process scope=scope auth_params=auth_params as href %}
+                        <div class="provider-item d-flex align-items-center">
+                            <div class="provider-logo-field mx-1">
+                                {% if provider.id == "google" %}
+                                    <i class="iconify fs-1" data-icon="logos:google-icon"></i>
+                                {% else %}
+                                    <i class="iconify" data-icon="mdi:account"></i> {# デフォルトアイコン #}
+                                {% endif %}
+                            </div>
+                            <div class="name-field ms-3">
+                                <div class="provider-name"><strong>{{ provider.name }}</strong></div>
+                                {% if provider.id in accounts %}
+                                    <span class="text-primary">連携済み</span>
+                                {% else %}
+                                    <span class="text-muted">連携なし</span>
+                                {% endif %}
+                            </div>
+                            <div class="provider-link-field ms-auto">
+                                {% if provider.id in accounts %}
+                                    <a href="#" class="btn btn-danger">
+                                        連携解除
+                                    </a>
+                                {% else %}
+                                    <a href="{{ href }}" class="btn btn-outline-primary" id="provider-{{ provider.id }}">
+                                        連携する
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
                 {% endfor %}
-            {% else %}
-                {% provider_login_url provider process=process scope=scope auth_params=auth_params as href %}
-                <div class="provider-item">
-                    <a href="{{ href }}" class="provider-link" id="provider-{{ provider.id }}">
-                        {% if provider.id == "google" %}
-                            <i class="bi bi-google"></i>
-                        {% elif provider.id == "github" %}
-                            <i class="bi bi-github"></i>
-                        {% elif provider.id == "twitter" %}
-                            <i class="bi bi-twitter-x"></i>
-                        {% elif provider.id == "facebook" %}
-                            <i class="bi bi-facebook"></i>
-                        {% else %}
-                            <i class="bi bi-person-circle"></i> <!-- その他のプロバイダー用 -->
-                        {% endif %}
-                        <span class="provider-name">{{ provider.name }}</span>
-                    </a>
-                </div>
-            {% endif %}
-        {% endfor %}
+            </div>
+        </div>
     </div>
 {% else %}
     <p>現在，外部アカウントによる連携はできません</p>

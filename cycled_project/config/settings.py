@@ -215,6 +215,7 @@ ACCOUNT_EMAIL_UNIQUE = True
 ACCOUNT_USERNAME_REQUIRED = True
 # ACCOUNT_EMAIL_VERIFICATION = "mandatory"    # 登録後、メールアドレスに確認メールが送信される
 ACCOUNT_EMAIL_VERIFICATION = "none"         # メール確認を無効にする
+
 ACCOUNT_RATE_LIMITS = {
     'login_failed': '5/m',  # 例えば1分間に5回のログイン試行制限
 }
