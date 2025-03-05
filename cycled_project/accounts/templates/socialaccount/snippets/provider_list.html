@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load allauth socialaccount %}
 {% get_providers as socialaccount_providers %}
+
 {% if socialaccount_providers %}
     <div class="provider-list">
         {% for provider in socialaccount_providers %}
@@ -10,6 +11,7 @@
                     <div class="provider-item">
                         <a href="{{ href }}" class="provider-link" id="provider-{{ provider.id }}-{{ brand.name }}">
                             <img src="{{ brand.logo_url }}" alt="{{ brand.name }} logo" class="provider-logo">
+                            <i class="bi bi-key"></i>  <!-- OpenID用のアイコン -->
                             <span class="provider-name">{{ brand.name }}</span>
                         </a>
                     </div>
@@ -18,6 +20,17 @@
                 {% provider_login_url provider process=process scope=scope auth_params=auth_params as href %}
                 <div class="provider-item">
                     <a href="{{ href }}" class="provider-link" id="provider-{{ provider.id }}">
+                        {% if provider.id == "google" %}
+                            <i class="bi bi-google"></i>
+                        {% elif provider.id == "github" %}
+                            <i class="bi bi-github"></i>
+                        {% elif provider.id == "twitter" %}
+                            <i class="bi bi-twitter-x"></i>
+                        {% elif provider.id == "facebook" %}
+                            <i class="bi bi-facebook"></i>
+                        {% else %}
+                            <i class="bi bi-person-circle"></i> <!-- その他のプロバイダー用 -->
+                        {% endif %}
                         <span class="provider-name">{{ provider.name }}</span>
                     </a>
                 </div>
@@ -25,5 +38,5 @@
         {% endfor %}
     </div>
 {% else %}
-    <p>{% trans "現在利用可能なサードパーティログインプロバイダーはありません。" %}</p>
+    <p>現在，外部アカウントによる連携はできません</p>
 {% endif %}
