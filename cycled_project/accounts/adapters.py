@@ -1,8 +1,12 @@
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+from allauth.socialaccount.models import SocialAccount
 from allauth.exceptions import ImmediateHttpResponse
+
 from django.core.exceptions import ValidationError
-from django.shortcuts import redirect
+from django.urls import reverse
+from django.http import HttpResponseRedirect
+from django.contrib import messages
 
 class CustomAccountAdapter(DefaultAccountAdapter):
     def is_open_for_signup(self, request):
@@ -15,4 +19,16 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         return super().clean_username(username, shallow)
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
-    pass
+    def pre_social_login(self, request, sociallogin):
+        # ユーザーが認証されているか確認
+        if not request.user.is_authenticated:
+            return super().pre_social_login(request, sociallogin)
+
+        # ユーザーがすでにこのプロバイダーで連携したアカウントを持っているかチェック
+        if SocialAccount.objects.filter(user=request.user, provider=sociallogin.account.provider).exists():
+            # エラーメッセージを設定
+            messages.error(request, "複数アカウントを連携することはできません")
+            # ImmediateHttpResponse を使用してログイン処理を中止
+            response = HttpResponseRedirect(reverse('accounts:connections'))  # ログインページにリダイレクト
+            raise ImmediateHttpResponse(response)
+        return super().pre_social_login(request, sociallogin)
