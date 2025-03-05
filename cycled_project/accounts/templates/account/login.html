@@ -53,14 +53,11 @@
                         </form>
                         <hr>
                         <div class="mt-4 pt-1">
-                            <form action="{% provider_login_url 'google' method='POST' %}" method="post">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-info py-3 w-100">
-                                    <strong>
-                                        <i class="bi bi-google me-3"></i>Googleでログイン
-                                    </strong>
-                                </button>
-                            </form>
+                            <a href="{% provider_login_url 'google' process='login' %}" class="btn btn-outline-info py-3 w-100">
+                                <strong>
+                                    <i class="bi bi-google me-3"></i>Googleでログイン
+                                </strong>
+                            </a>
                         </div>
                     </div>
 

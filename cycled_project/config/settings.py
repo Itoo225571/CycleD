@@ -223,6 +223,9 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
 
 ACCOUNT_ADAPTER = 'accounts.adapters.CustomAccountAdapter'  # アダプターの設定
+SOCIALACCOUNT_ADAPTER = "accounts.adapters.CustomSocialAccountAdapter"
+
+SOCIALACCOUNT_LOGIN_ON_GET=True     #直接ログインページに飛ぶ
 
 # キャッシュ
 # CACHES = {
