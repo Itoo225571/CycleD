@@ -1,51 +1,78 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% load allauth %}
+{% load allauth socialaccount %}
 
 {% block content %}
-    {% if form.accounts %}
-        <p>
-            以下の外部アカウントを使って，あなたのアカウントにサインインできます：
-        </p>
+    {% get_providers as socialaccount_providers %}
+    {% get_social_accounts user as accounts %}
 
-        {% url 'socialaccount_connections' as action_url %}
-        <form method="post" action="{{ action_url }}">
-            {% csrf_token %}
-            
-            <!-- 接続されているアカウントのループ -->
-            <div class="form-group">
-                {% for acc in form.fields.account.choices %}
-                    {% with account=acc.0.instance.get_provider_account %}
-                        <div class="form-check">
-                            <input type="radio" 
-                                   class="form-check-input" 
-                                   id="account_{{ account.account.pk }}" 
-                                   name="account" 
-                                   value="{{ account.account.pk }}">
-
-                            <label class="form-check-label" for="account_{{ account.account.pk }}">
-                                {{ account }}
-                                <span class="badge badge-primary">{{ account.get_brand.name }}</span>
-                            </label>
-                        </div>
-                    {% endwith %}
-                {% endfor %}
+    {% if socialaccount_providers %}
+        <div class="card mt-3">
+            <div class="card-header bg-white">
+                <h5><strong>アカウントの紐付け</strong></h5>
             </div>
-
-            <!-- アクション（アカウント削除ボタン） -->
-            <div class="form-group">
-                <button type="submit" class="btn btn-danger">
-                    {% trans "削除" %}
-                </button>
+            <div class="card-body">
+                <div class="provider-container">
+                    {% for provider in socialaccount_providers %}
+                        {% if provider.id == "openid" %}
+                            {% for brand in provider.get_brands %}
+                                {% provider_login_url provider openid=brand.openid_url process="connect" as href %}
+                                <div class="provider-item">
+                                    <a href="{{ href }}" class="provider-link" id="provider-{{ provider.id }}-{{ brand.name }}">
+                                        <img src="{{ brand.logo_url }}" alt="{{ brand.name }} logo" class="provider-logo">
+                                        <i class="bi bi-key"></i>  <!-- OpenID用のアイコン -->
+                                        <span class="provider-name">{{ brand.name }}</span>
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            {% provider_login_url provider process="connect" scope=scope auth_params=auth_params as href_login %}
+                            <div class="provider-item d-flex align-items-center">
+                                <div class="provider-logo-field mx-1">
+                                    {% if provider.id == "google" %}
+                                        <i class="iconify fs-1" data-icon="logos:google-icon"></i>
+                                    {% else %}
+                                        <i class="iconify" data-icon="mdi:account"></i> {# デフォルトアイコン #}
+                                    {% endif %}
+                                </div>
+                                <div class="name-field ms-3">
+                                    <div class="provider-name"><strong>{{ provider.name }}</strong></div>
+                                    {% if provider.id in accounts %}
+                                        <span class="text-primary">連携済み</span>
+                                    {% else %}
+                                        <span class="text-muted">連携なし</span>
+                                    {% endif %}
+                                </div>
+                                <div class="provider-link-field ms-auto">
+                                    {% if provider.id in accounts %}
+                                        <form method="post" action="{% url 'accounts:connections' %}">
+                                            {% csrf_token %}
+                                            {% for key, val_list in accounts.items %}
+                                                {% for account in val_list %}
+                                                    {% if provider.id == key %}
+                                                        <input type="hidden" name="account" value="{{ account.id }}">
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endfor %}     
+                                            <button type="submit" class="btn btn-danger">
+                                                連携解除
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <a href="{{ href_login }}" class="btn btn-outline-primary" id="provider-{{ provider.id }}">
+                                            連携する
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
             </div>
-        </form>
+        </div>
     {% else %}
-        <p>
-            現在，あなたのアカウントには外部アカウントが接続されていません
-        </p>
+        <p>現在，外部アカウントによる連携はできません</p>
     {% endif %}
 
-    <h2>{% trans '外部アカウントを追加' %}</h2>
-    {% include "socialaccount/snippets/provider_list.html" with process="connect" %}
     {% include "socialaccount/snippets/login_extra.html" %}
 {% endblock content %}

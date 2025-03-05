@@ -131,4 +131,8 @@ class UserLeaveView(LoginRequiredMixin, account_views.FormView):
     
 class CustomConnectionsView(socialaccount_views.ConnectionsView):
     template_name = "socialaccount/connections.html"
-    pass
+    def post(self, request, *args, **kwargs):
+        if not request.user.has_usable_password():
+            messages.error(request, "アカウント連携を解除するには先にパスワードを設定してください。")
+            return redirect('accounts:password_set')
+        return super().post(request, *args, **kwargs)
