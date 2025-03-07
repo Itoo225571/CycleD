@@ -24,7 +24,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from ..forms import DiaryForm,DiaryDynamicForm
-from ..forms import AddressSearchForm,LocationForm,LocationCoordForm,LocationFormSet,DiaryFormSet,PhotosForm
+from ..forms import AddressSearchForm,AddressForm,LocationFormSet,DiaryFormSet,PhotosForm
 from ..models import Diary,Location,TempImage,Good
 from ..serializers import DiarySerializer,LocationSerializer
 
@@ -284,7 +284,7 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
         context['MAX_LOCATIONS'] = Diary.MAX_LOCATIONS
 
         context['addressseach_form'] = AddressSearchForm()
-        context['addressselect_form'] = LocationForm()
+        context['addressselect_form'] = AddressForm()
         return context
     
     def get(self, request: HttpRequest, *args: str, **kwargs) -> HttpResponse:

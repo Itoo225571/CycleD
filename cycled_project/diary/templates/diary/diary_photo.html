@@ -129,20 +129,21 @@
                     <ul class="dropdown-menu scale-in-ver-top" aria-labelledby="dropdownMenuButton-__prefix__">
                         <li>
                             <button type="button" class="button-edit-addressSearchModal dropdown-item p-2 bt-0 d-flex align-items-center">
-                                <i class="material-icons-round pe-2">edit_location_alt</i>
-                                <span>場所を変更</span>
+                                <i class="material-icons-round">edit_location_alt</i>
+                                <span class="ps-2">場所を変更</span>
                             </button>
                         </li>
                         <li>
                             <button type="button" class="button-edit-location-label dropdown-item p-2 bt-0 d-flex align-items-center" onclick="edit_location(this)">
-                                <i class="material-icons-outlined pe-2">edit</i>
-                                <span>名前を変更</span>
+                                {% comment %} <i class="material-icons-outlined pe-2">edit</i> {% endcomment %}
+                                <i class="iconify" data-icon="bx:rename" style="font-size: 1.5rem;"></i>
+                                <span class="ps-2">名前を変更</span>
                             </button>
                         </li>
                         <li>
                             <button type="button" class="button-delete-location dropdown-item p-2 bt-0 text-danger d-flex align-items-center" onclick="delete_location(this)">
-                                <i class="material-icons-outlined pe-2">delete</i>
-                                <span>削除</span>
+                                <i class="material-icons-outlined">delete</i>
+                                <span class="ps-2">削除</span>
                             </button>
                         </li>
                     </ul>

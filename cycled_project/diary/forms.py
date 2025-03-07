@@ -44,6 +44,12 @@ class AddressSearchForm(forms.Form):
                             "autocomplete": "off"  # 自動履歴機能を無効化
                         })
                     )
+class AddressForm(forms.ModelForm):
+    class Meta:
+        model = Location
+        fields = [
+            "lat","lon","state","display","label"
+        ]
     
 class LocationForm(forms.ModelForm):
     date_of_Diary = forms.DateField(required=False, widget=forms.HiddenInput())

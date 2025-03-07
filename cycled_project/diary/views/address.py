@@ -15,7 +15,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from ..forms import AddressSearchForm,LocationForm,LocationCoordForm
+from ..forms import AddressSearchForm,AddressForm,LocationCoordForm
 from ..models import Location
 from ..serializers import DiarySerializer,LocationSerializer
 
@@ -115,79 +115,26 @@ async def regeocode_async(request,lat,lon,count=0):
     return geocode_data.model_dump()
 
 class AddressUserView(LoginRequiredMixin,generic.FormView):
-    template_name = "diary/address.html"
-    # ↓二つは後で変える
-    form_class = AddressSearchForm
-    success_url = reverse_lazy('diary:address_user')
-
-    def get_form_class(self) -> type:
-        if "address-search-form" in self.request.POST:
-            return AddressSearchForm
-        elif "address-select-form" in self.request.POST:
-            return LocationForm
-        elif "get-current-address-form" in self.request.POST:
-            return LocationCoordForm
-        return super().get_form_class()
-
-    def get_success_url(self) -> str:
-        if "address-search-form" in self.request.POST:
-            return reverse_lazy('diary:address_user')
-        elif "address-select-form" in self.request.POST or "get-current-address-form" in self.request.POST:
-            return reverse_lazy('diary:weather_report')
-        return super().get_success_url()
-
-    def post(self, request: HttpRequest, *args: str, **kwargs) -> HttpResponse:
-        form = None
-        # 検索した場合
-        if "address-search-form" in request.POST:
-            form = AddressSearchForm(request.POST)
-            if form.is_valid():
-                if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                    keyword = form.cleaned_data.get('keyword')
-                    response = {"data_list":geocode(request,keyword)}
-                    return JsonResponse(response, json_dumps_params={'ensure_ascii': False})
-                return self.form_valid(form)
-            return self.form_invalid(form)
-            
-        # 検索結果を選択した場合
-        elif "address-select-form" in request.POST:
-            form = LocationForm(request.POST)
-            if form.is_valid():
-                loc = form.save(commit=False)
-                # Homeの場合Trueにする
-                loc.is_home = True
-                existing_location = Location.objects.filter(user=request.user)
-                if existing_location.exists():
-                    existing_location.delete()
-                    
-                loc.user = request.user
-                loc.save()
-            else:
-                return self.form_invalid(form)
-        
-        # 現在位置を取得した場合
-        elif "get-current-address-form" in self.request.POST:
-            form = LocationCoordForm(request.POST)
-            if form.is_valid():
-                loc = form.save(commit=False)
-                
-                lat = form.cleaned_data["lat"]
-                lon = form.cleaned_data["lon"]
-                geo = regeocode(request,lat,lon)
-                loc.state = geo.address.state
-                loc.display = geo.address.display
-                # Homeの場合Trueにする
-                loc.is_home = True
-                existing_location = Location.objects.filter(user=request.user)
-                if existing_location.exists():
-                    existing_location.delete()
-
-                loc.user = request.user
-                loc.save()
-            else:
-                return self.form_invalid(form)
-
-        return self.form_valid(form)
+    template_name = "diary/address_user.html"
+    form_class = AddressForm
+    success_url = reverse_lazy('diary:weather_report')    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['addressseach_form'] = AddressSearchForm()
+        context['addressselect_form'] = AddressForm()
+        return context
+    
+    def form_valid(self, form):
+        loc = form.save(commit=False)
+        # 既存のデータがある場合は削除
+        existing_location = Location.objects.filter(user=self.request.user, is_home=True)
+        if existing_location:
+            existing_location.delete()
+        # 新しいデータを保存
+        loc.user = self.request.user
+        loc.is_home = True
+        loc.save()
+        return super().form_valid(form)
 
 @api_view(['POST'])
 @authentication_classes([SessionAuthentication])  # セッション認証
@@ -207,7 +154,7 @@ def address_search(request):
 @authentication_classes([SessionAuthentication])  # セッション認証
 @permission_classes([IsAuthenticated])  # ログイン必須
 def address_select(request):
-    form = LocationForm(request.POST)
+    form = AddressForm(request.POST)
     if form.is_valid():
         loc = form.save(commit=False)
         loc.location_id = None  # 新規作成なのでidは空にする
