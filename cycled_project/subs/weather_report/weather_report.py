@@ -26,10 +26,6 @@ class WeatherDataBase(BaseModel):
     """___上から導く項目____"""
     weather_day: str = ""
     weather_night: str = ""
-    img_file_name_day: str = ""
-    img_file_name_night: str = ""
-    img_file_path_day: str = ""
-    img_file_path_night: str = ""
     
     def __init__(self,dir_name=None,*args,**data):
         super().__init__(**data) 
@@ -39,15 +35,6 @@ class WeatherDataBase(BaseModel):
         
         self.weather_day = data_day.get("description")
         self.weather_night = data_night.get("description")
-
-        self.img_file_name_day =  data_day.get("image")
-        self.img_file_name_night =  data_night.get("image")
-        if dir_name and isinstance(dir_name,str):
-            self.img_file_path_day = (Path(dir_name) / self.img_file_name_day).as_posix()
-            self.img_file_path_night = (Path(dir_name) / self.img_file_name_night).as_posix()
-        else:
-            self.img_file_path_day = (Path(__file__).parent / Path('./img') / self.img_file_name_day).as_posix()
-            self.img_file_path_night = (Path(__file__).parent / Path('./img') / self.img_file_name_night).as_posix()
 
     @field_serializer("time")
     def serialize_time(self, value: datetime) -> dict:

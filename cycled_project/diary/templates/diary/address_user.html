@@ -17,7 +17,7 @@
 
 {% block content %}
     <div class="address-form-container">
-        {% include 'diary/address_search.html' %}
+        {% include 'diary/address.html' %}
         <form method="post" id="id_locationform" style="display: none;">
             {% csrf_token %}
             {% for field in form %}
@@ -32,6 +32,6 @@
     <script src="{% static 'js/loading_overlay.js' %}"></script>
     <script src="{% static 'js/searchKeys.js' %}"></script>
     {% comment %} <script src="{% static 'diary/js/address.js' %}"></script> {% endcomment %}
-    <script src="{% static 'diary/js/address_search.js' %}"></script>
+    <script src="{% static 'diary/js/address.js' %}"></script>
     <script src="{% static 'diary/js/address_user.js' %}"></script>
 {% endblock %}
