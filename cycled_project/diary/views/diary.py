@@ -73,7 +73,7 @@ class HomeView(LoginRequiredMixin, generic.TemplateView):
             Diary.objects.filter(
                 is_public=True,
                 # date__gte=one_week_ago.date(),  # 1週間以内の写真
-                date_created__gte=one_week_ago  # 1週間以内の作成日
+                # date_created__gte=one_week_ago  # 1週間以内の作成日
                 # rank=0
             )
             .exclude(user=self.request.user)  # 自分の日記を除外

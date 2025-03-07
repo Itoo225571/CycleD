@@ -203,6 +203,7 @@ SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {'access_type': 'online'},
+        'EMAIL_AUTHENTICATION': True,      # 既に同じemailで登録していた場合，それに連携される
     }
 }
 # ユーザー認証にユーザー名とメールアドレスを使用
@@ -215,6 +216,8 @@ ACCOUNT_EMAIL_UNIQUE = True
 ACCOUNT_USERNAME_REQUIRED = True
 # ACCOUNT_EMAIL_VERIFICATION = "mandatory"    # 登録後、メールアドレスに確認メールが送信される
 ACCOUNT_EMAIL_VERIFICATION = "none"         # メール確認を無効にする
+ACCOUNT_UNIQUE_EMAIL = True     # 同じメールアドレスで複数のアカウントを作れない 
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True      # 既存のemailログイン時にsocialによりemailでログインすると自動的に連携される
 
 ACCOUNT_RATE_LIMITS = {
     'login_failed': '5/m',  # 例えば1分間に5回のログイン試行制限
