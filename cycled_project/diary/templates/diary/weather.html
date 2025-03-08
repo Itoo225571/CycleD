@@ -72,9 +72,9 @@
                     <div>
                         {% with weather_data=meteocons|get_item:current.weather_code %}
                             {% if current.is_day %}
-                                <img src="{% static 'diary_weather_report/img/'|add:weather_data.day.image %}" alt="今の天気" height="100" width="100">
+                                <object data="{% static 'diary_weather_report/img/'|add:weather_data.day.image %}" type="image/svg+xml" width="100" height="100"></object>
                             {% else %}
-                                <img src="{% static 'diary_weather_report/img/'|add:weather_data.night.image %}" alt="今の天気" height="100" width="100">
+                                <object data="{% static 'diary_weather_report/img/'|add:weather_data.night.image %}" type="image/svg+xml" width="100" height="100"></object>
                             {% endif %}
                         {% endwith %}                        
                     </div>
@@ -113,9 +113,9 @@
                             <td class="py-0">
                                 {% with weather_data=meteocons|get_item:data.weather_code %}
                                     {% if data.is_day %}
-                                        <img src="{% static 'diary_weather_report/img/'|add:weather_data.day.image %}" alt="今の天気" height="50" width="50">
+                                        <object data="{% static 'diary_weather_report/img/'|add:weather_data.day.image %}" type="image/svg+xml" width="50" height="50"></object>
                                     {% else %}
-                                        <img src="{% static 'diary_weather_report/img/'|add:weather_data.night.image %}" alt="今の天気" height="50" width="50">
+                                        <object data="{% static 'diary_weather_report/img/'|add:weather_data.night.image %}" type="image/svg+xml" width="50" height="50"></object>
                                     {% endif %}
                                 {% endwith %}
                             </td>
