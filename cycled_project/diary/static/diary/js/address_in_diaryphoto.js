@@ -25,9 +25,9 @@ function setup_addressModal($locationFormWrapper, location) {
         $modal.find('.address-search-form').off("submit").on("submit", function(event) {
             event.preventDefault();
             var url = $(this).attr("action");
-            var keyword = $(this).find("input[name='keyword']").val();
+            var $input = $(this).find("input[name='keyword']");
             
-            search_address(url, keyword)
+            search_address(url, $input)
                 .then(location_list => {
                     // ここでレスポンスを処理
                     display_location_list(location_list,select_location);

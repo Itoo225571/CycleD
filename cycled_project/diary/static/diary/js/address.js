@@ -66,7 +66,8 @@ function get_current_address(url_getCurrentPos,href=null) {
     });
 }
 
-function search_address(url_searchAddress,keyword) {
+function search_address(url_searchAddress,$input) {
+    $input.blur();  // $inputからフォーカスを外す
     return new Promise((resolve, reject) => {
         start_loading();
         $.ajax({
@@ -76,7 +77,7 @@ function search_address(url_searchAddress,keyword) {
                 "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンの取得
             },
             data: {
-                'keyword': keyword,
+                'keyword': $input.val(),
             },
             dataType: "json",
             success: function(response) {
@@ -96,17 +97,17 @@ function search_address(url_searchAddress,keyword) {
 
 // addressが選ばれた場合，func_selectedを実行
 function display_location_list(location_list,func_selected) {
-    function template(dataArray) {
+    function template(dataArray,startIndex) {
         return dataArray.map(function(data, index) {
             return `
                 <button type="button" 
                         class="address-select-button list-group-item list-group-item-action border border-3 border-light rounded-3 m-1 p-2 d-flex align-items-center"
-                        data-index="${index}">
+                        data-index="${startIndex + index}">  <!-- startIndexを足す -->
                     <i class="material-icons-outlined me-2 rounded-circle bg-light p-1">location_on</i>
                     <span>${data.address.label}</span>
                 </button>
             `;
-        }).join('');  // 配列を文字列に結合
+        }).join('');
     }
     // ページネーション設定
     const options = {
@@ -125,15 +126,18 @@ function display_location_list(location_list,func_selected) {
         disabledClass: 'disabled',  // 無効化されたページリンクに適用するクラス
 
         callback: function(data, pagination) {
-            const html = template(data);   // 新しいページデータに基づいてテンプレートを生成
+            const startIndex = (pagination.pageNumber - 1) * options.pageSize; // 現在のページの開始インデックスを計算
+            const html = template(data,startIndex);   // 新しいページデータに基づいてテンプレートを生成
             $('#id_location-list').html(html); // ページ内容を更新
+
+            $('#id_location-list').find('.address-select-button').off('click').on('click', function() {
+                func_selected(location_list, $(this));  // クリックされたボタンと location_list を渡す
+            });
         },
     };
     // ページネーションを作成
     $('#pagination').pagination(options);
-    $('#id_location-list').find('.address-select-button').off('click').on('click', function() {
-        func_selected(location_list, $(this));  // クリックされたボタンと location_list を渡す
-    });
+
     return;
 }
 
@@ -196,5 +200,4 @@ function displayHistory($input,setLocation) {
     $input.on('focus', function() {
         $(this).autocomplete("search", ""); // 空文字を検索してリストを表示
     });
-
 }
