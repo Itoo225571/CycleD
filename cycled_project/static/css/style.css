@@ -3,6 +3,10 @@ body {
     margin: 0;
     display: flex;
     flex-direction: column; /* 縦方向の配置 */
+    
+    font-family: "Potta One", system-ui;    /* フォントを統一 */
+    font-weight: 400;
+    font-style: normal;
 }
 .wrapper-whole {
     min-height: 100vh; /* ビューポートの高さを満たす */

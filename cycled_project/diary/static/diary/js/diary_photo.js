@@ -32,7 +32,7 @@ $(document).ready(function() {
             maxParallelUploads: 8, // 同時にアップロードするファイルの最大数
             allowRemove: false,
             allowRevert: false,
-            labelIdle: '<span class="icon-upload">写真を選択してください</span>',
+            labelIdle: '<span class="icon-upload potta-one-regular">写真を選択してください</span>',
             labelFileLoading: '写真を読み込んでいます...',
             labelFileAdded: '写真が追加されました',
             labelFileProcessing: '写真をアップロードしています...',

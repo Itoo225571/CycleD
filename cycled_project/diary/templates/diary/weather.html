@@ -19,7 +19,7 @@
                 <p>お気に入りの場所を登録することで天気を見ることができます</p>
                 <a href={% url "diary:address_user" %} class="btn btn-outline-primary">
                     <i class="iconify fs-2" data-icon="material-symbols:location-on-outline"></i>
-                    <span class="potta-one-regular px-2">
+                    <span class="px-2">
                         新しく登録する
                     </span>
                 </a>
@@ -29,57 +29,56 @@
             {% with current=weather.current %}             
             <div class="card card-current-weather" style="border-radius: 35px;">
                 <div class="card-body p-4">
-                <div class="d-flex">
-                    <h6 class="class_city-name flex-grow-1">
-                        <span class="d-flex align-items-center">
-                            <text class="pe-1">{{ user.location.display }}</text>
-                            <a href="{% url 'diary:address_user' %}">
-                                <i class="iconify fs-3" data-icon="material-symbols:moved-location"></i>
-                            </a>
-                        </span>                        
-                    </h6>
-                    <h6 class="class_latest-time">
-                        <span>{{ current.time|date:"G:i" }}</span>
-                    </h6>
-                </div>
-    
-                <div class="d-flex flex-column text-center mt-5 mb-4">
-                    <h6 class="display-4 mb-0 font-weight-bold" style="color: #1C2331;">
-                        <span class="class_tempareture">
-                            {{ current.temperature_2m }}°C
-                        </span>
-                    </h6>
-                    <span class="class_weathe small">
-                        {% if current.is_day %}
-                            {{ current.weather_day_ja }}
-                        {% else %}
-                            {{ current.weather_night_ja }}
-                        {% endif %}    
-                    </span>
-                </div>
-    
-                <div class="d-flex align-items-center">
-                    <div class="flex-grow-1" style="font-size: 1rem;">
-                        <div class="d-flex align-items-center">
-                            <i class="iconify fs-3 text-muted" data-icon="material-symbols:air"></i>
-                            <span class="class_wind-speed ms-2"> {{ current.wind_speed_10m }} m/s</span>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <i class="iconify fs-3 text-info" data-icon="material-symbols:water-drop"></i>
-                            <span class="ms-2"> {{ current.relative_humidity_2m }} %</span>
-                        </div>
+                    <div class="d-flex">
+                        <h6 class="class_city-name flex-grow-1">
+                            <span class="d-flex align-items-center">
+                                <text class="pe-1">{{ user.location.display }}</text>
+                                <a href="{% url 'diary:address_user' %}">
+                                    <i class="iconify fs-3" data-icon="material-symbols:edit-location-alt-outline"></i>
+                                </a>
+                            </span>                        
+                        </h6>
+                        <h6 class="class_latest-time">
+                            <span>{{ current.time|date:"G:i" }}</span>
+                        </h6>
                     </div>
-                    <div>
-                        {% with weather_data=meteocons|get_item:current.weather_code %}
+        
+                    <div class="d-flex flex-column text-center mt-5 mb-4">
+                        <h5 class="display-4 mb-0" style="color: #1C2331;">
+                            <span class="class_tempareture">
+                                {{ current.temperature_2m }}°C
+                            </span>
+                        </h5>
+                        <span class="class_weathe small">
                             {% if current.is_day %}
-                                <object data="{% static 'diary_weather_report/img/'|add:weather_data.day.image %}" type="image/svg+xml" width="100" height="100"></object>
+                                {{ current.weather_day_ja }}
                             {% else %}
-                                <object data="{% static 'diary_weather_report/img/'|add:weather_data.night.image %}" type="image/svg+xml" width="100" height="100"></object>
-                            {% endif %}
-                        {% endwith %}                        
+                                {{ current.weather_night_ja }}
+                            {% endif %}    
+                        </span>
                     </div>
-                </div>
-    
+        
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1" style="font-size: 1rem;">
+                            <div class="d-flex align-items-center">
+                                <i class="iconify fs-3 text-muted" data-icon="material-symbols:air"></i>
+                                <span class="class_wind-speed ms-2"> {{ current.wind_speed_10m }} m/s</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="iconify fs-3 text-info" data-icon="material-symbols:water-drop"></i>
+                                <span class="ms-2"> {{ current.relative_humidity_2m }} %</span>
+                            </div>
+                        </div>
+                        <div>
+                            {% with weather_data=meteocons|get_item:current.weather_code %}
+                                {% if current.is_day %}
+                                    <object data="{% static 'diary_weather_report/img/'|add:weather_data.day.image %}" type="image/svg+xml" width="100" height="100"></object>
+                                {% else %}
+                                    <object data="{% static 'diary_weather_report/img/'|add:weather_data.night.image %}" type="image/svg+xml" width="100" height="100"></object>
+                                {% endif %}
+                            {% endwith %}                        
+                        </div>
+                    </div>
                 </div>
             </div>
             {% endwith %}
