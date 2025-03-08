@@ -19,3 +19,11 @@ def days_ago(value):
         return '30日以上前'
     else:
         return f'{diff_in_days}日前'
+
+@register.filter
+def get_item(dictionary, key):
+    """辞書からキーに対応する値を取得"""
+    try:
+        return dictionary.get(str(key))  # keyを文字列に変換して取得
+    except (ValueError, TypeError):
+        return None

@@ -13,7 +13,7 @@ from pprint import pprint
 _EMPTY = -1
 
 def _get_weather_categories():
-    p = path.join(path.dirname(__file__), 'weather_category.json')
+    p = path.join(path.dirname(__file__), 'weather_code.json')
     with open(p,mode="rt", encoding='utf-8') as f:
         weather_categories = json.load(f)
     return weather_categories
@@ -26,8 +26,10 @@ class WeatherDataBase(BaseModel):
     """___上から導く項目____"""
     weather_day: str = ""
     weather_night: str = ""
+    weather_day_ja: str = ""
+    weather_night_ja: str = ""
     
-    def __init__(self,dir_name=None,*args,**data):
+    def __init__(self,*args,**data):
         super().__init__(**data) 
         data = _weather_category.get(str(self.weather_code))
         data_day = data.get("day")
@@ -35,6 +37,8 @@ class WeatherDataBase(BaseModel):
         
         self.weather_day = data_day.get("description")
         self.weather_night = data_night.get("description")
+        self.weather_day_ja = data_day.get("ja")
+        self.weather_night_ja = data_night.get("ja")
 
     @field_serializer("time")
     def serialize_time(self, value: datetime) -> dict:
@@ -131,7 +135,7 @@ class WeatherData(BaseModel):
     tomorrow: WeatherDataDaily
     current: WeatherDataCurrent
     
-def get_weather(lat,lon,dir_name= None,time_range=24*2):
+def get_weather(lat,lon,time_range=24*2):
     params = {
         "latitude": lat,
         "longitude": lon,
@@ -154,7 +158,7 @@ def get_weather(lat,lon,dir_name= None,time_range=24*2):
     for _, row in df_hourly.iterrows():
         row_dict = row.to_dict()
         row_dict['time_range'] = time_range
-        wData = WeatherDataHourly(dir_name,**row_dict)
+        wData = WeatherDataHourly(**row_dict)
         if time_range != None:
             current = datetime.now(timezone(timedelta(hours=9))).replace(tzinfo=None)
             if wData.time - current <= timedelta(hours=time_range) and wData.time - current >= timedelta(hours=-2):
@@ -165,11 +169,11 @@ def get_weather(lat,lon,dir_name= None,time_range=24*2):
     df_daily = pd.DataFrame(data=data_json["daily"])
     data_today = df_daily.iloc[0]
     data_tomorrow = df_daily.iloc[1]
-    today = WeatherDataDaily(dir_name,**data_today)
-    tomorrow = WeatherDataDaily(dir_name,**data_tomorrow)
+    today = WeatherDataDaily(**data_today)
+    tomorrow = WeatherDataDaily(**data_tomorrow)
 
     data_current = data_json["current"]
-    current = WeatherDataCurrent(dir_name,**data_current)
+    current = WeatherDataCurrent(**data_current)
     
     weather_data_param = {
         "lat": lat,
@@ -184,4 +188,4 @@ def get_weather(lat,lon,dir_name= None,time_range=24*2):
 
 if __name__ == "__main__":
     data = get_weather(35.7247316,139.5812637)
-
+    data_dis = data.model_dump()

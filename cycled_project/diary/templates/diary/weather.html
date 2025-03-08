@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load django_bootstrap5 %}
 {% load static %}
+{% load diary_filters %}
 
 {% block title %}
     天気よほー
@@ -25,38 +26,58 @@
             </div>
         {% else %}        
         <div class="current-wearher-container">
+            {% with current=weather.current %}             
             <div class="card card-current-weather" style="border-radius: 35px;">
                 <div class="card-body p-4">
                 <div class="d-flex">
-                    <h6 class="class_city-name flex-grow-1">練馬氏</h6>
-                    <h6 class="class_latest-time">29:11</h6>
+                    <h6 class="class_city-name flex-grow-1">
+                        <span>{{ user.location.display }}</span>
+                    </h6>
+                    <h6 class="class_latest-time">
+                        <span>{{ current_time|date:"H:i" }}</span>
+                    </h6>
                 </div>
     
                 <div class="d-flex flex-column text-center mt-5 mb-4">
                     <h6 class="display-4 mb-0 font-weight-bold" style="color: #1C2331;">
-                        <span class="class_tempareture">13°C</span>
+                        <span class="class_tempareture">
+                            {{ current.temperature_2m }}°C
+                        </span>
                     </h6>
-                    <span class="class_weathe small">はれ</span>
+                    <span class="class_weathe small">
+                        {% if current.is_day %}
+                            {{ current.weather_day_ja }}
+                        {% else %}
+                            {{ current.weather_night_ja }}
+                        {% endif %}    
+                    </span>
                 </div>
     
                 <div class="d-flex align-items-center">
                     <div class="flex-grow-1" style="font-size: 1rem;">
                         <div class="d-flex align-items-center">
                             <i class="iconify fs-3" data-icon="material-symbols:air"></i>
-                            <span class="class_wind-speed ms-2"> 40 m/s</span>
+                            <span class="class_wind-speed ms-2"> {{ current.wind_speed_10m }} m/s</span>
                         </div>
                         <div class="d-flex align-items-center">
                             <i class="iconify fs-3" data-icon="material-symbols:water-drop"></i>
-                            <span class="ms-2"> 84 %</span>
+                            <span class="ms-2"> {{ current.relative_humidity_2m }} %</span>
                         </div>
                     </div>
                     <div>
-                        <i class="iconify" data-icon="meteocons:rain-fill" style="font-size: 100px;"></i>
+                        {% with weather_data=meteocons|get_item:current.weather_code %}
+                        {% if current.is_day %}
+                            <img src="{% static 'diary_weather_report/img/'|add:weather_data.day.image %}" alt="今の天気" height="100" width="100">
+                        {% else %}
+                            <img src="{% static 'diary_weather_report/img/'|add:weather_data.night.image %}" alt="今の天気" height="100" width="100">
+                        {% endif %}
+                        {% endwith %}                        
                     </div>
                 </div>
     
                 </div>
             </div>
+            {% endwith %}
         </div>
         <div class="72h-weather-container">
 

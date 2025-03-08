@@ -1,5 +1,10 @@
 $(document).ready(function() {
-
+    // requestAnimationFrame(() => {
+    //     const animations = document.querySelectorAll('animate');
+    //     animations.forEach(animation => {
+    //         animation.setAttribute('repeatCount', 'indefinite');
+    //     });
+    // });
 });
 
 function sendLocationToServer(lat,lon) {

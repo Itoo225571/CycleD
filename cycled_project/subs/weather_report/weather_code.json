@@ -1,0 +1,338 @@
+{
+	"0":{
+		"day":{
+			"description":"Sunny",
+			"image":"http://openweathermap.org/img/wn/01d@2x.png",
+			"ja":"晴れ"
+		},
+		"night":{
+			"description":"Clear",
+			"image":"http://openweathermap.org/img/wn/01n@2x.png",
+			"ja":"快晴"
+		}
+	},
+	"1":{
+		"day":{
+			"description":"Mainly Sunny",
+			"image":"http://openweathermap.org/img/wn/01d@2x.png",
+			"ja":"ほぼ晴れ"
+		},
+		"night":{
+			"description":"Mainly Clear",
+			"image":"http://openweathermap.org/img/wn/01n@2x.png",
+			"ja":"ほぼ快晴"
+		}
+	},
+	"2":{
+		"day":{
+			"description":"Partly Cloudy",
+			"image":"http://openweathermap.org/img/wn/02d@2x.png",
+			"ja":"晴れ時々曇り"
+		},
+		"night":{
+			"description":"Partly Cloudy",
+			"image":"http://openweathermap.org/img/wn/02n@2x.png",
+			"ja":"晴れ時々曇り"
+		}
+	},
+	"3":{
+		"day":{
+			"description":"Cloudy",
+			"image":"http://openweathermap.org/img/wn/03d@2x.png",
+			"ja":"曇り"
+		},
+		"night":{
+			"description":"Cloudy",
+			"image":"http://openweathermap.org/img/wn/03n@2x.png",
+			"ja":"曇り"
+		}
+	},
+	"45":{
+		"day":{
+			"description":"Foggy",
+			"image":"http://openweathermap.org/img/wn/50d@2x.png",
+			"ja":"霧"
+		},
+		"night":{
+			"description":"Foggy",
+			"image":"http://openweathermap.org/img/wn/50n@2x.png",
+			"ja":"霧"
+		}
+	},
+	"48":{
+		"day":{
+			"description":"Rime Fog",
+			"image":"http://openweathermap.org/img/wn/50d@2x.png",
+			"ja":"霧氷"
+		},
+		"night":{
+			"description":"Rime Fog",
+			"image":"http://openweathermap.org/img/wn/50n@2x.png",
+			"ja":"霧氷"
+		}
+	},
+	"51":{
+	    "day":{
+            "description":"Light Drizzle",
+            "image":"http://openweathermap.org/img/wn/09d@2x.png",
+            "ja":"霧雨"
+        },
+        "night":{
+            "description":"Light Drizzle",
+            "image":"http://openweathermap.org/img/wn/09n@2x.png",
+            "ja":"霧雨"
+        }
+    },
+    "53":{
+        "day":{
+            "description":"Drizzle",
+            "image":"http://openweathermap.org/img/wn/09d@2x.png",
+            "ja":"小雨"
+        },
+        "night":{
+            "description":"Drizzle",
+            "image":"http://openweathermap.org/img/wn/09n@2x.png",
+            "ja":"小雨"
+        }
+    },
+    "55":{
+        "day":{
+            "description":"Heavy Drizzle",
+            "image":"http://openweathermap.org/img/wn/09d@2x.png",
+            "ja":"強い霧雨"
+        },
+        "night":{
+            "description":"Heavy Drizzle",
+            "image":"http://openweathermap.org/img/wn/09n@2x.png",
+            "ja":"強い霧雨"
+        }
+    },
+    "56":{
+        "day":{
+            "description":"Light Freezing Drizzle",
+            "image":"http://openweathermap.org/img/wn/09d@2x.png",
+            "ja":"弱い雨氷"
+        },
+        "night":{
+            "description":"Light Freezing Drizzle",
+            "image":"http://openweathermap.org/img/wn/09n@2x.png",
+            "ja":"弱い雨氷"
+        }
+    },
+    "57":{
+        "day":{
+            "description":"Freezing Drizzle",
+            "image":"http://openweathermap.org/img/wn/09d@2x.png",
+            "ja":"雨氷"
+        },
+        "night":{
+            "description":"Freezing Drizzle",
+            "image":"http://openweathermap.org/img/wn/09n@2x.png",
+            "ja":"雨氷"
+        }
+    },
+    "61":{
+        "day":{
+            "description":"Light Rain",
+            "image":"http://openweathermap.org/img/wn/10d@2x.png",
+            "ja":"小雨"
+        },
+        "night":{
+            "description":"Light Rain",
+            "image":"http://openweathermap.org/img/wn/10n@2x.png",
+            "ja":"小雨"
+        }
+    },
+    "63":{
+        "day":{
+            "description":"Rain",
+            "image":"http://openweathermap.org/img/wn/10d@2x.png",
+            "ja":"雨"
+        },
+        "night":{
+            "description":"Rain",
+            "image":"http://openweathermap.org/img/wn/10n@2x.png",
+            "ja":"雨"
+        }
+    },
+    "65":{
+        "day":{
+            "description":"Heavy Rain",
+            "image":"http://openweathermap.org/img/wn/10d@2x.png",
+            "ja":"強い雨"
+        },
+        "night":{
+            "description":"Heavy Rain",
+            "image":"http://openweathermap.org/img/wn/10n@2x.png",
+            "ja":"強い雨"
+        }
+    },
+    "66":{
+        "day":{
+            "description":"Light Freezing Rain",
+            "image":"http://openweathermap.org/img/wn/10d@2x.png",
+            "ja":"弱い氷雨"
+        },
+        "night":{
+            "description":"Light Freezing Rain",
+            "image":"http://openweathermap.org/img/wn/10n@2x.png",
+            "ja":"弱い氷雨"
+        }
+    },
+    "67":{
+        "day":{
+            "description":"Freezing Rain",
+            "image":"http://openweathermap.org/img/wn/10d@2x.png",
+            "ja":"氷雨"
+        },
+        "night":{
+            "description":"Freezing Rain",
+            "image":"http://openweathermap.org/img/wn/10n@2x.png",
+            "ja":"氷雨"
+        }
+    },
+    "71":{
+        "day":{
+            "description":"Light Snow",
+            "image":"http://openweathermap.org/img/wn/13d@2x.png",
+            "ja":"軽い雪"
+        },
+        "night":{
+            "description":"Light Snow",
+            "image":"http://openweathermap.org/img/wn/13n@2x.png",
+            "ja":"軽い雪"
+        }
+    },
+    "73":{
+        "day":{
+            "description":"Snow",
+            "image":"http://openweathermap.org/img/wn/13d@2x.png",
+            "ja":"雪"
+        },
+        "night":{
+            "description":"Snow",
+            "image":"http://openweathermap.org/img/wn/13n@2x.png",
+            "ja":"雪"
+        }
+    },
+    "75":{
+        "day":{
+            "description":"Heavy Snow",
+            "image":"http://openweathermap.org/img/wn/13d@2x.png",
+            "ja":"強い雪"
+        },
+        "night":{
+            "description":"Heavy Snow",
+            "image":"http://openweathermap.org/img/wn/13n@2x.png",
+            "ja":"強い雪"
+        }
+    },
+    "77":{
+        "day":{
+            "description":"Snow Grains",
+            "image":"http://openweathermap.org/img/wn/13d@2x.png",
+            "ja":"雪片"
+        },
+        "night":{
+            "description":"Snow Grains",
+            "image":"http://openweathermap.org/img/wn/13n@2x.png",
+            "ja":"雪片"
+        }
+    },
+    "80":{
+        "day":{
+            "description":"Light Showers",
+            "image":"http://openweathermap.org/img/wn/09d@2x.png",
+            "ja":"軽い通り雨"
+        },
+        "night":{
+            "description":"Light Showers",
+            "image":"http://openweathermap.org/img/wn/09n@2x.png",
+            "ja":"軽い通り雨"
+        }
+    },
+    "81":{
+        "day":{
+            "description":"Showers",
+            "image":"http://openweathermap.org/img/wn/09d@2x.png",
+            "ja":"通り雨"
+        },
+        "night":{
+            "description":"Showers",
+            "image":"http://openweathermap.org/img/wn/09n@2x.png",
+            "ja":"通り雨"
+        }
+    },
+    "82":{
+        "day":{
+            "description":"Heavy Showers",
+            "image":"http://openweathermap.org/img/wn/09d@2x.png",
+            "ja":"強い通り雨"
+        },
+        "night":{
+            "description":"Heavy Showers",
+            "image":"http://openweathermap.org/img/wn/09n@2x.png",
+            "ja":"強い通り雨"
+        }
+    },
+    "85":{
+        "day":{
+            "description":"Light Snow Showers",
+            "image":"http://openweathermap.org/img/wn/13d@2x.png",
+            "ja":"軽い通り雪"
+        },
+        "night":{
+            "description":"Light Snow Showers",
+            "image":"http://openweathermap.org/img/wn/13n@2x.png",
+            "ja":"軽い通り雪"
+        }
+    },
+    "86":{
+        "day":{
+            "description":"Snow Showers",
+            "image":"http://openweathermap.org/img/wn/13d@2x.png",
+            "ja":"通り雪"
+        },
+        "night":{
+            "description":"Snow Showers",
+            "image":"http://openweathermap.org/img/wn/13n@2x.png",
+            "ja":"通り雪"
+        }
+    },
+    "95":{
+        "day":{
+            "description":"Thunderstorm",
+            "image":"http://openweathermap.org/img/wn/11d@2x.png",
+            "ja":"雷雨"
+        },
+        "night":{
+            "description":"Thunderstorm",
+            "image":"http://openweathermap.org/img/wn/11n@2x.png",
+            "ja":"雷雨"
+        }
+    },
+    "96":{
+        "day":{
+            "description":"Light Thunderstorms With Hail",
+            "image":"http://openweathermap.org/img/wn/11d@2x.png",
+            "ja":"軽い雷雨と雹"
+        },
+        "night":{
+            "description":"Light Thunderstorms With Hail",
+            "image":"http://openweathermap.org/img/wn/11n@2x.png",
+            "ja":"軽い雷雨と雹"
+        }
+    },
+    "99":{
+        "day":{
+            "description":"Thunderstorm With Hail",
+            "image":"http://openweathermap.org/img/wn/11d@2x.png",
+            "ja":"雷雨と雹"
+        },
+        "night":{
+            "description":"Thunderstorm With Hail",
+            "image":"http://openweathermap.org/img/wn/11n@2x.png",
+            "ja":"雷雨と雹"
+        }
+    }
+}
