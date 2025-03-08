@@ -40,17 +40,6 @@ class WeatherDataBase(BaseModel):
         self.weather_day_ja = data_day.get("ja")
         self.weather_night_ja = data_night.get("ja")
 
-    @field_serializer("time")
-    def serialize_time(self, value: datetime) -> dict:
-        return {
-            'year': value.year,
-            'month': value.month,
-            'day': value.day,
-            'hour': value.hour,
-            'minute': value.minute,
-            'second': value.second
-        }
-
 class WeatherDataHourly(WeatherDataBase):
     """___必須項目___"""
     temperature_2m: int
@@ -88,28 +77,6 @@ class WeatherDataDaily(WeatherDataBase):
         data['wind_speed_10m_max'] = int(data['wind_speed_10m_max']/3.6)
         data['wind_gusts_10m_max'] = int(data['wind_gusts_10m_max']/3.6)
         super().__init__(*args,**data)
-
-    @field_serializer("sunrise")
-    def serialize_sunrise(self, value: datetime) -> dict:
-        return {
-            'year': value.year,
-            'month': value.month,
-            'day': value.day,
-            'hour': value.hour,
-            'minute': value.minute,
-            'second': value.second
-        }
-
-    @field_serializer("sunset")
-    def serialize_sunset(self, value: datetime) -> dict:
-        return {
-            'year': value.year,
-            'month': value.month,
-            'day': value.day,
-            'hour': value.hour,
-            'minute': value.minute,
-            'second': value.second
-        }
 
 class WeatherDataCurrent(WeatherDataBase):
     temperature_2m: int
@@ -161,7 +128,7 @@ def get_weather(lat,lon,time_range=24*2):
         wData = WeatherDataHourly(**row_dict)
         if time_range != None:
             current = datetime.now(timezone(timedelta(hours=9))).replace(tzinfo=None)
-            if wData.time - current <= timedelta(hours=time_range) and wData.time - current >= timedelta(hours=-2):
+            if wData.time - current <= timedelta(hours=time_range) and wData.time - current >= timedelta(hours=-1):
                 hourly_list.append(wData)
         else:
             hourly_list.append(wData)
