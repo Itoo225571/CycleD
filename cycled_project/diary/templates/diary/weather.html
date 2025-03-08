@@ -31,10 +31,16 @@
                 <div class="card-body p-4">
                 <div class="d-flex">
                     <h6 class="class_city-name flex-grow-1">
-                        <span>{{ user.location.display }}</span>
+                        <span class="d-flex align-items-center">
+                            <text class="pe-1">{{ user.location.display }}</text>
+                            <a href="{% url 'diary:address_user' %}">
+                                <i class="iconify fs-3" data-icon="material-symbols:moved-location"></i>
+                            </a>
+                        </span>
+                        
                     </h6>
                     <h6 class="class_latest-time">
-                        <span>{{ current_time|date:"H:i" }}</span>
+                        <span>{{ current.time|date:"G:i" }}</span>
                     </h6>
                 </div>
     
@@ -66,11 +72,11 @@
                     </div>
                     <div>
                         {% with weather_data=meteocons|get_item:current.weather_code %}
-                        {% if current.is_day %}
-                            <img src="{% static 'diary_weather_report/img/'|add:weather_data.day.image %}" alt="今の天気" height="100" width="100">
-                        {% else %}
-                            <img src="{% static 'diary_weather_report/img/'|add:weather_data.night.image %}" alt="今の天気" height="100" width="100">
-                        {% endif %}
+                            {% if current.is_day %}
+                                <img src="{% static 'diary_weather_report/img/'|add:weather_data.day.image %}" alt="今の天気" height="100" width="100">
+                            {% else %}
+                                <img src="{% static 'diary_weather_report/img/'|add:weather_data.night.image %}" alt="今の天気" height="100" width="100">
+                            {% endif %}
                         {% endwith %}                        
                     </div>
                 </div>
@@ -79,15 +85,52 @@
             </div>
             {% endwith %}
         </div>
-        <div class="72h-weather-container">
+        <div class="hours-weather-container">
+            <table class="table text-center align-middle my-3">
+                <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        <th scope="col" class="p-0"></th>
+                        <th scope="col" class="p-0">
+                            <i class="iconify" data-icon="meteocons:thermometer-celsius" style="font-size: 2.5rem;"></i>
+                        </th>
+                        <th scope="col" class="p-0">
+                            <i class="iconify" data-icon="meteocons:wind-fill" style="font-size: 2.5rem;"></i>
+                        </th>
+                        <th scope="col" class="p-0">
+                            <i class="iconify" data-icon="meteocons:windsock-fill" style="font-size: 2.5rem;"></i>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in weather.hourly %}
+                        {% if data.time.hour == 0 %}
+                            <tr class="table-active">
+                                <th colspan="5">{{ data.time|date:"j" }}日</th>
+                            </tr>
+                        {% endif %}
+                        <tr>
+                            <th scope="row" class="py-0">{{ data.time|date:"G" }}</th>
+                            <td class="py-0">
+                                {% with weather_data=meteocons|get_item:data.weather_code %}
+                                    {% if data.is_day %}
+                                        <img src="{% static 'diary_weather_report/img/'|add:weather_data.day.image %}" alt="今の天気" height="50" width="50">
+                                    {% else %}
+                                        <img src="{% static 'diary_weather_report/img/'|add:weather_data.night.image %}" alt="今の天気" height="50" width="50">
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
 
+                            <td class="py-0">{{ data.temperature_2m }}°C</td>
+                            <td class="py-0">{{ data.wind_speed_10m }} m/s</td>
+                            <td class="py-0">
+                                <i class="iconify fs-3" data-icon="mage:direction-up" style="rotate: {{ data.wind_direction_10m|add:180 }}deg;"></i>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-        <a href={% url "diary:address_user" %} class="btn btn-outline-primary">
-            <i class="iconify fs-2" data-icon="material-symbols:moved-location"></i>
-            <span class="potta-one-regular px-2">
-                お気に入りの場所を変更する
-            </span>
-        </a>
         {% endif %}
     </div>
 {% endblock content %}
