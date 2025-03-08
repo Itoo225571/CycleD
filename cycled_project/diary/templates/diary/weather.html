@@ -36,8 +36,7 @@
                             <a href="{% url 'diary:address_user' %}">
                                 <i class="iconify fs-3" data-icon="material-symbols:moved-location"></i>
                             </a>
-                        </span>
-                        
+                        </span>                        
                     </h6>
                     <h6 class="class_latest-time">
                         <span>{{ current.time|date:"G:i" }}</span>
@@ -62,11 +61,11 @@
                 <div class="d-flex align-items-center">
                     <div class="flex-grow-1" style="font-size: 1rem;">
                         <div class="d-flex align-items-center">
-                            <i class="iconify fs-3" data-icon="material-symbols:air"></i>
+                            <i class="iconify fs-3 text-muted" data-icon="material-symbols:air"></i>
                             <span class="class_wind-speed ms-2"> {{ current.wind_speed_10m }} m/s</span>
                         </div>
                         <div class="d-flex align-items-center">
-                            <i class="iconify fs-3" data-icon="material-symbols:water-drop"></i>
+                            <i class="iconify fs-3 text-info" data-icon="material-symbols:water-drop"></i>
                             <span class="ms-2"> {{ current.relative_humidity_2m }} %</span>
                         </div>
                     </div>
