@@ -123,7 +123,7 @@
 							<span class="icon-label">カレンダー</span>
 						</div>
 					</a>
-					<a class="navbar-brand nav-item" href="#">
+					<a class="navbar-brand nav-item" href="{% url 'diary:map' %}">
 						<div class="icon-text">
 							<span class="material-icons-outlined {% if request.resolver_match.url_name == 'map' %}selected{% endif %}">
 								map
@@ -171,6 +171,9 @@
 										<li class="nav-item ms-2">
 											<a class="nav-link button-weather with-icon ps-2" href="{% url 'diary:weather_report' %}">天気予報</a>
 										</li>
+										<li class="nav-item ms-2">
+											<a class="nav-link button-map with-icon ps-2" href="{% url 'diary:map' %}">地図</a>
+										</li>										
 										
 										<li class="bd-links-span-all my-2 border-top"></li>
 										<li class="nav-item ms-2">

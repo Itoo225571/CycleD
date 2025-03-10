@@ -167,6 +167,10 @@ class CalendarView(LoginRequiredMixin, generic.TemplateView):
             # エラー情報を辞書形式に変換してコンテキストに追加(リストにするのは複数ある他と合わせるため)
             context['form_errors'] = [json.loads(form_errors)]
         return context
+    
+class MapView(LoginRequiredMixin, generic.TemplateView):
+    template_name="diary/map.html"
+
 
 @api_view(['POST'])
 @csrf_protect  # CSRF保護を追加
