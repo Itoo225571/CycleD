@@ -19,7 +19,9 @@ urlpatterns = [
     path("get-current-address/",views.get_current_address,name="get_current_address"),
 
     path("calendar/",views.CalendarView.as_view(),name="calendar"),
-    # path("calendar_edit/",views.DiaryNewView.as_view(),name="calendar_edit"),   
+    # path("calendar_edit/",views.DiaryNewView.as_view(),name="calendar_edit"),
+
+    path("map/",views.MapView.as_view(),name="map"),
 
     path("diary/sendDiaries",views.sendDairies,name="sendDiaries"),
     # path("diary/photos2Locations",views.photos2Locations,name="photos2Locations"),

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}
+    Map
+{% endblock title %}
+
+{% block page_title %}
+{% endblock page_title %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link href=" https://cdn.jsdelivr.net/npm/leaflet-easybutton@2.4.0/src/easy-button.min.css " rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/leaflet-tag-filter-button@0.0.5/src/leaflet-tag-filter-button.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'diary/css/map.css' %}" type="text/css" >
+{% endblock extra_css %}
+
+{% block content %}
+    <div class="container-map">
+        <div id="mapid"></div>
+    </div>
+{% endblock content %}
+
+{% block extra_js %}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src=" https://cdn.jsdelivr.net/npm/leaflet-easybutton@2.4.0/src/easy-button.min.js "></script>    
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-tag-filter-button@0.0.5/src/leaflet-tag-filter-button.min.js"></script>
+    
+    <script src="{% static 'js/pagination.js' %}"></script>
+    <script src="{% static 'js/loading_overlay.js' %}"></script>
+    <script src="{% static 'js/searchKeys.js' %}"></script>
+    <script>
+        const url_getDiaries = "{% url 'diary:sendDiaries' %}";
+    </script>
+    <script src="{% static 'diary/js/map.js' %}"></script>
+{% endblock %}
