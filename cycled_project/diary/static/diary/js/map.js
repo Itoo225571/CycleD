@@ -4,8 +4,7 @@ $(document).ready(function() {
 });
 
 function make_map() {
-    var point_of_view = [35.688544, 139.764692];
-    var map = L.map('mapid').setView(point_of_view, 14);
+    var map = L.map('mapid');
     
     var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
@@ -71,7 +70,7 @@ function setLocations(data, map) {
                 
                 // マーカーを作成し、クラスタグループに追加
                 var marker = L.marker([location.lat, location.lon], opt)
-                    .bindPopup(popup);
+                    .bindPopup(popup)
                 markers.addLayer(marker); // クラスタグループに追加
             });
         }
