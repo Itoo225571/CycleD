@@ -210,10 +210,13 @@ def diary_edit_noPK(request):
 @api_view(['GET'])
 @login_required
 def sendDairies(request):
+    # クエリパラメータ 'filter_days' を取得
+    filter_days = request.GET.get('filter_days', 365)
+
     # Diaryをコンテキストに含める
     # すべてのDiaryと関連するLocationを一度に取得
     current_date = now().date()
-    one_year_ago = current_date - timedelta(days=365)
+    one_year_ago = current_date - timedelta(days=int(filter_days))
     diaries = Diary.objects.prefetch_related('locations').filter(
         date__gte=one_year_ago,
         date__lte=current_date,

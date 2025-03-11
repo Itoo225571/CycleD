@@ -11,6 +11,10 @@
     max-width: 250px; /* ポップアップの最大幅 */
     text-align: center; /* 画像とラベルを中央に配置 */
 }
+#mapid .leaflet-popup-content {
+    width: 200px; /* 自動でサイズ調整 */
+    padding: 0;
+}
 
 /* 画像のスタイル */
 #mapid .popup-image img {
@@ -31,6 +35,35 @@
     #mapid .popup-label {
         font-size: 14px;
     }
+}
+
+/* ラジオボタン */
+#mapid .leaflet-bar {
+    border: none;
+}
+#filterDropdown {
+    width: 100%;  /* ボタンを親要素いっぱいに広げる */
+    height: 100%;  /* ボタンの高さも親要素いっぱいに */
+    display: flex;  /* フレックスボックスでアイコンを中央に配置 */
+    justify-content: center;  /* 横方向で中央に配置 */
+    align-items: center;  /* 縦方向で中央に配置 */
+    padding: 0;  /* パディングを0にしてアイコンがボタン全体に広がるように */
+}
+#filterDropdown .material-icons-round {
+    font-size: 1.5rem;  /* アイコンのサイズを調整 */
+}
+
+#tagFilterForm {
+    border-radius: 0.5rem; /* フォーム全体の角を丸くする */
+    overflow: hidden; /* 丸みが適切に表示されるように、オーバーフローを隠す */
+}
+/* ラジオボタンとラベルの配置を調整 */
+#tagFilterForm .dropdown-item {
+    border: none;
+    display: block;
+}
+#tagFilterForm input[type="radio"] {
+    margin-right: 5px; /* ラジオボタンとテキストの間にスペースを追加 */
 }
 
 /* ボタン全体のスタイル */
