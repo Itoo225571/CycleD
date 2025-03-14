@@ -5,6 +5,7 @@ app_name="diary"
 
 urlpatterns = [
     path("",views.TopView.as_view(),name="top"),
+
     path("home/",views.HomeView.as_view(),name="home"),
     path("home/good/<uuid:pk>",views.good_for_diary,name="good_for_diary"),
     

@@ -28,6 +28,9 @@ DEBUG = env.bool('DEBUG')
 #Cliant ID
 CLIANT_ID_YAHOO = env('CLIANT_ID_YAHOO')
 
+# random画像用のAPI Key
+PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
+
 #media用
 MEDIA_ROOT=BASE_DIR.joinpath("media")
 MEDIA_URL="/media/"
