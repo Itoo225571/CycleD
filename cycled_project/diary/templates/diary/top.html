@@ -2,24 +2,55 @@
 {% load django_bootstrap5 %}
 
 {% block title %}
-    とっぷぺーじ
+    ちゃりニキ - サイクリング記録アプリ
 {% endblock title %}
     
 {% block content %}
-    <div class="container-top mt-5">
-        <div class="row">
-            <div class="col">
-                <h2>Welcome to ちゃりニキ</h2>
-                <p>ちゃりニキは日々のサイクリングを日記として記録に残すことで</p>
-                <p>日々の運動の継続をサポートする目的でつくられたサイトです</p>
-                <p>移動先の写真を添付することで自動的に移動距離を計算します</p>
-                <p>サイクリングの他にも日々持続したいことに対して日記をつけるのもありです</p>
-                <a href="{% url 'accounts:login' %}">ログイン</a>
+    <!-- ヒーローセクション -->
+    <header class=" bg-light text-center py-4 pt-5 shadow-sm rounded">
+        <div class="container">
+            <h1 class="fs-3 fs-md-2 fs-lg-1">毎日のサイクリングを思い出として記録しよう</h1>
+            <p class="lead fs-6 fs-md-5">写真を撮って自動で日記を作成！</p>
+        </div>
+    </header>
+
+    <!-- ログイン・登録セクション -->
+    <section class="container py-5">
+        <div class="text-center">
+            <h2 class="fs-4 fs-md-3">今すぐ始めよう</h2>
+            <a href="{% url 'accounts:signup' %}" class="btn btn-success btn-lg">無料で登録</a>
+            <p class="mt-3">
+                <a href="{% url 'accounts:login' %}">ログインはこちら</a>
+            </p>
+        </div>
+    </section>    
+
+    <!-- 特徴セクション -->
+    <section id="features" class="container py-4">
+        <div class="row text-center gy-2">
+            <div class="col-12 col-md-6 bg-light p-1 shadow-sm rounded">
+                <span class="material-icons d-block" style="font-size: 48px;">pedal_bike</span>
+                <h3 class="fw-bold fs-5 fs-md-4">ライドを記録</h3>
+                <p class="fs-6">行き先を簡単に記録</p>
+            </div>
+            <div class="col-12 col-md-6 bg-light p-1 shadow-sm rounded">
+                <span class="material-icons d-block" style="font-size: 48px;">photo_camera</span>
+                <h3 class="fw-bold fs-5 fs-md-4">写真で日記</h3>
+                <p class="fs-6">写真のGPS情報で日記を自動作成</p>
+            </div>
+            <div class="col-12 col-md-6 bg-light p-1 shadow-sm rounded">
+                <span class="material-icons d-block" style="font-size: 48px;">event_available</span>
+                <h3 class="fw-bold fs-5 fs-md-4">継続をサポート</h3>
+                <p class="fs-6">サイクリング以外の習慣記録にも</p>
+            </div>
+            <div class="col-12 col-md-6 bg-light p-1 shadow-sm rounded">
+                <span class="material-icons d-block" style="font-size: 48px;">bar_chart</span>
+                <h3 class="fw-bold fs-5 fs-md-4">データで振り返り</h3>
+                <p class="fs-6">過去のライドをカレンダーやマップで確認</p>
             </div>
         </div>
-    </div>
+    </section>    
 
-    
 {% endblock content %}
 
 {% block extra_js %}
