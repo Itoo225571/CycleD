@@ -141,7 +141,7 @@
                             </button>
                         </li>
                         <li>
-                            <button type="button" class="button-delete-location dropdown-item p-2 bt-0 text-danger d-flex align-items-center" onclick="delete_location(this)">
+                            <button type="button" class="button-delete-location dropdown-item p-2 bt-0 text-danger d-flex align-items-center">
                                 <i class="material-icons-outlined">delete</i>
                                 <span class="ps-2">削除</span>
                             </button>
@@ -176,8 +176,11 @@
     {% comment %} これはHeicの関係上導入できない {% endcomment %}
     {% comment %} <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script> {% endcomment %}
     {% comment %} サイズ制限 {% endcomment %}
-    <script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.js"></script>
-    <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
+    
+    <!-- jsDelivr を使用 -->
+    <script src="https://cdn.jsdelivr.net/npm/filepond/dist/filepond.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.min.js"></script>
+
     <script src="{% static 'js/loading_overlay.js' %}"></script>
     <script src="{% static 'js/searchKeys.js' %}"></script>
     <script src="{% static 'js/pagination.js' %}"></script>
