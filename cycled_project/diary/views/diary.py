@@ -327,7 +327,7 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
                         location = form.save(commit=False)
                     id = form.cleaned_data.get("id_of_image")
                     date = form.cleaned_data.get("date_of_Diary")
-                    print(id)
+                    # print(id)
 
                     # tempImageの場合
                     if id:
@@ -365,6 +365,8 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
             return self.formset_invalid(diary_formset, location_formset)
 
     def formset_invalid(self, diary_formset=None, location_formset=None,errors=None):
+        # TempImage削除
+        TempImage.objects.filter(user=self.request.user).delete()
         for key, value in self.request.POST.items():
             if 'form-' in key:
                 print(f"{key}: {value}")
@@ -552,7 +554,7 @@ class Photos2LocationsView(generic.View):
         if form.is_valid():
             files = request.FILES.getlist('images')
             diaries = await cache.aget(f'diaries_{self.user.id}')
-            image_hash_list = await cache.aget(f'image_hash_list_{self.user.id}')
+            image_hash_list = await cache.aget(f'image_hash_list')
             if not diaries or not image_hash_list:
                 # 非同期にデータを取得しながら辞書に変換
                 diary_queryset = await sync_to_async(Diary.objects.filter)(user=request.user)
@@ -567,7 +569,7 @@ class Photos2LocationsView(generic.View):
                     for location in locations:
                         if location.image_hash:
                             image_hash_list.append(location.image_hash)
-                await cache.aset(f'image_hash_list_{self.user.id}', image_hash_list, timeout=600)
+                await cache.aset(f'image_hash_list', image_hash_list, timeout=600)
 
             # TempImageの作成と添削
             # `files` が空でない場合にのみ処理を実行
