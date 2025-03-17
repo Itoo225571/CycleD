@@ -178,3 +178,10 @@ body {
 .border-transparent {
     border-color: transparent !important;
 }
+
+/* テキスト風のボタン */
+.button-text {
+    background: none;
+    border: none;
+    cursor: pointer;
+}

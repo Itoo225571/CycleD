@@ -2,6 +2,7 @@ function setup_addressModal($locationFormWrapper, location) {
     $locationFormWrapper.find('.button-open-addressSearchModal, .button-edit-addressSearchModal').off('click').on('click',function(e) {
         // e.preventDefault();
         var $modal = $('#AddressSearchModal');
+        const user_id = $modal.find('#user-info').data('user-id');
         pre_modalOpen();
         $modal.modal('show');
 
@@ -41,7 +42,7 @@ function setup_addressModal($locationFormWrapper, location) {
             var index = $button.data('index');
             var location = location_list[index];
             setLocation(location);
-            storeHistory(location);
+            storeHistory(location,user_id);
         }
 
         function setLocation(location) {
@@ -86,7 +87,7 @@ function setup_addressModal($locationFormWrapper, location) {
             const html = `<img src="${imageSrc}" class="modal-diary-img rounded" alt="場所の写真">`;
             $imgField.html(html);
 
-            displayHistory($('#id_keyword'),setLocation);   // 履歴表示
+            displayHistory($('#id_keyword'),setLocation,user_id);   // 履歴表示
 
             // 検索要素を初期化
             $modal.find('#id_keyword').val('');
@@ -108,6 +109,12 @@ function setup_addressModal($locationFormWrapper, location) {
         // モーダルが閉じられたときのイベントリスナー
         $modal.on('hidden.bs.modal', function () {
             // delete $locationNewForm;
+        });
+
+        // 履歴削除ボタン
+        $modal.find('.button-delete-history').off('click').on('click',function(e) {
+            var $input = $(this).closest('.address-search-form').find("input[name='keyword']");
+            deleteHistory($input,user_id);
         });
     });
 }

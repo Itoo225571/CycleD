@@ -142,8 +142,8 @@ function display_location_list(location_list,func_selected) {
 }
 
 // 履歴保存（最大10件まで）
-function storeHistory(location) {
-    let history = JSON.parse(localStorage.getItem('locationSelected')) || [];
+function storeHistory(location,user_id) {
+    let history = JSON.parse(localStorage.getItem(`locationSelected-${user_id}`)) || [];
     
     // 既に同じデータがある場合は削除
     history = history.filter(item => JSON.stringify(item) !== JSON.stringify(location));
@@ -152,16 +152,16 @@ function storeHistory(location) {
     history.push(location);
 
     // 10個を超えたら先頭の要素を削除
-    if (history.length > 10) {
+    if (history.length > 5) {
         history.shift();
     }
 
-    localStorage.setItem('locationSelected', JSON.stringify(history));
+    localStorage.setItem(`locationSelected-${user_id}`, JSON.stringify(history));
 }
 
 // 履歴表示
-function displayHistory($input,setLocation) {
-    const history = JSON.parse(localStorage.getItem('locationSelected')) || [];
+function displayHistory($input,setLocation,user_id) {
+    const history = JSON.parse(localStorage.getItem(`locationSelected-${user_id}`)) || [];
     // 履歴のアイテムごとにlabelとlocationをペアで作成
     const labelsWithLocation = history.map(item => ({
         label: searchKeys(item, 'label'),
@@ -194,10 +194,18 @@ function displayHistory($input,setLocation) {
             </div>
         `)
         .appendTo(ul);
-    };
+    };    
     
     // input が focus された時に強制的に履歴を表示
     $input.on('focus', function() {
         $(this).autocomplete("search", ""); // 空文字を検索してリストを表示
     });
+}
+
+// 履歴削除
+function deleteHistory($input,user_id) {
+    localStorage.removeItem(`locationSelected-${user_id}`);
+    // autocompleteの中身をリセット
+    $input.autocomplete("option", "source", []);  // sourceを空の配列に変更
+    $input.autocomplete("search", "");  // 空文字で検索してリストを非表示
 }
