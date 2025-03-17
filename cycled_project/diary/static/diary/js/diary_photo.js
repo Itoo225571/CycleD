@@ -671,7 +671,6 @@ function resetPrefix() {
                     const newName = currentName.replace(new RegExp(`${name}-\\d+`), `${name}-${index}`);
                     $input.attr('name', newName);
                 }
-
                 if (currentId) {
                     const newId = currentId.replace(new RegExp(`${name}-\\d+`), `${name}-${index}`);
                     $input.attr('id', newId);
