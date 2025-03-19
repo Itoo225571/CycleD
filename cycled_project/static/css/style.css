@@ -188,3 +188,9 @@ body {
 .button-text:disabled {
     cursor: default; /* disabled状態のときは、通常のカーソルにする */
 }
+
+/* 仕切り線のwidth調節 */
+.dropdown-divider {
+    width: 90%;
+    margin: auto;
+}
