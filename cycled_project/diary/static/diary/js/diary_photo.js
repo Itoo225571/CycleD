@@ -504,10 +504,17 @@ $(document).ready(function() {
     });
 
     $('.publish-all-diary').off('click').on('click', function(e) {
-        $field_ispublic = $('.field-is_public');
-        $field_ispublic.each(function(index, element) {
+        var $field_ispublic = $('.field-is_public');
+        $field_ispublic.each(function(_, element) {
             let checkbox = $(element).find("input[type='checkbox']");
             checkbox.prop('checked', true);
+        });
+    });
+    $('.unpublish-all-diary').off('click').on('click', function(e) {
+        var $field_ispublic = $('.field-is_public');
+        $field_ispublic.each(function(_, element) {
+            let checkbox = $(element).find("input[type='checkbox']");
+            checkbox.prop('checked', false);
         });
     });
 });
