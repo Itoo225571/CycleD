@@ -51,6 +51,11 @@ function appendLocations(url_getDiaries, map) {
 function setLocations(data, map) {
     var markers = L.markerClusterGroup(); // クラスタグループを作成
 
+    if (!data.length) {
+        map.setView([35.6762, 139.6503], 8); // dataが空の場合に東京の座標を指定
+        $('#explanation').html('<span>1年以内の日記が存在しません</span>')
+    }
+
     data.forEach(function(diary) {
         if (Array.isArray(diary.locations)) {
             var locations = diary.locations;

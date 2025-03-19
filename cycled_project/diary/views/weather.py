@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponse
 from django.templatetags.static import static
 from django.shortcuts import redirect
 from django.views import generic
@@ -17,32 +17,28 @@ from datetime import timedelta
 import os
 import json
 
+@method_decorator(ratelimit(key='ip', rate='1/s', method='GET'), name='get')
 class WeatherView(LoginRequiredMixin, generic.TemplateView):
     template_name = "diary/weather.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
         # JSONファイルの読み込み
         json_file_path = os.path.join(settings.BASE_DIR, 'diary', 'resources', 'openweather_mapping.json')
         with open(json_file_path, 'r') as file:
             openweather_data = json.load(file)
             context['openweather'] = openweather_data
-
         location = getattr(self.request.user, 'location', None)
         weather = None
-
         # ユーザーの位置が設定されている場合
         if location:
             lat = location.lat
             lon = location.lon
-            weather = get_weather_ratelimit(self.request,lat,lon)
-
+            weather = get_weather_data(self.request,lat,lon)
         context['weather'] = weather
         return context
 
-@ratelimit(key='user', rate='5/m', method='GET', block=True)
-def get_weather_ratelimit(request,lat,lon) -> dict:
+def get_weather_data(request,lat,lon) -> dict:
     now = timezone.now()
     api_key = settings.OPENWEATHER_API_KEY
 

@@ -31,6 +31,7 @@ django-extensions==3.2.3
 django-imagekit==5.0.0
 django-ratelimit==4.1.0
 django-sslserver==0.22
+django-user-agents==0.4.0
 django-widget-tweaks==1.5.0
 django-widgets-improved==1.5.0
 djangorestframework==3.15.2
@@ -65,7 +66,7 @@ pickleshare==0.7.5
 pilkit==3.0
 pillow==10.3.0
 pillow_heif==0.18.0
-pip==24.3.1
+pip==25.0.1
 platformdirs==4.2.2
 prompt_toolkit==3.0.47
 psutil==6.0.0
@@ -76,9 +77,11 @@ pydantic==2.7.3
 pydantic_core==2.18.4
 Pygments==2.18.0
 PyJWT==2.10.1
+pymemcache==4.0.0
 pyOpenSSL==24.2.1
 PySocks==1.7.1
 python-dateutil==2.9.0.post0
+python-memcached==1.62
 pytz==2024.1
 PyWavelets==1.7.0
 pyzmq==26.0.3
@@ -96,7 +99,10 @@ traitlets==5.14.3
 typing_extensions==4.12.2
 tzdata==2023.3
 tzlocal==5.2
+ua-parser==1.0.0
+ua-parser-builtins==0.18.0.post1
 urllib3==2.2.1
+user-agents==2.2.0
 wcwidth==0.2.13
 Werkzeug==3.0.6
 wheel==0.43.0

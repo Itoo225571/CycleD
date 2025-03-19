@@ -185,3 +185,6 @@ body {
     border: none;
     cursor: pointer;
 }
+.button-text:disabled {
+    cursor: default; /* disabled状態のときは、通常のカーソルにする */
+}

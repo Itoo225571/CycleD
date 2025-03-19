@@ -86,7 +86,6 @@
                         </label>
                     </div>
                     
-                    
                     <div class="row">
                         <div class="col order-md-2">
                             <div class="d-flex justify-content-end align-items-center">                                
@@ -108,45 +107,35 @@
             </div>
         </div>
         <div id="empty-form-location" style="display:none;">
-            {% for field in location_formset.empty_form %}
-                {% if field.name != 'label' %}
-                    {{ field }}
-                {% endif %}
-            {% endfor %}
-            <div class="location-surface-field input-group d-flex flex-row align-items-center">
-                <div class="location-list-label-display w-100"></div>
-                {{ location_formset.empty_form.label|add_class:"w-100 form-control class_locations-label"}}
-                <button class="button-open-addressSearchModal btn btn-link" type="button" style="display: none;">
-                    <span>場所を指定する</span>
-                </button>
-            </div>
-            <div class="location-buttons-field">
-
-                <div class="dropdown">
-                    <button class="btn button-location-dropdown" type="button" id="dropdownMenuButton-__prefix__" data-bs-toggle="dropdown" aria-expanded="false" style="border:none;">
-                        <i class="material-icons-outlined align-text-bottom">more_horiz</i>
-                    </button>
-                    <ul class="dropdown-menu scale-in-ver-top" aria-labelledby="dropdownMenuButton-__prefix__">
-                        <li>
-                            <button type="button" class="button-edit-addressSearchModal dropdown-item p-2 bt-0 d-flex align-items-center">
-                                <i class="material-icons-round">edit_location_alt</i>
-                                <span class="ps-2">場所を変更</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button type="button" class="button-edit-location-label dropdown-item p-2 bt-0 d-flex align-items-center" onclick="edit_location(this)">
-                                {% comment %} <i class="material-icons-outlined pe-2">edit</i> {% endcomment %}
-                                <i class="iconify" data-icon="bx:rename" style="font-size: 1.5rem;"></i>
-                                <span class="ps-2">名前を変更</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button type="button" class="button-delete-location dropdown-item p-2 bt-0 text-danger d-flex align-items-center">
-                                <i class="material-icons-outlined">delete</i>
-                                <span class="ps-2">削除</span>
-                            </button>
-                        </li>
-                    </ul>
+            <div class="d-flex justify-content-between w-100">
+                {% for field in location_formset.empty_form %}
+                    {% if field.name != 'label' %}
+                        {{ field }}
+                    {% endif %}
+                {% endfor %}
+                <div class="location-surface-field flex-grow-1">
+                    <div class="input-group d-flex align-items-center">
+                        <div class="location-list-label-display w-100"></div>
+                        {{ location_formset.empty_form.label|add_class:"w-100 form-control class_locations-label"}}
+                        <button class="button-open-addressSearchModal btn btn-link" type="button" style="display: none;">
+                            <span>場所を指定する</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="location-buttons-field">
+                    <div class="d-flex align-items-center" style="font-size: 20px;"> <!-- d-flex と gap-3 を追加 -->
+                        <button type="button" class="button-edit-addressSearchModal button-text px-1 d-flex align-items-center">
+                            <i class="iconify text-primary" data-icon="material-symbols:edit-location-alt-outline-rounded"></i>
+                        </button>
+                        
+                        <button type="button" class="button-edit-location-label button-text px-1 d-flex align-items-center" onclick="edit_location(this)">
+                            <i class="iconify text-dark" data-icon="bx:rename"></i>
+                        </button>
+                        
+                        <button type="button" class="button-delete-location button-text px-1 d-flex align-items-center">
+                            <i class="iconify text-danger" data-icon="material-symbols:delete-outline-rounded"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
