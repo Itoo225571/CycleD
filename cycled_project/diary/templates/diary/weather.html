@@ -57,7 +57,11 @@
                     <div class="d-flex align-items-center">
                         <div class="flex-grow-1" style="font-size: 1rem;">
                             <div class="d-flex align-items-center">
-                                <i class="iconify fs-3 text-muted" data-icon="material-symbols:air"></i>
+                                <i class="iconify fs-4" data-icon="mage:direction-up" 
+                                    style="rotate: {{ current.wind_direction|add:180 }}deg; 
+                                        color: {% if current.wind_speed >= 10 %} red 
+                                                {% elif current.wind_speed >= 5 %} orange
+                                                {% else %} blue {% endif %};"></i>
                                 <span class="class_wind-speed ms-2"> {{ current.wind_speed }} m/s</span>
                             </div>
                             <div class="d-flex align-items-center mt-2">
@@ -110,7 +114,11 @@
                             <td class="py-0">{{ data.temperature }}°C</td>
                             <td class="py-0">{{ data.wind_speed }} m/s</td>
                             <td class="py-0">
-                                <i class="iconify fs-3" data-icon="mage:direction-up" style="rotate: {{ data.wind_direction|add:180 }}deg;"></i>
+                                <i class="iconify fs-4" data-icon="mage:direction-up" 
+                                    style="rotate: {{ data.wind_direction|add:180 }}deg; 
+                                        color: {% if data.wind_speed >= 10 %} red 
+                                                {% elif data.wind_speed >= 5 %} orange
+                                                {% else %} blue {% endif %};"></i>
                             </td>
                         </tr>
                     {% endfor %}

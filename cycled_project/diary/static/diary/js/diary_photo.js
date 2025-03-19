@@ -627,20 +627,20 @@ function check_errors($diaryForm,errors=null) {
     }
 
     // diary 内に空の loc があった場合のエラー
-    var $location_empty = $locationFormsExist.find("[id^='id_locations-'][id$='-lat']")
-    .not(function() {
-        return $(this).val();  // 空白を削除して判定
+    var hasEmptyLat = false;  // 空のlatがあるかどうかを追跡する変数
+    $locationFormsExist.each(function(){
+        var lat = $(this).find("[id^='id_locations-'][id$='-lat']").val();
+        if (lat) {
+            $(this).find('.button-edit-location-label').prop('disabled', false);
+            $(this).find('.button-open-addressSearchModal').hide();
+        } else {
+            $(this).find('.button-open-addressSearchModal').show();
+            $(this).find('.button-edit-location-label').prop('disabled', true);
+            hasEmptyLat = true;  // 空のlatが見つかったのでフラグを立てる
+        }
     });
-    $location_empty.each(function() {
-        var $locationForm = $(this).closest('.locations-form-wrapper');
-        errors.noAddress.append($diaryErrors, $submit);
-        $locationForm.find('.button-open-addressSearchModal').show();
-        $locationForm.find('.button-edit-location-label').addClass('disabled');
-    });
-    if ($location_empty.length === 0) {
-        errors.noAddress.remove($diaryErrors, $submit);
-        $diaryForm.find('.button-edit-location-label').removeClass('disabled');
-    }
+    if (hasEmptyLat) errors.noAddress.append($diaryErrors, $submit);
+    else errors.noAddress.remove($diaryErrors, $submit);
 
     // lat, lon が入力されたら再帰
     $diaryForm.find('input').on('change', function () {
