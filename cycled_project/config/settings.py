@@ -30,6 +30,8 @@ CLIANT_ID_YAHOO = env('CLIANT_ID_YAHOO')
 
 # random画像用のAPI Key
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
+# openweather用のAPI Key
+OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
 
 #media用
 MEDIA_ROOT=BASE_DIR.joinpath("media")

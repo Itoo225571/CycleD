@@ -13,7 +13,7 @@ urlpatterns = [
     path("diary/photo/",views.DiaryPhotoView.as_view(),name="diary_photo"),
 
     path("weather/",views.WeatherView.as_view(),name="weather_report"),
-    path("location2weather/",views.ajax_location2weather,name="ajax_location2weather"), 
+    # path("location2weather/",views.ajax_location2weather,name="ajax_location2weather"), 
 
     path("address/",views.AddressUserView.as_view(),name= "address_user"),
     path("address-search/",views.address_search,name="address_search"),

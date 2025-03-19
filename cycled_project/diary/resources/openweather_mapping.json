@@ -1,0 +1,56 @@
+{
+    "01d": {
+        "image": "clear-day.svg"
+    },
+    "01n": {
+        "image": "clear-night.svg"
+    },
+    "02d": {
+        "image": "partly-cloudy-day.svg"
+    },
+    "02n": {
+        "image": "partly-cloudy-night.svg"
+    },
+    "03d": {
+        "image": "cloudy.svg"
+    },
+    "03n": {
+        "image": "cloudy.svg"
+    },
+    "04d": {
+        "image": "extreme.svg"
+    },
+    "04n": {
+        "image": "extreme.svg"
+    },
+    "09d": {
+        "image": "drizzle.svg"
+    },
+    "09n": {
+        "image": "drizzle.svg"
+    },
+    "10d": {
+        "image": "rain.svg"
+    },
+    "10n": {
+        "image": "rain.svg"
+    },
+    "11d": {
+        "image": "thunderstorms.svg"
+    },
+    "11n": {
+        "image": "thunderstorms.svg"
+    },
+    "13d": {
+        "image": "snow.svg"
+    },
+    "13n": {
+        "image": "snow.svg"
+    },
+    "50d": {
+        "image": "fog.svg"
+    },
+    "50n": {
+        "image": "fog.svg"
+    }
+}

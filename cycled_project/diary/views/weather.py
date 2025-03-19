@@ -8,9 +8,12 @@ from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from django.utils import timezone
 from django.core.cache import cache
+from django_ratelimit.decorators import ratelimit
+from django.utils import timezone
 
-from subs.weather_report.weather_report import get_weather
-from datetime import datetime,timedelta
+# from subs.weather_report.weather_report import get_weather
+from subs.weather_report.weather_report_v2 import get_weather,update_weather
+from datetime import timedelta
 import os
 import json
 
@@ -21,10 +24,10 @@ class WeatherView(LoginRequiredMixin, generic.TemplateView):
         context = super().get_context_data(**kwargs)
         
         # JSONファイルの読み込み
-        json_file_path = os.path.join(settings.BASE_DIR, 'diary', 'resources', 'meteocons_mapping.json')
+        json_file_path = os.path.join(settings.BASE_DIR, 'diary', 'resources', 'openweather_mapping.json')
         with open(json_file_path, 'r') as file:
-            meteocons_data = json.load(file)
-            context['meteocons'] = meteocons_data
+            openweather_data = json.load(file)
+            context['openweather'] = openweather_data
 
         location = getattr(self.request.user, 'location', None)
         weather = None
@@ -33,56 +36,42 @@ class WeatherView(LoginRequiredMixin, generic.TemplateView):
         if location:
             lat = location.lat
             lon = location.lon
-
-            # セッションから以前の位置情報、天気情報、時間を取得
-            previous_lat = self.request.session.get('lat')
-            previous_lon = self.request.session.get('lon')
-            last_weather_time = self.request.session.get('last_weather_time')
-            stored_weather = self.request.session.get('weather')
-
-            # 位置情報が変わった場合、または15分以上経過している場合に天気情報を取得
-            if (lat != previous_lat or lon != previous_lon or
-                (last_weather_time and timezone.now() - last_weather_time >= timedelta(minutes=15))):
-                # 新しい天気情報を取得
-                weather_base = get_weather(lat, lon, time_range=48)
-                weather = weather_base.model_dump()
-                # セッションに新しい位置情報、天気情報、時間を保存
-                self.request.session['lat'] = lat
-                self.request.session['lon'] = lon
-                self.request.session['last_weather_time'] = timezone.now()
-                self.request.session['weather'] = weather  # weather をセッションに保存
-            else:
-                # セッションに天気情報が保存されている場合、それを使用
-                weather = stored_weather
+            weather = get_weather_ratelimit(self.request,lat,lon)
 
         context['weather'] = weather
         return context
 
+@ratelimit(key='user', rate='5/m', method='GET', block=True)
+def get_weather_ratelimit(request,lat,lon) -> dict:
+    now = timezone.now()
+    api_key = settings.OPENWEATHER_API_KEY
 
-def ajax_location2weather(request):
-    if request.method == 'POST':
-        latitude = float(request.POST.get('latitude',None))
-        longitude = float(request.POST.get('longitude',None))
-        latlon = str(latitude) + str(longitude)
-        # キャッシュキーを生成
-        cache_key = f"weather_{latlon}"
-        weather = cache.get(cache_key)
+    pre = {
+        'lat' : request.session.get('lat'),
+        'lon' : request.session.get('lon'),
+        'time_current' : request.session.get('time_current'),
+        'time_hourly': request.session.get('time_hourly'),
+        'weather' : request.session.get('weather'),
+    }
 
-        # キャッシュが無い場合はAPIを呼び出してデータを取得
-        if weather is None:
-            img_path = static('diary_weather_report/img/')
-            weather_json = get_weather(latitude, longitude, time_range=48)
-            weather = weather_json.model_dump()
-            # データをキャッシュする（15分間）
-            cache.set(cache_key, weather, timeout=60 * 15)
-
-        # 位置情報を含むレスポンスを作成
-        response = {
-            'message': 'Location data received successfully.',
-            "weather": weather,
-            'latlon': latlon,
-        }
-        request.session['weather_data'] = response
-        return JsonResponse(response)
+    # latもしくはlonが異なる or pre内のいずれかがNone
+    if lat != pre['lat'] or lon != pre['lon'] or (any(value is None for value in pre.values())):
+        weather = get_weather(api_key,lat,lon)
     else:
-        return JsonResponse({'error': 'Invalid request method.'}, status=400)
+        # 場所が同じ場合，過去のデータを使う
+        weather = pre['weather']
+        # currentの取得時間が10分以上経過していた場合 currentのみを更新
+        if now - pre['time_current'] > timedelta(minutes=10):
+            weather = update_weather(api_key,weather,update_for=['current'])
+        # hourlyの最新時刻が現在時刻よりも過去の場合
+        if now > pre['time_hourly']:
+            weather = update_weather(api_key,weather,update_for=['hourly'])
+    
+    # セッションに新しい位置情報、天気情報、時間を保存
+    request.session['lat'] = lat
+    request.session['lon'] = lon
+    request.session['time_current'] = weather['current']['time']
+    request.session['time_hourly'] = weather['hourly'][0]['time']   #一番近いデータの時刻を保存
+    request.session['weather'] = weather  # weather をセッションに保存
+
+    return weather
