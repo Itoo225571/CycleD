@@ -46,15 +46,11 @@
                     <div class="d-flex flex-column text-center mt-5 mb-4">
                         <h5 class="display-4 mb-0" style="color: #1C2331;">
                             <span class="class_tempareture">
-                                {{ current.temperature_2m }}°C
+                                {{ current.temperature }}°C
                             </span>
                         </h5>
                         <span class="class_weathe small">
-                            {% if current.is_day %}
-                                {{ current.weather_day_ja }}
-                            {% else %}
-                                {{ current.weather_night_ja }}
-                            {% endif %}    
+                            {{ current.weather }}
                         </span>
                     </div>
         
@@ -62,20 +58,16 @@
                         <div class="flex-grow-1" style="font-size: 1rem;">
                             <div class="d-flex align-items-center">
                                 <i class="iconify fs-3 text-muted" data-icon="material-symbols:air"></i>
-                                <span class="class_wind-speed ms-2"> {{ current.wind_speed_10m }} m/s</span>
+                                <span class="class_wind-speed ms-2"> {{ current.wind_speed }} m/s</span>
                             </div>
-                            <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center mt-2">
                                 <i class="iconify fs-3 text-info" data-icon="material-symbols:water-drop"></i>
-                                <span class="ms-2"> {{ current.relative_humidity_2m }} %</span>
+                                <span class="ms-2"> {{ current.humidity }} %</span>
                             </div>
                         </div>
                         <div>
-                            {% with weather_data=meteocons|get_item:current.weather_code %}
-                                {% if current.is_day %}
-                                    <object data="{% static 'diary_weather_report/img/'|add:weather_data.day.image %}" type="image/svg+xml" width="100" height="100"></object>
-                                {% else %}
-                                    <object data="{% static 'diary_weather_report/img/'|add:weather_data.night.image %}" type="image/svg+xml" width="100" height="100"></object>
-                                {% endif %}
+                            {% with weather_data=openweather|get_item:current.weather_icon %}
+                                <object data="{% static 'diary_weather_report/img/'|add:weather_data.image %}" type="image/svg+xml" width="100" height="100"></object>
                             {% endwith %}                        
                         </div>
                     </div>
@@ -108,21 +100,17 @@
                             </tr>
                         {% endif %}
                         <tr>
-                            <th scope="row" class="py-0">{{ data.time|date:"G" }}</th>
+                            <th scope="row" class="py-0">{{ data.time|date:"G" }}時</th>
                             <td class="py-0">
-                                {% with weather_data=meteocons|get_item:data.weather_code %}
-                                    {% if data.is_day %}
-                                        <object data="{% static 'diary_weather_report/img/'|add:weather_data.day.image %}" type="image/svg+xml" width="50" height="50"></object>
-                                    {% else %}
-                                        <object data="{% static 'diary_weather_report/img/'|add:weather_data.night.image %}" type="image/svg+xml" width="50" height="50"></object>
-                                    {% endif %}
+                                {% with weather_data=openweather|get_item:data.weather_icon %}
+                                    <object data="{% static 'diary_weather_report/img/'|add:weather_data.image %}" type="image/svg+xml" width="50" height="50"></object>
                                 {% endwith %}
                             </td>
 
-                            <td class="py-0">{{ data.temperature_2m }}°C</td>
-                            <td class="py-0">{{ data.wind_speed_10m }} m/s</td>
+                            <td class="py-0">{{ data.temperature }}°C</td>
+                            <td class="py-0">{{ data.wind_speed }} m/s</td>
                             <td class="py-0">
-                                <i class="iconify fs-3" data-icon="mage:direction-up" style="rotate: {{ data.wind_direction_10m|add:180 }}deg;"></i>
+                                <i class="iconify fs-3" data-icon="mage:direction-up" style="rotate: {{ data.wind_direction|add:180 }}deg;"></i>
                             </td>
                         </tr>
                     {% endfor %}
