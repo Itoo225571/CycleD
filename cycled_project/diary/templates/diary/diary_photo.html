@@ -43,12 +43,20 @@
                     <div id="diary-management">{{ diary_formset.management_form }}</div>
                     <div id="location-management">{{ location_formset.management_form }}</div>
                     <div class="mb-4 w-100 w-md-75 mx-auto">
-                        <button type="button" class="btn btn-outline-success publish-all-diary d-flex align-items-center justify-content-center mx-auto">
-                            <div class="px-2 d-flex align-items-center fs-3">
-                                <i class="material-icons me-2">public</i>
-                                <span class="kaisei-decol-regular">全日記を公開にする</span>
-                            </div>
-                        </button>                        
+                        <div class="d-flex justify-content-around align-items-center">
+                            <button type="button" class="btn btn-outline-primary publish-all-diary d-flex align-items-center">
+                                <div class="px-2 d-flex align-items-center fs-4">
+                                    <i class="material-icons me-2">public</i>
+                                    <span class="kaisei-decol-regular">全公開</span>
+                                </div>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary unpublish-all-diary d-flex align-items-center">
+                                <div class="px-2 d-flex align-items-center fs-4">
+                                    <i class="material-icons me-2">public_off</i>
+                                    <span class="kaisei-decol-regular">全非公開</span>
+                                </div>
+                            </button>
+                        </div>
                     </div>
                     
                     <div id="diary-formset-body"></div>
