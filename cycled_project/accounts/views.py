@@ -14,15 +14,9 @@ from django_user_agents.utils import get_user_agent
 from django.views.decorators.csrf import csrf_protect
 from django.http import JsonResponse, HttpResponseRedirect
 
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
-
-from .forms import CustomLoginForm,CustomSignupForm,UserSettingForm,UserDynamicForm,UserLeaveForm,AllauthUserLeaveForm
+from .forms import CustomLoginForm,CustomSignupForm,UserLeaveForm,AllauthUserLeaveForm,CustomEmailForm
+from .forms import UserSettingForm,UserUsernameForm,UserIconForm
 from .models import User
-from diary.models import Diary,Coin  # diaryアプリから
 
 class CustomLoginView(account_views.LoginView):
     template_name="account/login.html"
@@ -52,29 +46,30 @@ class UserSettingView(LoginRequiredMixin,generic.UpdateView):
     def get_object(self, queryset=None):
         # 常に現在ログイン中のユーザーを返す
         return self.request.user
-    def post(self, request, *args, **kwargs):
+    def form_valid(self, request, *args, **kwargs):
         # fields の各フィールドに 'form-' をつけて request.POST に含まれるかをチェック
         form = self.get_form()  # フォームインスタンスを取得
         matched_field = next(
             (f"form-{field}" for field in form.fields if f"form-{field}" in request.POST), None
         )
-        if matched_field:
-            field_name = matched_field.replace('form-', '') #formを取り除く
-            form = UserDynamicForm(request.POST, dynamic_fields=[field_name], instance=request.user)
-            if form.is_valid():
-                # request.user.save(update_fields=[field_name])  # 一致したフィールドだけ保存
-                request.user.save()  # 一致したフィールドだけ保存
-                return HttpResponseRedirect(self.success_url)
-            else:
-                # フォームのエラーを表示
-                for field, errors in form.errors.items():
-                    for error in errors:
-                        messages.error(self.request, f"{field} のエラー: {error}")
-                return HttpResponseRedirect(self.success_url)
+        field_name = matched_field.replace('form-', '') #formを取り除く
+        form_class = form.form_map.get(field_name)
+        if form_class:
+            form = form_class(request.POST, instance=request.user)
         else:
             # fields に含まれない場合はエラーを表示
             messages.error(self.request, '不正なリクエストです')
-            return HttpResponseRedirect(self.success_url)
+            return self.form_invalid(form)
+        if form.is_valid():
+            # request.user.save(update_fields=[field_name])  # 一致したフィールドだけ保存
+            request.user.save()  # 一致したフィールドだけ保存
+            return super().form_valid(form)
+        else:
+            # フォームのエラーを表示
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(self.request, f"{field} のエラー: {error}")
+            return super().form_invalid(form)
 
 class CustomPasswordChangeView(LoginRequiredMixin, account_views.PasswordChangeView):
     template_name = "account/password_change.html"
@@ -85,9 +80,6 @@ class CustomPasswordSetView(LoginRequiredMixin, account_views.PasswordSetView):
     template_name = "account/password_set.html"
     success_url = reverse_lazy('accounts:setting')
     success_message = 'パスワードの設定に成功'
-
-class UserEditView(LoginRequiredMixin,generic.UpdateView):
-    pass
 
 class UserLeaveView(LoginRequiredMixin, account_views.FormView):
     template_name = "account/leave.html"
@@ -136,3 +128,10 @@ class CustomConnectionsView(socialaccount_views.ConnectionsView):
             messages.error(request, "アカウント連携を解除するには先にパスワードを設定してください。")
             return redirect('accounts:password_set')
         return super().post(request, *args, **kwargs)
+    
+class CustomEmailView(account_views.EmailView):
+    form_class = CustomEmailForm
+    template_name = "account/email.html"
+    # success_url = reverse_lazy('accounts:setting')
+    # success_message = ''
+    

@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model,authenticate
 from django.contrib.auth.forms import UserCreationForm,UserChangeForm,AuthenticationForm
-from allauth.account.forms import SignupForm,LoginForm
+from allauth.account.forms import SignupForm,LoginForm,AddEmailForm
 from django import forms
 
 from .models import User
@@ -24,6 +24,14 @@ class CustomLoginForm(LoginForm):
         self.fields['login'].label = 'ユーザー名またはメールアドレス'  # ラベルを変更
         self.fields['remember'].label = '次回以降自動でログインする'  # ラベルを変更
 
+class UserUsernameForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username']
+class UserIconForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['icon']
 class UserSettingForm(forms.ModelForm):
     # アイコンの選択肢をラジオボタンで表示
     icon = forms.ChoiceField(
@@ -31,22 +39,15 @@ class UserSettingForm(forms.ModelForm):
         choices=User.ICON_CHOICES,
         label="アイコン画像"
     )
+    form_map = {
+        'icon': UserIconForm,
+        'username': UserUsernameForm
+    }
     class Meta:
         model = User
-        fields = ['icon', 'username', 'email']
+        fields = ['icon', 'username']
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-class UserDynamicForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['icon', 'username', 'email']
-
-    def __init__(self, *args, **kwargs):
-        dynamic_fields = kwargs.pop('dynamic_fields', None)
-        super(UserDynamicForm, self).__init__(*args, **kwargs)
-        if dynamic_fields:
-            self.fields = {field: self.fields[field] for field in dynamic_fields}
 
 class UserLeaveForm(forms.Form):
     password = forms.CharField(
@@ -64,3 +65,21 @@ class AllauthUserLeaveForm(forms.Form):
         label="退会することを確認しました",
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
     )
+
+class CustomEmailForm(AddEmailForm):
+    password = forms.CharField(
+        label="現在のパスワード",
+        widget=forms.PasswordInput(attrs={'placeholder': 'パスワードを入力','autocomplete': 'off'}),
+        required=True
+    )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["email"].widget.attrs.update({
+            "placeholder": "新しいメールアドレスを入力"
+        })
+    def clean_password(self):
+        password = self.cleaned_data.get("password")
+        user = self.user
+        if not user.check_password(password):
+            raise forms.ValidationError("パスワードが正しくありません。")
+        return password

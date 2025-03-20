@@ -18,6 +18,7 @@
     height: auto;  /* アスペクト比を維持 */
     object-fit: cover;  /* はみ出しを防ぐ */
     border-radius: 50%;  /* 丸い画像を維持 */
+    aspect-ratio: 1 / 1;
 }
 .usericon-field .user-edit-button {
     position:absolute;
@@ -43,6 +44,11 @@
     .usericon-field .user-edit-button {
         font-size: 2vw; /* md 以上でのフォントサイズ */
     }
+}
+#usericonModal .icon-img-radio {
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    cursor: pointer;
 }
 
 .userinformation-field th {
