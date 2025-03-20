@@ -388,6 +388,7 @@ $(document).ready(function() {
 				event_form.preventDefault();
 				send_form_ajax($form,event_calendar);
 			});
+
 			function set_label_field() {
 				const $locations_field = $backContent.find('.diary-locations-field');
 				const $labels_field = $backContent.find('.diary-labels-field');
@@ -395,49 +396,59 @@ $(document).ready(function() {
 				$labels_field.empty();
 				$labels_field.html('<div class="text-center"><img class="diary-image fade-anime mb-3" loading="lazy"></div>');
 
-				$locations_field.children().each(function (index, child) {
-					const imgSrc = $(child).find('.location-img-url').val();
-					const isThumbnail = $(child).find('*[id^="id_locations"][id$="is_thumbnail"]').val();
-					const rotateAngle = $(child).find('*[id^="id_locations"][id$="rotate_angle"]').val();
+				$locations_field.children().each(function (index, locationForm) {
+					const imgSrc = $(locationForm).find('.location-img-url').val();
+					const isThumbnail = $(locationForm).find('*[id^="id_locations"][id$="is_thumbnail"]').val();
+					const rotateAngle = $(locationForm).find('*[id^="id_locations"][id$="rotate_angle"]').val();
 
 					var isChecked = '';
 					if (isThumbnail) {
-						const imageSrc = $(child).find('.location-img-url').val();
+						const imageSrc = $(locationForm).find('.location-img-url').val();
 						isChecked = 'checked';
 						$labels_field.find('.diary-image').attr('src', imageSrc);
 						$labels_field.find('.diary-image').css({'transform': `rotate(${rotateAngle}deg)`,});	//角度を初期化
 					}
-					var $label_input = $(child).find('*[id^="id_locations"][id$="label"]');
+					var $label_input = $(locationForm).find('*[id^="id_locations"][id$="label"]');
 					$label_input.addClass('w-100');
-					var $radioButtonHtml = $(`
+					var $radioButton = $(`
 						<div class="diary-location-label-item">
 							<input type="hidden" class="location-label-imgSrc" value="${imgSrc}">
 							<input type="radio"
 								class="diary-location-label-radiobutton visually-hidden" 
 								id="location-edit-${index}-label" 
 								name="locationRadiobuttonEditLabel" ${isChecked}>
-							<label for="location-edit-${index}-label" class="location-label w-100 text-start py-1">
+							<label for="location-edit-${index}-label" class="location-label w-100 text-start py-3">
 								<div class="d-flex align-items-center justify-content-between w-100">
-									<text class="me-2 text-truncate" style="max-width: calc(100% - 50px);">
-										${$label_input.val()}
-									</text> <!-- 右側にスペースを空ける -->
-									<div class="d-flex align-items-center">
-										<button type="button" class="button-edit-label btn p-0 icon-in-button">
-											<i class="bi bi-pencil-square icon-location text-muted"></i>
-										</button>
-										<button type="button" class="button-delete-location btn p-0 icon-in-button">
-											<i class="bi bi-trash icon-location text-danger" alt="icon-trash"></i>
-										</button> 
+									<div class="location-surface-field flex-grow-1 overflow-hidden">
+										<span class="location-label-surface me-2 w-100">
+											${$label_input.val()}
+										</span>
+									</div>
+									<div class="location-buttons-field flex-shrink-0">
+										<div class="d-flex align-items-center" style="font-size: 20px;">
+											<button type="button" class="button-edit-addressSearchModal button-text px-1 d-flex align-items-center">
+												<i class="iconify text-primary" data-icon="material-symbols:edit-location-alt-outline-rounded"></i>
+											</button>
+											<button type="button" class="button-edit-location-label button-text px-1 d-flex align-items-center">
+												<i class="iconify text-dark" data-icon="bx:rename"></i>
+											</button>
+											<button type="button" class="button-delete-location button-text px-1 d-flex align-items-center">
+												<i class="iconify text-danger" data-icon="material-symbols:delete-outline-rounded"></i>
+											</button>
+										</div>
 									</div>
 								</div>
 							</label>
 						</div>
 					`);
-					$radioButtonHtml.find('text').after($label_input);  // <text> の後ろに $label_input を追加
-					const $delete_input = $(child).find('*[id^="id_locations"][id$="DELETE"]');
-					$radioButtonHtml.find('text').after($delete_input);
+					// $radioButton.find('.location-label-surface').after($label_input);
+					const $label_input_copy = $('<input type="hidden" class="label-input-copy w-100">');
+					$radioButton.find('.location-label-surface').after($label_input_copy);
 					
-					$radioButtonHtml.find('.diary-location-label-radiobutton').on('change', function() {
+					const $delete_input = $(locationForm).find('*[id^="id_locations"][id$="DELETE"]');
+					$radioButton.find('.location-label-surface').after($delete_input);
+					
+					$radioButton.find('.diary-location-label-radiobutton').on('change', function() {
 						var $img = $labels_field.find('.diary-image');
 						$img.css('opacity', 0); // フェードアウト
 						setTimeout(() => {
@@ -449,20 +460,20 @@ $(document).ready(function() {
 						}, 500); // フェードアウト時間に合わせる
 					});
 					// ラベル編集関連
-					$radioButtonHtml.find('.button-edit-label').off('click').on('click', change_label_edit);
+					$radioButton.find('.button-edit-location-label').off('click').on('click', change_label_edit);
 
 					// Location削除
-					$radioButtonHtml.find('.button-delete-location').off('click').on('click', function(){
+					$radioButton.find('.button-delete-location').off('click').on('click', function(){
 						const $delete_inputs = $labels_field.find('*[id^="id_locations"][id$="DELETE"]');
 						const count = $delete_inputs.filter(function() {
 							return $(this).val() === 'true'; // val() が true のものをフィルタリング
 						}).length;
 						if (count + 1 < diary.locations.length) {
 							$delete_input.val(true);
-							$radioButtonHtml.hide();
+							$radioButton.hide();
 							// チェック移動
-							if ($radioButtonHtml.find('.diary-location-label-radiobutton').is(':checked')) {
-								var $nextRadiobutton = $labels_field.find('.diary-location-label-item').filter(':visible').not($radioButtonHtml).eq(0).find('.diary-location-label-radiobutton');
+							if ($radioButton.find('.diary-location-label-radiobutton').is(':checked')) {
+								var $nextRadiobutton = $labels_field.find('.diary-location-label-item').filter(':visible').not($radioButton).eq(0).find('.diary-location-label-radiobutton');
 								$nextRadiobutton.prop('checked', true);
 								$nextRadiobutton.trigger('change');
 							}
@@ -470,40 +481,56 @@ $(document).ready(function() {
 							alert('これ以上は削除できませんよ');
 						}
 					});
-					$label_input.on('keypress', function(event) {
+
+					// 住所変更button
+					$radioButton.find('.button-edit-addressSearchModal').off('click').on('click', function(){
+						setup_addressModal($(locationForm));
+					});
+
+					$label_input_copy.on('keypress', function(event) {
 						if (event.key === "Enter") {
 							event.preventDefault();
 							change_label_edit();
 						}
 					});
 					function change_label_edit(){
-						var $textElement = $radioButtonHtml.find('text');
-						if ($textElement.is(':visible')) {
-							$labels_field.find('input[type="text"]').attr('type','hidden');
-							$labels_field.find('text').show();
-
-							$label_input.attr('type', 'text');
-							$textElement.hide();  // textを隠す
-							$label_input.val(''); // 中身を削除
-							$label_input.focus(); // 入力フィールドにフォーカスを当てる
-							if (!$radioButtonHtml.find('.diary-location-label-radiobutton').is(':checked')) {
-								$radioButtonHtml.find('.diary-location-label-radiobutton').prop('checked', true);
-								$radioButtonHtml.find('.diary-location-label-radiobutton').trigger('change');
+						var $surface = $radioButton.find('.location-label-surface');
+						if ($surface.is(':visible')) {
+							$surface.hide();  // textを隠す
+							$label_input_copy.attr('type', 'text');
+							$label_input_copy.val(''); // 中身を削除
+							$label_input_copy.focus(); // 入力フィールドにフォーカスを当てる
+							if (!$radioButton.find('.diary-location-label-radiobutton').is(':checked')) {
+								$radioButton.find('.diary-location-label-radiobutton').prop('checked', true);
+								$radioButton.find('.diary-location-label-radiobutton').trigger('change');
 							}
 						} else {
-							$label_input.attr('type', 'hidden');
-							$textElement.show();  // textを表示
-							$textElement.text($label_input.val());
+							// labelinputのcopyの変化は surfave,inputどちらにも反映
+							$surface.text($label_input_copy.val());
+							$label_input.val($label_input_copy.val());
+							$label_input_copy.attr('type', 'hidden');
+							$surface.show();  // textを表示
 						}
 					}
-					$labels_field.append($radioButtonHtml);
+					$label_input.on('change', function() {
+						// labelinputの変化はsurfaceのみに反映
+						var $surface = $radioButton.find('.location-label-surface');
+						$surface.text($(this).val());
+					});
+					$radioButton.find('button').not('.button-edit-location-label').on('click', function() {
+						// 全てのinputを非表示,surfaceを表示する
+						$labels_field.find('.label-input-copy').attr('type','hidden');
+						$labels_field.find('.location-label-surface').show();
+					});
+
+					$labels_field.append($radioButton);
 				});
 			}
 		}
 		
 		function send_form_ajax($form, event_calendar, is_flip_card = true) {
 			const $backContent = $('#diaryModal').find('.modal-content.flip-back');
-
+			
 			$.ajax({
 				method: $form.prop("method"),
 				url: $form.prop("action"),
@@ -573,7 +600,7 @@ $(document).ready(function() {
 
 	$diaryModal.on('hidden.bs.modal', function () {
 		// 強制的にモーダルを閉じる
-		var backdrop = document.querySelector('.modal-backdrop');
+		var backdrop = $diaryModal.find('.modal-backdrop');
 		if (backdrop) {
 			backdrop.remove(); // バックドロップを削除
 		}

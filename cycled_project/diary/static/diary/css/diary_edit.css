@@ -38,7 +38,7 @@
 /* ラジオボタン(通常) */
 .location-label {
     margin: .1em; 
-    padding: .7em 1em;
+    padding: 16px 0 16px 16px;
     line-height: 1;
     position: relative;
     cursor: pointer;
@@ -109,11 +109,6 @@
 .diary-edit-container .diary-thumbnail-background {
     transition: transform 0.5s ease; /* opacityとtranslateXを同時にアニメーション */
     transform-origin: center; /* 回転の基準点を中心に設定 */
-}
-.diary-edit-container .location-label {
-    white-space: nowrap;         /* テキストを1行に制限 */
-    overflow: hidden;            /* コンテナを超えた部分を隠す */
-    text-overflow: ellipsis;     /* 溢れたテキストに省略記号（...）を表示 */
 }
 
 /* 回転ボタン */

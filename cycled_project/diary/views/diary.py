@@ -162,15 +162,13 @@ class CalendarView(LoginRequiredMixin, generic.TemplateView):
         context['mock_uuid'] = uuid.uuid4() # 仮のPK
         # is_public を HiddenInput にする
         context['diary'] = DiaryForm(widgets={"is_public": HiddenInput()})
-        # form_errors = self.request.session.pop('diary_form_errors', None)   # セッションからエラー情報を取得
-        # if form_errors:
-        #     # エラー情報を辞書形式に変換してコンテキストに追加(リストにするのは複数ある他と合わせるため)
-        #     context['form_errors'] = [json.loads(form_errors)]
+        
+        context['addressseach_form'] = AddressSearchForm()
+        context['addressselect_form'] = AddressForm()
         return context
     
 class MapView(LoginRequiredMixin, generic.TemplateView):
     template_name="diary/map.html"
-
 
 @api_view(['POST'])
 @csrf_protect  # CSRF保護を追加
