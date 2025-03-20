@@ -162,8 +162,8 @@ function storeHistory(location,user_id) {
 // 履歴表示
 function displayHistory($input,setLocation,user_id) {
     const history = JSON.parse(localStorage.getItem(`locationSelected-${user_id}`)) || [];
-    // 履歴のアイテムごとにlabelとlocationをペアで作成
-    const labelsWithLocation = history.map(item => ({
+    // 履歴のアイテムごとにlabelとlocationをペアで作成 (末尾から作成)
+    const labelsWithLocation = history.reverse().map(item => ({
         label: searchKeys(item, 'label'),
         location: item
     }));

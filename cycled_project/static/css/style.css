@@ -27,7 +27,7 @@ body {
 
 #loading-container {
     background-color: rgba(255, 255, 255, 0.8); /* 半透明の白背景 */
-    z-index: 1050; /* 他の要素よりも前面に表示するための高い値 */
+    z-index: 1075; /* 他の要素よりも前面に表示するための高い値 */
     pointer-events: none; /* この要素を操作不可にする */
 }
 

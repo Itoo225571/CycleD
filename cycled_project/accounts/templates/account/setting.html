@@ -35,7 +35,7 @@
                             <tr>
                                 <th>{{ user |verbose_name:"username" }}</th>
                             </tr>
-                            <tr>
+                            <tr class="align-middle">
                                 <td style="width: 90%;">
                                     <span class="user-info">{{ user.username }}</span>
                                     {{ form.username|add_class:"form-control w-100 d-none" }}
@@ -49,7 +49,7 @@
                             <tr>
                                 <th>{{user|verbose_name:"email"}}</th>
                             </tr>
-                            <tr>
+                            <tr class="align-middle">
                                 <td>
                                     <span class="user-info">{{ user.email }}</span>
                                     {{ form.email |add_class:"form-control w-100 d-none" }}
@@ -59,10 +59,11 @@
                                     <button type="submit" class="user-submit-button d-none" name="form-email" id="form-email"></button>
                                 </td>
                             </tr>
+
                             <tr>
                                 <th scope="row">{{user|verbose_name:"date_joined"}}</th>
                             </tr>
-                            <tr>
+                            <tr class="align-middle">
                                 <td>
                                     <span class="user-info">{{ user.date_joined|date:"Y年m月d日" }}</span>
                                 </td>
