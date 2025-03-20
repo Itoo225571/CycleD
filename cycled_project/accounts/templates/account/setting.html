@@ -55,8 +55,7 @@
                                     {{ form.email |add_class:"form-control w-100 d-none" }}
                                 </td>
                                 <td>
-                                    <button type="button" class="user-edit-button" onclick="toEdit(this)"></button>
-                                    <button type="submit" class="user-submit-button d-none" name="form-email" id="form-email"></button>
+                                    <a href="{% url 'accounts:email' %}" class="btn user-edit-button"></a>
                                 </td>
                             </tr>
 
@@ -141,7 +140,7 @@
                                         <img 
                                             class="icon-img-radio rounded-circle p-1 w-100 border border-3 border-transparent" 
                                             src="{{ radio.data.value }}" 
-                                            alt="{{ radio.choice_label }}" style="cursor: pointer;">
+                                            alt="{{ radio.choice_label }}">
                                     </label>
                                 {% endfor %}
                             </div>
