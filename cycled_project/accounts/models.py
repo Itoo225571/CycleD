@@ -18,7 +18,7 @@ class User(AbstractUser):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     username=models.CharField(max_length=8,unique=True,verbose_name="ユーザー名")
-    email = models.EmailField(unique=True, verbose_name="メールアドレス")  # メールアドレスを一意に設定
+    email = models.EmailField(unique=True, blank=False, verbose_name="メールアドレス")  # メールアドレスを一意に設定
     first_name = None
     last_name = None
     icon = models.CharField(
@@ -40,7 +40,6 @@ class User(AbstractUser):
             raise ValidationError({
                 'username': '名前が短すぎます',
             })
-
         if '@' not in self.email:
             raise ValidationError({
                 'email': '正しいメールアドレスを入力してください'

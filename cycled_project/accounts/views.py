@@ -1,5 +1,7 @@
 from allauth.account import views as account_views
 from allauth.socialaccount import views as socialaccount_views
+from allauth.account.models import EmailAddress
+
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.hashers import check_password
@@ -13,11 +15,15 @@ from django.utils.decorators import method_decorator
 from django_user_agents.utils import get_user_agent
 from django.views.decorators.csrf import csrf_protect
 from django.http import JsonResponse, HttpResponseRedirect
+from django_ratelimit.decorators import ratelimit
+from django.conf import settings
 
 from .forms import CustomLoginForm,CustomSignupForm,UserLeaveForm,AllauthUserLeaveForm,CustomEmailForm
 from .forms import UserSettingForm,UserUsernameForm,UserIconForm
 from .models import User
 
+# 1分間に10回までログイン試行可能
+@method_decorator(ratelimit(key='ip', rate='10/m', method='POST'), name='post')
 class CustomLoginView(account_views.LoginView):
     template_name="account/login.html"
     form_class=CustomLoginForm
@@ -131,7 +137,25 @@ class CustomConnectionsView(socialaccount_views.ConnectionsView):
     
 class CustomEmailView(account_views.EmailView):
     form_class = CustomEmailForm
-    template_name = "account/email.html"
-    # success_url = reverse_lazy('accounts:setting')
-    # success_message = ''
-    
+    template_name = "account/email.html"    
+    success_url = reverse_lazy('accounts:setting')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["explanation"] = (
+            "入力されたメールアドレスに確認メールが送信されます。"
+            if settings.ACCOUNT_EMAIL_VERIFICATION in ["mandatory", "optional"] 
+            else ""
+        )
+        return context
+    def post(self, request, *args, **kwargs):
+        if "action_add" in request.POST:
+            return super().post(request, *args, **kwargs)  # action_add の場合のみ親クラスの処理
+        return HttpResponseRedirect(self.success_url)  # それ以外はリダイレクト
+    def form_valid(self, form):
+        # メールアドレスが正常に追加された場合
+        response = super().form_valid(form)
+        # メールアドレスが変更された際にメッセージを送信
+        email = form.cleaned_data["email"]
+        # メッセージをユーザーに表示
+        messages.success(self.request, f"メールアドレス {email} が正常に変更されました。")
+        return response

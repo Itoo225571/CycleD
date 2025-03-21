@@ -1,6 +1,5 @@
-from django.contrib.auth import get_user_model,authenticate
-from django.contrib.auth.forms import UserCreationForm,UserChangeForm,AuthenticationForm
 from allauth.account.forms import SignupForm,LoginForm,AddEmailForm
+from allauth.account.models import EmailAddress
 from django import forms
 
 from .models import User
@@ -67,19 +66,20 @@ class AllauthUserLeaveForm(forms.Form):
     )
 
 class CustomEmailForm(AddEmailForm):
-    password = forms.CharField(
-        label="現在のパスワード",
-        widget=forms.PasswordInput(attrs={'placeholder': 'パスワードを入力','autocomplete': 'off'}),
-        required=True
-    )
+    # password = forms.CharField(
+    #     label="現在のパスワード",
+    #     widget=forms.PasswordInput(attrs={'placeholder': 'パスワードを入力','autocomplete': 'off'}),
+    #     required=True
+    # )
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["email"].widget.attrs.update({
-            "placeholder": "新しいメールアドレスを入力"
+            "placeholder": "新しいメールアドレスを入力",
         })
-    def clean_password(self):
-        password = self.cleaned_data.get("password")
-        user = self.user
-        if not user.check_password(password):
-            raise forms.ValidationError("パスワードが正しくありません。")
-        return password
+
+    # def clean_password(self):
+    #     password = self.cleaned_data.get("password")
+    #     user = self.user
+    #     if not user.check_password(password):
+    #         raise forms.ValidationError("パスワードが正しくありません。")
+    #     return password

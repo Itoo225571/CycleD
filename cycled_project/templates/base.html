@@ -205,7 +205,7 @@
 									</button>
 									<ul class="dropdown-menu dropdown-menu-end">
 										<li>
-											<h6 class="dropdown-header d-flex">
+											<h6 class="dropdown-header d-flex pb-3">
 												<img src="{{ user.icon }}" class="rounded-circle" width="50" height="50" alt="icon" loading="lazy">
 												<div class="ms-2">
 													<div class="fs-6 text-dark">{{ user.username }}</div>
@@ -215,13 +215,13 @@
 										</li>
 										<li><hr class="dropdown-divider"></li>
 										<li>
-											<a class="dropdown-item button-setting with-icon" href="{% url 'accounts:setting' %}">設定</a>
+											<a class="dropdown-item button-setting with-icon py-2" href="{% url 'accounts:setting' %}">設定</a>
 										</li>
 										<li><hr class="dropdown-divider"></li>
 										<li>
 											<form action="{% url 'accounts:logout' %}" method="post">
 												{% csrf_token %}
-												<button type="button" class="dropdown-item button-logout with-icon" data-url='{% url "accounts:logout" %}'>
+												<button type="button" class="dropdown-item button-logout with-icon py-2" data-url='{% url "accounts:logout" %}'>
 													ログアウト
 												</button>
 											</form>
