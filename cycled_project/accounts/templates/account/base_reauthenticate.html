@@ -1,22 +1,16 @@
 {% extends "base.html" %}
 {% load allauth %}
 {% load i18n %}
-{% block head_title %}
-    {% trans "Confirm Access" %}
-{% endblock head_title %}
+
 {% block content %}
-    {% element h1 %}
-        {% trans "Confirm Access" %}
-    {% endelement %}
     {% element p %}
-        {% blocktranslate %}Please reauthenticate to safeguard your account.{% endblocktranslate %}
+        アカウント保護のため、再認証してください。
     {% endelement %}
     {% block reauthenticate_content %}{% endblock %}
     {% if reauthentication_alternatives %}
-        {% element hr %}
-        {% endelement %}
+        {% element hr %}{% endelement %}
         {% element h2 %}
-            {% translate "Alternative options" %}
+            代替オプション
         {% endelement %}
         {% element button_group %}
             {% for alt in reauthentication_alternatives %}

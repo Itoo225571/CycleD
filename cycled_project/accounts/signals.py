@@ -22,7 +22,6 @@ def make_email_primary_after_confirmation(sender, email_address, **kwargs):
         if email_address.verified:
             change_email(user,email_address)
 
-
 # 2️⃣ メール認証なしの場合（"none"）
 @receiver(email_added)
 def make_email_primary_immediately(request, email_address, **kwargs):
