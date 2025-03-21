@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 {% load widget_tweaks %}
 
 {% block content %}
@@ -7,28 +8,44 @@
     <div class="col-12 col-md-8 col-lg-6 col-xl-5">
         <div class="card bg-light-subtle text-dark" style="border-radius: 1rem;">
             <div class="card-body p-4 text-center">
-                <div class="mb-md-5 mt-md-4 pb-3">
-                    <p class="opacity-50">Change Email</p>
-                    <form method="post" name="action_send">
-                        {% csrf_token %}
-                        {% for field in form %}
-                            <div class="mb-2">
-                                <label for="{{ field.id_for_label }}" class="d-none"></label>
-                                <div class="input-group">
-                                    {{ field | add_class:"form-control" }}
+                <div class="mb-md-5 mt-md-4">
+                    {% if can_add_email %}
+                        <p class="opacity-50">Change Email</p>
+                        <div class="text-start text-muted opacity-75 mb-2">
+                            新しく登録するメールアドレスを入力してください。<br>
+                            {% if explanation %}
+                                {{ explanation }}<br>
+                            {% endif %}
+                            <div class="pt-2">現在のメールアドレス: <strong>{{ user.email }}</strong></div>
+                        </div>
+                        <form method="post" name="action_send">
+                            {% csrf_token %}
+                            {% for field in form %}
+                                <div class="py-2">
+                                    <label for="{{ field.id_for_label }}" class="d-none"></label>
+                                    <div class="input-group">
+                                        {{ field | add_class:"form-control" }}
+                                    </div>
+                                    {% if field.help_text %}
+                                        <div class="py-2 text-start text-muted small">
+                                            <ul class="m-0">
+                                                <li>{{ field.help_text|linebreaksbr }}</li>
+                                            </ul>
+                                        </div>
+                                    {% endif %}
                                 </div>
-                            </div>
-                        {% endfor %}                        
+                            {% endfor %}               
 
-                        {% for error in form.non_field_errors %}
-                            <div class="alert-message">
-                                <p>{{ error }}</p>
-                            </div>
-                        {% endfor %}
-                        <button class="btn btn-outline-dark btn-lg w-100 mt-3" type="submit">
-                            変更
-                        </button>
-                    </form>
+                            {% for error in form.non_field_errors %}
+                                <div class="alert-message">
+                                    <p>{{ error }}</p>
+                                </div>
+                            {% endfor %}
+                            <button class="btn btn-outline-dark btn-lg w-100 mt-4" type="submit" name="action_add">
+                                変更
+                            </button>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         </div>

@@ -3,83 +3,65 @@
 
 {% block content %}
     {% if emailaddresses %}
-        {% element p %}
-            {% trans 'The following email addresses are associated with your account:' %}
-        {% endelement %}
         {% url 'account_email' as email_url %}
-        {% element form form=form action=email_url method="post" tags="email,list" %}
-            {% slot body %}
-                {% csrf_token %}
-                {% for radio in emailaddress_radios %}
-                    {% with emailaddress=radio.emailaddress %}
-                        {% element field type="radio" checked=radio.checked name="email" value=emailaddress.email id=radio.id %}
-                            {% slot label %}
-                                {{ emailaddress.email }}
-                                {% if emailaddress.verified %}
-                                    {% element badge tags="success,email,verified" %}
-                                        {% translate "Verified" %}
-                                    {% endelement %}
-                                {% else %}
-                                    {% element badge tags="warning,email,unverified" %}
-                                        {% translate "Unverified" %}
-                                    {% endelement %}
-                                {% endif %}
-                                {% if emailaddress.primary %}
-                                    {% element badge tags="email,primary" %}
-                                        {% translate "Primary" %}
-                                    {% endelement %}
-                                {% endif %}
-                            {% endslot %}
-                        {% endelement %}
-                    {% endwith %}
-                {% endfor %}
-            {% endslot %}
-            {% slot actions %}
-                {% element button type="submit" name="action_primary" %}
-                    {% trans 'Make Primary' %}
-                {% endelement %}
-                {% element button tags="secondary" type="submit" name="action_send" %}
-                    {% trans 'Re-send Verification' %}
-                {% endelement %}
-                {% element button tags="danger,delete" type="submit" name="action_remove" %}
-                    {% trans 'Remove' %}
-                {% endelement %}
-            {% endslot %}
-        {% endelement %}
+        <p>あなたのアカウントに関連付けられたメールアドレスは次の通りです:</p>
+        <form action="{{ email_url }}" method="post" class="email-list">
+            {% csrf_token %}
+            
+            {% for radio in emailaddress_radios %}
+                {% with emailaddress=radio.emailaddress %}
+                    <div class="radio-group">
+                        <input type="radio" name="email" value="{{ emailaddress.email }}" id="{{ radio.id }}" 
+                            {% if radio.checked %} checked {% endif %}>
+                        <label for="{{ radio.id }}">
+                            {{ emailaddress.email }}
+                            
+                            {% if emailaddress.primary %}
+                                <span class="badge bg-secondary">メイン</span>
+                            {% endif %}
+                        </label>
+                    </div>
+                {% endwith %}
+            {% endfor %}
+
+            <div class="form-actions">
+                <button type="submit" name="action_primary">メインに設定</button>
+                <button type="submit" name="action_send" class="secondary">確認メールを再送信</button>
+                <button type="submit" name="action_remove" class="danger">削除</button>
+            </div>
+        </form>
     {% else %}
         {% include "account/snippets/warn_no_email.html" %}
     {% endif %}
+
     {% if can_add_email %}
-        {% element h2 %}
-            {% trans "Add Email Address" %}
-        {% endelement %}
-        {% url 'account_email' as action_url %}
-        {% element form form=form method="post" action=action_url tags="email,add" %}
-            {% slot body %}
+        <div class="mt-3">
+            {% url 'account_email' as action_url %}
+            <form method="post" action="{{ action_url }}" class="add-email-form">
                 {% csrf_token %}
-                {% element fields form=form %}
-                {% endelement %}
-            {% endslot %}
-            {% slot actions %}
-                {% element button name="action_add" type="submit" %}
-                    {% trans "Add Email" %}
-                {% endelement %}
-            {% endslot %}
-        {% endelement %}
+                
+                {{ form.as_p }}
+                
+                <div class="form-actions">
+                    <button type="submit" name="action_add">メールアドレスを追加</button>
+                </div>
+            </form>
+        </div>
     {% endif %}
 {% endblock content %}
+
 {% block extra_body %}
     <script>
-(function() {
-  var message = "{% trans 'Do you really want to remove the selected email address?' %}";
-  var actions = document.getElementsByName('action_remove');
-  if (actions.length) {
-    actions[0].addEventListener("click", function(e) {
-      if (! confirm(message)) {
-        e.preventDefault();
-      }
-    });
-  }
-})();
+        (function() {
+            var message = "選択したメールアドレスを削除してもよろしいですか？";
+            var actions = document.getElementsByName('action_remove');
+            if (actions.length) {
+                actions[0].addEventListener("click", function(e) {
+                    if (! confirm(message)) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        })();
     </script>
 {% endblock extra_body %}
