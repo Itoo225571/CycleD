@@ -53,7 +53,7 @@ function setLocations(data, map) {
 
     if (!data.length) {
         map.setView([35.6762, 139.6503], 8); // dataが空の場合に東京の座標を指定
-        $('#explanation').html('<span>1年以内の日記が存在しません</span>')
+        $('#explanation').html('<span>1年以内の日記が存在しません</span>');
     }
 
     data.forEach(function(diary) {
@@ -105,9 +105,9 @@ function make_filter(map,markerLayer) {
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="filterDropdown" id="tagFilterForm">
                     <li>
-                        <label for="thisYear" class="dropdown-item">
-                            <input type="radio" id="thisYear" name="tag" value="thisYear" checked>
-                            今年
+                        <label for="withinOneYear" class="dropdown-item">
+                            <input type="radio" id="withinOneYear" name="tag" value="withinOneYear" checked>
+                            1年以内
                         </label>
                     </li>
                     <li>
@@ -150,7 +150,7 @@ function make_filter(map,markerLayer) {
         });
     }
     // ページ読み込み時に初期化
-    updateMarkers('thisYear'); // 初期値として'今年'を選択して表示
+    updateMarkers('withinOneYear'); // 初期値として'今年'を選択して表示
 }
 
 function getTags(date) {
@@ -161,20 +161,15 @@ function getTags(date) {
     var tags = [];
 
     // 今日の日付と比較
-    if (locationDate.isSame(today, 'day')) {
-        tags.push('today');
-    }
+    if (locationDate.isSame(today, 'day')) tags.push('today');
     // 1週間以内かどうかをチェック
-    if (locationDate.isSame(today, 'week')) {
-        tags.push('thisWeek');
-    }
+    if (locationDate.isSame(today, 'week')) tags.push('thisWeek');
     // 今月かどうかをチェック
-    if (locationDate.isSame(today, 'month')) {
-        tags.push('thisMonth');
+    if (locationDate.isSame(today, 'month')) tags.push('thisMonth');
+    // 1年以内かどうかをチェック
+    if (locationDate.isAfter(today.subtract(1, 'year')) && locationDate.isBefore(today)) {
+        tags.push('withinOneYear');
     }
-    // 今年かどうかをチェック
-    if (locationDate.isSame(today, 'year')) {
-        tags.push('thisYear');
-    }
+
     return tags
 }
