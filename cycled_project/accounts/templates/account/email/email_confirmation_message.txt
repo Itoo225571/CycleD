@@ -2,8 +2,19 @@
 {% load account %}
 {% load i18n %}
 
-{% block content %}{% autoescape off %}{% user_display user as user_display %}{% blocktranslate with site_name=current_site.name site_domain=current_site.domain %}このメールは、ユーザー {{ user_display }} が {{ site_domain }} でアカウントを登録するためにあなたのメールアドレスを使用したため送信されました。{% endblocktranslate %}
-
-{% if code %}{% blocktranslate %}あなたのメール認証コードは以下の通りです。開いているブラウザのウィンドウに入力してください。{% endblocktranslate %}
-
-{{ code }}{% else %}{% blocktranslate %}これが正しいことを確認するには、次のリンクにアクセスしてください: {{ activate_url }}{% endblocktranslate %}{% endif %}{% endautoescape %}{% endblock content %}
+{% block content %}{% autoescape off %}{% user_display user as user_display %}{% with site_name=current_site.name site_domain=current_site.domain %}
+このメールは、{{ site_domain }}でアカウントを登録するためにあなたのメールアドレスを使用したため送信されました。
+ログイン情報:
+メールアドレス: {{ user.email }}
+ログイン日時: {{ login_time }}
+デバイス情報: {{ user_agent.device.family }}
+{% if code %}
+● あなたのメール認証コードは以下の通りです。開いているブラウザのウィンドウに入力してください。
+{{ code }}
+{% else %}
+● これが正しいことを確認するには、以下のリンクにアクセスしてください
+{{ activate_url }}
+{% endif %}
+● もしこのログイン試行に心当たりがない場合は、以下のリンクより直ちにアカウントのパスワードを変更してください。  
+{{ request.scheme }}://{{ request.get_host }}{% url 'accounts:password_change' %}
+{% endwith %}{% endautoescape %}{% endblock %}

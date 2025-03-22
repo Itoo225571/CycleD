@@ -157,5 +157,8 @@ class CustomEmailView(account_views.EmailView):
         # メールアドレスが変更された際にメッセージを送信
         email = form.cleaned_data["email"]
         # メッセージをユーザーに表示
-        messages.success(self.request, f"メールアドレス {email} が正常に変更されました。")
+        if settings.ACCOUNT_EMAIL_VERIFICATION == "none":
+            messages.success(self.request, f"メールアドレスが{email}に変更されました。")
+        else:
+            messages.success(self.request, f"{email}に確認のメールを送信しました。")
         return response
