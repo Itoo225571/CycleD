@@ -17,7 +17,7 @@ from datetime import timedelta
 import os
 import json
 
-@method_decorator(ratelimit(key='ip', rate='1/s', method='GET'), name='get')
+# @method_decorator(ratelimit(key='ip', rate='1/s', method='GET'), name='get')
 class WeatherView(LoginRequiredMixin, generic.TemplateView):
     template_name = "diary/weather.html"
 

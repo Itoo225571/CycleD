@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "account/email/base_message.txt" %}
 {% load i18n %}
 
 {% block content %}{% autoescape off %}{% blocktrans %}You are receiving this email because you or someone else tried to signup for an

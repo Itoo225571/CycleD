@@ -1,9 +1,9 @@
-{% extends "base.html" %}
+{% extends "account/email/base_message.txt" %}
 {% load account %}
 {% load i18n %}
 
-{% block content %}{% autoescape off %}{% user_display user as user_display %}{% blocktranslate with site_name=current_site.name site_domain=current_site.domain %}You're receiving this email because user {{ user_display }} has given your email address to register an account on {{ site_domain }}.{% endblocktranslate %}
+{% block content %}{% autoescape off %}{% user_display user as user_display %}{% blocktranslate with site_name=current_site.name site_domain=current_site.domain %}このメールは、ユーザー {{ user_display }} が {{ site_domain }} でアカウントを登録するためにあなたのメールアドレスを使用したため送信されました。{% endblocktranslate %}
 
-{% if code %}{% blocktranslate %}Your email verification code is listed below. Please enter it in your open browser window.{% endblocktranslate %}
+{% if code %}{% blocktranslate %}あなたのメール認証コードは以下の通りです。開いているブラウザのウィンドウに入力してください。{% endblocktranslate %}
 
-{{ code }}{% else %}{% blocktranslate %}To confirm this is correct, go to {{ activate_url }}{% endblocktranslate %}{% endif %}{% endautoescape %}{% endblock content %}
+{{ code }}{% else %}{% blocktranslate %}これが正しいことを確認するには、次のリンクにアクセスしてください: {{ activate_url }}{% endblocktranslate %}{% endif %}{% endautoescape %}{% endblock content %}

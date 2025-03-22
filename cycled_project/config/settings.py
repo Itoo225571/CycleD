@@ -217,8 +217,17 @@ ACCOUNT_AUTHENTICATION_METHOD = "username_email"
 ACCOUNT_EMAIL_REQUIRED = True
 # ユーザー名の登録を不要にする
 ACCOUNT_USERNAME_REQUIRED = True
-# ACCOUNT_EMAIL_VERIFICATION = "mandatory"    # 登録後、メールアドレスに確認メールが送信される
-ACCOUNT_EMAIL_VERIFICATION = "none"         # メール確認を無効にする
+
+# email関係
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+ACCOUNT_EMAIL_VERIFICATION = "optional"       # 登録後、メールアドレスに確認メールが送信される
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# EMAIL_HOST = "smtp.gmail.com"
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+# EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+
 ACCOUNT_UNIQUE_EMAIL = True     # 同じメールアドレスで複数のアカウントを作れない 
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True      # 既存のemailログイン時にsocialによりemailでログインすると自動的に連携される
 # ACCOUNT_CHANGE_EMAIL = True
@@ -226,7 +235,6 @@ SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True      # 既存のemailロ�
 ACCOUNT_RATE_LIMITS = {
     'login_failed': '5/m',  # 例えば1分間に5回のログイン試行制限
 }
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
 
