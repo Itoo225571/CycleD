@@ -1,8 +1,9 @@
 from allauth.account import views as account_views
 from allauth.socialaccount import views as socialaccount_views
 from allauth.account.models import EmailAddress
+from allauth.account.utils import send_email_confirmation
 
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy,reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.hashers import check_password
 from django.shortcuts import redirect
@@ -162,3 +163,4 @@ class CustomEmailView(account_views.EmailView):
         else:
             messages.success(self.request, f"{email}に確認のメールを送信しました。")
         return response
+    

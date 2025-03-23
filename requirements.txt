@@ -81,6 +81,7 @@ pymemcache==4.0.0
 pyOpenSSL==24.2.1
 PySocks==1.7.1
 python-dateutil==2.9.0.post0
+python-ipware==3.0.0
 python-memcached==1.62
 pytz==2024.1
 PyWavelets==1.7.0
