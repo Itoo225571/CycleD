@@ -7,6 +7,8 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.contrib import messages
+from django.utils.timezone import now, localtime
+from django.utils import timezone
 
 class CustomAccountAdapter(DefaultAccountAdapter):
     def is_open_for_signup(self, request):
@@ -17,6 +19,16 @@ class CustomAccountAdapter(DefaultAccountAdapter):
         if username == 'admin':
             raise ValidationError('この名前は許可されていません')
         return super().clean_username(username, shallow)
+    
+    # 送信するemailのカスタマイズ
+    def send_mail(self, template_prefix, email, context):
+        # ユーザーのタイムゾーンを取得（ここではデフォルトでタイムゾーンを使用）
+        user_timezone = timezone.get_current_timezone()
+        # 現在の時刻をタイムゾーン対応で取得
+        send_time = localtime(now(), timezone=user_timezone)
+        # context に送信時刻を追加（タイムゾーン対応）
+        context['send_time'] = send_time
+        return super().send_mail(template_prefix, email, context)
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def pre_social_login(self, request, sociallogin):

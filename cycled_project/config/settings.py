@@ -220,7 +220,7 @@ ACCOUNT_USERNAME_REQUIRED = True
 
 # email関係
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-ACCOUNT_EMAIL_VERIFICATION = "optional"       # 登録後、メールアドレスに確認メールが送信される
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"       # 登録後、メールアドレスに確認メールが送信される
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
@@ -233,7 +233,7 @@ SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True      # 既存のemailロ�
 # ACCOUNT_CHANGE_EMAIL = True
 
 ACCOUNT_RATE_LIMITS = {
-    'login_failed': '5/m',  # 例えば1分間に5回のログイン試行制限
+    'login_failed': '5/m',  # 1分間に5回のログイン試行制限
 }
 
 ACCOUNT_FORMS = {"signup": "accounts.forms.CustomSignupForm"}
