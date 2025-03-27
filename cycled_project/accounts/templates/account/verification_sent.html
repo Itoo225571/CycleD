@@ -6,7 +6,7 @@
     <p>メールアドレス確認メールを送信しました</p>
     <p>確認メールが届かない場合は、迷惑メールフォルダを確認するか、以下のボタンから再送信してください。</p>
 
-    <form method="post" class="py-2">
+    <form method="post" class="py-2" action="{% url "account_email_verification_sent" %}">
         {% csrf_token %}
         <button type="submit" class="btn btn-outline-primary" name="action-send">
             メールを再送信

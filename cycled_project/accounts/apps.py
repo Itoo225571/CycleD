@@ -6,3 +6,5 @@ class AccountsConfig(AppConfig):
     name = "accounts"
     def ready(self):
         import accounts.signals  # ここで signals.py を読み込む
+        from .ap_scheduler import start
+        start()

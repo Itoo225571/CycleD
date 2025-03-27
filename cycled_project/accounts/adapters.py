@@ -10,6 +10,8 @@ from django.contrib import messages
 from django.utils.timezone import now, localtime
 from django.utils import timezone
 
+# from accounts.models import CustomEmailAddress
+
 class CustomAccountAdapter(DefaultAccountAdapter):
     def is_open_for_signup(self, request):
         # サインアップを許可する
