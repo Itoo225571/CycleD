@@ -1,5 +1,8 @@
 {% load i18n %}
 {% autoescape off %}{% with site_name=current_site.name %}{{ site_name }}からの連絡です。{% endwith %}
 {% block content %}{% endblock content %}
+※このメールに心当たりがない場合は、無視していただいて構いません。
+※このメールアドレスには返信できません。
+
 {% with site_name=current_site.name site_domain=current_site.domain %}{{ site_name }}: {{ request.scheme }}://{{ request.get_host }}
 {% endwith %}{% endautoescape %}

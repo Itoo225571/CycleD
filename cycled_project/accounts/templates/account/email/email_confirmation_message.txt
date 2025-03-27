@@ -17,7 +17,4 @@
 {% endif %}
 {% comment %} ● もしこのログイン試行に心当たりがない場合は、以下のリンクより直ちにアカウントのパスワードを変更してください。  
 {{ request.scheme }}://{{ request.get_host }}{% url 'accounts:password_change' %} {% endcomment %}
-※このメールに心当たりがない場合は、無視していただいて構いません。
-※このメールアドレスには返信できません。
-{% comment %} ※リンクの有効期限は○時間です。期限を過ぎた場合は、再度登録をお願いいたします。 {% endcomment %}
 {% endwith %}{% endautoescape %}{% endblock content %}

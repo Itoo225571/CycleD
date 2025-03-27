@@ -44,7 +44,8 @@
                     {% endif %}
                 </div>
                 {% if new_emailaddress %}
-                    <div class="border-top pt-2">
+                    <hr>
+                    <div class="">
                         <p class="opacity-50">確認メールを送信しているアドレス</p>
                         {% for radio in emailaddress_radios %}
                             {% with emailaddress=radio.emailaddress %}

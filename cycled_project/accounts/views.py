@@ -19,7 +19,7 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django_ratelimit.decorators import ratelimit
 from django.conf import settings
 
-from .forms import CustomLoginForm,CustomSignupForm,UserLeaveForm,AllauthUserLeaveForm,CustomEmailForm
+from .forms import CustomLoginForm,CustomSignupForm,UserLeaveForm,AllauthUserLeaveForm,CustomEmailForm,CustomResetPasswordForm
 from .forms import UserSettingForm,UserUsernameForm,UserIconForm
 from .models import User
 
@@ -87,6 +87,9 @@ class CustomPasswordSetView(LoginRequiredMixin, account_views.PasswordSetView):
     template_name = "account/password_set.html"
     success_url = reverse_lazy('accounts:setting')
     success_message = 'パスワードの設定に成功'
+
+class CustomPasswordResetView(account_views.PasswordResetView):
+    form_class = CustomResetPasswordForm
 
 class UserLeaveView(LoginRequiredMixin, account_views.FormView):
     template_name = "account/leave.html"
