@@ -8,16 +8,14 @@
     <div class="col-12 col-md-8 col-lg-6 col-xl-5">
         <div class="card bg-light-subtle text-dark" style="border-radius: 1rem;">
             <div class="card-body p-4 text-center">
-                <div class="mb-md-5 mt-md-4">
+                <div class="my-4">
                     {% if can_add_email %}
                         <p class="opacity-50">Change Email</p>
                         <div class="text-start text-muted opacity-75 mb-2">
-                            新しく登録するメールアドレスを入力してください。<br>
-                            {% if explanation %}
-                                {{ explanation }}<br>
-                            {% endif %}
-                            <div class="pt-2">現在のメールアドレス: <strong>{{ user.email }}</strong></div>
+                            <span>新しく登録するメールアドレスを入力してください。</span><br>
+                            <span>現在のメールアドレス: <strong>{{ user.email }}</strong></span>
                         </div>
+                        
                         <form method="post" name="action_send">
                             {% csrf_token %}
                             {% for field in form %}
@@ -28,9 +26,7 @@
                                     </div>
                                     {% if field.help_text %}
                                         <div class="py-2 text-start text-muted small">
-                                            <ul class="m-0">
-                                                <li>{{ field.help_text|linebreaksbr }}</li>
-                                            </ul>
+                                            {{ field.help_text|safe }}
                                         </div>
                                     {% endif %}
                                 </div>
@@ -41,12 +37,40 @@
                                     <p>{{ error }}</p>
                                 </div>
                             {% endfor %}
-                            <button class="btn btn-outline-dark btn-lg w-100 mt-4" type="submit" name="action_add">
+                            <button class="btn btn-outline-dark btn-lg w-100" type="submit" name="action_add">
                                 変更
                             </button>
                         </form>
                     {% endif %}
                 </div>
+                {% if new_emailaddress %}
+                    <div class="border-top pt-2">
+                        <p class="opacity-50">確認メールを送信しているアドレス</p>
+                        {% for radio in emailaddress_radios %}
+                            {% with emailaddress=radio.emailaddress %}
+                                {% if not emailaddress.primary %}
+                                    <form action="{{ email_url }}" method="post" class="email-list">
+                                        {% csrf_token %}
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                            <div class="email-field">
+                                                <input type="hidden" name="email" value="{{ emailaddress.email }}">
+                                                <label class="fs-6">{{ emailaddress.email }}</label>
+                                            </div>
+                                            <div class="actions-field d-flex justify-content-sm-end py-2 ms-auto">
+                                                <button type="submit" name="action_send" class="btn btn-outline-primary fs-6">
+                                                    再送信
+                                                </button>
+                                                <button type="submit" name="action_remove" class="btn btn-outline-danger py-0 px-2 ms-2" style="font-size: 1.5rem;">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                {% endif %}
+                            {% endwith %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

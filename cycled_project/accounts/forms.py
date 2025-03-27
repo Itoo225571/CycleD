@@ -1,6 +1,7 @@
 from allauth.account.forms import SignupForm,LoginForm,AddEmailForm
 from allauth.account.models import EmailAddress
 from django import forms
+from django.conf import settings
 
 from .models import User
 
@@ -66,20 +67,17 @@ class AllauthUserLeaveForm(forms.Form):
     )
 
 class CustomEmailForm(AddEmailForm):
-    # password = forms.CharField(
-    #     label="現在のパスワード",
-    #     widget=forms.PasswordInput(attrs={'placeholder': 'パスワードを入力','autocomplete': 'off'}),
-    #     required=True
-    # )
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["email"].widget.attrs.update({
             "placeholder": "新しいメールアドレスを入力",
         })
-
-    # def clean_password(self):
-    #     password = self.cleaned_data.get("password")
-    #     user = self.user
-    #     if not user.check_password(password):
-    #         raise forms.ValidationError("パスワードが正しくありません。")
-    #     return password
+        if settings.ACCOUNT_EMAIL_VERIFICATION in ["mandatory", "optional"]:
+            # 確認メールが送信される旨のメッセージ
+            verification_message = "<li>入力されたメールアドレスに確認メールが送信されます。</li>"
+        else: verification_message = None
+        # 有効期限を設定
+        expiry_message = f"<li>確認メールの有効期限は {settings.ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS} 日です。</li>"
+        
+        # help_text にリストを追加
+        self.fields["email"].help_text = f"<ul>{verification_message} {expiry_message}</ul>"

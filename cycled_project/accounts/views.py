@@ -139,17 +139,9 @@ class CustomConnectionsView(socialaccount_views.ConnectionsView):
 class CustomEmailView(account_views.EmailView):
     form_class = CustomEmailForm
     template_name = "account/email.html"    
-    success_url = reverse_lazy('accounts:setting')
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["explanation"] = (
-            "入力されたメールアドレスに確認メールが送信されます。"
-            if settings.ACCOUNT_EMAIL_VERIFICATION in ["mandatory", "optional"] 
-            else ""
-        )
-        return context
+    # success_url = reverse_lazy('accounts:setting')
     def post(self, request, *args, **kwargs):
-        if "action_add" in request.POST:
+        if "action_add" or "action_send" or "action_remove" in request.POST:
             return super().post(request, *args, **kwargs)  # action_add の場合のみ親クラスの処理
         return HttpResponseRedirect(self.success_url)  # それ以外はリダイレクト
     def form_valid(self, form):
