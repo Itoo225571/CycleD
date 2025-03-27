@@ -1,4 +1,4 @@
-from allauth.account.forms import SignupForm,LoginForm,AddEmailForm
+from allauth.account.forms import SignupForm,LoginForm,AddEmailForm,ResetPasswordForm
 from allauth.account.models import EmailAddress
 from django import forms
 from django.conf import settings
@@ -72,6 +72,24 @@ class CustomEmailForm(AddEmailForm):
         self.fields["email"].widget.attrs.update({
             "placeholder": "新しいメールアドレスを入力",
         })
+        if settings.ACCOUNT_EMAIL_VERIFICATION in ["mandatory", "optional"]:
+            # 確認メールが送信される旨のメッセージ
+            verification_message = "<li>入力されたメールアドレスに確認メールが送信されます。</li>"
+        else: verification_message = None
+        # 有効期限を設定
+        expiry_message = f"<li>確認メールの有効期限は {settings.ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS} 日です。</li>"
+        
+        # help_text にリストを追加
+        self.fields["email"].help_text = f"<ul>{verification_message} {expiry_message}</ul>"
+
+class CustomResetPasswordForm(ResetPasswordForm):
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'placeholder': 'メールアドレスを入力してください',
+        })
+    )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         if settings.ACCOUNT_EMAIL_VERIFICATION in ["mandatory", "optional"]:
             # 確認メールが送信される旨のメッセージ
             verification_message = "<li>入力されたメールアドレスに確認メールが送信されます。</li>"
