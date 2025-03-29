@@ -1,7 +1,8 @@
 {% load allauth socialaccount %}
 {% get_providers as socialaccount_providers %}
 {% if socialaccount_providers %}
-    <div class="provider-list">
+    <strong>その他外部アカウントでログイン</strong>
+    <div class="provider-list mt-3">
         {% for provider in socialaccount_providers %}
             {% if provider.id == "openid" %}
                 {% for brand in provider.get_brands %}

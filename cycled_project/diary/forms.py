@@ -53,14 +53,13 @@ class AddressForm(forms.ModelForm):
     
 class LocationForm(forms.ModelForm):
     date_of_Diary = forms.DateField(required=False, widget=forms.HiddenInput())
-    id_of_image = forms.UUIDField(required=False, widget=forms.HiddenInput())
     rank = forms.ChoiceField(choices=Diary.RANK_CHOICES, initial=1, required=False, widget=forms.HiddenInput())
+    id_of_image = forms.UUIDField(required=False, widget=forms.HiddenInput())
     class Meta:
         model = Location
         fields = [
-            "lat","lon","state","display",
-            "label","is_thumbnail","rotate_angle",
-            "date_of_Diary","id_of_image","rank",
+            "lat","lon","state","display","label","is_thumbnail","rotate_angle",
+            "date_of_Diary","rank","id_of_image",
         ]
         labels = {
             "label": "表示名",
