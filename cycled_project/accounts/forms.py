@@ -85,7 +85,7 @@ class CustomEmailForm(AddEmailForm):
 class CustomResetPasswordForm(ResetPasswordForm):
     email = forms.EmailField(
         widget=forms.EmailInput(attrs={
-            'placeholder': 'メールアドレスを入力してください',
+            'placeholder': 'メールアドレスを入力',
         })
     )
     def __init__(self, *args, **kwargs):

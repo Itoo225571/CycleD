@@ -229,6 +229,7 @@ EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1  # メール確認リンクの有効期限を設定
 DEFAULT_FROM_EMAIL = f'ちゃりニキ(配信) <{os.getenv("EMAIL_HOST_USER")}>'
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True  # メール確認後に自動的にログインされる 
 
 ACCOUNT_UNIQUE_EMAIL = True     # 同じメールアドレスで複数のアカウントを作れない 
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True      # 既存のemailログイン時にsocialによりemailでログインすると自動的に連携される
