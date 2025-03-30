@@ -1,9 +1,12 @@
 from allauth.account import views as account_views
 from allauth.socialaccount import views as socialaccount_views
 from allauth.account.models import EmailAddress
+from allauth.account.models import EmailAddress, EmailConfirmation
+from allauth.account.adapter import get_adapter
 from allauth.account.utils import send_email_confirmation
 
 from django.urls import reverse_lazy,reverse
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.hashers import check_password
 from django.shortcuts import redirect
@@ -15,9 +18,11 @@ from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from django_user_agents.utils import get_user_agent
 from django.views.decorators.csrf import csrf_protect
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django_ratelimit.decorators import ratelimit
 from django.conf import settings
+from django.utils import timezone
+from django.contrib.auth import get_user_model
 
 from .forms import CustomLoginForm,CustomSignupForm,UserLeaveForm,AllauthUserLeaveForm,CustomEmailForm,CustomResetPasswordForm
 from .forms import UserSettingForm,UserUsernameForm,UserIconForm
@@ -144,7 +149,7 @@ class CustomEmailView(account_views.EmailView):
     template_name = "account/email.html"    
     # success_url = reverse_lazy('accounts:setting')
     def post(self, request, *args, **kwargs):
-        if "action_add" or "action_send" or "action_remove" in request.POST:
+        if "action_add" in request.POST or "action_send" in request.POST or "action_remove" in request.POST:
             return super().post(request, *args, **kwargs)  # action_add の場合のみ親クラスの処理
         return HttpResponseRedirect(self.success_url)  # それ以外はリダイレクト
     def form_valid(self, form):
@@ -158,4 +163,42 @@ class CustomEmailView(account_views.EmailView):
         else:
             messages.success(self.request, f"{email}に確認のメールを送信しました。")
         return response
+
+# @method_decorator(login_not_required, name="dispatch")
+# class CustomEmailVerificationSentView(account_views.EmailView):
+#     template_name = "account/verification_sent.html"
+#     def get_success_url(self):
+#         return self.request.path_info  # 現在のURLを取得
+#     def post(self, request, *args, **kwargs):
+#         if "action_send" in request.POST:
+#             return super().post(request, *args, **kwargs)  # action_add の場合のみ親クラスの処理
+#         return HttpResponseRedirect(self.get_success_url())  # それ以外はリダイレクト
     
+class CustomEmailVerificationSentView(account_views.EmailVerificationSentView):
+    def post(self, request, *args, **kwargs):
+        email = request.session.get("unconfirmed_email")
+        if not email:
+            messages.error(request, "再送信できるメールアドレスが見つかりません。")
+            return redirect("account_login")  # 必要に応じて変更
+        try:
+            User = get_user_model()
+            user = User.objects.get(email=email)
+            email_address = EmailAddress.objects.get(user=user, email=email)
+            if email_address.verified:
+                messages.info(request, "このメールアドレスはすでに確認済みです。")
+            else:
+                confirmation = EmailConfirmation.objects.filter(email_address=email_address).order_by('-sent').first()
+                if not confirmation:
+                    # 確認メールを手動で作成・送信
+                    confirmation = EmailConfirmation.create(email_address)
+                    confirmation.sent = timezone.now()
+                    confirmation.save()
+
+                adapter = get_adapter(request)
+                signup = True  # 新規登録用のテンプレートを使う
+                adapter.send_confirmation_mail(request, confirmation, signup)
+
+                messages.success(request, "確認メールを再送信しました。")
+        except User.DoesNotExist:
+            messages.error(request, "ユーザーが見つかりません。")
+        return HttpResponseRedirect(self.request.path_info)  # 現在のページをリロード

@@ -16,7 +16,7 @@ urlpatterns = [
     # path("user/edit/",views.UserEditView.as_view(),name="user_edit"),
 
     path("email/",views.CustomEmailView.as_view(),name="email"),
-    # path("confirm-email/",views.CustomEmailVerificationSentView.as_view(),name="confirm_email"),
+    path("confirm-email/",views.CustomEmailVerificationSentView.as_view(),name="confirm_email"),
 
     path("password/change/",views.CustomPasswordChangeView.as_view(),name="password_change"),
     path("password/set/",views.CustomPasswordSetView.as_view(),name="password_set"),

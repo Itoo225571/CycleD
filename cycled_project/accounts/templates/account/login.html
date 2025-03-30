@@ -40,6 +40,11 @@
                                             {% endif %}
                                         </div>
                                     {% endif %}
+                                    {% if field.help_text %}
+                                        <div class="py-2 text-start text-muted small">
+                                            {{ field.help_text }}
+                                        </div>
+                                    {% endif %}
                                 </div>
                             {% endfor %}                        
 
@@ -49,7 +54,7 @@
                                 </div>
                             {% endfor %}
                             <p class="small pb-lg-2 mt-4"><a class="text-dark" href="{% url 'account_reset_password' %}">パスワードがわからないの?</a></p>
-                            <button class="btn btn-outline-dark btn-lg w-100 mt-3" type="submit">ログイン</button>
+                            <button class="btn btn-outline-dark btn-lg w-100" type="submit">ログイン</button>
                         </form>
                         <hr>
                         <div class="pt-1">

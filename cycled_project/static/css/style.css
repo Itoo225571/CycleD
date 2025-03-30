@@ -79,12 +79,12 @@ body {
     margin-right: 10px;
     font-size: 1.4em;
 }
-.user-icon-container .button-logout::before {
+.button-logout::before {
     font-family: 'Material Icons';
     content: "\e9ba";
     opacity: .7;
 }
-.user-icon-container .button-setting::before {
+.button-setting::before {
     font-family: 'Material Icons Two Tone';
     content: '\e8b8';
     opacity: .7;
