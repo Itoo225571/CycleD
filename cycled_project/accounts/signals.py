@@ -1,6 +1,6 @@
 from django.conf import settings
 from allauth.account.models import EmailAddress
-from allauth.account.signals import email_confirmed, email_added
+from allauth.account.signals import email_confirmed, email_added, user_signed_up,user_logged_in
 from django.dispatch import receiver
 
 def change_email(user,email_address):
@@ -28,3 +28,12 @@ def make_email_primary_immediately(request, email_address, **kwargs):
     if settings.ACCOUNT_EMAIL_VERIFICATION == "none":
         user = email_address.user
         change_email(user,email_address)
+
+@receiver(user_signed_up)
+@receiver(user_logged_in)
+def save_email_in_session(request, user, **kwargs):
+    email_address = EmailAddress.objects.filter(user=user, verified=False).first()
+    if email_address:
+        request.session['unconfirmed_email'] = email_address.email
+    else:
+        request.session.pop('unconfirmed_email', None)  # 認証済みなら削除

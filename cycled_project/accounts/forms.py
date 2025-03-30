@@ -2,8 +2,21 @@ from allauth.account.forms import SignupForm,LoginForm,AddEmailForm,ResetPasswor
 from allauth.account.models import EmailAddress
 from django import forms
 from django.conf import settings
+from django.utils.safestring import mark_safe
 
 from .models import User
+
+# email に help_text等 を追加する関数
+def set_email(email_field):
+    if settings.ACCOUNT_EMAIL_VERIFICATION in ["mandatory", "optional"]:
+        verification_message = "<li>入力されたメールアドレスに確認メールが送信されます。</li>"
+    else:
+        verification_message = ""
+    expiry_message = f"<li>確認メールの有効期限は {settings.ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS} 日です。</li>"
+    html = f"<ul style='margin-bottom:0;'>{verification_message} {expiry_message}</ul>"
+    
+    email_field.help_text = mark_safe(html)
+    email_field.widget.attrs.update({'placeholder': 'メールアドレスを入力'})
 
 class CustomSignupForm(SignupForm):
     def __init__(self, *args, **kwargs):
@@ -11,8 +24,8 @@ class CustomSignupForm(SignupForm):
         self.fields.pop('password2', None)  # パスワード確認欄を削除
 
         self.fields["username"].widget.attrs={"placeholder":"ユーザー名を入力"}
-        self.fields["email"].widget.attrs={"placeholder":"メールアドレスを入力"}
         self.fields["password1"].widget.attrs={"placeholder":"パスワードを入力",'data-toggle': 'password','autocomplete': 'off'}
+        set_email(self.fields["email"])
 
         self.fields['email'].required = True
         for _, field in self.fields.items():
@@ -23,6 +36,7 @@ class CustomLoginForm(LoginForm):
         super().__init__(*args, **kwargs)
         self.fields['login'].label = 'ユーザー名またはメールアドレス'  # ラベルを変更
         self.fields['remember'].label = '次回以降自動でログインする'  # ラベルを変更
+        self.fields['password'].help_text = ''
 
 class UserUsernameForm(forms.ModelForm):
     class Meta:
@@ -69,33 +83,9 @@ class AllauthUserLeaveForm(forms.Form):
 class CustomEmailForm(AddEmailForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["email"].widget.attrs.update({
-            "placeholder": "新しいメールアドレスを入力",
-        })
-        if settings.ACCOUNT_EMAIL_VERIFICATION in ["mandatory", "optional"]:
-            # 確認メールが送信される旨のメッセージ
-            verification_message = "<li>入力されたメールアドレスに確認メールが送信されます。</li>"
-        else: verification_message = None
-        # 有効期限を設定
-        expiry_message = f"<li>確認メールの有効期限は {settings.ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS} 日です。</li>"
-        
-        # help_text にリストを追加
-        self.fields["email"].help_text = f"<ul>{verification_message} {expiry_message}</ul>"
+        set_email(self.fields["email"])
 
 class CustomResetPasswordForm(ResetPasswordForm):
-    email = forms.EmailField(
-        widget=forms.EmailInput(attrs={
-            'placeholder': 'メールアドレスを入力',
-        })
-    )
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if settings.ACCOUNT_EMAIL_VERIFICATION in ["mandatory", "optional"]:
-            # 確認メールが送信される旨のメッセージ
-            verification_message = "<li>入力されたメールアドレスに確認メールが送信されます。</li>"
-        else: verification_message = None
-        # 有効期限を設定
-        expiry_message = f"<li>確認メールの有効期限は {settings.ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS} 日です。</li>"
-        
-        # help_text にリストを追加
-        self.fields["email"].help_text = f"<ul>{verification_message} {expiry_message}</ul>"
+        set_email(self.fields["email"])
