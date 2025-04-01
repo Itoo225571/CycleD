@@ -163,16 +163,6 @@ class CustomEmailView(account_views.EmailView):
         else:
             messages.success(self.request, f"{email}に確認のメールを送信しました。")
         return response
-
-# @method_decorator(login_not_required, name="dispatch")
-# class CustomEmailVerificationSentView(account_views.EmailView):
-#     template_name = "account/verification_sent.html"
-#     def get_success_url(self):
-#         return self.request.path_info  # 現在のURLを取得
-#     def post(self, request, *args, **kwargs):
-#         if "action_send" in request.POST:
-#             return super().post(request, *args, **kwargs)  # action_add の場合のみ親クラスの処理
-#         return HttpResponseRedirect(self.get_success_url())  # それ以外はリダイレクト
     
 class CustomEmailVerificationSentView(account_views.EmailVerificationSentView):
     def post(self, request, *args, **kwargs):

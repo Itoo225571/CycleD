@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block content %}
+    <div class="row d-flex justify-content-center align-items-center my-2">
+        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="card bg-light-subtle text-dark" style="border-radius: 1rem;">
+                <div class="card-body p-4 text-center">
+                    {% block card_body %}{% endblock card_body %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

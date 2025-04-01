@@ -12,9 +12,6 @@ urlpatterns = [
 
     path("",views.UserSettingView.as_view(),name="setting"),
 
-    # path("user/",views.UserProfileView.as_view(),name="mypage"),
-    # path("user/edit/",views.UserEditView.as_view(),name="user_edit"),
-
     path("email/",views.CustomEmailView.as_view(),name="email"),
     path("confirm-email/",views.CustomEmailVerificationSentView.as_view(),name="confirm_email"),
 

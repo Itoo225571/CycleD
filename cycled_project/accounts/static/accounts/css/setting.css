@@ -98,3 +98,8 @@
 .setting-field td {
     padding: 10px 15px;
 }
+
+/* アイコン非表示 */
+.setting-field .button-logout::before {
+    content: ""!important;
+}
