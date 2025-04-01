@@ -1,6 +1,5 @@
 from allauth.account import views as account_views
 from allauth.socialaccount import views as socialaccount_views
-from allauth.account.models import EmailAddress
 from allauth.account.models import EmailAddress, EmailConfirmation
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import send_email_confirmation
@@ -35,6 +34,18 @@ class CustomLoginView(account_views.LoginView):
     form_class=CustomLoginForm
     next_page = 'diary:home'    # success_url (名前での指定が可)
     redirect_authenticated_user = True  # ログイン後にアクセスしたらnext_pageに飛ぶ
+    def post(self, request, *args, **kwargs):
+        email_or_username = request.POST.get('login')
+        # ユーザーがメールアドレスまたはユーザー名を入力しているか判定
+        if '@' in email_or_username:
+            user = get_user_model().objects.get(email=email_or_username)
+            email = user.email
+        else:
+            user = get_user_model().objects.get(username=email_or_username)
+            email = user.email  # ユーザー名からメールアドレスを取得
+        # メールアドレスをセッションに保存
+        request.session['unconfirmed_email'] = email
+        return super().post(request, *args, **kwargs)
 
 class CustomLogoutView(LoginRequiredMixin,account_views.LogoutView):
     template_name="account/logout.html"
@@ -164,31 +175,34 @@ class CustomEmailView(account_views.EmailView):
             messages.success(self.request, f"{email}に確認のメールを送信しました。")
         return response
     
+def resend_confirm_email(request,email):
+    if not email:
+        messages.error(request, "再送信できるメールアドレスが見つかりません。")
+        return redirect("account_login")  # 必要に応じて変更
+    try:
+        User = get_user_model()
+        user = User.objects.get(email=email)
+        email_address = EmailAddress.objects.get(user=user, email=email)
+        if email_address.verified:
+            messages.info(request, "このメールアドレスはすでに確認済みです。")
+        else:
+            confirmation = EmailConfirmation.objects.filter(email_address=email_address).order_by('-sent').first()
+            if not confirmation:
+                # 確認メールを手動で作成・送信
+                confirmation = EmailConfirmation.create(email_address)
+                confirmation.sent = timezone.now()
+                confirmation.save()
+
+            adapter = get_adapter(request)
+            signup = True  # 新規登録用のテンプレートを使う
+            adapter.send_confirmation_mail(request, confirmation, signup)
+
+            messages.success(request, "確認メールを再送信しました。")
+    except User.DoesNotExist:
+        messages.error(request, "ユーザーが見つかりません。")
+    return HttpResponseRedirect(request.path_info)  # 現在のページをリロード
+    
 class CustomEmailVerificationSentView(account_views.EmailVerificationSentView):
     def post(self, request, *args, **kwargs):
         email = request.session.get("unconfirmed_email")
-        if not email:
-            messages.error(request, "再送信できるメールアドレスが見つかりません。")
-            return redirect("account_login")  # 必要に応じて変更
-        try:
-            User = get_user_model()
-            user = User.objects.get(email=email)
-            email_address = EmailAddress.objects.get(user=user, email=email)
-            if email_address.verified:
-                messages.info(request, "このメールアドレスはすでに確認済みです。")
-            else:
-                confirmation = EmailConfirmation.objects.filter(email_address=email_address).order_by('-sent').first()
-                if not confirmation:
-                    # 確認メールを手動で作成・送信
-                    confirmation = EmailConfirmation.create(email_address)
-                    confirmation.sent = timezone.now()
-                    confirmation.save()
-
-                adapter = get_adapter(request)
-                signup = True  # 新規登録用のテンプレートを使う
-                adapter.send_confirmation_mail(request, confirmation, signup)
-
-                messages.success(request, "確認メールを再送信しました。")
-        except User.DoesNotExist:
-            messages.error(request, "ユーザーが見つかりません。")
-        return HttpResponseRedirect(self.request.path_info)  # 現在のページをリロード
+        return resend_confirm_email(request,email)

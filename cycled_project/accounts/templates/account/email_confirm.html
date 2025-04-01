@@ -5,35 +5,63 @@
 {% block head_title %}
     {% trans "Confirm Email Address" %}
 {% endblock head_title %}
+
 {% block content %}
-    {% element h1 %}
-        {% trans "Confirm Email Address" %}
-    {% endelement %}
     {% if confirmation %}
         {% user_display confirmation.email_address.user as user_display %}
         {% if can_confirm %}
-            {% element p %}
-                {% blocktrans with confirmation.email_address.email as email %}Please confirm that <a href="mailto:{{ email }}">{{ email }}</a> is an email address for user {{ user_display }}.{% endblocktrans %}
-            {% endelement %}
-            {% url 'account_confirm_email' confirmation.key as action_url %}
-            {% element form method="post" action=action_url %}
-                {% slot actions %}
-                    {% csrf_token %}
-                    {{ redirect_field }}
-                    {% element button type="submit" %}
-                        {% trans 'Confirm' %}
-                    {% endelement %}
-                {% endslot %}
-            {% endelement %}
+            <div class="row d-flex justify-content-center align-items-center my-4">
+                <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                    <div class="card bg-light-subtle text-dark shadow-sm" style="border-radius: 1rem;">
+                        <div class="card-body p-5 text-center">
+                            {% if confirmation.email_address.user.last_login %}
+                                <h4 class="mb-3 text-info fw-bold">メールアドレスの変更</h4>
+                                <p class="text-muted">以下のメールアドレスを使用してアカウント情報を更新します。</p>
+                            {% else %}
+                                <h4 class="mb-3 text-info fw-bold">ご登録ありがとうございます！</h4>
+                                <p class="text-muted">アカウントを有効にするには、以下を確認してください。</p>
+                            {% endif %}
+            
+                            <div class="text-start mt-4 row">
+                                <div class="col-12 col-lg-5">
+                                    メールアドレス
+                                </div>
+                                <div class="col-12 col-lg-7 d-flex justify-content-end justify-content-lg-start">
+                                    <strong><a href="mailto:{{ email }}" class="text-primary">{{ email }}</a></strong>
+                                </div>
+                                <div class="col-12 col-lg-5 mt-3">
+                                    ユーザー名
+                                </div>
+                                <div class="col-12 col-lg-7 d-flex justify-content-end justify-content-lg-start">
+                                    <strong>{{ user_display }}</strong>
+                                </div>
+                            </div>
+            
+                            {% url 'account_confirm_email' confirmation.key as action_url %}
+                            {% element form method="post" action=action_url %}
+                                {% slot actions %}
+                                    {% csrf_token %}
+                                    {{ redirect_field }}
+                                    <button type="submit" class="btn btn-outline-primary btn-lg w-100 mt-4">
+                                        <i class="bi bi-check-circle me-2"></i> メールを確認
+                                    </button>
+                                {% endslot %}
+                            {% endelement %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
         {% else %}
-            {% element p %}
-                {% blocktrans %}Unable to confirm {{ email }} because it is already confirmed by a different account.{% endblocktrans %}
-            {% endelement %}
+            <p><strong><a href="mailto:{{ email }}" class="text-primary">{{ email }}</a></strong> はすでに別のアカウントで使用されているため、認証できません。</p>
+            <p><a href="{% url 'account_login' %}">ログインページへ戻る</a></p>
         {% endif %}
     {% else %}
-        {% url 'account_email' as email_url %}
-        {% element p %}
-            {% blocktrans %}This email confirmation link expired or is invalid. Please <a href="{{ email_url }}">issue a new email confirmation request</a>.{% endblocktrans %}
-        {% endelement %}
+        <p>このメールリンクは期限切れまたは無効です。 
+            <a href="{% url 'account_login' %}">再度ログイン</a>してください。
+        </p>
+        <p class="small">
+            ※パスワードがわからない場合は、リセットページで再設定してください。
+        </p>
     {% endif %}
 {% endblock content %}
