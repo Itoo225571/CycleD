@@ -17,12 +17,19 @@
 }
 
 /* 画像のスタイル */
+#mapid .popup-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 #mapid .popup-image img {
     border-radius: 8px; /* 画像に角丸をつける */
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* 画像に影をつける */
     transition: transform 0.3s ease-in-out; /* 回転時のスムーズなアニメーション */
 }
-
 #mapid .popup-image img:hover {
     transform: scale(1.05); /* 画像をホバー時に少し拡大 */
 }
