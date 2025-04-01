@@ -215,11 +215,9 @@ SOCIALACCOUNT_PROVIDERS = {
 ACCOUNT_LOGIN_METHODS = ['username', 'email']
 # ユーザー登録にメールアドレスを必須にする
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
-# ユーザー名の登録を不要にする
-# ACCOUNT_USERNAME_REQUIRED = True
 
 # email関係
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"       # 登録後、メールアドレスに確認メールが送信される
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
