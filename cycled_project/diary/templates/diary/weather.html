@@ -18,8 +18,8 @@
                 <p>お気に入りの場所が登録されていません</p>
                 <p>お気に入りの場所を登録することで天気を見ることができます</p>
                 <a href={% url "diary:address_user" %} class="btn btn-outline-primary">
-                    <i class="iconify fs-2" data-icon="material-symbols:location-on-outline"></i>
-                    <span class="px-2">
+                    <i class="iconify fs-2" data-icon="material-symbols:add-location-alt-rounded"></i>
+                    <span class="px-2 potta-one-regular">
                         新しく登録する
                     </span>
                 </a>
@@ -49,25 +49,25 @@
                                 {{ current.temperature }}°C
                             </span>
                         </h5>
-                        <span class="class_weathe small">
+                        <span class="class_weather text-muted small">
                             {{ current.weather }}
                         </span>
                     </div>
         
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-end">
                         <div class="flex-grow-1" style="font-size: 1rem;">
-                            <div class="d-flex align-items-center">
+                            <h6 class="d-flex align-items-center">
                                 <i class="iconify fs-4" data-icon="mage:direction-up" 
                                     style="rotate: {{ current.wind_direction|add:180 }}deg; 
                                         color: {% if current.wind_speed >= 10 %} red 
                                                 {% elif current.wind_speed >= 5 %} orange
-                                                {% else %} blue {% endif %};"></i>
+                                                {% else %} skyblue {% endif %};"></i>
                                 <span class="class_wind-speed ms-2"> {{ current.wind_speed }} m/s</span>
-                            </div>
-                            <div class="d-flex align-items-center mt-2">
+                            </h6>
+                            <h6 class="d-flex align-items-center mt-2">
                                 <i class="iconify fs-3 text-info" data-icon="material-symbols:water-drop"></i>
                                 <span class="ms-2"> {{ current.humidity }} %</span>
-                            </div>
+                            </h6>
                         </div>
                         <div>
                             {% with weather_data=openweather|get_item:current.weather_icon %}
@@ -118,7 +118,7 @@
                                     style="rotate: {{ data.wind_direction|add:180 }}deg; 
                                         color: {% if data.wind_speed >= 10 %} red 
                                                 {% elif data.wind_speed >= 5 %} orange
-                                                {% else %} blue {% endif %};"></i>
+                                                {% else %} skyblue {% endif %};"></i>
                             </td>
                         </tr>
                     {% endfor %}

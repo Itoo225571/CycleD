@@ -18,21 +18,21 @@
                                 <h4 class="mb-3 text-info fw-bold">メールアドレスの変更</h4>
                                 <p class="text-muted">以下のメールアドレスを使用してアカウント情報を更新します。</p>
                             {% else %}
-                                <h4 class="mb-3 text-info fw-bold">ご登録ありがとうございます！</h4>
-                                <p class="text-muted">アカウントを有効にするには、以下を確認してください。</p>
+                                <h4 class="mb-3 text-info fw-bold">Welcome !</h4>
+                                <p class="text-muted text-start">アカウントを有効にするには、以下を確認してください。</p>
                             {% endif %}
             
                             <div class="text-start mt-4 row">
                                 <div class="col-12 col-lg-5">
                                     メールアドレス
                                 </div>
-                                <div class="col-12 col-lg-7 d-flex justify-content-end justify-content-lg-start">
+                                <div class="col-12 col-lg-7">
                                     <strong><a href="mailto:{{ email }}" class="text-primary">{{ email }}</a></strong>
                                 </div>
                                 <div class="col-12 col-lg-5 mt-3">
                                     ユーザー名
                                 </div>
-                                <div class="col-12 col-lg-7 d-flex justify-content-end justify-content-lg-start">
+                                <div class="col-12 col-lg-7">
                                     <strong>{{ user_display }}</strong>
                                 </div>
                             </div>
