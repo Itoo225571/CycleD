@@ -11,6 +11,7 @@ class WeatherDataBase(BaseModel):
     weather: str
     weather_icon: str
     weather_code: int
+    chance_of_rain: int
     is_day: bool
     temperature: int
     humidity: int
@@ -20,6 +21,7 @@ class WeatherDataBase(BaseModel):
         data['temperature'] = int(data['temperature'])
         data['wind_speed'] = int(data['wind_speed'])
         data['wind_direction'] = int(data['wind_direction'])
+        data['chance_of_rain'] = int(data['chance_of_rain'])
         super().__init__(**data)
 
 class WeatherData(BaseModel):
@@ -42,6 +44,7 @@ def _convert_json(json_data,timezone_offset=32400):
         'weather': weather,
         'weather_icon': weather_icon,
         'weather_code': weather_code,
+        'chance_of_rain': json_data.get("pop",0) * 100,
         'is_day': is_day,
         'temperature': json_data['main'].get("temp") - 273.15,
         'humidity': json_data['main'].get("humidity"),

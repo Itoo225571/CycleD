@@ -105,10 +105,14 @@
                         {% endif %}
                         <tr>
                             <th scope="row" class="py-0">{{ data.time|date:"G" }}時</th>
-                            <td class="py-0">
+                            <td class="position-relative py-0">
                                 {% with weather_data=openweather|get_item:data.weather_icon %}
                                     <object data="{% static 'diary_weather_report/img/'|add:weather_data.image %}" type="image/svg+xml" width="50" height="50"></object>
                                 {% endwith %}
+                                {% comment %} 雨が降る場合，確率をのせる {% endcomment %}
+                                {% if data.chance_of_rain %}
+                                    <span class="chance_of_rain">{{ data.chance_of_rain }} %</span>
+                                {% endif %}
                             </td>
 
                             <td class="py-0">{{ data.temperature }}°C</td>

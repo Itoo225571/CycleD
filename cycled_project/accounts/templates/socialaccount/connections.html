@@ -2,6 +2,10 @@
 {% load i18n %}
 {% load allauth socialaccount %}
 
+{% block title %}
+    アカウントれんけー
+{% endblock title %}
+
 {% block content %}
     {% get_providers as socialaccount_providers %}
     {% get_social_accounts user as accounts %}
