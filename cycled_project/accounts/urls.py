@@ -13,7 +13,7 @@ urlpatterns = [
     path("",views.UserSettingView.as_view(),name="setting"),
 
     path("email/",views.CustomEmailView.as_view(),name="email"),
-    path("confirm-email/",views.CustomEmailVerificationSentView.as_view(),name="confirm_email"),
+    path("confirm-email/",views.CustomEmailVerificationSentView.as_view(),name="email_verification_sent"),
 
     path("password/change/",views.CustomPasswordChangeView.as_view(),name="password_change"),
     path("password/set/",views.CustomPasswordSetView.as_view(),name="password_set"),

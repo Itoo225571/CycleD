@@ -19,9 +19,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path("admin/", admin.site.urls),#admin(管理)画面用のURL
+    # path("admin/", admin.site.urls),#admin(管理)画面用のURL
     path("",include("diary.urls")),
     path("__debug__/",include("debug_toolbar.urls")),#Debug-toolbar追加
     path("accounts/", include("accounts.urls")),  # 追加
     path("accounts/", include("allauth.urls")),
 ] +static(settings.STATIC_URL,document_root=settings.STATICFILES_DIRS) +static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+
+if settings.DEBUG:
+    urlpatterns.append(path("admin/", admin.site.urls))
