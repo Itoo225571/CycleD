@@ -2,6 +2,7 @@ from allauth.account.forms import SignupForm,LoginForm,AddEmailForm,ResetPasswor
 from allauth.account.models import EmailAddress
 from django import forms
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 
 from .models import User
@@ -89,3 +90,10 @@ class CustomResetPasswordForm(ResetPasswordForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         set_email(self.fields["email"])
+
+    """カスタムパスワードリセットフォーム（存在しないメールにエラーを出す）"""
+    def clean_email(self):
+        email = super().clean_email()
+        if not EmailAddress.objects.filter(email=email, verified=True).exists():
+            self.add_error("email","このメールアドレスは登録されていません。")
+        return email

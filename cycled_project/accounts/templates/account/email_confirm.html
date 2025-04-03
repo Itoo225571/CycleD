@@ -14,6 +14,7 @@
                 <div class="col-12 col-md-8 col-lg-6 col-xl-5">
                     <div class="card bg-light-subtle text-dark shadow-sm" style="border-radius: 1rem;">
                         <div class="card-body p-5 text-center">
+                            {% comment %} ユーザーがLogin済みかそうでないかで判別 {% endcomment %}
                             {% if confirmation.email_address.user.last_login %}
                                 <h4 class="mb-3 text-info fw-bold">メールアドレスの変更</h4>
                                 <p class="text-muted">以下のメールアドレスを使用してアカウント情報を更新します。</p>
@@ -53,10 +54,12 @@
             </div>
            
         {% else %}
+            <h2 class="mb-3">無効なメールアドレス</h2>
             <p><strong><a href="mailto:{{ email }}" class="text-primary">{{ email }}</a></strong> はすでに別のアカウントで使用されているため、認証できません。</p>
             <p><a href="{% url 'account_login' %}">ログインページへ戻る</a></p>
         {% endif %}
     {% else %}
+        <h2 class="mb-3">無効なメールリンク</h2>
         <p>このメールリンクは期限切れまたは無効です。 
             <a href="{% url 'account_login' %}">再度ログイン</a>してください。
         </p>

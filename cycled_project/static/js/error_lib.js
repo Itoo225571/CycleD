@@ -23,10 +23,21 @@ function remove_error() {
     $('#error-list-container').hide();
 }
 
-$(document).ready(function() {
+function check_errors() {
     if ($('#error-list-modal li').length > 0) {
         $('#errorModal').modal('show');  // モーダルを表示
     } else {
         $('#errorModal').modal('hide');  // モーダルを非表示
-    }    
+    }  
+}
+// 手動でエラーを追加
+function append_error_ajax(field_label,errors) {
+    const errorList = $('#error-list-modal');
+    $.each(errors,function(_,error) {
+        errorList.append('<li class="list-group-item list-group-item-danger">' + field_label + ':<br>' + error + '</li>');  
+    })
+    check_errors();
+}
+$(document).ready(function() {
+    check_errors();
 });
