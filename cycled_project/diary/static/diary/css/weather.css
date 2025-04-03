@@ -1,11 +1,11 @@
 .hours-weather-container td .chance_of_rain {
-    opacity: 0.2;
+    opacity: 0.8; /* 半透明に */
     position: absolute;
     bottom: 0;
     right: 0;
-    background: rgba(0, 0, 0); /* 背景を半透明に */
+    background: skyblue; 
     color: white;
     padding: 2px 5px;
-    font-size: 9px;
+    font-size: 10px;
     border-radius: 50%;
 }

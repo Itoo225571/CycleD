@@ -106,6 +106,19 @@ class CustomPasswordSetView(LoginRequiredMixin, account_views.PasswordSetView):
 
 class CustomPasswordResetView(account_views.PasswordResetView):
     form_class = CustomResetPasswordForm
+    # def form_invalid(self, form):
+    #     if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+    #         return JsonResponse({'message': '入力にエラーがあります。', 'errors': form.errors.as_json()}, status=400)
+    #     return super().form_invalid(form)
+    def form_invalid(self, form):
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # フォームエラーをJSONで返す
+            errors = {}
+            for field in form:
+                if field.errors:
+                    errors[field.name] = field.errors
+            return JsonResponse({"success": False, "errors": errors}, status=400)
+        return super().form_invalid(form)
 
 class UserLeaveView(LoginRequiredMixin, account_views.FormView):
     template_name = "account/leave.html"
@@ -175,6 +188,11 @@ class CustomEmailView(account_views.EmailView):
             messages.success(self.request, f"{email}に確認のメールを送信しました。")
         return response
     
+class CustomEmailVerificationSentView(account_views.EmailVerificationSentView):
+    def post(self, request, *args, **kwargs):
+        email = request.session.get("unconfirmed_email")
+        return resend_confirm_email(request,email)
+
 def resend_confirm_email(request,email):
     if not email:
         messages.error(request, "再送信できるメールアドレスが見つかりません。")
@@ -201,8 +219,3 @@ def resend_confirm_email(request,email):
     except User.DoesNotExist:
         messages.error(request, "ユーザーが見つかりません。")
     return HttpResponseRedirect(request.path_info)  # 現在のページをリロード
-    
-class CustomEmailVerificationSentView(account_views.EmailVerificationSentView):
-    def post(self, request, *args, **kwargs):
-        email = request.session.get("unconfirmed_email")
-        return resend_confirm_email(request,email)

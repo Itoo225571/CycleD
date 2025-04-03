@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "account/snippets/auth_card.html" %}
 {% load i18n %}
 {% load allauth %}
 
@@ -6,15 +6,28 @@
     確認メ〜ルを送信しました
 {% endblock title %}
 
-{% block content %}
-    <p>メールアドレス確認メールを送信しました。確認メールが届かない場合は、迷惑メールフォルダを確認するか、以下のボタンから再送信してください。</p>
-
+{% block card_body %}
+<div class="mb-4 mt-3">
+    <p class="text-muted mb-3">Email send</p>
+    <h5 class="mb-4 fw-bold">確認メールを送信しました</h5>
+    <p class="mb-4">
+        届かない場合は、迷惑メールフォルダを確認するか、以下のボタンから再送信してください。
+    </p>
+    
     <form method="post" class="my-2">
         {% csrf_token %}
-        <button type="submit" class="btn btn-outline-primary" name="action-send">
-            メールを再送信
+        <button type="submit" class="btn btn-outline-primary btn-lg w-100 shadow-sm hover-shadow-lg transition-all" name="action-send">
+            <span class="d-flex align-items-center justify-content-center">
+                <i class="material-icons-round me-2">email</i>メール再送信
+            </span>
         </button>
     </form>
+    
+    <hr class="my-4">
+    
+    <p class="">
+        <a href="{% url 'account_login' %}">ログイン画面に戻る</a>
+    </p>
+</div>
+{% endblock card_body %}
 
-    <p class="mt-3"><a href="{% url 'account_login' %}">ログイン画面に戻る</a></p>
-{% endblock content %}

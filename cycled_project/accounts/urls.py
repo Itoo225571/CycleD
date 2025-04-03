@@ -18,6 +18,7 @@ urlpatterns = [
     path("password/change/",views.CustomPasswordChangeView.as_view(),name="password_change"),
     path("password/set/",views.CustomPasswordSetView.as_view(),name="password_set"),
     path("password/reset/",views.CustomPasswordResetView.as_view(),name="password_reset"),
+    # path("password/reset/done/",views.CustomPasswordResetDoneView.as_view(),name="password_reset_done"),
 
     path("3rdparty/",views.CustomConnectionsView.as_view(),name="connections"),
 ]

@@ -316,8 +316,6 @@
 			</div>
 		</div>
 		
-		{% comment %} エラー表示用 {% endcomment %}
-		<script src="{% static 'diary/js/error_lib.js' %}"></script>
 		{% comment %} messages表示(error以外) {% endcomment %}
 		<script>
 			$(document).ready(function() {
@@ -330,8 +328,12 @@
 				{% endif %}
 			});
 		</script>
+		{% comment %} 全体でのエラー表示用 {% endcomment %}
+		<script src="{% static 'js/error_lib.js' %}"></script>
+
 		{% comment %} logout用 {% endcomment %}
 		<script src="{% static 'js/getCookie.js' %}"></script>
+
 		<script src="{% static 'accounts/js/logout.js' %}"></script>
 		
 		{% block extra_js %}{% endblock %}

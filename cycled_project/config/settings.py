@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google', # 追加
     'django_user_agents', # user-agents導入
 
+    'rest_framework',
 ]
 
 SITE_ID = 1
