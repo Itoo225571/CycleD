@@ -24,8 +24,16 @@
             {% for field in form %}
                 <div class="mb-2">
                     {% if field.name == "confirm" %}
+                        <!-- 退会に際する注意事項 -->
+                        <div class="py-2 text-start small">
+                            <ul style='margin-bottom:0;'>
+                                {% for warning in leave_warnings %}
+                                    <li>{{ warning }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                         <label for="{{ field.id_for_label }}">
-                            {{ field }} {{ field.label }}
+                            <strong>{{ field }} {{ field.label }}</strong>
                         </label>
                     {% else %}
                         <label for="{{ field.id_for_label }}" class="d-none"></label>
@@ -40,15 +48,6 @@
                     {% endif %}
                     </div>
             {% endfor %}
-
-            <!-- 退会に際する注意事項 -->
-            <div class="mb-2">
-                <ul class="list-unstyled">
-                    {% for warning in leave_warnings %}
-                        <li class="text-start explanation">{{ warning }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
 
             {% for error in form.non_field_errors %}
                 <div class="alert-message">

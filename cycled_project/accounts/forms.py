@@ -71,13 +71,13 @@ class UserLeaveForm(forms.Form):
     )
     confirm = forms.BooleanField(
         required=True,
-        label="退会することを確認しました",
+        label="以上に同意して退会します",
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
     )
 class AllauthUserLeaveForm(forms.Form):
     confirm = forms.BooleanField(
         required=True,
-        label="退会することを確認しました",
+        label="以上に同意して退会します",
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
     )
 
