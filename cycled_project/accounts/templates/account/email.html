@@ -7,10 +7,15 @@
     メ〜ル変更
 {% endblock title %}
 
+{% block card_header %}
+    {% if can_add_email %}
+        <span class="opacity-50">Change Email</span>
+    {% endif %}
+{% endblock card_header %}
+
 {% block card_body %}
     <div class="my-4">
         {% if can_add_email %}
-            <p class="opacity-50">Change Email</p>
             <div class="text-start text-muted opacity-75 mb-2">
                 <span>新しく登録するメールアドレスを入力してください。</span><br>
                 <span>現在のメールアドレス: <strong>{{ user.email }}</strong></span>

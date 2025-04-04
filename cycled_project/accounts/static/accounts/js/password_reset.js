@@ -13,8 +13,8 @@ $(document).ready(function() {
                 "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンをヘッダーに設定
             },
             success: function(response) {
-                $('#password-reset-field').hide();
-                $('#password-reset-done-field').show();
+                $('.password-reset-field').hide();
+                $('.password-reset-done-field').show();
                 formDataCommon = formData;
             },
             error: function(xhr, status, error) {
@@ -44,8 +44,8 @@ $(document).ready(function() {
             },
             success: function(response) {
                 if (response.status == 'success') {
-                    $('#password-reset-field').hide();
-                    $('#password-reset-done-field').show();
+                    $('.password-reset-field').hide();
+                    $('.password-reset-done-field').show();
                 }
                 else alert(response.message);
             },
@@ -57,7 +57,7 @@ $(document).ready(function() {
     });
     $('.button-reset').off('click').on('click',function(e) {
         formDataCommon = null;  //リセット
-        $('#password-reset-done-field').hide();
-        $('#password-reset-field').show();
+        $('.password-reset-done-field').hide();
+        $('.password-reset-field').show();
     })
 });
