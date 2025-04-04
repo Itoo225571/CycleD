@@ -106,10 +106,6 @@ class CustomPasswordSetView(LoginRequiredMixin, account_views.PasswordSetView):
 
 class CustomPasswordResetView(account_views.PasswordResetView):
     form_class = CustomResetPasswordForm
-    # def form_invalid(self, form):
-    #     if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-    #         return JsonResponse({'message': '入力にエラーがあります。', 'errors': form.errors.as_json()}, status=400)
-    #     return super().form_invalid(form)
     def form_invalid(self, form):
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             # フォームエラーをJSONで返す
