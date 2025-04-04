@@ -11,12 +11,13 @@
 {% block title %}
     退会処理
 {% endblock title %}
+
+{% block card_header %}
+    <span class="text-danger opacity-10">Delete account</span>
+{% endblock card_header %}
     
 {% block card_body %}
     <div class="mb-md-5 mt-md-4 pb-3">
-        <p class="text-danger opacity-10">
-            Delete account
-        </p>
         <!-- フォーム -->
         <form method="post">
             {% csrf_token %}

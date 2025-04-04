@@ -6,9 +6,12 @@
     確認メ〜ルを送信しました
 {% endblock title %}
 
+{% block card_header %}
+    <span class="text-muted mb-3">Email send</span>
+{% endblock card_header %}
+
 {% block card_body %}
 <div class="mb-4 mt-3">
-    <p class="text-muted mb-3">Email send</p>
     <h5 class="mb-4 fw-bold">確認メールを送信しました</h5>
     <p class="mb-4">
         届かない場合は、迷惑メールフォルダを確認するか、以下のボタンから再送信してください。

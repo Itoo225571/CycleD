@@ -2,6 +2,7 @@ $(document).ready(function() {
     // AJAX リクエスト開始時に処理を実行
     $(this).ajaxStart(function() {
         start_loading();  // ローディングインジケーターを表示
+        remove_error_ajax();    // 前のエラーを削除
     });
 
     // AJAX リクエストが完了した時に処理を実行

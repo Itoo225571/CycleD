@@ -38,6 +38,10 @@ function append_error_ajax(field_label,errors) {
     })
     check_errors();
 }
+function remove_error_ajax() {
+    const errorList = $('#error-list-modal');
+    errorList.empty();
+}
 $(document).ready(function() {
     check_errors();
 });
