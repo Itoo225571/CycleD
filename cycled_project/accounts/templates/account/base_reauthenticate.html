@@ -1,23 +1,27 @@
-{% extends "base.html" %}
-{% load allauth %}
-{% load i18n %}
+{% extends "account/snippets/auth_card.html" %}
+{% load i18n allauth account static %}
 
-{% block content %}
-    {% element p %}
-        アカウント保護のため、再認証してください。
-    {% endelement %}
+{% block title %}
+    再認証
+{% endblock title %}
+
+{% block card_header %}
+    <span class="opacity-50">Reauthenticate</span>
+{% endblock card_header %}
+
+{% block card_body %}
+    <h6 class="mb-3 text-muted fw-bold">アカウント保護のため、再認証してください。</h6>
     {% block reauthenticate_content %}{% endblock %}
+
     {% if reauthentication_alternatives %}
-        {% element hr %}{% endelement %}
-        {% element h2 %}
-            代替オプション
-        {% endelement %}
-        {% element button_group %}
-            {% for alt in reauthentication_alternatives %}
-                {% element button href=alt.url tags="primary,outline" %}
-                    {{ alt.description }}
-                {% endelement %}
-            {% endfor %}
-        {% endelement %}
+    <hr>
+    <p>代替オプション</p>
+    <div class="button-group">
+        {% for alt in reauthentication_alternatives %}
+            <a href="{{ alt.url }}" class="btn btn-outline-primary">
+                {{ alt.description }}
+            </a>
+        {% endfor %}
+    </div>
     {% endif %}
-{% endblock content %}
+{% endblock card_body %}

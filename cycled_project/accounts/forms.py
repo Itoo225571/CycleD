@@ -39,14 +39,6 @@ class CustomLoginForm(LoginForm):
         self.fields['remember'].label = '次回以降自動でログインする'  # ラベルを変更
         self.fields['password'].help_text = ''
 
-class UserUsernameForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['username']
-class UserIconForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['icon']
 class UserSettingForm(forms.ModelForm):
     # アイコンの選択肢をラジオボタンで表示
     icon = forms.ChoiceField(
@@ -54,15 +46,14 @@ class UserSettingForm(forms.ModelForm):
         choices=User.ICON_CHOICES,
         label="アイコン画像"
     )
-    form_map = {
-        'icon': UserIconForm,
-        'username': UserUsernameForm
-    }
     class Meta:
         model = User
         fields = ['icon', 'username']
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, update_field=['icon', 'username'], **kwargs):
         super().__init__(*args, **kwargs)
+        # 必要なフィールドだけを残す
+        if update_field:
+            self.fields = {field: self.fields[field] for field in update_field if field in self.fields}
 
 class UserLeaveForm(forms.Form):
     password = forms.CharField(

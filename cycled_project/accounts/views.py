@@ -24,7 +24,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 
 from .forms import CustomLoginForm,CustomSignupForm,UserLeaveForm,AllauthUserLeaveForm,CustomEmailForm,CustomResetPasswordForm
-from .forms import UserSettingForm,UserUsernameForm,UserIconForm
+from .forms import UserSettingForm
 from .models import User
 
 # 1分間に10回までログイン試行可能
@@ -34,18 +34,20 @@ class CustomLoginView(account_views.LoginView):
     form_class=CustomLoginForm
     next_page = 'diary:home'    # success_url (名前での指定が可)
     redirect_authenticated_user = True  # ログイン後にアクセスしたらnext_pageに飛ぶ
-    def post(self, request, *args, **kwargs):
-        email_or_username = request.POST.get('login')
-        # ユーザーがメールアドレスまたはユーザー名を入力しているか判定
+    def form_valid(self, form):
+        email_or_username = form.cleaned_data.get('login')
         if '@' in email_or_username:
-            user = get_user_model().objects.get(email=email_or_username)
-            email = user.email
+            email = email_or_username
         else:
-            user = get_user_model().objects.get(username=email_or_username)
-            email = user.email  # ユーザー名からメールアドレスを取得
+            try:
+                user = get_user_model().objects.get(username=email_or_username)
+                email = user.email  # ユーザー名からメールアドレスを取得
+            except get_user_model().DoesNotExist:
+                messages.error(self.request, "ユーザー名が見つかりません。再確認してください。")
+                return self.form_invalid(form)
         # メールアドレスをセッションに保存
-        request.session['unconfirmed_email'] = email
-        return super().post(request, *args, **kwargs)
+        self.request.session['unconfirmed_email'] = email
+        return super().form_valid(form)    
 
 class CustomLogoutView(LoginRequiredMixin,account_views.LogoutView):
     template_name="account/logout.html"
@@ -63,36 +65,33 @@ class UserSettingView(LoginRequiredMixin,generic.UpdateView):
     template_name="account/setting.html"
     form_class = UserSettingForm
     success_url = reverse_lazy('accounts:setting')
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+    
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(self.request.POST, instance=self.request.user)
+        matched_fields = [
+            f"form-{field}" for field in form.fields if f"form-{field}" in self.request.POST
+        ]
+        field_names = [field.replace('form-', '') for field in matched_fields]
+        form = self.form_class(self.request.POST, instance=self.request.user, update_field=field_names)
+        if form.is_valid():
+            return self.form_valid(form)
+        else: 
+            return self.form_invalid(form)
+    
     def get_object(self, queryset=None):
         # 常に現在ログイン中のユーザーを返す
         return self.request.user
-    def form_valid(self, request, *args, **kwargs):
-        # fields の各フィールドに 'form-' をつけて request.POST に含まれるかをチェック
-        form = self.get_form()  # フォームインスタンスを取得
-        matched_field = next(
-            (f"form-{field}" for field in form.fields if f"form-{field}" in request.POST), None
-        )
-        field_name = matched_field.replace('form-', '') #formを取り除く
-        form_class = form.form_map.get(field_name)
-        if form_class:
-            form = form_class(request.POST, instance=request.user)
-        else:
-            # fields に含まれない場合はエラーを表示
-            messages.error(self.request, '不正なリクエストです')
-            return self.form_invalid(form)
-        if form.is_valid():
-            # request.user.save(update_fields=[field_name])  # 一致したフィールドだけ保存
-            request.user.save()  # 一致したフィールドだけ保存
-            return super().form_valid(form)
-        else:
-            # フォームのエラーを表示
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(self.request, f"{field} のエラー: {error}")
-            return super().form_invalid(form)
+    def form_valid(self,form):
+        # 更新されたフィールドだけを保存
+        updated_fields = form.cleaned_data.keys()
+        self.request.user.save(update_fields=updated_fields)
+        return super().form_valid(form)
+    def form_invalid(self, form):
+        # フォームのエラーを表示
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(self.request, f"{field} のエラー: {error}")
+        return super().form_invalid(form)
 
 class CustomPasswordChangeView(LoginRequiredMixin, account_views.PasswordChangeView):
     template_name = "account/password_change.html"
