@@ -1,4 +1,5 @@
 from django.urls import path
+from django.shortcuts import redirect
 
 from . import views
 
@@ -18,7 +19,7 @@ urlpatterns = [
     path("password/change/",views.CustomPasswordChangeView.as_view(),name="password_change"),
     path("password/set/",views.CustomPasswordSetView.as_view(),name="password_set"),
     path("password/reset/",views.CustomPasswordResetView.as_view(),name="password_reset"),
-    # path("password/reset/done/",views.CustomPasswordResetDoneView.as_view(),name="password_reset_done"),
-
+    # ajaxにしたので使用しない(password/reset にリダイレクトにリダイレクト)
+    path("password/reset/done/", lambda request: redirect('accounts:password_reset'), name="password_reset_done"),
     path("3rdparty/",views.CustomConnectionsView.as_view(),name="connections"),
 ]
