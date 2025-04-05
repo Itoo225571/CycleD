@@ -44,11 +44,6 @@
                 </div>
             {% endfor %}                        
 
-            {% for error in form.non_field_errors %}
-                <div class="alert-message">
-                    <p>{{ error }}</p>
-                </div>
-            {% endfor %}
             <p class="small pb-lg-2 mt-4"><a class="text-dark" href="{% url 'account_reset_password' %}">パスワードがわからないの?</a></p>
             <button class="btn btn-outline-dark btn-lg w-100" type="submit">ログイン</button>
         </form>
