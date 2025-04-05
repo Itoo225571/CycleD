@@ -1,52 +1,88 @@
 {% extends "base.html" %}
-{% load django_bootstrap5 %}
+{% load static %}
 
 {% block title %}
     ちゃりニキ - サイクリング記録アプリ
 {% endblock title %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'diary/css/top.css' %}" type="text/css" >
+{% endblock extra_css %}
     
 {% block content %}
-    <!-- ヒーローセクション -->
-    <header class=" bg-light text-center py-4 pt-5 shadow-sm rounded">
-        <div class="container">
-            <h1 class="fs-3 fs-md-2 fs-lg-1">毎日のサイクリングを思い出として記録しよう</h1>
-            <p class="lead fs-6 fs-md-5">写真を撮影して自動で日記を作成！</p>
+    <header class="container py-3" id="intro-header">
+        <div class="row">
+            <div class="col-lg-5 text-center d-flex align-items-center justify-content-center">
+                <div>
+                    <section id="hero">
+                        <h2 class="fs-3 fs-md-2 fs-lg-1 fw-bold">
+                            今日から始めるあなたの健康ライフ
+                        </h2>
+                        <p class="fs-6 text-muted text-start pt-2 d-none d-lg-block">
+                            {{ features }}
+                        </p>
+                    </section>
+                    <section id="entry" class="pt-md-2 d-flex justify-content-center">
+                        <a href="{% url 'accounts:signup' %}" class="btn btn-light btn-entry">
+                            <span class="px-2 py-1 fw-semibold">今すぐ始める</span>
+                        </a>
+                        <a href="{% url 'accounts:login' %}" class="d-flex align-items-center m-3 my-2">
+                            <span class="px-2 py-1">ログイン</span>
+                        </a>
+                    </section>
+                </div>
+            </div>
+            <div class="col-lg-7 pt-lg-0 pt-4">
+                <div class="fade-image-wrapper">
+                    <img class="cycle_picture_ex w-100 rounded" src="{{ cycle_picture_url }}" alt="サイクリング画像例">
+                </div>
+            </div>
         </div>
     </header>
-
-    <!-- ログイン・登録セクション -->
-    <section class="container py-md-5 py-3">
-        <div class="text-center">
-            <h2 class="mt-2 fs-4 fs-md-3">今すぐ始めよう</h2>
-            <a href="{% url 'accounts:signup' %}" class="btn btn-success btn-lg">無料で登録</a>
-            <p class="mt-3">
-                <a href="{% url 'accounts:login' %}">ログインはこちら</a>
+    
+    <!-- 特徴セクション -->
+    <section id="features" class="container py-md-2">
+        <div class="py-2">
+            <p class="fs-6 text-muted text-start pt-2 d-block d-lg-none">
+                {{ features }}
             </p>
         </div>
-    </section>    
-
-    <!-- 特徴セクション -->
-    <section id="features" class="container py-md-4 py-2">
-        <div class="row text-center gy-2">
-            <div class="col-12 col-md-6 col-lg-3 bg-light p-1 shadow-sm rounded">
-                <span class="material-icons d-block mt-2" style="font-size: 48px;">pedal_bike</span>
-                <h3 class="fw-bold fs-5 fs-md-4">ライドを記録</h3>
-                <p class="fs-6">行き先を簡単に記録</p>
+        <div class="row gy-4">
+            <div class="col-xl-3 col-md-6">
+                <div class="features-box">
+                    <div class="text-center">
+                        <span class="material-icons d-block mt-2" style="font-size: 48px;">pedal_bike</span>
+                        <h3 class="fw-bold fs-5 fs-md-4">ライドを記録</h3>
+                        <p class="fs-6">行き先を簡単に記録</p>
+                    </div>
+                </div>
             </div>
-            <div class="col-12 col-md-6 col-lg-3 bg-light p-1 shadow-sm rounded">
-                <span class="material-icons d-block mt-2" style="font-size: 48px;">photo_camera</span>
-                <h3 class="fw-bold fs-5 fs-md-4">写真で日記</h3>
-                <p class="fs-6">写真のGPS情報で日記を自動作成</p>
+            <div class="col-xl-3 col-md-6">
+                <div class="features-box">
+                    <div class="text-center">
+                        <span class="material-icons d-block mt-2" style="font-size: 48px;">photo_camera</span>
+                        <h3 class="fw-bold fs-5 fs-md-4">写真で日記</h3>
+                        <p class="fs-6">写真のGPS情報で日記を自動作成</p>
+                    </div>
+                </div>
             </div>
-            <div class="col-12 col-md-6 col-lg-3 bg-light p-1 shadow-sm rounded">
-                <span class="material-icons d-block mt-2" style="font-size: 48px;">event_available</span>
-                <h3 class="fw-bold fs-5 fs-md-4">継続をサポート</h3>
-                <p class="fs-6">サイクリング以外の習慣記録にも</p>
+            <div class="col-xl-3 col-md-6">
+                <div class="features-box">
+                    <div class="text-center">
+                        <span class="material-icons d-block mt-2" style="font-size: 48px;">event_available</span>
+                        <h3 class="fw-bold fs-5 fs-md-4">継続をサポート</h3>
+                        <p class="fs-6">サイクリング以外の習慣記録にも</p>
+                    </div>
+                </div>
             </div>
-            <div class="col-12 col-md-6 col-lg-3 bg-light p-1 shadow-sm rounded">
-                <span class="material-icons d-block mt-2" style="font-size: 48px;">bar_chart</span>
-                <h3 class="fw-bold fs-5 fs-md-4">データで振り返り</h3>
-                <p class="fs-6">過去のライドをカレンダーやマップで確認</p>
+            <div class="col-xl-3 col-md-6">
+                <div class="features-box">
+                    <div class="text-center">
+                        <span class="material-icons d-block mt-2" style="font-size: 48px;">bar_chart</span>
+                        <h3 class="fw-bold fs-5 fs-md-4">データで振り返り</h3>
+                        <p class="fs-6">過去のライドをカレンダーやマップで確認</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>    

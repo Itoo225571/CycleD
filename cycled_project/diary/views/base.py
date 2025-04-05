@@ -9,11 +9,12 @@ from django.conf import settings
 from django_ratelimit.decorators import ratelimit
 from django.core.cache import cache
 from django.contrib import messages
+from django.utils.safestring import mark_safe
 
-from subs.get_pictures import get_pictures,get_random_url,is_bright
+from subs.get_pictures import get_pictures,get_random_url,is_bright,get_main_color
 
 class TopView(generic.TemplateView):
-    template_name="diary/top_v2.html"
+    template_name="diary/top.html"
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect('diary:home')  # 'home' にリダイレクト
@@ -23,6 +24,12 @@ class TopView(generic.TemplateView):
         url = get_cycle_picture(self.request)    #ランダムな画像を表示するやつ
         context['cycle_picture_url'] = url
         # context['is_bright'] = is_bright(url)     # 　明るさ判定
+        html = '''
+            ちゃりニキでは、写真をアップロードするだけでサイクリングのデータを簡単に記録できます。<br>
+            サイクリングだけでなく、他の運動や健康管理、旅行の記録にも活用できます。<br>
+            ちゃりニキはあなたの楽しく健康的な生活をサポートします。
+        '''
+        context['features'] = mark_safe(html)
         return context
     
 class CacheMixin:

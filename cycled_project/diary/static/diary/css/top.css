@@ -1,8 +1,70 @@
+#intro-header .cycle_picture_ex {
+    min-height: 250px;
+    aspect-ratio: 16 / 9;
+    object-fit: cover; /* 必要に応じて画像をトリミング */
+    display: block; /* 余計な余白を防ぐ */
+}
+#intro-header .fade-image-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+#intro-header .fade-image-wrapper::before,
+#intro-header .fade-image-wrapper::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    z-index: 2;
+    left: 0;
+    width: 100%;
+    height: 10%;
+}
+#intro-header .fade-image-wrapper::before{
+    top: 0;
+    /* デフォルト：縦方向（Y軸）のグラデーション */
+    background: linear-gradient(to top, rgba(255,255,255,0), rgba(255,255,255,1));
+}
+#intro-header .fade-image-wrapper::after {
+    bottom: 0;
+    /* デフォルト：縦方向（Y軸）のグラデーション */
+    background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));
+}
+/* lg以上のとき（992px～）は横方向（X軸）のグラデーションに切り替え */
+@media (min-width: 992px) {
+    #intro-header .fade-image-wrapper::before,
+    #intro-header .fade-image-wrapper::after {
+        width: 10%;
+        height: 100%;
+        background: none;
+    }
+    #intro-header .fade-image-wrapper::before {
+        left: 0;
+        background: linear-gradient(to left, rgba(255,255,255,0), rgba(255,255,255,1));
+    }
+}
+
+#intro-header .cycle_picture_ex::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(255,255,255,1), rgba(255,255,255,0));
+    pointer-events: none;
+}
+
 #entry .btn-entry {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* 通常時の影 */
     transition: box-shadow 0.3s ease; /* 影の変化を滑らかに */
-    border-radius: 50rem;  /* これでピル形状に */
-    margin: 0 10px;
+    margin: .5rem 1rem;
+}
+@media (min-width: 992px) {
+    #entry .btn-entry {
+        padding: 0.5rem 1.25rem;   /* 上下の余白: 0.75rem、左右の余白: 1.25rem */
+        font-size: 1.25rem;         /* フォントサイズ: 1.25rem */
+        line-height: 1.5;           /* 行の高さ: 1.5 */
+        border-radius: 0.375rem;    /* 角の丸み: 0.375rem */
+    }
 }
 #entry .btn-entry:hover {
     box-shadow: none !important; /* 影を消す */
