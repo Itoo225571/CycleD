@@ -413,6 +413,9 @@ async def process_image_file(img_file, image_hash_list, request):
         if lastModifiedDate:
             if datetime.now().date() == temp_image.date_photographed.date() == temp_image.date_lastModified.date():
                 geo_data['rank'] = 0
+        
+        image_hash_list.append(photo_hash)
+        await cache.aset('image_hash_list', image_hash_list, timeout=600)
 
         return geo_data
     except Exception as e:
