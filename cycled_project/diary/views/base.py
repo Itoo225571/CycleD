@@ -10,17 +10,19 @@ from django_ratelimit.decorators import ratelimit
 from django.core.cache import cache
 from django.contrib import messages
 
-from subs.get_pictures import get_pictures,get_random_url
+from subs.get_pictures import get_pictures,get_random_url,is_bright
 
 class TopView(generic.TemplateView):
-    template_name="diary/top.html"
+    template_name="diary/top_v2.html"
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect('diary:home')  # 'home' にリダイレクト
         return super().get(request, *args, **kwargs)
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['cycle_picture_url'] = get_cycle_picture(self.request)
+        url = get_cycle_picture(self.request)    #ランダムな画像を表示するやつ
+        context['cycle_picture_url'] = url
+        # context['is_bright'] = is_bright(url)     # 　明るさ判定
         return context
     
 class CacheMixin:
