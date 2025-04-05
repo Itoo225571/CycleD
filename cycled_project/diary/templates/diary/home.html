@@ -123,7 +123,7 @@
                                                 </div>
                                             </div>
                                             <div class="card-good col-3 d-flex justify-content-center align-items-center">
-                                                <button class="toggle-diary-good icon-in-button" type="button" data-url="{% url 'diary:good_for_diary' pk=diary.diary_id %}">
+                                                <button class="toggle-diary-good icon-in-button" type="button" data-url="{% url 'diary:good-toggle' pk=diary.diary_id %}">
                                                     <i class="icon-liked" data-liked="{{ diary.liked|lower }}"></i>
                                                 </button>
                                             </div>

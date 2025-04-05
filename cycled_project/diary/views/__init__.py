@@ -5,4 +5,4 @@ from .diary import DiaryPhotoView,Photos2LocationsView,CalendarView,DiaryDeleteV
 from .diary import sendDairies,delete_all_diaries,diary_edit_noPK,diary_delete_noPK
 from .weather import WeatherView
 
-from .home import HomeView,good_for_diary
+from .home import HomeView,GoodViewSet

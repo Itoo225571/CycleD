@@ -10,6 +10,8 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework import status,viewsets
+from rest_framework.decorators import action
 
 from ..models import Diary,Location,TempImage,Good
 from .cache_and_session import get_diaries
@@ -70,33 +72,29 @@ class HomeView(LoginRequiredMixin, generic.TemplateView):
         return context
     
 # good機能
-@api_view(['POST', 'DELETE'])
-@csrf_protect  # CSRF保護を追加
-@authentication_classes([SessionAuthentication])  # セッション認証
-@permission_classes([IsAuthenticated])  # ログイン必須
-def good_for_diary(request, pk):
-    try:
+class GoodViewSet(viewsets.ViewSet):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=True, methods=['post', 'delete'], url_path='toggle')
+    def toggle(self, request, pk=None):
         diary = get_object_or_404(Diary, diary_id=pk)
-        # 公開設定をチェック
+
         if not diary.is_public and diary.user != request.user:
-            return JsonResponse({"status": "error", "message": "公開されていない日記にアクセスしています"}, status=403)
-        
-        liked, created = Good.objects.get_or_create(user=request.user, diary=diary)
+            return Response(
+                {"status": "error", "message": "公開されていない日記にアクセスしています"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        good_obj, created = Good.objects.get_or_create(user=request.user, diary=diary)
         if not created:
-            liked.delete()
+            good_obj.delete()
             liked = False
         else:
             liked = True
 
-        return JsonResponse({
+        return Response({
             "status": "success",
-            "liked": liked, 
+            "liked": liked,
             "good_count": diary.good.count(),
         })
-    
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        return JsonResponse({
-            "status": "error",
-            "message": str(e)
-        }, status=500)

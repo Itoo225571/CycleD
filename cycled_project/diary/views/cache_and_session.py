@@ -33,6 +33,7 @@ def update_diaries(request,whose=['mine','public']):
             .order_by('-date_last_updated', '-date')
             .prefetch_related(thumbnail_location, 'user')
         )
+        print(diaries_public)
         data = {
             'diaries_public': diaries_public,
         }
