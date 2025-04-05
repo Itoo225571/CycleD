@@ -1,1 +1,1 @@
-from .get_pictures import get_pictures,get_random_url
+from .get_pictures import get_pictures,get_random_url,is_bright

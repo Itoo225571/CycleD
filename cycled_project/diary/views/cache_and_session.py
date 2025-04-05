@@ -42,8 +42,8 @@ def update_diaries(request,whose=['mine','public']):
 
 def get_diaries(request,whose=['mine','public']):
     key = 'diaries_for_display'
-    request.session.get(key,None) or print('ない')
-    cache.get(key, None) or print('NO')
+    request.session.get(key,None)
+    cache.get(key, None)
     # whoseの中に対象の名前があったらそれをセッションもしくはキャッシュにより取得(失敗したらupdateを使う)
     session_data = (request.session.get(key,None) or update_diaries(request, ['mine'])) if 'mine' in whose else {}
     cached_data = (cache.get(key, None) or update_diaries(request, ['public'])) if 'public' in whose else {}
