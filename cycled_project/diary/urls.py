@@ -1,13 +1,17 @@
-from django.urls import path
+from django.urls import path,include
 from . import views
+from rest_framework.routers import DefaultRouter
 
 app_name="diary"
+
+router = DefaultRouter()
+router.register(r'good', views.GoodViewSet, basename='good')
 
 urlpatterns = [
     path("",views.TopView.as_view(),name="top"),
 
     path("home/",views.HomeView.as_view(),name="home"),
-    path("home/good/<uuid:pk>",views.good_for_diary,name="good_for_diary"),
+    # path("home/good/<uuid:pk>",views.good_for_diary,name="good_for_diary"),
     
     # path("diary/",views.DiaryNewView.as_view(),name="diary"),
     path("diary/photo/",views.DiaryPhotoView.as_view(),name="diary_photo"),
@@ -32,5 +36,8 @@ urlpatterns = [
     path('diary/edit-diary-noPK/', views.diary_edit_noPK, name='editDiary_noPK'),
     path('diary/delete-diary-noPK/', views.diary_delete_noPK, name='deleteDiary_noPK'),
     path('diary/delete-diary/<uuid:pk>', views.DiaryDeleteView.as_view(), name='deleteDiary'),
+
+    # routerで自動的に設定されたURLを含める(API用のURL)
+    path('api/', include(router.urls)),
 ]
 
