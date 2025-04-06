@@ -26,6 +26,8 @@ $(document).ready(function() {
             })
             .catch(error => {
                 console.error('エラー:', error);
+                // 大元でエラー処理してるので基本不要
+                // alert('エラーが発生しました。再度お試しください。');
             });
     });
 

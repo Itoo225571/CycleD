@@ -10,10 +10,11 @@ from django.forms.models import model_to_dict
 from django.shortcuts import redirect
 from django.core.exceptions import ValidationError
 
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
 
 from ..forms import AddressSearchForm,AddressForm,LocationCoordForm
 from ..models import Location
@@ -136,57 +137,48 @@ class AddressUserView(LoginRequiredMixin,generic.FormView):
         loc.save()
         return super().form_valid(form)
 
-@api_view(['POST'])
-@authentication_classes([SessionAuthentication])  # セッション認証
-@permission_classes([IsAuthenticated])  # ログイン必須
-def address_search(request):
-    form = AddressSearchForm(request.POST)
-    if form.is_valid():
-        keyword = form.cleaned_data.get('keyword')
-        data_list = geocode(request, keyword)  # geocode関数を呼び出す
-        response = {"data_list": data_list}
-        return Response(response, status=200)  # 正常にデータを返す
+class AddressSearchView(APIView):
+    authentication_classes = [SessionAuthentication]    # セッション認証
+    permission_classes = [IsAuthenticated]  # ログイン必須
+    def post(self, request, *args, **kwargs):
+        form = AddressSearchForm(request.data)
+        if form.is_valid():
+            keyword = form.cleaned_data.get('keyword')
+            data_list = geocode(request, keyword)
+            return Response({"data_list": data_list}, status=status.HTTP_200_OK)
+        return Response({
+            "detail": "フォームが正しくありません",  # メッセージは detail に入れる
+            "errors": form.errors  # エラー詳細を errors としてそのまま返す
+        }, status=status.HTTP_400_BAD_REQUEST)
 
-    # フォームが無効な場合、エラーメッセージを返す
-    return Response({"error": "Invalid form data", "errors": form.errors}, status=400)
+class AddressCurrentPositionView(APIView):
+    authentication_classes = [SessionAuthentication]    # セッション認証
+    permission_classes = [IsAuthenticated]  # ログイン必須
+    def post(self, request, *args, **kwargs):
+        form = LocationCoordForm(request.POST)
+        if form.is_valid():
+            loc = form.save(commit=False)
+            lat = form.cleaned_data["lat"]
+            lon = form.cleaned_data["lon"]
+            geo = regeocode(request,lat,lon)
+            
+            loc.state = geo.address.state
+            loc.display = geo.address.display
+            loc.label = geo.address.label
+            loc.location_id = None  # 新規作成なのでidは空にする
 
-@api_view(['POST'])
-@authentication_classes([SessionAuthentication])  # セッション認証
-@permission_classes([IsAuthenticated])  # ログイン必須
-def address_select(request):
-    form = AddressForm(request.POST)
-    if form.is_valid():
-        loc = form.save(commit=False)
-        loc.location_id = None  # 新規作成なのでidは空にする
-        # ここにチェック？
-        serializer = LocationSerializer(loc)
-        return Response(serializer.data, status=200)  # シリアライズしたデータを返す
+            try:
+                loc.clean()  # モデルのバリデーションを実行
+            except ValidationError as e:
+                return Response({"detail": "サーバーで問題が発生しました", "errors": e.messages}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            # saveはしない
+            # loc.save()
+            # シリアライズして返却
+            serializer = LocationSerializer(loc)
+            return Response(serializer.data, status=status.HTTP_200_OK)  # シリアライズしたデータを返す
 
-@api_view(['POST'])
-@authentication_classes([SessionAuthentication])  # セッション認証
-@permission_classes([IsAuthenticated])  # ログイン必須
-def get_current_address(request):
-    form = LocationCoordForm(request.POST)
-    if form.is_valid():
-        loc = form.save(commit=False)
-        
-        lat = form.cleaned_data["lat"]
-        lon = form.cleaned_data["lon"]
-        geo = regeocode(request,lat,lon)
-        loc.state = geo.address.state
-        loc.display = geo.address.display
-        loc.label = geo.address.label
-        loc.location_id = None  # 新規作成なのでidは空にする
-
-        try:
-            loc.clean()  # モデルのバリデーションを実行
-        except ValidationError as e:
-            return Response({"error": "モデルバリデーションエラー", "details": e.messages}, status=400)
-        # saveはしない
-        # loc.save()
-        # シリアライズして返却
-        serializer = LocationSerializer(loc)
-        return Response(serializer.data, status=200)  # シリアライズしたデータを返す
-
-    # フォームが無効な場合、エラーメッセージを返す
-    return Response({"error": "Invalid form data", "errors": form.errors}, status=400)
+        # フォームが無効な場合、エラーメッセージを返す
+        return Response({
+            "detail": "フォームが正しくありません",  # メッセージは detail に入れる
+            "errors": form.errors  # エラー詳細を errors としてそのまま返す
+        }, status=status.HTTP_400_BAD_REQUEST)

@@ -66,6 +66,7 @@ function setup_addressModal($locationForm) {
             })
             .catch(error => {
                 console.error('エラー:', error);
+                alert('エラーが発生しました。再度お試しください。');
             });
     });
 };
