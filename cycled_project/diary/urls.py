@@ -28,14 +28,14 @@ urlpatterns = [
 
     path("map/",views.MapView.as_view(),name="map"),
 
-    path("diary/sendDiaries",views.sendDairies,name="sendDiaries"),
+    # path("diary/sendDiaries",views.sendDairies,name="sendDiaries"),
     # path("diary/photos2Locations",views.photos2Locations,name="photos2Locations"),
     path("diary/photos2Locations",views.Photos2LocationsView.as_view(),name="photos2Locations"),
-    path('diary/delete-all-diaries/', views.delete_all_diaries, name='delete_all_diaries'),
+    # path('diary/delete-all-diaries/', views.delete_all_diaries, name='delete_all_diaries'),
 
-    path('diary/edit-diary-noPK/', views.diary_edit_noPK, name='editDiary_noPK'),
-    path('diary/delete-diary-noPK/', views.diary_delete_noPK, name='deleteDiary_noPK'),
-    path('diary/delete-diary/<uuid:pk>', views.DiaryDeleteView.as_view(), name='deleteDiary'),
+    # path('diary/edit-diary-noPK/', views.diary_edit_noPK, name='editDiary_noPK'),
+    # path('diary/delete-diary-noPK/', views.diary_delete_noPK, name='deleteDiary_noPK'),
+    # path('diary/delete-diary/<uuid:pk>', views.DiaryDeleteView.as_view(), name='deleteDiary'),
 
     # routerで自動的に設定されたURLを含める(API用のURL)
     path('api/', include(router.urls)),

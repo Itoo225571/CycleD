@@ -48,9 +48,6 @@ from pprint import pprint
 logger = logging.getLogger(__name__)
 
 """______Diary関係______"""    
-class MapView(LoginRequiredMixin, generic.TemplateView):
-    template_name="diary/map.html"
-
 @api_view(['POST'])
 @csrf_protect  # CSRF保護を追加
 @authentication_classes([SessionAuthentication])  # セッション認証
