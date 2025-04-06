@@ -7,23 +7,33 @@ $(document).ready(function() {
 });
 
 function logout(url_logout) {
-    if (confirm('ログアウトしますか？')) {
-        $.ajax({
-            url: url_logout,  // AJAXで送信するURL
-            type: 'POST',  // POSTリクエスト
-            headers: {
-                "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンをヘッダーに設定
-            },
-            success: function(response) {
-                if (response && response.status === 'success') {
-                    window.location.href = '/';  // ログアウト後のリダイレクト先
-                } else {
-                    alert('ログアウトに失敗しました');
+    Swal.fire({
+        title: 'ログアウトしますか？',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'はい',
+        cancelButtonText: 'キャンセル',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: url_logout,
+                type: 'POST',
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')
+                },
+                success: function(response) {
+                    window.location.href = '/';
+                },
+                error: function(xhr, errmsg, err) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'ログアウトに失敗しました',
+                        text: '再度お試しください',
+                        confirmButtonText: 'OK'
+                    });
                 }
-            },
-            error: function(xhr, errmsg, err) {
-                alert('エラーが発生しました。再度お試しください。');
-            }
-        });
-    }    
+            });
+        }
+    });
 }

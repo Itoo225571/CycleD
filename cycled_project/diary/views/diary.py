@@ -34,7 +34,6 @@ from subs.photo_info.photo_info import get_photo_info,to_jpeg,to_pHash
 from datetime import timedelta
 import json
 import tempfile
-import uuid
 import os
 import asyncio
 import aiofiles
@@ -48,20 +47,7 @@ from urllib.parse import urlencode
 from pprint import pprint
 logger = logging.getLogger(__name__)
 
-"""______Diary関係______"""
-class CalendarView(LoginRequiredMixin, generic.TemplateView):
-    template_name="diary/calendar.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['mock_uuid'] = uuid.uuid4() # 仮のPK
-        # is_public を HiddenInput にする
-        context['diary'] = DiaryForm(widgets={"is_public": HiddenInput()})
-        
-        context['addressseach_form'] = AddressSearchForm()
-        context['addressselect_form'] = AddressForm()
-        return context
-    
+"""______Diary関係______"""    
 class MapView(LoginRequiredMixin, generic.TemplateView):
     template_name="diary/map.html"
 
