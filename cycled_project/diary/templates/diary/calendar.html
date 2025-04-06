@@ -1,15 +1,9 @@
 {% extends "base.html" %}
-{% load django_bootstrap5 %}
-{% load static %}
-{% load widget_tweaks %}
+{% load static widget_tweaks %}
 
 {% block title %}
-    しんきさくせい
+    カレンダーで記録を確認・編集
 {% endblock title %}
-
-{% block page_title %}
-    {% comment %} <h2 class="justify-content-md-center text-center">日記メニュー</h2> {% endcomment %}
-{% endblock page_title %}
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'diary/css/calendar.css' %}" type="text/css" >
