@@ -31,7 +31,12 @@ $(document).ready(function() {
         event.preventDefault();  // 通常のフォーム送信を防ぐ
 
         if (!formDataCommon) {
-            alert('最初のフォームが送信されていません。');
+            Swal.fire({
+                icon: 'error',
+                title: 'フォームの送信に失敗しました',
+                text: '画面を再度読み込んでください',
+                confirmButtonText: 'OK'
+              });
             return;
         }
         var formData = formDataCommon;  // フォームデータを流用
@@ -43,11 +48,8 @@ $(document).ready(function() {
                 "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンをヘッダーに設定
             },
             success: function(response) {
-                if (response.status == 'success') {
-                    $('.password-reset-field').hide();
-                    $('.password-reset-done-field').show();
-                }
-                else alert(response.message);
+                $('.password-reset-field').hide();
+                $('.password-reset-done-field').show();
             },
             error: function(xhr, status, error) {
                 var response = xhr.responseJSON;

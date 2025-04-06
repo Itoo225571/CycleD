@@ -38,13 +38,13 @@
                                 </a>
                             </span>                        
                         </h6>
-                        <h6 class="class_latest-time">
-                            <span>{{ current.time|date:"G:i" }}</span>
-                        </h6>
+                        <div class="class_current-time">
+                            <span class="fs-2 fw-bold">{{ current.time|date:"G:i" }}</span>
+                        </div>
                     </div>
         
                     <div class="d-flex flex-column text-center mt-5 mb-4">
-                        <h5 class="display-4 mb-0" style="color: #1C2331;">
+                        <h5 class="display-4 mb-0 fw-bold" style="color: #1C2331;">
                             <span class="class_tempareture">
                                 {{ current.temperature }}°C
                             </span>

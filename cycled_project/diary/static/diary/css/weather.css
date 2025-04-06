@@ -12,6 +12,11 @@
 }
 @media (min-width: 1024px) {
     .hours-weather-container td .chance_of_rain {
+        /* Y軸中央揃え */
+        top: 50%;
+        transform: translateY(-50%); /* 要素の高さを考慮して中央に配置 */
+        font-weight: 600;
+
         font-size: 14px;
         padding: 4px 6px;
     }

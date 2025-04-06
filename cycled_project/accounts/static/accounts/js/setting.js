@@ -54,25 +54,40 @@ function toEdit(button) {
 }
 
 function deleteAllDiaries(url_deleteAllDiaries) {
-    if (confirm("本当にすべての日記を削除しますか？")) {
-        // AJAXリクエストを送信
-        $.ajax({
-            url: url_deleteAllDiaries,
-            type: 'POST',
-            headers: {
-                "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンも必要な場合
-            },
-            data: {},
-            success: function(response) {
-                if (response.status === 'success') {
-                    alert(response.message);
-                } else {
-                    alert(response.message);
+    Swal.fire({
+        title: '本当に全ての日記を削除しますか？',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'はい',
+        cancelButtonText: 'キャンセル',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // AJAXリクエストを送信
+            $.ajax({
+                url: url_deleteAllDiaries,
+                type: 'POST',
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンも必要な場合
+                },
+                data: {},
+                success: function(response) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '全ての日記を削除しました',
+                        text: 'バイバイ日記！',
+                        confirmButtonText: 'OK'
+                    });
+                },
+                error: function(xhr, errmsg, err) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'エラーが発生しました',
+                        text: '再度お試しください',
+                        confirmButtonText: 'OK'
+                    });
                 }
-            },
-            error: function(xhr, errmsg, err) {
-                alert('エラーが発生しました。再度お試しください。');
-            }
-        });
-    }
+            });
+        }
+    });
 }
