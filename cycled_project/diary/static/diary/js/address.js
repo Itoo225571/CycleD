@@ -53,9 +53,25 @@ function get_current_address(url_getCurrentPos,href=null) {
                     resolve(response);  // Promiseをresolveしてレスポンスを返す
                 },
                 error: function(xhr, status, error) {
-                    console.error("AJAXエラー:", status, error);  // コンソールに詳細を出力
-                    alert('エラーが発生しました。再度お試しください。');
-                    reject('AJAXエラー');
+                    try {
+                        var responseData = JSON.parse(xhr.responseText);  // レスポンスの内容をJSONとしてパース
+                        if (responseData.detail) {
+                            console.error('エラー詳細:', responseData.detail);  // detailを出力
+                            alert('エラー: ' + responseData.detail);  // ユーザーに詳細を通知
+                        } else {
+                            console.error('エラー詳細がありません');
+                        }
+            
+                        // その他のエラー詳細（例えば errors）があれば処理
+                        if (responseData.errors) {
+                            for (var field in responseData.errors) {
+                                console.error(field + ' エラー:', responseData.errors[field].join(', '));
+                            }
+                        }
+                    } catch (e) {
+                        console.error('レスポンスの解析エラー:', e);
+                    }
+                    reject(error);
                 },
                 complete: function() {
                     finallyCallback(); // 最後に必ず呼ぶ
@@ -84,8 +100,25 @@ function search_address(url_searchAddress,$input) {
                 resolve(response.data_list);  // Promiseをresolveしてデータを返す
             },
             error: function(xhr, status, error) {
-                console.error("AJAXエラー:", status, error);  // コンソールに詳細を出力
-                alert('エラーが発生しました。再度お試しください。');
+                try {
+                    var responseData = JSON.parse(xhr.responseText);  // レスポンスの内容をJSONとしてパース
+                    if (responseData.detail) {
+                        console.error('エラー詳細:', responseData.detail);  // detailを出力
+                        alert('エラー: ' + responseData.detail);  // ユーザーに詳細を通知
+                    } else {
+                        console.error('エラー詳細がありません');
+                    }
+        
+                    // その他のエラー詳細（例えば errors）があれば処理
+                    if (responseData.errors) {
+                        for (var field in responseData.errors) {
+                            console.error(field + ' エラー:', responseData.errors[field].join(', '));
+                        }
+                    }
+                } catch (e) {
+                    console.error('レスポンスの解析エラー:', e);
+                }
+
                 reject(error);  // Promiseをreject
             },
             complete: function() {

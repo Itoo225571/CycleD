@@ -80,9 +80,10 @@ class GoodViewSet(viewsets.ViewSet):
     def toggle(self, request, pk=None):
         diary = get_object_or_404(Diary, diary_id=pk)
 
+        # 公開されていない & 自分の日記じゃない
         if not diary.is_public and diary.user != request.user:
             return Response(
-                {"status": "error", "message": "公開されていない日記にアクセスしています"},
+                {"message": "公開されていない日記にアクセスしています"},
                 status=status.HTTP_403_FORBIDDEN
             )
 
@@ -94,7 +95,7 @@ class GoodViewSet(viewsets.ViewSet):
             liked = True
 
         return Response({
-            "status": "success",
             "liked": liked,
-            "good_count": diary.good.count(),
-        })
+            "good_count": diary.good.count(),},
+            status=status.HTTP_200_OK
+        )

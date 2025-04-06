@@ -36,16 +36,11 @@ $(document).ready(function() {
                 "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンも必要な場合
             },
             success: function(response) {
-                if (response.status === 'success') {
-                    $icon.attr("data-liked", response.liked.toString()); //data-likedを更新
-                } else {
-                    console.error("エラー:", data.message);
-                    $icon.data("liked", liked);  // 元のliked状態に戻す
-                }
+                $icon.attr("data-liked", response.liked.toString()); //data-likedを更新
             },
             error: function(xhr, errmsg, error) {
-                console.error("通信エラー:", error);
-                alert('通信エラーが発生しました。再度お試しください。');
+                console.error("エラー:", error);
+                alert('エラーが発生しました。再度お試しください');
                 $icon.data("liked", originalLiked);  // 元のliked状態に戻す
             }
         });
