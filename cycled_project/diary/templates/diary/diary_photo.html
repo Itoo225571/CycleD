@@ -185,7 +185,7 @@
     <script>
         // DjangoテンプレートタグでURLを埋め込む
         const url_photos2Locations = "{% url 'diary:photos2Locations' %}";
-        const url_sendDiaries = "{% url 'diary:sendDiaries' %}";
+        const url_sendDiaries = "{% url 'diary:diary-list' %}";
         const MAX_LOCATIONS = {{ MAX_LOCATIONS }};
     </script>    
     <script src="{% static 'diary/js/diary_photo.js' %}"></script>

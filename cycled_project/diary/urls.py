@@ -5,6 +5,7 @@ from rest_framework.routers import DefaultRouter
 app_name="diary"
 
 router = DefaultRouter()
+router.register(r'diary',views.DiaryViewSet, basename='diary')
 router.register(r'good', views.GoodViewSet, basename='good')
 
 urlpatterns = [

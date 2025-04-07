@@ -3,6 +3,7 @@ from .address import AddressUserView,AddressSearchView,AddressCurrentPositionVie
 from .base import TopView,CacheMixin
 from .diary import DiaryPhotoView,Photos2LocationsView,DiaryDeleteView
 from .diary import sendDairies,delete_all_diaries,diary_edit_noPK,diary_delete_noPK
+from .diary_v2 import DiaryViewSet
 from .weather import WeatherView
 from .calendar import CalendarView
 from .map import MapView

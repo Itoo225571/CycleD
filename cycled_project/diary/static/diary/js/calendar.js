@@ -1,73 +1,104 @@
-// 祝日データを取得してカレンダーに追加する関数
-function addHolidaysToCalendar() {
-	return fetch('https://holidays-jp.github.io/api/v1/date.json')
-		.then(response => response.json())
-		.then(data => {
-			var events = [];
-			// 取得した祝日データをFullCalendarのイベント形式に変換
-			for (const date in data) {
-				events.push({
-					title: data[date].replace(/ /g, '\n'),  // 祝日名
-					start: date,        // 祝日の日付
-					allDay: true,       // 終日イベントとして設定
-					className: "holiday",
-					holiday: date,
-					display: 'background',
-				});
-			}
-			return events;
-		})
-		.catch(error => {
-			console.error('祝日データの取得に失敗しました:', error);
-			return []; // 失敗時は空の配列を返す
-		});
-}
-
-// Diaryデータを取得してカレンダーに加える関数
-function addDiariesToCalendar() {
-	return fetch(url_sendDiaries)
-        .then(response => response.json())
-        .then(data => {
-            var events = [];
-            // 取得した日記データをFullCalendarのイベント形式に変換
-            data.forEach(diary => {
-				// 最初の地名をタイトルとする
-				let description,locations;
-				if (diary.locations.length > 0){
-					description = diary.locations[0].label;
-					locations = diary.locations;
-				}
-                // Diaryのデータをイベントに追加
-                events.push({
-					diary: diary,
-					locations: locations,
-                    title: '',
-					description: description,
-                    start: diary.date,                     // 日記の日付
-                    allDay: true,                          // 終日イベントとして設定
-                    className: `diary-event diary-rank-${diary.rank}`, // rankを含めたクラス名
-					backgroundColor: 'rgba(255, 255, 255, 0)',  // 背景色を指定
-					borderColor: 'rgba(255, 255, 255, 0)',      // 枠線の色も同じにする場合
-                });
+// 祝日データを取得してカレンダーに追加する非同期関数
+async function addHolidaysToCalendar() {
+    try {
+        const response = await fetch('https://holidays-jp.github.io/api/v1/date.json');
+        const data = await response.json();
+        
+        var events = [];
+        // 取得した祝日データをFullCalendarのイベント形式に変換
+        for (const date in data) {
+            events.push({
+                title: data[date].replace(/ /g, '\n'),  // 祝日名
+                start: date,        // 祝日の日付
+                allDay: true,       // 終日イベントとして設定
+                className: "holiday",
+                holiday: date,
+                display: 'background',
             });
-            return events;
-        })
-        .catch(error => {
-            console.error('データの取得に失敗しました:', error);
-            return []; // 失敗時は空の配列を返す
-        });
+        }
+        
+        return events; // 祝日データを返す
+    } catch (error) {
+        console.error('祝日データの取得に失敗しました:', error);
+        throw new Error('祝日データの取得に失敗しました'); // エラーをスローしてまとめて処理
+    }
 }
 
-// カレンダーにイベントを追加する関数
-function addEventsToCalendar() {
-    // 非同期関数を実行し、すべてのプロミスが解決されるのを待つ
-    return Promise.all([addHolidaysToCalendar(), addDiariesToCalendar()])
-        .then(([holidayEvents, diaryEvents]) => {
-            // イベントを統合
-            const events = [...holidayEvents, ...diaryEvents];
-            return events;
+// 非同期で日記データを取得してカレンダーに追加する関数
+async function addDiariesToCalendar() {
+    try {
+        const response = await fetch(url_sendDiaries);
+		// HTTPステータスコードが204の場合、空のデータを返す
+		if (response.status === 204) {
+			dont_show_again_popup('calendar',{
+				title: '1年以内の日記が存在しません',
+				body: '',
+				icon: 'warning'
+			});
+			dont_show_again_popup('calendar',{
+				title: '日記が存在しません',
+				body: `<a href="${url_createDiaries}">ここから作成</a>`,
+				icon: 'warning'
+			});
+			return [];  // 空の配列を返す
+		}
+        const data = await response.json();
+        
+        var events = [];
+        // 取得した日記データをFullCalendarのイベント形式に変換
+        data.forEach(diary => {
+            let description, locations;
+            
+            if (diary.locations.length > 0) {
+                description = diary.locations[0].label;
+                locations = diary.locations;
+            }
+            
+            // Diaryのデータをイベントに追加
+            events.push({
+                diary: diary,
+                locations: locations,
+                title: '',  // タイトルが空の場合はここで追加しても良い
+                description: description,
+                start: diary.date,  // 日記の日付
+                allDay: true,       // 終日イベントとして設定
+                className: `diary-event diary-rank-${diary.rank}`, // rankを含めたクラス名
+                backgroundColor: 'rgba(255, 255, 255, 0)',  // 背景色を指定
+                borderColor: 'rgba(255, 255, 255, 0)',      // 枠線の色も同じにする場合
+            });
         });
+        
+        return events;  // イベントデータを返す
+    } catch (error) {
+        console.error('データの取得に失敗しました:', error);
+        throw new Error('日記データの取得に失敗しました'); // エラーをスローしてまとめて処理
+    }
 }
+
+// カレンダーにイベントを追加する非同期関数
+async function addEventsToCalendar() {
+    try {
+        // addHolidaysToCalendar と addDiariesToCalendar の非同期結果を待機
+        const [holidayEvents, diaryEvents] = await Promise.all([
+            addHolidaysToCalendar(),
+            addDiariesToCalendar()
+        ]);
+    
+        // 祝日と日記のイベントを統合
+        const events = [...holidayEvents, ...diaryEvents];
+        return events;
+    } catch (error) {
+        // エラーが発生した場合、まとめて表示
+        console.error('イベントの取得に失敗しました:', error);
+        Swal.fire({
+            title: 'エラー',
+            text: error.message,  // エラーメッセージを表示
+            icon: 'error',
+            confirmButtonText: 'OK',
+        });
+        return []; // エラー発生時は空の配列を返す
+    }
+} 
 
 // 日本の年月日に変換する関数
 function formatDateJapanese(dateStr) {
@@ -270,20 +301,38 @@ $(document).ready(function() {
 				const $form = $('#id_diary-form');
 				send_form_ajax($form, event_calendar, false);
 			});
-			$frontContent.find('form').off('submit').on('submit', function(event) {
+			$frontContent.find('#delete-form').on('submit', function(event) {
 				event.preventDefault();
-				var actionURL = $(this).attr('action');
-				if (actionURL.includes('delete-diary')) {
-					if (confirm('本当に削除しますか？')) {
-						if (actionURL.includes(mockUuid)){
-							var uuid = diary.diary_id;
-							actionURL = actionURL.replace(mockUuid, uuid);
-							$(this).attr('action', actionURL);
-							this.submit();  // フォームを送信する
-						} else {
-							console.error('mockIDが含まれていません');
+				if (!confirm('本当に削除しますか？')) return;
+				const form = $(this);
+				const actionURL_mock = form.attr('action');
+				const csrfToken = getCookie('csrftoken');
+
+				if (actionURL_mock.includes(mockUuid)){
+					var uuid = diary.diary_id;
+					var actionURLNew = actionURL_mock.replace(mockUuid, uuid);
+					
+					$.ajax({
+						url: actionURLNew,
+						type: 'POST', // Djangoでは"疑似DELETE"にする
+						headers: {
+						  	'X-CSRFToken': csrfToken
+						},
+						data: {
+						  	_method: 'DELETE' // これはDjango側で読み取る必要あり
+						},
+						success: function(response) {
+							// alert('削除が完了しました');
+							location.reload();	// 削除された後の状態にする
+						},
+						error: function(xhr, status, error) {
+							console.error('削除失敗:', xhr.responseText);
+							alert('削除に失敗しました: ' + xhr.status);
 						}
-					}
+					});
+				} else {
+					console.error('mockIDが含まれていません');
+					alert('再度読み込みを行ってください');
 				}
 			})
 		}

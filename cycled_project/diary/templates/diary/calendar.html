@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static widget_tweaks %}
+{% load static widget_tweaks method_override %}
 
 {% block title %}
     カレンダーで記録を確認・編集
@@ -65,12 +65,11 @@
                                         </button></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
-                                            <form action="{% url 'diary:deleteDiary' mock_uuid %}" method="post">
+                                            <form action="{% url 'diary:diary-detail' mock_uuid %}" method="post" id="delete-form">
                                                 {% csrf_token %}
+                                                {% method_override 'DELETE' %}
                                                 <button type="submit" class="dropdown-item text-danger">
-                                                    <i class="material-icons align-text-bottom fs-5 me-1">
-                                                        delete
-                                                    </i>
+                                                    <i class="material-icons align-text-bottom fs-5 me-1">delete</i>
                                                     削除
                                                 </button>
                                             </form>
@@ -90,7 +89,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body h-100">
-                                <form method="post" id="id_diary-form" action="{% url 'diary:editDiary_noPK' %}">
+                                <form method="post" id="id_diary-form" action="{% url 'diary:diary-detail' mock_uuid %}">
                                     {% csrf_token %}
                                     <div class="diary-edit-container text-center">
                                         <div id="diary-locations-management-field">{{ diary.formset.management_form }}</div>
@@ -157,11 +156,13 @@
     <script src="{% static 'js/pagination.js' %}"></script>
     <script src="{% static 'js/loading_overlay.js' %}"></script>
     <script src="{% static 'js/searchKeys.js' %}"></script>
+    <script src="{% static 'js/popup.js' %}"></script>
     <script src="{% static 'diary/js/check_input.js' %}"></script>
     {% comment %} fullカレンダー {% endcomment %}
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
     <script>
-        const url_sendDiaries = "{% url 'diary:sendDiaries' %}";
+        const url_sendDiaries = "{% url 'diary:diary-list' %}";
+        const url_createDiaries = "{% url 'diary:diary_photo' %}";
         const mockUuid = "{{ mock_uuid }}"; 
     </script>
     <script src="{% static 'diary/js/adjust_imgs.js' %}"></script>
