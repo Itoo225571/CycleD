@@ -18,7 +18,6 @@
 
 {% block content %}
     <div class="container-map">
-        <div id='explanation'></div>
         <div id="mapid"></div>
     </div>
 {% endblock content %}
@@ -32,8 +31,10 @@
     <script src="{% static 'js/pagination.js' %}"></script>
     <script src="{% static 'js/loading_overlay.js' %}"></script>
     <script src="{% static 'js/searchKeys.js' %}"></script>
+    <script src="{% static 'js/popup.js' %}"></script>
     <script>
-        const url_getDiaries = "{% url 'diary:sendDiaries' %}";
+        const url_getDiaries = "{% url 'diary:diary-list' %}";
+        const url_createDiaries = "{% url 'diary:diary_photo' %}";
     </script>
     <script src="{% static 'diary/js/map.js' %}"></script>
 {% endblock %}

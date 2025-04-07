@@ -1,6 +1,6 @@
 $(document).ready(function() {
     var map = make_map();
-    appendLocations(url_getDiaries, map);
+    appendLocations(url_getDiaries,url_createDiaries, map);
 });
 
 function make_map() {
@@ -31,13 +31,26 @@ function make_map() {
     return map;
 }
 
-function appendLocations(url_getDiaries, map) {
+function appendLocations(url_getDiaries,url_createDiaries, map) {
     return $.ajax({
         url: url_getDiaries,
         method: 'GET',
+        data: {
+            filter_days: 365  // ← 直近1年分のデータを取得
+        },
         dataType: 'json',
-        success: function(data) {
-            if (Array.isArray(data)) {
+        success: function(data, textStatus, jqXHR) {
+            // 日記が存在しない
+            if (jqXHR.status === 204) {
+                dont_show_again_popup('map',{
+                    title: '日記が存在しません',
+                    body: `<a href="${url_createDiaries}">ここから作成</a>`,
+                    icon: 'warning'
+                });
+                map.setView([35.6762, 139.6503], 8); // dataが空の場合に東京の座標を指定
+                return;
+            }
+            else {
                 var markers = setLocations(data, map);
                 make_filter(map, markers); // フィルターを追加
             }
@@ -50,11 +63,6 @@ function appendLocations(url_getDiaries, map) {
 
 function setLocations(data, map) {
     var markers = L.markerClusterGroup(); // クラスタグループを作成
-
-    if (!data.length) {
-        map.setView([35.6762, 139.6503], 8); // dataが空の場合に東京の座標を指定
-        $('#explanation').html('<span>1年以内の日記が存在しません</span>');
-    }
 
     data.forEach(function(diary) {
         if (Array.isArray(diary.locations)) {

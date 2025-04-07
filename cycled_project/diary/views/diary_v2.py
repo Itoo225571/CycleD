@@ -2,7 +2,7 @@ from django.utils import timezone
 
 from rest_framework import viewsets,status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,BasePermission
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
@@ -12,7 +12,16 @@ from ..serializers import DiarySerializer,LocationSerializer
 
 import datetime
 
-class DiaryViewSet(viewsets.ViewSet):
+class IsOwner(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.user == request.user  # オブジェクトの所有者がリクエストユーザーと一致するか
+
+class DiaryViewSet(viewsets.ModelViewSet):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated, IsOwner]
+    queryset = Diary.objects.all()  # ModelViewSetの場合、querysetを指定しておくと便利
+    serializer_class = DiarySerializer
+
     # 一覧の取得
     def list(self, request):
         # クエリパラメータ 'filter_days' を取得(ない場合はここ1年のDiaryを取得する)
@@ -34,27 +43,3 @@ class DiaryViewSet(viewsets.ViewSet):
             )
         serializer = DiarySerializer(diaries, many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
-
-    # 更新
-    def update(self, request, pk=None):
-        try:
-            diary = Diary.objects.get(diary_id=pk,user=request.user)
-        except Diary.DoesNotExist:
-            raise NotFound("指定された日記が見つかりません")
-        serializer = DiarySerializer(diary, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    # 削除
-    def destroy(self, request, pk=None):
-        try:
-            diary = Diary.objects.get(diary_id=pk,user=request.user)
-        except Diary.DoesNotExist:
-            raise NotFound("指定された日記が見つかりません")
-        diary.delete()
-        return Response(
-            {'detail': '日記を削除しました'},
-            status=status.HTTP_204_NO_CONTENT
-        )

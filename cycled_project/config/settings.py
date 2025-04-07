@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     'django_user_agents', # user-agents導入
 
     'rest_framework',
+    'method_override',
 ]
 
 SITE_ID = 1
@@ -99,6 +100,8 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',#session機能
     'allauth.account.middleware.AccountMiddleware',
     'django_user_agents.middleware.UserAgentMiddleware', # user-agent機能
+    # 'django.middleware.http.HttpMethodOverrideMiddleware',
+    'method_override.middleware.MethodOverrideMiddleware',  #method override用
 ]
 
 ROOT_URLCONF = "config.urls"
