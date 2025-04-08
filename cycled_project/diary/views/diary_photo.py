@@ -13,17 +13,7 @@ from django.core.exceptions import ValidationError,ObjectDoesNotExist
 from django.contrib import messages
 from django.core.cache import cache
 from django.utils import timezone
-from django.db.models import Prefetch
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_protect
-from django.forms import HiddenInput
 
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from rest_framework.authentication import SessionAuthentication
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-
-from ..forms import DiaryForm,DiaryDynamicForm
 from ..forms import AddressSearchForm,AddressForm,LocationFormSet,DiaryFormSet,PhotosForm
 from ..models import Diary,Location,TempImage,Good
 from ..serializers import DiarySerializer,LocationSerializer
@@ -46,112 +36,6 @@ import io
 from urllib.parse import urlencode
 from pprint import pprint
 logger = logging.getLogger(__name__)
-
-"""______Diary関係______"""    
-@api_view(['POST'])
-@csrf_protect  # CSRF保護を追加
-@authentication_classes([SessionAuthentication])  # セッション認証
-@permission_classes([IsAuthenticated])  # ログイン必須
-def diary_edit_noPK(request):
-    date = request.POST.get('date')
-    if not date:
-        return JsonResponse({"success": False, "errors": "日にちが含まれていません"})
-    
-    form_diary = DiaryForm()
-    field_names_diary = [field for field in form_diary.fields if field in request.POST]
-
-    diary = get_object_or_404(Diary, date=date, user=request.user)
-    # form = DiaryForm(request.POST, instance=diary, request=request)
-    if field_names_diary:
-        form = DiaryDynamicForm(request.POST, dynamic_fields=field_names_diary, instance=diary)
-    formset = LocationFormSet(request.POST, queryset=diary.locations.all(), instance=diary)
-
-    if formset.is_valid():
-        if form.is_valid() and field_names_diary:
-            diary = form.save(commit=False)
-            diary.save()  # Diaryを更新して保存
-
-        # フォームセットの保存処理
-        formset.save()
-        diary_data = DiarySerializer(diary).data
-        return JsonResponse({"success": True, "message": "更新が完了しました。","diary":diary_data})
-        # return JsonResponse({"success": None})
-    else:
-        error = {}
-        error['Diary'] = form.errors
-        error['Locations'] = formset.errors
-        return JsonResponse({"success": False, "errors": error})
-
-# ajaxでDiary日情報を送る用の関数
-@api_view(['GET'])
-@login_required
-def sendDairies(request):
-    # クエリパラメータ 'filter_days' を取得
-    filter_days = request.GET.get('filter_days', 365)
-
-    # Diaryをコンテキストに含める
-    # すべてのDiaryと関連するLocationを一度に取得
-    current_date = now().date()
-    one_year_ago = current_date - timedelta(days=int(filter_days))
-    diaries = Diary.objects.prefetch_related('locations').filter(
-        date__gte=one_year_ago,
-        date__lte=current_date,
-        user=request.user,
-    )
-    serializer = DiarySerializer(diaries, many=True)
-    return Response(serializer.data)
-
-# ログインしているユーザー本人のすべての日記を削除
-@api_view(['POST'])
-@authentication_classes([SessionAuthentication])  # セッション認証
-@permission_classes([IsAuthenticated])  # ログイン必須
-@csrf_protect  # CSRF保護を追加
-def delete_all_diaries(request):
-    try:
-        # リクエストユーザーのすべての日記を取得
-        diaries = Diary.objects.filter(user=request.user)
-        if diaries.exists():
-            # 日記があれば削除
-            diaries.delete()
-            msg = '全ての日記を削除しました'
-            status = 'success'
-        else:
-            # 日記が存在しない場合
-            msg = '日記が存在しませんでした'
-            status = 'error'
-        return JsonResponse({"status": status, "message": msg})
-
-    except ObjectDoesNotExist:
-        # オブジェクトが見つからないエラー処理
-        return JsonResponse({"status": "error", "message": "データベースエラーが発生しました"})
-    except Exception as e:
-        # その他の例外処理
-        return JsonResponse({"status": "error", "message": str(e)})
-
-@api_view(['POST'])
-@csrf_protect  # CSRF保護を追加
-@authentication_classes([SessionAuthentication])  # セッション認証
-@permission_classes([IsAuthenticated])  # ログイン必須
-def diary_delete_noPK(request):
-    pk = request.POST.get('')
-    diary = get_object_or_404(Diary, pk=pk, user=request.user)
-    if diary:
-        msg = f'{diary.date}の日記を削除しました'
-        diary.delete()  # 日記を全て削除
-    else:
-        msg = '日記が存在しませんでした'
-    return Response({"status": "success", "message": msg})
-
-class DiaryDeleteView(LoginRequiredMixin,generic.DeleteView):
-    model = Diary
-    def get_queryset(self):
-        # ログインユーザーが所有している日記だけを取得
-        return Diary.objects.filter(user=self.request.user)
-    def get_success_url(self):
-        # ここで get_object を使用して diary_date を取得
-        diary = self.get_object()
-        query_params = urlencode({'diary_date': diary.date.strftime("%Y-%m")})
-        return f"{reverse('diary:calendar')}?{query_params}"    
 
 class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
     template_name ="diary/diary_photo.html"

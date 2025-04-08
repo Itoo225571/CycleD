@@ -12,7 +12,8 @@ class CalendarView(LoginRequiredMixin, generic.TemplateView):
         context = super().get_context_data(**kwargs)
         context['mock_uuid'] = uuid.uuid4() # 仮のPK
         # is_public を HiddenInput にする
-        context['diary'] = DiaryForm(widgets={"is_public": HiddenInput()})
+        # context['diary'] = DiaryForm(widgets={"is_public": HiddenInput()})
+        context['diary'] = DiaryForm()
         
         context['addressseach_form'] = AddressSearchForm()
         context['addressselect_form'] = AddressForm()

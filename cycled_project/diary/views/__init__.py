@@ -1,8 +1,7 @@
 from .address import AddressUserView,AddressSearchView,AddressCurrentPositionView
 # from .address import address_search,get_current_address
 from .base import TopView,CacheMixin
-from .diary import DiaryPhotoView,Photos2LocationsView,DiaryDeleteView
-from .diary import sendDairies,delete_all_diaries,diary_edit_noPK,diary_delete_noPK
+from .diary_photo import DiaryPhotoView,Photos2LocationsView
 from .diary_v2 import DiaryViewSet
 from .weather import WeatherView
 from .calendar import CalendarView

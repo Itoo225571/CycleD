@@ -283,7 +283,6 @@ $(document).ready(function() {
 			initDiaryEdit(event_calendar,diary);
 			$frontContent.find('.button-to-edit').off('click').on('click', function() {
 				const editContent = this.getAttribute('data-edit-content');
-				limit_display(editContent);
 				initDiaryEdit(event_calendar,diary);
 
 				// submitのnameを編集対象にする
@@ -301,68 +300,95 @@ $(document).ready(function() {
 				const $form = $('#id_diary-form');
 				send_form_ajax($form, event_calendar, false);
 			});
-			$frontContent.find('#delete-form').on('submit', function(event) {
+			$frontContent.find('#delete-form').on('submit', function(event){
 				event.preventDefault();
-				if (!confirm('本当に削除しますか？')) return;
-				const form = $(this);
-				const actionURL_mock = form.attr('action');
-				const csrfToken = getCookie('csrftoken');
+				Swal.fire({
+					title: '本当に削除しますか？',
+					text: "この操作は取り消せません。",
+					icon: 'warning',
+					showCancelButton: true,
+					confirmButtonText: 'OK',
+					cancelButtonText: 'Cancel',
+					reverseButtons: true
+				}).then((result) => {
+					if (!result.isConfirmed) return;
+					const form = $(this);
+					const actionURL_mock = form.attr('action');
+					const csrfToken = getCookie('csrftoken');
 
-				if (actionURL_mock.includes(mockUuid)){
-					var uuid = diary.diary_id;
-					var actionURLNew = actionURL_mock.replace(mockUuid, uuid);
-					
-					$.ajax({
-						url: actionURLNew,
-						type: 'POST', // Djangoでは"疑似DELETE"にする
-						headers: {
-						  	'X-CSRFToken': csrfToken
-						},
-						data: {
-						  	_method: 'DELETE' // これはDjango側で読み取る必要あり
-						},
-						success: function(response) {
-							// alert('削除が完了しました');
-							location.reload();	// 削除された後の状態にする
-						},
-						error: function(xhr, status, error) {
-							console.error('削除失敗:', xhr.responseText);
-							alert('削除に失敗しました: ' + xhr.status);
-						}
-					});
-				} else {
-					console.error('mockIDが含まれていません');
-					alert('再度読み込みを行ってください');
-				}
-			})
+					if (actionURL_mock.includes(mockUuid)){
+						var uuid = diary.diary_id;
+						var actionURLNew = actionURL_mock.replace(mockUuid, uuid);
+						
+						$.ajax({
+							url: actionURLNew,
+							type: 'POST', // Djangoでは"疑似DELETE"にする
+							headers: {
+								'X-CSRFToken': csrfToken
+							},
+							data: {
+								_method: 'DELETE' // これはDjango側で読み取る必要あり
+							},
+							success: function(response) {
+								// alert('削除が完了しました');
+								Swal.fire({
+									title: '削除に成功しましたぁ!',
+									icon: 'success',
+									timer: 1500,
+									showConfirmButton: false
+								}).then(() => {
+									// Swal が閉じられた後にページをリロード
+									location.reload();
+								});
+							},
+							error: function(xhr, status, error) {
+								console.error('削除失敗:', xhr.responseText);
+								Swal.fire({
+									title: '削除に失敗しました',
+									text: 'エラーコード: ' + xhr.status,  // xhr.status を表示
+									icon: 'error',
+									confirmButtonText: '閉じる'
+								});
+							}
+						});
+					} else {
+						console.error('mockIDが含まれていません');
+						alert('再度読み込みを行ってください');
+					}
+				});
+			});
 		}
 		
 		function initDiaryEdit(event_calendar,diary) {
 			const $backContent = $('#diaryModal').find('.modal-content.flip-back');
 			// $backContent.find('.diary-thumbnail-background').css({'transform': `rotate(0deg)`,});	//角度を初期化
 
+			// 日付を表示
 			$backContent.find('.modal-title').html(`<span id="selectedDate-back">${formatDateJapanese(diary.date)}</span>`);
 			var locations = diary.locations;
+			// サムネイル用の画像
 			var loc_thumbnail = locations.filter(location => location.is_thumbnail === true)[0];
 			locations = locations.filter(location => location.is_thumbnail !== true);
 			locations.unshift(loc_thumbnail);
 
 			// 初期値
 			$('#id_comment').val(diary.comment);
-			$('#id_date').val(diary.date);
-			// 表のアイコンも合わせる
+			// $('#id_date').val(diary.date);
 			$('#id_is_public').val(diary.is_public);
 			// $frontContent.find('.icon-visibility').attr('data-visible', diary.is_public);
 
-			const form_comment = $('#id_comment');	//先にfield取得を行わなければdiaryEdit内にあったときに消える
 			// Management関連
 			$('#id_locations-TOTAL_FORMS').val(diary.locations.length);
 			$('#id_locations-INITIAL_FORMS').val(diary.locations.length);
 
 			var diaryEditHtml = '';
 			locations.forEach((location, index) => {
-				var location_base = $('#empty-form-locations').clone();
-				location_base.find('input').each(function() {
+				var $location_base = $('#empty-form-locations').clone();
+				// HTMLの中にある全ての __prefix__ を index に置換
+				$location_base.html($location_base.html().replace(/__prefix__/g, index));
+				// radiobuttonグループからclone元を省く
+				$location_base.html($location_base.html().replace(/__empty__/g, ''));
+				$location_base.find('input').not('[type="radio"]').each(function() {
 					let $input = $(this);
 					let name = $input.attr('name');
 					name = name.replace('locations-__prefix__-', '');
@@ -373,28 +399,22 @@ $(document).ready(function() {
 					}
 					$input.attr('type', 'hidden');
 				});
-				var isChecked = location.is_thumbnail ? 'checked' : '';
-				var radioButtonHtml = `
-				    <input class="diary-location-radiobutton visually-hidden" 
-						type="radio" id="location-edit-__prefix__-thumbnail" 
-						name="locationRadiobuttonEdit" ${isChecked}>
-					<label for="location-edit-__prefix__-thumbnail" class="location-label w-100 text-start"></label>
-				`;
-				location_base.find('.diary-location-item').append(radioButtonHtml);
-				location_base.find('.location-img-url').val(location.image);
-				location_base.find('.location-label').html(`<text>${location.label}</text>`);
+				$location_base.find('.location-img-url').val(location.image);
+				$location_base.find('.location-list-label-display').html(`<text>${location.label}</text>`);
 				if (location.is_thumbnail) {
-					location_base.find('.diary-location-radiobutton').prop('checked', true);
-					$backContent.find('.diary-thumbnail').attr('src', location.image);
+					// attrで直接checkedをつける
+					$location_base.find('.diary-location-radiobutton').prop('checked', true).attr('checked', 'checked');
+
+					// サムネイルをセット
+					$backContent.find('img.diary-thumbnail').attr('src', location.image);
 					$backContent.find('.diary-thumbnail-background').css({'transform': `rotate(${location.rotate_angle}deg)`,});	//角度を初期化
 				}
 
-				diaryEditHtml += location_base.html().replace(/__prefix__/g, `${index}`);
+				diaryEditHtml += $location_base.html().replace(/__prefix__/g, `${index}`);
 			});
 			
-			$backContent.find('.diary-locations-field').html(diaryEditHtml);
+			$backContent.find('.dairy-location-label-field').html(diaryEditHtml);
 			// $backContent.find('.diary-comment-field').html(form_comment);
-			set_label_field(); //label編集周りの初期化
 
 			$backContent.find('.diary-location-radiobutton').on('change', function() {
 				var $checkedLocation = $(this).closest('.diary-location-item');
@@ -438,12 +458,83 @@ $(document).ready(function() {
 				send_form_ajax($form,event_calendar);
 			});
 
-			function set_label_field() {
-				const $locations_field = $backContent.find('.diary-locations-field');
-				const $labels_field = $backContent.find('.diary-labels-field');
-				// 既存のラベルフィールドをクリア
-				$labels_field.empty();
-				$labels_field.html('<div class="text-center"><img class="diary-image fade-anime mb-3" loading="lazy"></div>');
+			// label変更ボタン
+			$backContent.find('.diary-location-item').find('.button-edit-location-label').off('click').on('click', function(e) {
+				const $location = $(this).closest('.diary-location-item');
+				const $surface = $location.find('.location-list-label-display text');
+				const $radioButton = $location.find('.diary-location-radiobutton');
+				const $label_input = $location.find('.class_locations-label');
+				// var $surface = $radioButton.find('.location-label-surface');
+				// 一旦全てリセット
+				$(this).closest('.dairy-location-label-field').find('.diary-location-item').each(function(e) {
+					const $surface = $(this).find('.location-list-label-display text');
+					const $label_input = $(this).find('.class_locations-label');
+					$label_input.attr('type', 'hidden');
+					$surface.show();  // textを表示
+				})
+				if ($surface.is(':visible')) {
+					$surface.hide();  // textを隠す
+					$label_input.attr('type', 'text');
+					$label_input.val(''); // 中身を削除
+					$label_input.focus(); // 入力フィールドにフォーカスを当てる
+					if (!$radioButton.is(':checked')) {
+						$radioButton.prop('checked', true);
+						$radioButton.trigger('change');
+					}
+				} else {
+					if ($label_input.val()) {
+						// labelinputのcopyの変化は surfave,inputどちらにも反映
+						$surface.text($label_input.val());
+						$label_input.val($label_input.val());
+					}
+					$label_input.attr('type', 'hidden');
+					$surface.show();  // textを表示
+				}
+				$label_input.on('change', function() {
+					// labelinputの変化はsurfaceのみに反映
+					$surface.text($(this).val());
+				});
+			});
+			// label変更ボタン以外が押されたら戻る
+			$backContent.find('.dairy-location-label-field').find('button').not('.button-edit-location-label').on('click', function() {
+				// 全てのinputを非表示,surfaceを表示する
+				const $location = $(this).closest('.diary-location-item');
+				$location.find('.class_locations-label').attr('type','hidden');
+				$location.find('.location-list-label-display text').show();
+			});
+
+			// Location削除
+			$backContent.find('.dairy-location-label-field').find('.button-delete-location').off('click').on('click', function(e){
+				const $container = $(this).closest('.dairy-location-label-field');
+				const $location = $(this).closest('.diary-location-item');
+				const $radioButton = $location.find('.diary-location-radiobutton');
+				
+				const $delete_inputs = $container.find('*[id^="id_locations"][id$="DELETE"]');
+				const $delete_input = $location.find('*[id^="id_locations"][id$="DELETE"]');
+				const count = $delete_inputs.filter(function() {
+					return $(this).val() === 'false' || $(this).val() === '' || $(this).val() == null;
+				}).length;
+				if (count > 1) {
+					$delete_input.val(true);
+					$location.hide();
+					// チェック移動
+					if ($radioButton.is(':checked')) {
+						var $nextRadiobutton = $container.find('.diary-location-item').filter(':visible').not($location).eq(0).find('.diary-location-radiobutton');
+						$nextRadiobutton.prop('checked', true);
+						$nextRadiobutton.trigger('change');
+					}
+				} else {
+					alert('これ以上は削除できませんよ');
+				}
+			});
+			// 住所変更
+			$backContent.find('.dairy-location-label-field').find('.button-edit-addressSearchModal').off('click').on('click', function(){
+				const $location = $(this).closest('.diary-location-item');
+				setup_addressModal($location);
+			});
+
+			function init_location_btns() {
+				const $locations_field = $backContent.find('.dairy-location-label-field');
 
 				$locations_field.children().each(function (index, locationForm) {
 					const imgSrc = $(locationForm).find('.location-img-url').val();
@@ -542,35 +633,6 @@ $(document).ready(function() {
 							change_label_edit();
 						}
 					});
-					function change_label_edit(){
-						var $surface = $radioButton.find('.location-label-surface');
-						if ($surface.is(':visible')) {
-							$surface.hide();  // textを隠す
-							$label_input_copy.attr('type', 'text');
-							$label_input_copy.val(''); // 中身を削除
-							$label_input_copy.focus(); // 入力フィールドにフォーカスを当てる
-							if (!$radioButton.find('.diary-location-label-radiobutton').is(':checked')) {
-								$radioButton.find('.diary-location-label-radiobutton').prop('checked', true);
-								$radioButton.find('.diary-location-label-radiobutton').trigger('change');
-							}
-						} else {
-							// labelinputのcopyの変化は surfave,inputどちらにも反映
-							$surface.text($label_input_copy.val());
-							$label_input.val($label_input_copy.val());
-							$label_input_copy.attr('type', 'hidden');
-							$surface.show();  // textを表示
-						}
-					}
-					$label_input.on('change', function() {
-						// labelinputの変化はsurfaceのみに反映
-						var $surface = $radioButton.find('.location-label-surface');
-						$surface.text($(this).val());
-					});
-					$radioButton.find('button').not('.button-edit-location-label').on('click', function() {
-						// 全てのinputを非表示,surfaceを表示する
-						$labels_field.find('.label-input-copy').attr('type','hidden');
-						$labels_field.find('.location-label-surface').show();
-					});
 
 					$labels_field.append($radioButton);
 				});
@@ -579,7 +641,7 @@ $(document).ready(function() {
 		
 		function send_form_ajax($form, event_calendar, is_flip_card = true) {
 			const $backContent = $('#diaryModal').find('.modal-content.flip-back');
-			
+			console.log($form.serialize())
 			$.ajax({
 				method: $form.prop("method"),
 				url: $form.prop("action"),
@@ -667,25 +729,4 @@ function flip_card(button){
 
 function convertLineBreaks(text) {
     return text.replace(/\n/g, "<br>");  // 改行文字を <br> に変換
-}
-
-function limit_display(content_name) {
-	const $editContainer = $('#diaryModal').find('.modal-content.flip-back').find('.diary-edit-container');
-	if ($editContainer) {
-		$editContainer.children().each(function(index, element) {
-			const $child = $(element);
-			// content name がedit contentに含まれているかチェック
-			var name = $child.data('edit-content');
-			if (name && name.includes(content_name)) {
-				$child.show();
-			}
-			else {
-				$child.hide();
-			}
-		});
-	}
-	else {
-		console.log('全ての要素を表示します');
-		$editContainer.children().show();
-	}
 }

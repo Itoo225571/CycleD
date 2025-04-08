@@ -21,6 +21,7 @@ class LocationSerializer(serializers.ModelSerializer):
             'is_thumbnail',
             'rotate_angle',
         ]
+        read_only_fields = ['location_id','image','image_hash','diary','is_home']
 
 class DiarySerializer(serializers.ModelSerializer):
     locations = LocationSerializer(many=True, read_only=True)
@@ -34,3 +35,4 @@ class DiarySerializer(serializers.ModelSerializer):
             'rank',
             'is_public',
         ]
+        read_only_fields = ['diary_id','date','rank']

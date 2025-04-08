@@ -83,21 +83,26 @@
 }
 
 /**** 編集 ****/
-.diary-edit-container .diary-comment-content textarea{
+.diary-edit-container .diary-comment-field textarea{
     background-color: #f8f9fa; /* 薄い背景色 */
     box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.1); /* 内側に影 */
     border-radius: 5px; /* 角を丸く */
     padding: 5px 7px;
 }
 .diary-edit-container .diary-thumbnail-field {
-    height: 250px;
-    width: 250px;
     position: relative; /* 画像の親要素を相対位置に設定 */
     display: flex;
-    justify-content: space-between; /* 画像を中央に、ボタンを右端に配置 */
+    justify-content: center;
 }
-.diary-edit-container .diary-thumbnail-background,
-.diary-edit-container .diary-thumbnail {
+/* 回転ボタンのみを右寄せで配置 */
+.diary-edit-container .diary-thumbnail-field .diary-img-rotate-button{
+    position: absolute;
+    right: 10px;
+    background-color: rgba(255, 255, 255, 0.25);
+    font-size: 24px;
+}
+
+.diary-edit-container .diary-thumbnail-background{
     max-height: 100%;
     max-width: 100%;
     aspect-ratio: 1/1;
