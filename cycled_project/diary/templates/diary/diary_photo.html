@@ -115,13 +115,13 @@
             </div>
         </div>
         <div id="empty-form-location" style="display:none;">
-            <div class="d-flex justify-content-between w-100">
-                {% for field in location_formset.empty_form %}
-                    {% if field.name != 'label' %}
-                        {{ field }}
-                    {% endif %}
-                {% endfor %}
-                <div class="location-surface-field flex-grow-1">
+            {% for field in location_formset.empty_form %}
+                {% if field.name != 'label' %}
+                    {{ field }}
+                {% endif %}
+            {% endfor %}
+            <div class="w-100">
+                <div class="location-surface-field d-flex">
                     <div class="input-group d-flex align-items-center">
                         <div class="location-list-label-display w-100"></div>
                         {{ location_formset.empty_form.label|add_class:"w-100 form-control class_locations-label"}}
@@ -129,18 +129,17 @@
                             <span>場所を指定する</span>
                         </button>
                     </div>
+                    <button type="button" class="button-edit-location-label button-text d-flex align-items-center" onclick="edit_location(this)" style="font-size: 24px;">
+                        <i class="iconify text-dark" data-icon="bx:rename"></i>
+                    </button>
                 </div>
-                <div class="location-buttons-field">
-                    <div class="d-flex align-items-center" style="font-size: 20px;"> <!-- d-flex と gap-3 を追加 -->
-                        <button type="button" class="button-edit-addressSearchModal button-text px-1 d-flex align-items-center">
+                <div class="location-buttons-field pt-2 d-flex justify-content-end">
+                    <div class="d-flex align-items-center" style="font-size: 24px;"> <!-- d-flex と gap-3 を追加 -->
+                        <button type="button" class="button-edit-addressSearchModal button-text pe-2 d-flex align-items-center">
                             <i class="iconify text-primary" data-icon="material-symbols:edit-location-alt-outline-rounded"></i>
                         </button>
                         
-                        <button type="button" class="button-edit-location-label button-text px-1 d-flex align-items-center" onclick="edit_location(this)">
-                            <i class="iconify text-dark" data-icon="bx:rename"></i>
-                        </button>
-                        
-                        <button type="button" class="button-delete-location button-text px-1 d-flex align-items-center">
+                        <button type="button" class="button-delete-location button-text d-flex align-items-center">
                             <i class="iconify text-danger" data-icon="material-symbols:delete-outline-rounded"></i>
                         </button>
                     </div>

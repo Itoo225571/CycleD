@@ -106,7 +106,8 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="button-delete-all-diaries text-danger" role="button" data-url="{% url 'diary:delete_all_diaries' %}">
+                        {% comment %} <td class="button-delete-all-diaries text-danger" role="button" data-url="{% url 'diary:delete_all_diaries' %}"> {% endcomment %}
+                        <td class="button-delete-all-diaries text-danger" role="button" data-url="#">
                             日記をすべて削除する
                         </td>
                     </tr>

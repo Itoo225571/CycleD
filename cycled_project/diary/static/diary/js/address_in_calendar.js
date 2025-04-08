@@ -30,6 +30,9 @@ function setup_addressModal($locationForm) {
                 $(input).trigger('change');  // change イベントを発生させる
             }            
         });
+        var $surface = $locationForm.find('.location-list-label-display text');
+        var label = searchKeys(location,'label');
+        $surface.text(label);
         $modal.modal('hide');
         $diary_modal.modal('show');
         return
