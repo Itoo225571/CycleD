@@ -48,6 +48,7 @@ def update_cache_on_create_or_update(sender, instance, created, **kwargs):
     cache_key = f'diaries_{instance.user.id}'
     cache.delete(cache_key)  # Diaryが作成または更新されたときにキャッシュを削除
 
+
 @receiver(post_delete, sender=Diary)
 def update_cache_on_delete(sender, instance, **kwargs):
     # キャッシュを削除する
