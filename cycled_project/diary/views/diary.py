@@ -10,7 +10,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.views import APIView
 
 from ..models import Diary,Location,TempImage
-from ..forms import DiaryForm,LocationFormSet
+from ..forms import DiaryEditForm,LocationEditFormSet
 from ..serializers import DiarySerializer,LocationSerializer
 
 import datetime
@@ -60,10 +60,10 @@ class DiaryViewSet(mixins.ListModelMixin,
 
 class DiaryUpdateAPIView(APIView):
     def post(self, request, pk):
-        diary = get_object_or_404(Diary, pk=pk)
+        diary = get_object_or_404(Diary, pk=pk, user=request.user)
         locations = Location.objects.filter(diary=diary)
-        diaryForm = DiaryForm(request.POST, instance=diary, request=request)
-        locationFormset = LocationFormSet(request.POST, queryset=locations,instance=diary, prefix='locations')
+        diaryForm = DiaryEditForm(request.POST, instance=diary)
+        locationFormset = LocationEditFormSet(request.POST, queryset=locations,instance=diary, prefix='locations')
         # locationFormset.instance = diary  # ← これが重要
         if diaryForm.is_valid() and locationFormset.is_valid():
             # フォームが有効ならデータを保存

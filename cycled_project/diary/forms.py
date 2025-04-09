@@ -79,11 +79,26 @@ class LocationForm(forms.ModelForm):
         if phash in phash_all:
             self.add_error("image","同じ画像が既に存在します。")
         return data
-            
 LocationFormSet = forms.inlineformset_factory(
         Diary,
         Location,
         form=LocationForm,
+        extra=0,
+        can_delete=True,
+        max_num=50,
+        validate_max=True,
+        min_num=0,
+        validate_min=True,
+)
+
+class LocationEditForm(forms.ModelForm):
+    class Meta:
+        model = Location
+        fields = ["lat","lon","state","display","label","is_thumbnail","rotate_angle",]
+LocationEditFormSet = forms.inlineformset_factory(
+        Diary,
+        Location,
+        form=LocationEditForm,
         extra=0,
         can_delete=True,
         max_num=50,
@@ -139,6 +154,44 @@ class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):
                 self.add_error('date',"この日時の日記はすでに存在します。")
         return date
     
+    def clean(self):
+        cleaned_data = super().clean()
+        # フォームセットのバリデーションを実行
+        formset_valid = self.formset.is_valid()
+        # フォームセットのエラーをフォームに追加する
+        if not formset_valid:
+            non_form_errors = self.formset.non_form_errors()
+            if non_form_errors:
+                for error in non_form_errors:
+                    self.add_error(None, error)
+            for form in self.formset:
+                for error in form.non_field_errors():
+                    self.add_error(None, error)
+        # 少なくとも1つのフォームが有効であることを確認
+        has_valid_data = any(form.cleaned_data for form in self.formset)
+        if not has_valid_data:
+            self.add_error(None, "少なくとも1つのロケーションを追加してください。")
+        return cleaned_data
+
+class DiaryEditForm(ModelFormWithFormSetMixin, forms.ModelForm):
+    formset_class = LocationEditFormSet
+    class Meta:
+        model = Diary
+        fields = ["comment", "is_public"]
+        labels = {
+            "comment": "コメント",
+        }
+        help_texts = {
+            "comment": "",
+        }
+        widgets = {
+            'comment': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'コメントを入力してください',
+                'style': 'resize: none; width: 100%;',
+                'oninput': 'checkLineLimit(this)',
+            }),
+        }
     def clean(self):
         cleaned_data = super().clean()
         # フォームセットのバリデーションを実行
