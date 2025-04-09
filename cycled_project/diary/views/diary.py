@@ -35,29 +35,7 @@ class DiaryViewSet(mixins.ListModelMixin,
             return base_qs.filter(date__gte=one_year_ago)
         return base_qs
 
-    # def update(self, request, *args, **kwargs):
-    #     # 受け取ったPUTデータの確認
-    #     # print("受け取ったPUTデータ:", request.data)
-
-    #     # Diaryのインスタンスを取得
-    #     instance = self.get_object()
-
-    #     # シリアライザにデータを渡す
-    #     serializer = self.get_serializer(instance, data=request.data, partial=True)
-
-    #     # シリアライザの検証
-    #     if serializer.is_valid():
-    #         location_serializer = LocationSerializer(location_instance, data=request.data, partial=True)
-    #         if location_serializer.is_valid():
-    #             location_serializer.save()
-
-    #         # Diaryを保存
-    #         serializer.save()
-
-    #         return Response(serializer.data)
-    #     else:
-    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+# updateのみはこちらでやる
 class DiaryUpdateAPIView(APIView):
     def post(self, request, pk):
         diary = get_object_or_404(Diary, pk=pk, user=request.user)
