@@ -461,14 +461,15 @@ $(document).ready(function() {
 			});
 
 			// label変更ボタン
-			$backContent.find('.diary-location-item').find('.button-edit-location-label').off('click').on('click', function(e) {
+			var $locations = $backContent.find('.diary-location-item');
+			$locations.find('.button-edit-location-label').off('click').on('click', function(e) {
 				const $location = $(this).closest('.diary-location-item');
 				const $surface = $location.find('.location-list-label-display text');
 				const $radioButton = $location.find('.diary-location-radiobutton');
 				const $label_input = $location.find('.class_locations-label');
 				// var $surface = $radioButton.find('.location-label-surface');
 				// 一旦全てリセット
-				$(this).closest('.diary-location-label-field').find('.diary-location-item').each(function(e) {
+				$locations.not($location).each(function(e) {
 					const $surface = $(this).find('.location-list-label-display text');
 					const $label_input = $(this).find('.class_locations-label');
 					$label_input.attr('type', 'hidden');
