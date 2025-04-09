@@ -293,13 +293,13 @@ $(document).ready(function() {
 			});
 
 			// 公開・非公開設定の切り替え
-			$frontContent.find('.button-to-toggle-ispublic').off('click').on('click', function(event) {
-				const $is_public = $('#id_is_public');
-				$is_public.val($is_public.val() === 'true' ? 'false' : 'true');
+			// $frontContent.find('.button-to-toggle-ispublic').off('click').on('click', function(event) {
+			// 	const $is_public = $('#id_is_public');
+			// 	$is_public.val($is_public.val() === 'true' ? 'false' : 'true');
 
-				const $form = $('#id_diary-form');
-				send_form_ajax($form, event_calendar, false);
-			});
+			// 	const $form = $('#id_diary-form');
+			// 	send_form_ajax($form, event_calendar,diary, false);
+			// });
 			$frontContent.find('#delete-form').on('submit', function(event){
 				event.preventDefault();
 				Swal.fire({
@@ -373,7 +373,7 @@ $(document).ready(function() {
 
 			// 初期値
 			$('#id_comment').val(diary.comment);
-			// $('#id_date').val(diary.date);
+			$('#id_date').val(diary.date);
 			$('#id_is_public').val(diary.is_public);
 			// $frontContent.find('.icon-visibility').attr('data-visible', diary.is_public);
 
@@ -384,10 +384,7 @@ $(document).ready(function() {
 			var diaryEditHtml = '';
 			locations.forEach((location, index) => {
 				var $location_base = $('#empty-form-locations').clone();
-				// HTMLの中にある全ての __prefix__ を index に置換
-				$location_base.html($location_base.html().replace(/__prefix__/g, index));
-				// radiobuttonグループからclone元を省く
-				$location_base.html($location_base.html().replace(/__empty__/g, ''));
+
 				$location_base.find('input').not('[type="radio"]').each(function() {
 					let $input = $(this);
 					let name = $input.attr('name');
@@ -399,6 +396,11 @@ $(document).ready(function() {
 					}
 					$input.attr('type', 'hidden');
 				});
+				// HTMLの中にある全ての __prefix__ を index に置換
+				$location_base.html($location_base.html().replace(/__prefix__/g, index));
+				// radiobuttonグループからclone元を省く
+				$location_base.html($location_base.html().replace(/__empty__/g, ''));
+
 				$location_base.find('.location-img-url').val(location.image);
 				$location_base.find('.location-list-label-display').html(`<text>${location.label}</text>`);
 				if (location.is_thumbnail) {
@@ -413,7 +415,7 @@ $(document).ready(function() {
 				diaryEditHtml += $location_base.html().replace(/__prefix__/g, `${index}`);
 			});
 			
-			$backContent.find('.dairy-location-label-field').html(diaryEditHtml);
+			$backContent.find('.diary-location-label-field').html(diaryEditHtml);
 			// $backContent.find('.diary-comment-field').html(form_comment);
 
 			$backContent.find('.diary-location-radiobutton').on('change', function() {
@@ -455,7 +457,7 @@ $(document).ready(function() {
 			$backContent.find('form').off('submit').on('submit', function(event_form) {
 				const $form = $(this);
 				event_form.preventDefault();
-				send_form_ajax($form,event_calendar);
+				send_form_ajax($form,event_calendar,diary);
 			});
 
 			// label変更ボタン
@@ -466,7 +468,7 @@ $(document).ready(function() {
 				const $label_input = $location.find('.class_locations-label');
 				// var $surface = $radioButton.find('.location-label-surface');
 				// 一旦全てリセット
-				$(this).closest('.dairy-location-label-field').find('.diary-location-item').each(function(e) {
+				$(this).closest('.diary-location-label-field').find('.diary-location-item').each(function(e) {
 					const $surface = $(this).find('.location-list-label-display text');
 					const $label_input = $(this).find('.class_locations-label');
 					$label_input.attr('type', 'hidden');
@@ -496,7 +498,7 @@ $(document).ready(function() {
 				});
 			});
 			// label変更ボタン以外が押されたら戻る
-			$backContent.find('.dairy-location-label-field').find('button').not('.button-edit-location-label').on('click', function() {
+			$backContent.find('.diary-location-label-field').find('button').not('.button-edit-location-label').on('click', function() {
 				// 全てのinputを非表示,surfaceを表示する
 				const $location = $(this).closest('.diary-location-item');
 				$location.find('.class_locations-label').attr('type','hidden');
@@ -504,8 +506,8 @@ $(document).ready(function() {
 			});
 
 			// Location削除
-			$backContent.find('.dairy-location-label-field').find('.button-delete-location').off('click').on('click', function(e){
-				const $container = $(this).closest('.dairy-location-label-field');
+			$backContent.find('.diary-location-label-field').find('.button-delete-location').off('click').on('click', function(e){
+				const $container = $(this).closest('.diary-location-label-field');
 				const $location = $(this).closest('.diary-location-item');
 				const $radioButton = $location.find('.diary-location-radiobutton');
 				
@@ -528,156 +530,46 @@ $(document).ready(function() {
 				}
 			});
 			// 住所変更
-			$backContent.find('.dairy-location-label-field').find('.button-edit-addressSearchModal').off('click').on('click', function(){
+			$backContent.find('.diary-location-label-field').find('.button-edit-addressSearchModal').off('click').on('click', function(){
 				const $location = $(this).closest('.diary-location-item');
 				setup_addressModal($location);
 			});
 
-			function init_location_btns() {
-				const $locations_field = $backContent.find('.dairy-location-label-field');
-
-				$locations_field.children().each(function (index, locationForm) {
-					const imgSrc = $(locationForm).find('.location-img-url').val();
-					const isThumbnail = $(locationForm).find('*[id^="id_locations"][id$="is_thumbnail"]').val();
-					const rotateAngle = $(locationForm).find('*[id^="id_locations"][id$="rotate_angle"]').val();
-
-					var isChecked = '';
-					if (isThumbnail) {
-						const imageSrc = $(locationForm).find('.location-img-url').val();
-						isChecked = 'checked';
-						$labels_field.find('.diary-image').attr('src', imageSrc);
-						$labels_field.find('.diary-image').css({'transform': `rotate(${rotateAngle}deg)`,});	//角度を初期化
-					}
-					var $label_input = $(locationForm).find('*[id^="id_locations"][id$="label"]');
-					$label_input.addClass('w-100');
-					var $radioButton = $(`
-						<div class="diary-location-label-item">
-							<input type="hidden" class="location-label-imgSrc" value="${imgSrc}">
-							<input type="radio"
-								class="diary-location-label-radiobutton visually-hidden" 
-								id="location-edit-${index}-label" 
-								name="locationRadiobuttonEditLabel" ${isChecked}>
-							<label for="location-edit-${index}-label" class="location-label w-100 text-start py-3">
-								<div class="d-flex align-items-center justify-content-between w-100">
-									<div class="location-surface-field flex-grow-1 overflow-hidden">
-										<span class="location-label-surface me-2 w-100">
-											${$label_input.val()}
-										</span>
-									</div>
-									<div class="location-buttons-field flex-shrink-0">
-										<div class="d-flex align-items-center" style="font-size: 20px;">
-											<button type="button" class="button-edit-addressSearchModal button-text px-1 d-flex align-items-center">
-												<i class="iconify text-primary" data-icon="material-symbols:edit-location-alt-outline-rounded"></i>
-											</button>
-											<button type="button" class="button-edit-location-label button-text px-1 d-flex align-items-center">
-												<i class="iconify text-dark" data-icon="bx:rename"></i>
-											</button>
-											<button type="button" class="button-delete-location button-text px-1 d-flex align-items-center">
-												<i class="iconify text-danger" data-icon="material-symbols:delete-outline-rounded"></i>
-											</button>
-										</div>
-									</div>
-								</div>
-							</label>
-						</div>
-					`);
-					// $radioButton.find('.location-label-surface').after($label_input);
-					const $label_input_copy = $('<input type="hidden" class="label-input-copy w-100">');
-					$radioButton.find('.location-label-surface').after($label_input_copy);
-					
-					const $delete_input = $(locationForm).find('*[id^="id_locations"][id$="DELETE"]');
-					$radioButton.find('.location-label-surface').after($delete_input);
-					
-					$radioButton.find('.diary-location-label-radiobutton').on('change', function() {
-						var $img = $labels_field.find('.diary-image');
-						$img.css('opacity', 0); // フェードアウト
-						setTimeout(() => {
-							$img.attr('src', imgSrc); // 画像を切り替え
-							$img.css({'transform': `rotate(${rotateAngle}deg)`,});	//角度を合わせる
-							setTimeout(() => {
-								$img.css('opacity', 1); // フェードイン
-							}, 200); // 0.1秒待機
-						}, 500); // フェードアウト時間に合わせる
-					});
-					// ラベル編集関連
-					$radioButton.find('.button-edit-location-label').off('click').on('click', change_label_edit);
-
-					// Location削除
-					$radioButton.find('.button-delete-location').off('click').on('click', function(){
-						const $delete_inputs = $labels_field.find('*[id^="id_locations"][id$="DELETE"]');
-						const count = $delete_inputs.filter(function() {
-							return $(this).val() === 'true'; // val() が true のものをフィルタリング
-						}).length;
-						if (count + 1 < diary.locations.length) {
-							$delete_input.val(true);
-							$radioButton.hide();
-							// チェック移動
-							if ($radioButton.find('.diary-location-label-radiobutton').is(':checked')) {
-								var $nextRadiobutton = $labels_field.find('.diary-location-label-item').filter(':visible').not($radioButton).eq(0).find('.diary-location-label-radiobutton');
-								$nextRadiobutton.prop('checked', true);
-								$nextRadiobutton.trigger('change');
-							}
-						} else {
-							alert('これ以上は削除できませんよ');
-						}
-					});
-
-					// 住所変更button
-					$radioButton.find('.button-edit-addressSearchModal').off('click').on('click', function(){
-						setup_addressModal($(locationForm));
-					});
-
-					$label_input_copy.on('keypress', function(event) {
-						if (event.key === "Enter") {
-							event.preventDefault();
-							change_label_edit();
-						}
-					});
-
-					$labels_field.append($radioButton);
-				});
-			}
 		}
 		
-		function send_form_ajax($form, event_calendar, is_flip_card = true) {
+		function send_form_ajax($form, event_calendar, diary, is_flip_card = true) {
 			const $backContent = $('#diaryModal').find('.modal-content.flip-back');
+			var method = $form.find('input[name="_method"]').val() || $form.prop("method");
+			var actionURL_mock = $form.prop("action");
 			console.log($form.serialize())
-			$.ajax({
-				method: $form.prop("method"),
-				url: $form.prop("action"),
-				data: $form.serialize(), //nameをくっつける
-				dataType: 'json',
-				timeout: 6000,
-				headers: {
-					"X-CSRFToken": getCookie('csrftoken')  // CSRFトークンも必要な場合
-				},
-			})
-			.done(function (data) {
-				if (data.success) {
+			if (actionURL_mock.includes(mockUuid)){
+				var uuid = diary.diary_id;
+				var actionURLNew = actionURL_mock.replace(mockUuid, uuid);
+				$.ajax({
+					method: method,
+					url: actionURLNew,
+					data: $form.serialize(), //nameをくっつける
+					dataType: 'json',
+					timeout: 6000,
+					headers: {
+						"X-CSRFToken": getCookie('csrftoken')  // CSRFトークンも必要な場合
+					},
+				})
+				.done(function (diary_new) {
+					console.log(diary_new)
 					var $button = $backContent.find('.button-OK');
-					diary = data.diary;        // DiaryをDB反映後のものに変更
-					initDiaryContent(event_calendar, diary);
-					initDiaryEdit(event_calendar,diary);
+					initDiaryContent(event_calendar, diary_new);
+					initDiaryEdit(event_calendar,diary_new);
 					if (is_flip_card) {
 						flip_card($button);
 					}
-				} else {
-					alert('リクエストが失敗しました');
-					// Diaryのエラーを表示
-					if (data.errors.Diary) {
-						console.log("Diary Errors:");
-						console.log(data.errors.Diary);
-					}
-					// Locationsのエラーを表示
-					if (data.errors.Locations) {
-						console.log("Locations Errors:");
-						console.log(data.errors.Locations);
-					}
-				}
-			})
-			.fail(function (jqXHR, textStatus, errorThrown) {
-				console.log("AJAXリクエストが失敗しました。");
-			});
+				})
+				.fail(function (jqXHR, textStatus, errorThrown) {
+					console.log("AJAXリクエストが失敗しました:",errorThrown);
+				});
+			} else {
+				alert('ページをリロードしてください')
+			}
 		}
 		
 		// カレンダーを表示

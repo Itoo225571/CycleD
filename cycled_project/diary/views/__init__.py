@@ -2,7 +2,7 @@ from .address import AddressUserView,AddressSearchView,AddressCurrentPositionVie
 # from .address import address_search,get_current_address
 from .base import TopView,CacheMixin
 from .diary_photo import DiaryPhotoView,Photos2LocationsView
-from .diary_v2 import DiaryViewSet
+from .diary import DiaryViewSet,DiaryUpdateAPIView
 from .weather import WeatherView
 from .calendar import CalendarView
 from .map import MapView
