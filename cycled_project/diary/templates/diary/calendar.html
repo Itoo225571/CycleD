@@ -133,7 +133,7 @@
             </div>
             <input class="diary-location-radiobutton visually-hidden" type="radio" id="location-edit-__prefix__" name="location-radio-button-edit__empty__">
             <label class="location-label w-100 text-start" for="location-edit-__prefix__">
-                <div class="location-surface-field d-flex">
+                <div class="location-surface-field d-flex flex-grow-1 pb-1">
                     <div class="input-group d-flex align-items-center">
                         <div class="location-list-label-display w-100 ps-2"></div>
                         {{ diary.formset.empty_form.label|add_class:"w-100 form-control class_locations-label"}}
@@ -142,9 +142,9 @@
                         <i class="iconify text-dark" data-icon="bx:rename"></i>
                     </button>
                 </div>
-                <div class="location-buttons-field pt-2 d-flex justify-content-end">
-                    <div class="d-flex align-items-center" style="font-size: 24px;"> <!-- d-flex と gap-3 を追加 -->
-                        <button type="button" class="button-edit-addressSearchModal button-text pe-2 d-flex align-items-center">
+                <div class="location-buttons-field d-flex justify-content-end">
+                    <div class="d-flex align-items-center" style="font-size: 24px;">
+                        <button type="button" class="button-edit-addressSearchModal button-text d-flex align-items-center">
                             <i class="iconify text-primary" data-icon="material-symbols:edit-location-alt-outline-rounded"></i>
                         </button>
                         <button type="button" class="button-delete-location button-text d-flex align-items-center">

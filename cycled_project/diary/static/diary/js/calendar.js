@@ -374,7 +374,8 @@ $(document).ready(function() {
 			// 初期値
 			$('#id_comment').val(diary.comment);
 			$('#id_date').val(diary.date);
-			$('#id_is_public').val(diary.is_public);
+			// $('#id_is_public').val(diary.is_public);
+			$('#id_is_public').prop('checked', diary.is_public);	//checkboxはこの形式
 			// $frontContent.find('.icon-visibility').attr('data-visible', diary.is_public);
 
 			// Management関連
