@@ -16,6 +16,7 @@ urlpatterns = [
     
     # path("diary/",views.DiaryNewView.as_view(),name="diary"),
     path("diary/photo/",views.DiaryPhotoView.as_view(),name="diary_photo"),
+    path("diary/update/<uuid:pk>",views.DiaryUpdateAPIView.as_view(),name="diary-update"),
 
     path("weather/",views.WeatherView.as_view(),name="weather_report"),
     # path("location2weather/",views.ajax_location2weather,name="ajax_location2weather"), 

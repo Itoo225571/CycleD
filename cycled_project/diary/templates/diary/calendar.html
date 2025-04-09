@@ -61,11 +61,11 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body h-100">
-                                <form method="post" id="id_diary-form" action="{% url 'diary:diary-detail' mock_uuid %}">
+                                <form method="post" id="id_diary-form" action="{% url 'diary:diary-update' mock_uuid %}">
                                     {% csrf_token %}
-                                    {% method_override 'PATCH' %}
                                     <div class="diary-edit-container text-center">
                                         <div id="diary-locations-management-field">{{ diary.formset.management_form }}</div>
+                                        <div id="diary-date-field" style="display: none;">{{ diary.date }}</div>
                                         {% comment %} 公開設定 {% endcomment %}
                                         <div class="diary-is_public-field form-check form-switch fs-5 mx-0 text-start">
                                             {{ diary.is_public|add_class:"form-check-input" }}
@@ -83,7 +83,7 @@
                                                     <i class="icon-rotate text-muted"></i>
                                                 </button>
                                             </div>
-                                            <div class="dairy-location-label-field mx-auto pt-1 pb-3"></div>
+                                            <div class="diary-location-label-field mx-auto pt-1 pb-3"></div>
                                         </div>
                                         {% comment %} コメント {% endcomment %}
                                         <div class="diary-comment-field">

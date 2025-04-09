@@ -24,7 +24,8 @@ class LocationSerializer(serializers.ModelSerializer):
         read_only_fields = ['location_id','image','image_hash','diary','is_home']
 
 class DiarySerializer(serializers.ModelSerializer):
-    locations = LocationSerializer(many=True, read_only=True)
+    # locations = LocationSerializer(many=True, read_only=True)
+    locations = LocationSerializer(many=True, read_only=False)
     class Meta:
         model = Diary
         fields = [
