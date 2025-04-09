@@ -470,12 +470,42 @@ $(document).ready(function() {
 				// var $surface = $radioButton.find('.location-label-surface');
 				// 一旦全てリセット
 				$locations.not($location).each(function(e) {
-					const $surface = $(this).find('.location-list-label-display text');
-					const $label_input = $(this).find('.class_locations-label');
-					$label_input.attr('type', 'hidden');
-					$surface.show();  // textを表示
+					const $surface_each = $(this).find('.location-list-label-display text');
+					const $label_input_each = $(this).find('.class_locations-label');
+					decide($surface_each,$label_input_each,is_confirmed=false)
 				})
-				if ($surface.is(':visible')) {
+				if ($surface.is(':visible')) edit($surface,$label_input);
+				else decide($surface,$label_input,is_confirmed=true);
+
+				$label_input.on('change', function() {
+					// labelinputの変化はsurfaceのみに反映
+					$surface.text($(this).val());
+				});
+				// Enterキーを押された時のフォーム送信を無効化
+				$label_input.on('keydown', function(e) {
+					if (e.key === 'Enter') {
+						e.preventDefault();  // フォーム送信を無効化
+						decide($surface,$label_input,is_confirmed=true);
+					}
+				});
+				// is_comfirmed: 確定かどうか
+				function decide($surface,$label_input,is_confirmed) {
+					// 決定版の場合
+					if (is_confirmed) {
+						// 何らかの入力があった場合
+						if ($label_input.val()) {
+							// labelinputのcopyの変化は surfave,inputどちらにも反映
+							$surface.text($label_input.val());
+							$label_input.val($label_input.val());
+						}
+						$label_input.attr('type', 'hidden');
+						$surface.show();  // textを表示
+					} else {
+						$label_input.attr('type', 'hidden');
+						$surface.show();  // textを表示
+					}
+				}
+				function edit($surface,$label_input) {
 					$surface.hide();  // textを隠す
 					$label_input.attr('type', 'text');
 					$label_input.val(''); // 中身を削除
@@ -484,19 +514,7 @@ $(document).ready(function() {
 						$radioButton.prop('checked', true);
 						$radioButton.trigger('change');
 					}
-				} else {
-					if ($label_input.val()) {
-						// labelinputのcopyの変化は surfave,inputどちらにも反映
-						$surface.text($label_input.val());
-						$label_input.val($label_input.val());
-					}
-					$label_input.attr('type', 'hidden');
-					$surface.show();  // textを表示
 				}
-				$label_input.on('change', function() {
-					// labelinputの変化はsurfaceのみに反映
-					$surface.text($(this).val());
-				});
 			});
 			// label変更ボタン以外が押されたら戻る
 			$backContent.find('.diary-location-label-field').find('button').not('.button-edit-location-label').on('click', function() {
