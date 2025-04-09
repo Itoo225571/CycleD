@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 from ..models import Diary,Location,TempImage
 from ..forms import DiaryEditForm,LocationEditFormSet
 from ..serializers import DiarySerializer,LocationSerializer
+from ..views.cache_and_session import update_diaries
 
 import datetime
 
@@ -34,6 +35,10 @@ class DiaryViewSet(mixins.ListModelMixin,
             one_year_ago = timezone.now().date() - datetime.timedelta(days=365)
             return base_qs.filter(date__gte=one_year_ago)
         return base_qs
+    
+    def perform_destroy(self, instance):
+        super().perform_destroy(instance)
+        update_diaries(self.request)  # キャッシュ更新
 
 # updateのみはこちらでやる
 class DiaryUpdateAPIView(APIView):
@@ -48,6 +53,9 @@ class DiaryUpdateAPIView(APIView):
             diary = diaryForm.save()
             locationFormset.save()
             diary_data = DiarySerializer(diary).data
+
+            # キャッシュ更新
+            update_diaries(request)
             return Response(diary_data,status=status.HTTP_200_OK)
         
         return Response({

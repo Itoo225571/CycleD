@@ -20,6 +20,7 @@ from ..serializers import DiarySerializer,LocationSerializer
 
 from .address import geocode,regeocode,regeocode_async
 from subs.photo_info.photo_info import get_photo_info,to_jpeg,to_pHash
+from .cache_and_session import update_diaries
 
 from datetime import timedelta
 import json
@@ -119,6 +120,8 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
                     location.full_clean()  # バリデーションを実行
                     location.save()
 
+                # キャッシュ更新
+                update_diaries(self.request)
                 return super().form_valid(diary_formset)
         except Exception as e:
             print(f"Error occurred: {e}")
