@@ -1,7 +1,7 @@
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import HiddenInput
-from ..forms import DiaryForm,AddressSearchForm,AddressForm
+from ..forms import DiaryEditForm,AddressSearchForm,AddressForm
 
 import uuid
 
@@ -13,7 +13,7 @@ class CalendarView(LoginRequiredMixin, generic.TemplateView):
         context['mock_uuid'] = uuid.uuid4() # 仮のPK
         # is_public を HiddenInput にする
         # context['diary'] = DiaryForm(widgets={"is_public": HiddenInput()})
-        context['diary'] = DiaryForm()
+        context['diary'] = DiaryEditForm()
         
         context['addressseach_form'] = AddressSearchForm()
         context['addressselect_form'] = AddressForm()
