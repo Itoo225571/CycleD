@@ -98,7 +98,7 @@
 } */
 #diaryModal .modal-dialog {
     height: 90vh; /* モーダル全体の高さを90vhに設定 */
-    min-height: 700px;
+    min-height: 900px;
 }
 #diaryModal .modal-content.flip-back {
     overflow-y: auto; /* コンテンツが溢れた場合、スクロールできるようにする */
@@ -108,4 +108,4 @@
 }
 #diaryModal .modal-content.flip-back::-webkit-scrollbar {
     display: none;                 /* Chrome, Safari用 */
-  }
+}

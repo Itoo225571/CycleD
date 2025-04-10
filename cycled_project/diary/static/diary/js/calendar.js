@@ -561,7 +561,6 @@ $(document).ready(function() {
 			const $backContent = $('#diaryModal').find('.modal-content.flip-back');
 			var method = $form.find('input[name="_method"]').val() || $form.prop("method");
 			var actionURL_mock = $form.prop("action");
-			console.log($form.serialize())
 			if (actionURL_mock.includes(mockUuid)){
 				var uuid = diary.diary_id;
 				var actionURLNew = actionURL_mock.replace(mockUuid, uuid);
@@ -576,7 +575,6 @@ $(document).ready(function() {
 					},
 				})
 				.done(function (diary_new) {
-					console.log(diary_new)
 					var $button = $backContent.find('.button-OK');
 					initDiaryContent(event_calendar, diary_new);
 					initDiaryEdit(event_calendar,diary_new);
@@ -585,8 +583,51 @@ $(document).ready(function() {
 					}
 				})
 				.fail(function (jqXHR, textStatus, errorThrown) {
-					console.log("AJAXリクエストが失敗しました:",errorThrown);
-				});
+					console.log("AJAXリクエストが失敗しました:", errorThrown);
+					let errors = jqXHR.responseJSON;
+					if (errors) {
+						let errorMessagesSet = new Set();  // 重複しないエラーメッセージを格納するSet
+				
+						// diary_errorsが存在する場合、そのエラーメッセージをSetに追加
+						if (errors.diary_errors) {
+							for (let key in errors.diary_errors) {
+								if (errors.diary_errors.hasOwnProperty(key)) {
+									errors.diary_errors[key].forEach(function(error) {
+										errorMessagesSet.add(error);  // Setに追加（重複は自動的に排除）
+									});
+								}
+							}
+						}
+				
+						// location_errorsが存在する場合、そのエラーメッセージをSetに追加
+						if (errors.location_errors) {
+							errors.location_errors.forEach(function(locationError) {
+								for (let key in locationError) {
+									if (locationError.hasOwnProperty(key)) {
+										locationError[key].forEach(function(error) {
+											errorMessagesSet.add(error);  // Setに追加（重複は自動的に排除）
+										});
+									}
+								}
+							});
+						}
+				
+						// Setに格納されたエラーメッセージをHTMLリストとして表示
+						if (errorMessagesSet.size > 0) {
+							let errorMessages = '';
+							errorMessagesSet.forEach(function(error) {
+								errorMessages += `<li class="list-group-item">${error}</li>`;  // <li>で囲んでリスト化
+							});
+				
+							Swal.fire({
+								icon: 'error',
+								title: 'エラーが発生しました',
+								html: `<ul class="list-group list-group-flush">${errorMessages}</ul>`,  // HTML形式でリスト表示
+								confirmButtonText: 'OK'
+							});
+						}
+					}
+				});									
 			} else {
 				alert('ページをリロードしてください')
 			}

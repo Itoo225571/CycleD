@@ -38,7 +38,7 @@ class Location(models.Model):
     def save(self, *args, **kwargs):
         self.rotate_angle = self.rotate_angle % 360 # 360度以内にする
 
-        if self.diary:  #日記作成の場合
+        if not self.is_home:  #日記作成の場合
             if self.image and not self.image_hash:
                 self.image_hash = to_pHash(self.image)   # pHashの生成
             # is_thumbnailがTrueの場合、同じDiary内の他のLocationのis_thumbnailをFalseにする
@@ -62,6 +62,15 @@ class Location(models.Model):
                 location_count = self.diary.locations.count() 
                 if location_count > self.diary.MAX_LOCATIONS:  # MAX_LOCATIONSは許可される最大数を指定
                     raise ValidationError(f"この日記には{self.diary.MAX_LOCATIONS}個以上の場所を追加できません。")
+                
+        # Diaryの場合に検証するフィールドリスト
+        if not self.is_home:
+            fields_to_validate = ["lat", "lon", "state", "display", "label",]
+            # 各フィールドがNoneまたは空の場合にValidationErrorを発生させる
+            for field in fields_to_validate:
+                value = getattr(self, field, None)
+                if value is None or (isinstance(value, str) and value.strip() == ''):
+                    raise ValidationError("必須フィールドが存在しません。")
 
 def upload_to(instance, filename):
     # 拡張子を取得

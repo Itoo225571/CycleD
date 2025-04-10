@@ -32,22 +32,22 @@
                     <div class="position-relative">
                         <!-- モーダルウィンドウ(表) -->
                         <div class="modal-content flip-front">
-                            <div class="modal-header">
-                                <h5 class="modal-title"></h5>
-                                <div class="btn-group d-flex align-items-center">
-                                    <button type="button" class="button-to-edit icon-in-button">
+                            <div class="modal-header d-flex">
+                                <h5 class="modal-title flex-grow-1"></h5>
+                                <div class="btn-group d-flex align-items-center justify-content-between">
+                                    <button type="button" class="button-to-edit icon-in-button pe-3">
                                         <i class="bi bi-pencil-square text-muted"></i>
                                     </button>
                                     <div>
                                         <form action="{% url 'diary:diary-detail' mock_uuid %}" method="post" id="delete-form">
                                             {% csrf_token %}
                                             {% method_override 'DELETE' %}
-                                            <button type="submit" class="icon-in-button text-danger">
+                                            <button type="submit" class="icon-in-button text-danger pe-3">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
                                     </div>
-                                    <button type="button" class="btn-close ms-1" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                             </div>
                             <div class="modal-body">
