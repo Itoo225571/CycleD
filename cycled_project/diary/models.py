@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 
 import uuid
 from subs.photo_info.photo_info import to_pHash
+import datetime
 
 User = get_user_model()
 
@@ -115,20 +116,56 @@ class Coin(models.Model):
     coin_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # UUIDを主キーとして設定
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="ユーザー")
     num = models.IntegerField(default=0)
+    date_list = models.JSONField(default=list)  # ここで複数日付を保存
+
+    rate = {
+        'Gold': 10,
+        'Normal': 1,
+    }
+
     num_continue = models.IntegerField(default=0)
-    timestamp = models.DateTimeField(null=True)
-    @property
-    def can_increment(self):
-        if self.timestamp is None:
-            return True  # まだ加算されたことがない場合
-        return self.timestamp.date() != timezone.now().date()
-    def add(self, amount=1):
-        if self.can_increment:
-            self.num += amount
-            self.num_continue += 1
-            self.timestamp = timezone.now()
+    timestamp = models.DateField(null=True)
+
+    def _can_increment(self, diary):
+        return str(diary.date) not in self.date_list  # diary.date を文字列に変換して比較
+    def _rate_convert(self, diary):
+        # rankを文字列に変換してrateを取得する
+        rank = diary.get_rank_display()  # 'Gold' or 'Normal'
+        return self.rate.get(rank, 0)  # rank に対応する rate を取得
+    def _date_process(self, diary):
+        yesterday = timezone.now().date() - datetime.timedelta(days=1)
+        # rankが'Gold'の場合に連続記録数を加算
+        if diary.get_rank_display() == 'Gold':
+            if self.timestamp and self.timestamp <= yesterday:
+                self.num_continue += 1
+            elif not self.timestamp:  # 初めて日記を作成する場合も考慮
+                self.num_continue = 1  # 初回は1に設定
+            else:
+                self.num_continue = 0
+            self.timestamp = timezone.now()     # rankがGoldの場合timestampを更新
+        if self._can_increment(diary):   # 念の為
+            self.date_list.append(str(diary.date))  # diary.date を文字列に変換して追加
+    
+    # Coin仕様:
+    # 1. Diaryが今日中に作成された場合:
+    #     ・連続記録数が加算される
+    #     ・rateに応じて獲得数が増える
+    # 2. Diaryが今日のものでなかった場合
+    #     ・rateに応じたCoinが手に入る
+    def add(self, diary):
+        if self._can_increment(diary):
+            self.num += self._rate_convert(diary)
+            self._date_process(diary)
             self.save()
         return self.num
+    
+    def sub(self, num):
+        if self.num - num > 0:
+            self.num -= num
+            self.save()
+            return True
+        else:
+            return False
     
 class Good(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="good")

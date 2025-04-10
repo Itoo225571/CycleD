@@ -41,39 +41,14 @@ def delete_file(sender, instance, **kwargs):
             instance.image.delete(False)
         except Exception as e:
             print(f"Error deleting file {instance.image.name}: {e}")
-    
-@receiver(post_save, sender=Diary)
-def update_cache_on_create_or_update(sender, instance, created, **kwargs):
-    # キャッシュを削除または更新する
-    cache_key = f'diaries_{instance.user.id}'
-    cache.delete(cache_key)  # Diaryが作成または更新されたときにキャッシュを削除
-
-
-@receiver(post_delete, sender=Diary)
-def update_cache_on_delete(sender, instance, **kwargs):
-    # キャッシュを削除する
-    cache_key = f'diaries_{instance.user.id}'
-    cache.delete(cache_key)  # Diaryが削除されたときにキャッシュを削除
-
-    # 削除した日記のrankが0の場合、連続数をリセット
-    if instance.rank == 0:
-        instance.user.coin.num_continue = 0
-        instance.user.coin.num -= 1
-        if instance.user.coin.num < 0:
-            instance.user.coin.num = 0
-        instance.user.coin.save()
 
 @receiver(post_save, sender=User)
 def create_coin_for_user(sender, instance, created, **kwargs):
     if created:  # ユーザーが新規作成された場合のみ
-        coin = Coin.objects.create(num=0, timestamp=None,user=instance)  # Coinインスタンスを作成
+        coin = Coin.objects.create(user=instance)  # Coinインスタンスを作成
         coin.save()
-@receiver(user_logged_in)
-def reset_num_continue(sender, request, user, **kwargs):
-    if user.coin is None:
-        coin = Coin.objects.create(num=0, timestamp=None,user=user)  # Coinインスタンスを作成
-        coin.save()  # Coinインスタンスを保存  
-    if user.coin.timestamp:
-        if user.coin.timestamp.date() < timezone.now().date() - timedelta(days=1):
-            user.coin.num_continue = 0
-            user.coin.save()
+@receiver(post_save, sender=Diary)
+def add_coin_on_create_diary(sender, instance, created, **kwargs):
+    if created:     # Diary新規作成時
+        coin = instance.user.coin
+        coin.add(instance)
