@@ -70,7 +70,7 @@ class DiaryUpdateAPIView(APIView):
             # キャッシュ更新
             update_diaries(request)
             return Response(diary_data,status=status.HTTP_200_OK)
-        
+
         return Response({
             'diary_errors': diaryForm.errors,
             'location_errors': locationFormset.errors,
