@@ -185,6 +185,7 @@ $(document).ready(function() {
                         $('button[name="diary-new-form"]').fadeIn(400); // 400msのフェードイン
                     }, 1500);
                 }
+                sortPrefix();
             },
         });
 
@@ -433,7 +434,7 @@ $(document).ready(function() {
                     // var is_exist = $locationNewForm.find('input[id^="id_locations"][id$="-location_id"]').val();
                     // if (!is_exist) $locationNewForm.remove();  // 編集でない場合，remove(編集の場合はremoveしない)
                     // console.log(is_exist)
-                    resetPrefix();
+                    // resetPrefix();
                 } else {
                     alert('もう消せないよ')
                 }
@@ -504,6 +505,7 @@ $(document).ready(function() {
             value: '',
         }).appendTo(this);
 
+        sortPrefix();   //送信前にprefixを整理
         this.submit();
     });
 
@@ -668,9 +670,19 @@ function check_errors($diaryForm,errors=null) {
     });
 }
 
-function resetPrefix() {
+function sortPrefix() {
     const updateFormAttributes = ($forms, name) => {
-        $forms.each(function(index) {
+        const sortedForms = $forms.sort(function(a, b) {
+            const aContainsId = $(a).find(`[name^="${name}-"][name$="_id"]`).val();
+            const bContainsId = $(b).find(`[name^="${name}-"][name$="_id"]`).val();
+            console.log(aContainsId,bContainsId)
+
+            // location_idやdiary_idを含むフォームを先に持ってくる
+            if (aContainsId && !bContainsId) return -1;
+            if (!aContainsId && bContainsId) return 1;
+            return 0;  // 並べ替え基準がない場合はそのまま
+        });
+        sortedForms.each(function(index) {
             // 各form内のnameとidを変更（nameまたはidにnameが含まれているもの）
             $(this).find(`[name*="${name}-"], [id*="${name}-"]`).each(function() {
                 const $input = $(this);
