@@ -402,9 +402,9 @@ $(document).ready(function() {
             // 削除ボタン
             $locationNewForm.find('.button-delete-location').off('click').on('click', function(){
                 const $locationExist = $diaryNewForm.find('input[id^="id_locations"][id$="-DELETE"]')
-                    .filter(function() {
-                        return !$(this).val(); // 値が空またはfalsyな場合にtrue
-                    }).parents('.locations-form-wrapper');
+                                        .filter(function() {
+                                            return !$(this).val(); // 値が空またはfalsyな場合にtrue
+                                        }).parents('.locations-form-wrapper');
                 // Diary内のLocationが２以上の場合実行可能
                 if ($locationExist.length > 1){
                     var $deleteInput = $locationNewForm.find('input[id^="id_locations"][id$="-DELETE"]');
@@ -426,12 +426,16 @@ $(document).ready(function() {
                     $deleteInput.trigger('change');
                     $locationNewForm.hide(); // 非表示にする
                     // totalformを変更
-                    const locationTotalForms = $('#id_locations-TOTAL_FORMS');
-                    const currentTotal = parseInt(locationTotalForms.val(), 10) || 1; // NaN の場合は 1 にする
-                    locationTotalForms.val(currentTotal - 1); // 更新された値をセット
+                    // const locationTotalForms = $('#id_locations-TOTAL_FORMS');
+                    // const currentTotal = parseInt(locationTotalForms.val(), 10) || 1; // NaN の場合は 1 にする
+                    // locationTotalForms.val(currentTotal - 1); // 更新された値をセット
 
-                    $locationNewForm.remove();  // ここで削除
+                    // var is_exist = $locationNewForm.find('input[id^="id_locations"][id$="-location_id"]').val();
+                    // if (!is_exist) $locationNewForm.remove();  // 編集でない場合，remove(編集の場合はremoveしない)
+                    // console.log(is_exist)
                     resetPrefix();
+                } else {
+                    alert('もう消せないよ')
                 }
             });
 
