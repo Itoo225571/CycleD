@@ -110,7 +110,7 @@ LocationEditFormSet = forms.inlineformset_factory(
 class LocationCoordForm(forms.ModelForm):
     class Meta:
         model = Location
-        fields = ["lat","lon",]
+        fields = ["lat", "lon", "is_home"]  # "is_home" をフォームのフィールドに追加
 
 """___Diary関連___"""
 class DiaryForm(ModelFormWithFormSetMixin, forms.ModelForm):

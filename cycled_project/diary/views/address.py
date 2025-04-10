@@ -165,6 +165,7 @@ class AddressCurrentPositionView(APIView):
             loc.state = geo.address.state
             loc.display = geo.address.display
             loc.label = geo.address.label
+            
             loc.location_id = None  # 新規作成なのでidは空にする
 
             try:
