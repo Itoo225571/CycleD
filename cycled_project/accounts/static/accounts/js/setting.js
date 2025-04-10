@@ -66,24 +66,26 @@ function deleteAllDiaries(url_deleteAllDiaries) {
             // AJAXリクエストを送信
             $.ajax({
                 url: url_deleteAllDiaries,
-                type: 'POST',
+                type: 'DELETE',
                 headers: {
+                    'Content-Type': 'application/json',
                     "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンも必要な場合
                 },
-                data: {},
                 success: function(response) {
                     Swal.fire({
                         icon: 'success',
                         title: '全ての日記を削除しました',
-                        text: 'バイバイ日記！',
+                        text: response.message,
                         confirmButtonText: 'OK'
                     });
                 },
                 error: function(xhr, errmsg, err) {
+                    var data = xhr.responseJSON;
+                    var msg = data.message || '再度お試しください';
                     Swal.fire({
                         icon: 'error',
                         title: 'エラーが発生しました',
-                        text: '再度お試しください',
+                        text: msg,
                         confirmButtonText: 'OK'
                     });
                 }

@@ -40,6 +40,19 @@ class DiaryViewSet(mixins.ListModelMixin,
         super().perform_destroy(instance)
         update_diaries(self.request)  # キャッシュ更新
 
+    # ユーザーが所有するすべての日記を削除するカスタムアクション
+    @action(detail=False, methods=['delete'], url_path='delete-all')
+    def delete_all(self, request):
+        # ユーザーが所有するすべてのDiaryを削除
+        user = request.user
+        diaries = Diary.objects.filter(user=user)
+        if not diaries.exists():
+            return Response({"message": "日記が存在しません"}, status=status.HTTP_404_NOT_FOUND)
+        # 日記が存在する場合は削除
+        count, _ = diaries.delete()
+        update_diaries(self.request)  # キャッシュ更新
+        return Response({"message": f"日記（{count}コ）を削除しました"}, status=status.HTTP_200_OK)
+
 # updateのみはこちらでやる
 class DiaryUpdateAPIView(APIView):
     def post(self, request, pk):
