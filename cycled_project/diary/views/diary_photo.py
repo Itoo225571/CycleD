@@ -20,7 +20,7 @@ from ..serializers import DiarySerializer,LocationSerializer
 
 from .address import geocode,regeocode,regeocode_async
 from subs.photo_info.photo_info import get_photo_info,to_jpeg,to_pHash
-from .cache_and_session import update_diaries
+from .cache_and_session import update_diaries,get_diaries_async,update_diaries_async
 
 from datetime import timedelta
 import json
@@ -38,6 +38,7 @@ from urllib.parse import urlencode
 from pprint import pprint
 logger = logging.getLogger(__name__)
 
+# 外見
 class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
     template_name ="diary/diary_photo.html"
     success_url = reverse_lazy("diary:home")
@@ -58,6 +59,7 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
     def get(self, request: HttpRequest, *args: str, **kwargs) -> HttpResponse:
         # TempImage削除
         TempImage.objects.filter(user=request.user).delete()
+        cache.delete(f'image_hash_list_{request.user.id}')     # キャッシュも削除
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args: str, **kwargs) -> HttpResponse:
@@ -107,8 +109,10 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
                             continue
                     # Location編集の場合
                     else:
+                        if form.cleaned_data.get('DELETE', False):
+                            location.delete()   # 元のDiaryを削除
+                            continue
                         # print(location.location_id)
-                        pass
 
                     location.diary = get_object_or_404(Diary, user=self.request.user, date=date)
                     # 今日中に作成されたものかどうか(0がGOLD)
@@ -265,12 +269,14 @@ async def process_image_file(img_file, image_hash_list, request):
         while attempt < retry_count:
             try:
                 result = await regeocode_async(request, temp_image.lat, temp_image.lon)
+                attempt += 1
                 if result:
                     if result.get("address", {}).get("locality") == "（その他）":
                         logger.info(f"試行 {attempt + 1}/{retry_count}: 'その他' が返されたため再試行します。")
                         continue  # 再試行
                     geo_data.update(result)
-                    return geo_data  # 成功したら返す
+                    break
+                    # return geo_data  # 成功したら返す
                 else:
                     logger.error("住所取得に失敗しました。geo_data が None です。")
                     return {'error': "住所取得に失敗しました。geo_data が None です。"}
@@ -285,7 +291,7 @@ async def process_image_file(img_file, image_hash_list, request):
                 geo_data['rank'] = 0
         
         image_hash_list.append(photo_hash)
-        await cache.aset('image_hash_list', image_hash_list, timeout=600)
+        await cache.aset(f'image_hash_list_{request.user.id}', image_hash_list, timeout=600)
 
         return geo_data
     except Exception as e:
@@ -319,23 +325,21 @@ class Photos2LocationsView(generic.View):
         form = PhotosForm(request.POST, request.FILES)
         if form.is_valid():
             files = request.FILES.getlist('images')
-            diaries = await cache.aget(f'diaries_{self.user.id}')
-            image_hash_list = await cache.aget(f'image_hash_list')
-            if not diaries or not image_hash_list:
-                # 非同期にデータを取得しながら辞書に変換
-                diary_queryset = await sync_to_async(Diary.objects.filter)(user=request.user)
-                # diaries = await sync_to_async(list)(diary_queryset)
-                diaries = await sync_to_async(lambda qs: {diary.date: diary for diary in qs})(diary_queryset)
-                
-                await cache.aset(f'diaries_{self.user.id}', diaries, timeout=600)
+            # diaries = await cache.aget(f'diaries_{self.user.id}')
+            data_all = await get_diaries_async(request,['mine'])
+            diaries = data_all.get('diaries_mine')
+            diaries_dict = await sync_to_async(lambda qs: {diary.date: diary for diary in qs})(diaries)
+            image_hash_list = await cache.aget(f'image_hash_list_{self.user.id}')
+
+            if not image_hash_list:
                 image_hash_list = []
-                for diary in diaries.values():
+                for diary in diaries:
                     # locations.all()は同期的な操作なので非同期化する
                     locations = await sync_to_async(list)(diary.locations.all())
                     for location in locations:
                         if location.image_hash:
                             image_hash_list.append(location.image_hash)
-                await cache.aset(f'image_hash_list', image_hash_list, timeout=600)
+                await cache.aset(f'image_hash_list_{self.user.id}', image_hash_list, timeout=600)
 
             # TempImageの作成と添削
             # `files` が空でない場合にのみ処理を実行
@@ -352,7 +356,7 @@ class Photos2LocationsView(generic.View):
             date = datetime.strptime(date_str, "%Y-%m-%d").date()
                 
             # diary_query = await sync_to_async(lambda: diaries.filter(date=date).first())()
-            diary_query = await sync_to_async(lambda: diaries.get(date))()
+            diary_query = await sync_to_async(lambda: diaries_dict.get(date))()
 
             if diary_query:
                 diary_serializer = await sync_to_async(DiarySerializer)(diary_query)

@@ -80,15 +80,15 @@ class LocationForm(forms.ModelForm):
             self.add_error("image","同じ画像が既に存在します。")
         return data
 LocationFormSet = forms.inlineformset_factory(
-        Diary,
-        Location,
-        form=LocationForm,
-        extra=0,
-        can_delete=True,
-        max_num=50,
-        validate_max=True,
-        min_num=0,
-        validate_min=True,
+    Diary,
+    Location,
+    form=LocationForm,
+    extra=0,
+    can_delete=True,
+    max_num=50,
+    validate_max=True,
+    min_num=0,
+    validate_min=True,
 )
 
 class LocationEditForm(forms.ModelForm):
@@ -96,15 +96,15 @@ class LocationEditForm(forms.ModelForm):
         model = Location
         fields = ["lat","lon","state","display","label","is_thumbnail","rotate_angle",]
 LocationEditFormSet = forms.inlineformset_factory(
-        Diary,
-        Location,
-        form=LocationEditForm,
-        extra=0,
-        can_delete=True,
-        max_num=50,
-        validate_max=True,
-        min_num=0,
-        validate_min=True,
+    Diary,
+    Location,
+    form=LocationEditForm,
+    extra=0,
+    can_delete=True,
+    max_num=50,
+    validate_max=True,
+    min_num=0,
+    validate_min=True,
 )
 
 class LocationCoordForm(forms.ModelForm):
