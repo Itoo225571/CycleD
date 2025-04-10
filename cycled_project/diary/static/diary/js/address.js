@@ -36,6 +36,7 @@ function get_current_address(url_getCurrentPos,href=null) {
         function successCallback(position) {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
+            console.log(latitude,longitude)
         
             $.ajax({
                 url: url_getCurrentPos,
@@ -47,6 +48,7 @@ function get_current_address(url_getCurrentPos,href=null) {
                     'lat': latitude,
                     'lon': longitude,
                     'image': href,
+                    'is_home': true     // is_homeをtrueにする
                 },
                 dataType: "json",
                 success: function(response) {
