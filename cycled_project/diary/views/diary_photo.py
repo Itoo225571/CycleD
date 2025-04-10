@@ -115,7 +115,7 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
                     if id:
                         if datetime.now().date() == temp_image.date_photographed.date() == temp_image.date_lastModified.date():
                             location.diary.rank = 0
-                            self.request.user.coin.add()
+                            # self.request.user.coin.add()
                             location.diary.save()
                     location.full_clean()  # バリデーションを実行
                     location.save()
