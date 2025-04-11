@@ -65,12 +65,21 @@ class Location(models.Model):
                 
         # Diaryの場合に検証するフィールドリスト
         if not self.is_home:
-            fields_to_validate = ["lat", "lon", "state", "display", "label",]
-            # 各フィールドがNoneまたは空の場合にValidationErrorを発生させる
-            for field in fields_to_validate:
+            errors = {}
+            fields_to_validate = {
+                "lat": "緯度を入力してください。",
+                "lon": "経度を入力してください。",
+                "state": "都道府県を入力してください。",
+                "display": "表示名を入力してください。",
+                "label": "ラベルを入力してください。",
+            }
+            for field, message in fields_to_validate.items():
                 value = getattr(self, field, None)
                 if value is None or (isinstance(value, str) and value.strip() == ''):
-                    raise ValidationError("必須フィールドが存在しません。")
+                    errors[field] = message
+            
+            if errors:
+                raise ValidationError(errors)
 
 def upload_to(instance, filename):
     # 拡張子を取得

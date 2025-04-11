@@ -95,6 +95,15 @@ class LocationEditForm(forms.ModelForm):
     class Meta:
         model = Location
         fields = ["lat","lon","state","display","label","is_thumbnail","rotate_angle",]
+        # HTML側にrequired属性をつけたい場合だけ明示的に追加（ウィジェットはそのまま）
+        required_fields = ["lat", "lon", "state", "display", "label"]
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # HTML側にrequired属性をつけたい場合だけ明示的に追加（ウィジェットはそのまま）
+        required_fields = ["lat", "lon", "state", "display", "label"]
+        for field in required_fields:
+            self.fields[field].required = True
+            self.fields[field].widget.attrs["required"] = "required"  # ←ここでHTMLに反映される
 LocationEditFormSet = forms.inlineformset_factory(
     Diary,
     Location,
