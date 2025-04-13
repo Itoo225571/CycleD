@@ -69,7 +69,12 @@ function setup_addressModal($locationForm) {
             })
             .catch(error => {
                 console.error('エラー:', error);
-                alert('エラーが発生しました。再度お試しください。');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'エラーが発生しました。再度お試しください。',
+                    confirmButtonText: 'OK'
+                });
             });
     });
 };

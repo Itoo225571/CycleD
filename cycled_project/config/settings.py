@@ -59,7 +59,6 @@ INSTALLED_APPS = [
     "diary.apps.DiaryConfig",
     "accounts.apps.AccountsConfig", # アカウント管理用アプリ
     "django_bootstrap5",#Bootstrap5追加
-    "debug_toolbar",#Debug-toolbar追加
 	# "subs",
 	'ratelimit', #APIリクエスト制限
     'widget_tweaks', #HTMLの見た目調節
@@ -77,6 +76,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'method_override',
 ]
+if os.environ.get('DJANGO_ENV') != 'production':
+    INSTALLED_APPS += ['debug_toolbar']
 
 SITE_ID = 1
 
@@ -95,7 +96,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     
-    "debug_toolbar.middleware.DebugToolbarMiddleware",#Debug-toolbar
 	'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',#session機能
     'allauth.account.middleware.AccountMiddleware',
@@ -103,6 +103,8 @@ MIDDLEWARE = [
     # 'django.middleware.http.HttpMethodOverrideMiddleware',
     'method_override.middleware.MethodOverrideMiddleware',  #method override用
 ]
+if os.environ.get('DJANGO_ENV') != 'production':
+    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
 
 ROOT_URLCONF = "config.urls"
 

@@ -148,7 +148,7 @@ class UserLeaveView(LoginRequiredMixin, account_views.FormView):
         user.is_active = False
         user.save()
         logout(self.request)
-        messages.success(self.request, "退会が完了しました。ご利用いただきありがとうございました。")
+        messages.success(self.request, "退会が完了しました　ご利用いただきありがとうございました")
         return redirect("diary:top")
 
     def form_invalid(self, form):
@@ -178,9 +178,9 @@ class CustomEmailView(account_views.EmailView):
         email = form.cleaned_data["email"]
         # メッセージをユーザーに表示
         if settings.ACCOUNT_EMAIL_VERIFICATION == "none":
-            messages.success(self.request, f"メールアドレスが{email}に変更されました。")
+            messages.success(self.request, f"メールアドレスが{email}に変更されました")
         else:
-            messages.success(self.request, f"{email}に確認のメールを送信しました。")
+            messages.success(self.request, f"{email}に確認のメールを送信しました")
         return response
     
 class CustomEmailVerificationSentView(account_views.EmailVerificationSentView):
@@ -197,7 +197,7 @@ def resend_confirm_email(request,email):
         user = User.objects.get(email=email)
         email_address = EmailAddress.objects.get(user=user, email=email)
         if email_address.verified:
-            messages.info(request, "このメールアドレスはすでに確認済みです。")
+            messages.info(request, "このメールアドレスはすでに確認済みです")
         else:
             confirmation = EmailConfirmation.objects.filter(email_address=email_address).order_by('-sent').first()
             if not confirmation:
@@ -210,7 +210,7 @@ def resend_confirm_email(request,email):
             signup = True  # 新規登録用のテンプレートを使う
             adapter.send_confirmation_mail(request, confirmation, signup)
 
-            messages.success(request, "確認メールを再送信しました。")
+            messages.success(request, "確認メールを再送信しました")
     except User.DoesNotExist:
         messages.error(request, "ユーザーが見つかりません。")
     return HttpResponseRedirect(request.path_info)  # 現在のページをリロード

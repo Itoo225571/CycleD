@@ -13,23 +13,27 @@ function get_current_address(url_getCurrentPos,href=null) {
         
         // 失敗時の処理
         function errorCallback(error) {
+            var errorText = '不明なエラーが発生しました';
             switch (error.code) {
                 case error.PERMISSION_DENIED:
-                    console.error("ユーザーが位置情報の取得を拒否しました");
-                    alert("ユーザーが位置情報の取得を拒否しました");
-                break;
+                    errorText = "ユーザーが位置情報の取得を拒否しました";
+                    break;
                 case error.POSITION_UNAVAILABLE:
-                    console.error("位置情報が取得できませんでした");
-                    alert("位置情報が取得できませんでした");
-                break;
+                    errorText = "位置情報が取得できませんでした";
+                    break;
                 case error.TIMEOUT:
-                    console.error("位置情報の取得がタイムアウトしました");
-                    alert("位置情報の取得がタイムアウトしました");
-                break;
+                    errorText = "位置情報の取得がタイムアウトしました";
+                    break;
                 default:
                     console.error("不明なエラーが発生しました", error);
-                    alert("不明なエラーが発生しました", error);
+                    errorText = `不明なエラーが発生しました: ${error.message ?? error}`;
             }
+            Swal.fire({
+                icon: 'error',
+                title: 'エラー',
+                text: errorText,
+                confirmButtonText: 'OK'
+            });
             finallyCallback();
         }
 
@@ -57,12 +61,19 @@ function get_current_address(url_getCurrentPos,href=null) {
                 error: function(xhr, status, error) {
                     try {
                         var responseData = JSON.parse(xhr.responseText);  // レスポンスの内容をJSONとしてパース
+                        var errorText = '不明なエラーが発生しました';
                         if (responseData.detail) {
                             console.error('エラー詳細:', responseData.detail);  // detailを出力
-                            alert('エラー: ' + responseData.detail);  // ユーザーに詳細を通知
+                            errorText = responseData.detail;
                         } else {
                             console.error('エラー詳細がありません');
                         }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errorText,
+                            confirmButtonText: 'OK'
+                        });
             
                         // その他のエラー詳細（例えば errors）があれば処理
                         if (responseData.errors) {

@@ -10,17 +10,22 @@
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);  /* ホバー時に影を強調 */
 }
 
-.usericon-field {
+.usericon-container {
     text-align: center;
 }
-.usericon-field img {
+@media (max-width: 576px) {
+    .usericon-container .usericon-field {
+        width: 50%;
+    }
+}
+.usericon-container img {
     width: 100%;  /* 親要素に収まる */
     height: auto;  /* アスペクト比を維持 */
     object-fit: cover;  /* はみ出しを防ぐ */
     border-radius: 50%;  /* 丸い画像を維持 */
     aspect-ratio: 1 / 1;
 }
-.usericon-field .user-edit-button {
+.usericon-container .user-edit-button {
     position:absolute;
     bottom: 1px;
     right: 10px;
@@ -30,18 +35,19 @@
     border-radius: 3px;
     cursor: pointer;
     padding: 3px 10px;
-    width: 20%;  /* 親要素の20%の幅 */
     height: 20%; /* 親要素の20%の高さ */
+    width: auto;
     min-width: 30px;  /* 最小の幅 */
     min-height: 30px; /* 最小の高さ */
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 30px;
+    font-size: 20px;
+    aspect-ratio: 1 / 1;
 }
 /* 768px以上の画面幅でフォントサイズを変更 */
 @media (min-width: 768px) {
-    .usericon-field .user-edit-button {
+    .usericon-container .user-edit-button {
         font-size: 2vw; /* md 以上でのフォントサイズ */
     }
 }

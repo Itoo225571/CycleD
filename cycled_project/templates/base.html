@@ -321,17 +321,22 @@
 		</div>
 		
 		{% comment %} messages表示(error以外) {% endcomment %}
-		<script>
-			$(document).ready(function() {
-				{% if messages %}
+		{% if messages %}
+			<script>
+				$(document).ready(function() {
 					{% for message in messages %}
 						{% if message.level_tag != 'danger' %}  {# error 以外を対象にする #}
-							window.alert("{{ message|escapejs }}");
+							Swal.fire({
+								icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}",
+								title: "{{ message }}",
+								confirmButtonText: 'OK'
+							});
 						{% endif %}
 					{% endfor %}
-				{% endif %}
-			});
-		</script>
+				});
+			</script>
+		{% endif %}
+
 		{% comment %} 全体でのエラー表示用 {% endcomment %}
 		<script src="{% static 'js/error_lib.js' %}"></script>
 
