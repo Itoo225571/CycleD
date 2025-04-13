@@ -281,3 +281,5 @@ MESSAGE_TAGS = {
 # APSchedulerの設定
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"  # タスクの日時形式
 APSCHEDULER_RUN_NOW_TIMEOUT = 25  # タスクが今すぐ実行されるときのタイムアウト秒数
+
+ACCOUNT_SESSION_REMEMBER = None  # ← チェックボックスに任せる！

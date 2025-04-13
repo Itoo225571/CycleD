@@ -14,20 +14,29 @@
 {% block content %}
     <div class="container">
         {% if not user.location %}
-            <div>
-                <p>お気に入りの場所が登録されていません</p>
-                <p>お気に入りの場所を登録することで天気を見ることができます</p>
-                <a href={% url "diary:address_user" %} class="btn btn-outline-primary">
-                    <i class="iconify fs-2" data-icon="material-symbols:add-location-alt-rounded"></i>
-                    <span class="px-2 potta-one-regular">
-                        新しく登録する
-                    </span>
-                </a>
+            <div class="row">
+                <div class="col-lg-9 col-12 mx-auto">
+                    <div class="card text-center shadow" style="border-radius: 35px;">
+                        <div class="card-body p-4">
+                            <i class="iconify fs-1 mb-3 text-primary" data-icon="material-symbols:location-off-outline"></i>
+                            <h5 class="card-title"><strong>お気に入りの場所が登録されていません</strong></h5>
+                            <p class="card-text text-muted">
+                                お気に入りの場所を登録することで、<br>天気情報を確認できるようになります。
+                            </p>
+                            <a href="{% url 'diary:address_user' %}" class="btn btn-primary btn-lg mt-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="iconify me-3 fs-2" data-icon="material-symbols:add-location-alt-rounded"></i>
+                                    <span class="potta-one-regular">新しく登録する</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         {% else %}        
         <div class="current-wearher-container">
             {% with current=weather.current %}             
-            <div class="card card-current-weather" style="border-radius: 35px;">
+            <div class="card card-current-weather shadow" style="border-radius: 35px;">
                 <div class="card-body p-4">
                     <div class="d-flex">
                         <h6 class="class_city-name flex-grow-1">
