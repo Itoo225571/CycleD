@@ -407,7 +407,10 @@ $(document).ready(function() {
 
             // 削除ボタン
             $locationNewForm.find('.button-delete-location').off('click').on('click', function(e){
-                delete_location($locationNewForm,$diaryNewForm);
+                var diary_id = $diaryNewForm.find('input[id^="id_form-"][id$="-diary_id"]').val();
+                var bodyMessage = diary_id ? '既存の日記が削除されます': 'この日記は削除されます';
+                var key = diary_id ? 'delete_diary_exist' : 'delete_diary';
+                delete_location($locationNewForm,bodyMessage,key,$diaryNewForm);
             });
 
             // modal関係の関数
@@ -677,10 +680,14 @@ function sortPrefix() {
 }
 
 async function delete_diary($diary,to_confirm=true) {
+    var diary_id = $diary.find('input[id^="id_form-"][id$="-diary_id"]').val();
+    let bodyMessage = diary_id ? '既存の日記が削除されます': 'この日記は削除されます';
+    let key = diary_id ? 'delete_diary_exist' : 'delete_diary';
+
     if (to_confirm) {
-        const confirmed = await dont_show_again_popup('delete_diary', {
+        const confirmed = await dont_show_again_popup(key, {
             title: '日記を削除します',
-            body: '既存の日記を編集している場合，それが削除されます',
+            body: bodyMessage,
             icon: 'warning',
             showCancelButton: true,
             cancelButtonText: 'Cancel',
@@ -692,7 +699,7 @@ async function delete_diary($diary,to_confirm=true) {
 
     // 中に含まれるlocationを削除
     $diary.find('.locations-form-wrapper').each(function(index,el) {
-        delete_location($(this),null);
+        delete_location($(this),bodyMessage,key,null);
     });
 
     const $diaryAll = $('.diary-form-wrapper');
@@ -706,11 +713,11 @@ async function delete_diary($diary,to_confirm=true) {
         var $deleteInput = $diary.find('input[id^="id_form"][id$="-DELETE"]');
         $deleteInput.val(true);
         $deleteInput.trigger('change');
-        $diary.hide(); // 非表示にする
+        $diary.slideUp(500); // 500ms（0.5秒）でフェードアウト
     }
 }
 
-async function delete_location($locationForm,$diaryForm = null) {
+async function delete_location($locationForm,bodyMessage,key,$diaryForm = null) {
     if ($diaryForm) {
         var $locationExist = $diaryForm.find('input[id^="id_locations"][id$="-DELETE"]')
         .filter(function() {
@@ -719,9 +726,9 @@ async function delete_location($locationForm,$diaryForm = null) {
         
         // $diaryFormが指定されてる & Diary内のLocationが２以下の場合
         if ($locationExist.length <= 1) {
-            const confirmed = await dont_show_again_popup('delete_diary_from_loc', {
+            const confirmed = await dont_show_again_popup(key + '_from_loc', {
                 title: '日記が削除されます',
-                body: '既存の日記を編集している場合，それが削除されます',
+                body: bodyMessage,
                 icon: 'warning',
                 showCancelButton: true,
                 cancelButtonText: 'Cancel',
@@ -748,6 +755,6 @@ async function delete_location($locationForm,$diaryForm = null) {
     var $deleteInput = $locationForm.find('input[id^="id_locations"][id$="-DELETE"]');
     $deleteInput.val(true);
     $deleteInput.trigger('change');
-    $locationForm.hide(); // 非表示にする
+    $locationForm.slideUp(500); // 非表示にする
     return true;
 }
