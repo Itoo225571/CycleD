@@ -172,7 +172,7 @@ $(document).ready(function() {
                     });
 
                     diaries.forEach($form => {
-                        check_errors($form);
+                        check_errors_diary($form);
                     })
 
                     setTimeout(() => {
@@ -583,7 +583,7 @@ class Error {
         }
     }
 }
-function check_errors($diaryForm,errors=null) {
+function check_errors_diary($diaryForm,errors=null) {
     const $submit = $('button[name="diary-new-form"]');
     const $diaryErrors = $diaryForm.find("[id^='id_form-'][id$='-diary-errors']");
     const $locationFormsExist = $diaryForm.find('input[id^="id_locations"][id$="-DELETE"]')
@@ -633,13 +633,13 @@ function check_errors($diaryForm,errors=null) {
         var inputValue = $(this).val();
         var inputName = $(this).attr('name');
         if ((inputName.includes('lat') || inputName.includes('lon')) && inputValue) {
-            check_errors($diaryForm,errors);
+            check_errors_diary($diaryForm,errors);
         }
     });
 
     // locationForm が非表示（削除された）時の処理
     $diaryForm.find('input[id^="id_locations"][id$="-DELETE"]').on('change', function () {
-        check_errors($diaryForm,errors);
+        check_errors_diary($diaryForm,errors);
     });
 }
 
