@@ -36,6 +36,12 @@ class DiaryViewSet(mixins.ListModelMixin,
             return base_qs.filter(date__gte=one_year_ago)
         return base_qs
     
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        if not queryset.exists():
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return super().list(request, *args, **kwargs)
+
     def perform_destroy(self, instance):
         super().perform_destroy(instance)
         update_diaries(self.request)  # キャッシュ更新

@@ -31,35 +31,48 @@ function make_map() {
     return map;
 }
 
-function appendLocations(url_getDiaries,url_createDiaries, map) {
-    return $.ajax({
-        url: url_getDiaries,
-        method: 'GET',
-        data: {
-            filter_days: 365  // ← 直近1年分のデータを取得
-        },
-        dataType: 'json',
-        success: function(data, textStatus, jqXHR) {
-            // 日記が存在しない
-            if (jqXHR.status === 204) {
-                dont_show_again_popup('map',{
-                    title: '日記が存在しません',
-                    body: `<a href="${url_createDiaries}">ここから作成</a>`,
-                    icon: 'warning'
-                });
-                map.setView([35.6762, 139.6503], 8); // dataが空の場合に東京の座標を指定
-                return;
-            }
-            else {
-                var markers = setLocations(data, map);
-                make_filter(map, markers); // フィルターを追加
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('データの取得に失敗しました:', error);
+async function appendLocations(url_getDiaries, url_createDiaries, map) {
+    try {
+        const data = await fetchDiaries(url_getDiaries);
+        if (data.length === 0) {
+            await dont_show_again_popup('map', {
+                title: '日記が存在しません',
+                body: `<a href="${url_createDiaries}">ここから作成</a>`,
+                icon: 'info',
+            });
+            map.setView([35.6762, 139.6503], 8); // dataが空の場合に東京の座標を指定
+        } else {
+            const markers = setLocations(data, map);
+            make_filter(map, markers); // フィルターを追加
         }
+    } catch (error) {
+        console.error('データの取得に失敗しました:', error);
+    }
+}
+// fetchDiariesは非同期でデータを取得する関数
+function fetchDiaries(url) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: url,
+            method: 'GET',
+            data: {
+                filter_days: 365  // ← 直近1年分のデータを取得
+            },
+            dataType: 'json',
+            success: function(data, textStatus, jqXHR) {
+                if (jqXHR.status === 204) {
+                    resolve([]); // データが存在しない場合、空配列を返す
+                } else {
+                    resolve(data); // 正常にデータがあれば、データを返す
+                }
+            },
+            error: function(xhr, status, error) {
+                reject(error); // エラーがあればreject
+            }
+        });
     });
 }
+
 
 function setLocations(data, map) {
     var markers = L.markerClusterGroup(); // クラスタグループを作成

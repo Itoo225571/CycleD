@@ -30,15 +30,10 @@ async function addDiariesToCalendar() {
         const response = await fetch(url_sendDiaries);
 		// HTTPステータスコードが204の場合、空のデータを返す
 		if (response.status === 204) {
-			dont_show_again_popup('calendar',{
-				title: '1年以内の日記が存在しません',
-				body: '',
-				icon: 'warning'
-			});
-			dont_show_again_popup('calendar',{
+			await dont_show_again_popup('calendar',{
 				title: '日記が存在しません',
 				body: `<a href="${url_createDiaries}">ここから作成</a>`,
-				icon: 'warning'
+				icon: 'info'
 			});
 			return [];  // 空の配列を返す
 		}
