@@ -298,8 +298,8 @@ $(document).ready(function() {
 			$frontContent.find('#delete-form').on('submit', function(event){
 				event.preventDefault();
 				Swal.fire({
-					title: '本当に削除しますか？',
-					text: "この操作は取り消せません。",
+					title: '日記を削除します',
+					text: "この操作は取り消せません",
 					icon: 'warning',
 					showCancelButton: true,
 					confirmButtonText: 'OK',
@@ -541,7 +541,8 @@ $(document).ready(function() {
 						$nextRadiobutton.trigger('change');
 					}
 				} else {
-					alert('これ以上は削除できませんよ');
+					// alert('これ以上は削除できませんよ');
+					$('#delete-form').submit();
 				}
 			});
 			// 住所変更
