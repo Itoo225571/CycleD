@@ -59,7 +59,7 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
     def get(self, request: HttpRequest, *args: str, **kwargs) -> HttpResponse:
         # TempImage削除
         TempImage.objects.filter(user=request.user).delete()
-        cache.delete(f'image_hash_list_{request.user.id}')     # キャッシュも削除
+        request.session.pop('image_hash_list', None)
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args: str, **kwargs) -> HttpResponse:
@@ -72,11 +72,16 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
             return self.form_invalid(None)
         
     def form_valid(self, diary_formset, location_formset):
-        diaries = diary_formset.save(commit=False)
         try:
             with transaction.atomic():
-                for diary in diaries:
+                for form in diary_formset.forms:
+                    diary = form.instance
                     diary.user = self.request.user  # 現在のユーザーを設定
+                    to_delete = form.cleaned_data.get('DELETE', False)
+                    if to_delete:
+                        if diary.pk:  # 既存なら削除
+                            diary.delete()
+                        continue
                     diary.save()  # 保存
                 for form in location_formset.forms:
                     # locationがすでに存在しているか確認
@@ -291,7 +296,7 @@ async def process_image_file(img_file, image_hash_list, request):
                 geo_data['rank'] = 0
         
         image_hash_list.append(photo_hash)
-        await cache.aset(f'image_hash_list_{request.user.id}', image_hash_list, timeout=600)
+        request.session['image_hash_list'] = image_hash_list
 
         return geo_data
     except Exception as e:
@@ -329,7 +334,7 @@ class Photos2LocationsView(generic.View):
             data_all = await get_diaries_async(request,['mine'])
             diaries = data_all.get('diaries_mine')
             diaries_dict = await sync_to_async(lambda qs: {diary.date: diary for diary in qs})(diaries)
-            image_hash_list = await cache.aget(f'image_hash_list_{self.user.id}')
+            image_hash_list = request.session.get('image_hash_list', [])
 
             if not image_hash_list:
                 image_hash_list = []
@@ -339,7 +344,7 @@ class Photos2LocationsView(generic.View):
                     for location in locations:
                         if location.image_hash:
                             image_hash_list.append(location.image_hash)
-                await cache.aset(f'image_hash_list_{self.user.id}', image_hash_list, timeout=600)
+                request.session['image_hash_list'] = image_hash_list
 
             # TempImageの作成と添削
             # `files` が空でない場合にのみ処理を実行

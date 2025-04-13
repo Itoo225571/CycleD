@@ -248,6 +248,11 @@ $(document).ready(function() {
                     set_locationInDiary($diaryNewForm, location);
                 });
             }
+
+            $diaryNewForm.find('.button-delete-diary').off('click').on('click', function(e){
+                delete_diary($diaryNewForm);
+            });
+
             return $diaryNewForm
         }
 
@@ -401,43 +406,8 @@ $(document).ready(function() {
             });
 
             // 削除ボタン
-            $locationNewForm.find('.button-delete-location').off('click').on('click', function(){
-                const $locationExist = $diaryNewForm.find('input[id^="id_locations"][id$="-DELETE"]')
-                                        .filter(function() {
-                                            return !$(this).val(); // 値が空またはfalsyな場合にtrue
-                                        }).parents('.locations-form-wrapper');
-                // Diary内のLocationが２以上の場合実行可能
-                if ($locationExist.length > 1){
-                    var $deleteInput = $locationNewForm.find('input[id^="id_locations"][id$="-DELETE"]');
-                    var $radioButton = $locationNewForm.find('.class_location-radiobutton').first();
-                    var $otherradioButtons = $locationExist.find('.class_location-radiobutton').not($radioButton);
-                    if ($radioButton.is(':checked')){
-                        var is_thumbnail = $locationNewForm.find('input[name^="locations-"][name$="-is_thumbnail"]');
-                        $radioButton.prop('checked',false);
-                        is_thumbnail.val(false);
-            
-                        var nextRadio = $otherradioButtons.first();
-                        var nextLocation = nextRadio.closest('.locations-form-wrapper');
-                        var nextThumbnail = nextLocation.find('input[name^="locations-"][name$="-is_thumbnail"]');
-                        nextRadio.prop('checked', true);
-                        nextRadio.trigger('change');
-                        nextThumbnail.val(true);
-                    }
-                    $deleteInput.val(true);
-                    $deleteInput.trigger('change');
-                    $locationNewForm.hide(); // 非表示にする
-                    // totalformを変更
-                    // const locationTotalForms = $('#id_locations-TOTAL_FORMS');
-                    // const currentTotal = parseInt(locationTotalForms.val(), 10) || 1; // NaN の場合は 1 にする
-                    // locationTotalForms.val(currentTotal - 1); // 更新された値をセット
-
-                    // var is_exist = $locationNewForm.find('input[id^="id_locations"][id$="-location_id"]').val();
-                    // if (!is_exist) $locationNewForm.remove();  // 編集でない場合，remove(編集の場合はremoveしない)
-                    // console.log(is_exist)
-                    // resetPrefix();
-                } else {
-                    alert('もう消せないよ')
-                }
+            $locationNewForm.find('.button-delete-location').off('click').on('click', function(e){
+                delete_location($locationNewForm,$diaryNewForm);
             });
 
             // modal関係の関数
@@ -675,7 +645,6 @@ function sortPrefix() {
         const sortedForms = $forms.sort(function(a, b) {
             const aContainsId = $(a).find(`[name^="${name}-"][name$="_id"]`).val();
             const bContainsId = $(b).find(`[name^="${name}-"][name$="_id"]`).val();
-            console.log(aContainsId,bContainsId)
 
             // location_idやdiary_idを含むフォームを先に持ってくる
             if (aContainsId && !bContainsId) return -1;
@@ -705,4 +674,80 @@ function sortPrefix() {
     // diaryFormとlocationFormのprefixをリセット
     updateFormAttributes($('.diary-form-wrapper'), 'form');
     updateFormAttributes($('.locations-form-wrapper'), 'locations');
+}
+
+async function delete_diary($diary,to_confirm=true) {
+    if (to_confirm) {
+        const confirmed = await dont_show_again_popup('delete_diary', {
+            title: '日記を削除します',
+            body: '既存の日記を編集している場合，それが削除されます',
+            icon: 'warning',
+            showCancelButton: true,
+            cancelButtonText: 'Cancel',
+        });
+        if (!confirmed) {
+            return false;  // キャンセルされたので処理中断
+        }
+    }
+
+    // 中に含まれるlocationを削除
+    $diary.find('.locations-form-wrapper').each(function(index,el) {
+        delete_location($(this),null);
+    });
+
+    const $diaryAll = $('.diary-form-wrapper');
+    const $diaryExist = $diaryAll.find('input[id^="id_form"][id$="-DELETE"]')
+                        .filter(function() {
+                            return !$(this).val(); // 値が空またはfalsyな場合にtrue
+                        }).parents('.diary-form-wrapper');
+    // 1個以下の場合はリロード
+    if ($diaryExist.length <= 1) location.href = location.href;
+    else {
+        var $deleteInput = $diary.find('input[id^="id_form"][id$="-DELETE"]');
+        $deleteInput.val(true);
+        $deleteInput.trigger('change');
+        $diary.hide(); // 非表示にする
+    }
+}
+
+async function delete_location($locationForm,$diaryForm = null) {
+    if ($diaryForm) {
+        var $locationExist = $diaryForm.find('input[id^="id_locations"][id$="-DELETE"]')
+        .filter(function() {
+            return !$(this).val(); // 値が空またはfalsyな場合にtrue
+        }).parents('.locations-form-wrapper');
+        
+        // $diaryFormが指定されてる & Diary内のLocationが２以下の場合
+        if ($locationExist.length <= 1) {
+            const confirmed = await dont_show_again_popup('delete_diary_from_loc', {
+                title: '日記が削除されます',
+                body: '既存の日記を編集している場合，それが削除されます',
+                icon: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Cancel',
+            });
+            if (confirmed) delete_diary($diaryForm,to_comfirm=false);
+            else return false;
+        }    
+    
+        var $radioButton = $locationForm.find('.class_location-radiobutton').first();
+        var $otherradioButtons = $locationExist.find('.class_location-radiobutton').not($radioButton);
+        if ($radioButton.is(':checked')){
+            var is_thumbnail = $locationForm.find('input[name^="locations-"][name$="-is_thumbnail"]');
+            $radioButton.prop('checked',false);
+            is_thumbnail.val(false);
+    
+            var nextRadio = $otherradioButtons.first();
+            var nextLocation = nextRadio.closest('.locations-form-wrapper');
+            var nextThumbnail = nextLocation.find('input[name^="locations-"][name$="-is_thumbnail"]');
+            nextRadio.prop('checked', true);
+            nextRadio.trigger('change');
+            nextThumbnail.val(true);
+        }
+    }
+    var $deleteInput = $locationForm.find('input[id^="id_locations"][id$="-DELETE"]');
+    $deleteInput.val(true);
+    $deleteInput.trigger('change');
+    $locationForm.hide(); // 非表示にする
+    return true;
 }

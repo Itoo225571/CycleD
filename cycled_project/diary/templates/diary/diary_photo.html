@@ -72,14 +72,22 @@
 
         <div id="empty-form-diary" class="d-none">
             <div class="card" id="id_form-__prefix__-card">
-                <div class="card-header justify-content-center align-items-center">
-                    <h5 class="card-diary-date text-center"></h5>
+                <div class="card-header">
+                    <div class="d-flex justify-content-center align-items-center position-relative fs-3">
+                        <div class="card-diary-date text-center fw-bold"></div>
+                        <div class="position-absolute top-50 end-0 translate-middle-y">
+                            <button type="button" class="button-delete-diary button-text d-flex align-items-center">
+                                <i class="iconify text-danger" data-icon="material-symbols:delete-outline-rounded"></i>
+                            </button>
+                        </div>
+                    </div>
                     <div id="id_form-__prefix__-diary-errors"></div>
                 </div>
                 <div class="card-body">
                     {{ diary_formset.empty_form.date }}
                     {{ diary_formset.empty_form.diary_id }}
                     {{ diary_formset.empty_form.rotate_angle}}
+                    {{ diary_formset.empty_form.DELETE }}
                     <h5 class="card-title col-auto">
                         写真で得られた地域一覧
                     </h5>
@@ -180,6 +188,7 @@
     <script src="{% static 'js/loading_overlay.js' %}"></script>
     <script src="{% static 'js/searchKeys.js' %}"></script>
     <script src="{% static 'js/pagination.js' %}"></script>
+    <script src="{% static 'js/popup.js' %}"></script>
     <script src="{% static 'diary/js/check_input.js' %}"></script>
     <script>
         // DjangoテンプレートタグでURLを埋め込む
