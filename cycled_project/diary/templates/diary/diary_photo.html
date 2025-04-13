@@ -22,6 +22,13 @@
 
 {% block content %}
     <div class="container-diary-photo">
+        <div class="ms-auto">
+            <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#diaryGuideModal">
+                📘 日記作成ガイド
+            </button>
+            {% include "diary/snippets/ex.html" %}
+        </div>
+
         <form method="post" id="id_photos-form" name="photos-form" enctype="multipart/form-data" >
             {% csrf_token %}
             <div id="photo_form">
@@ -190,6 +197,7 @@
     <script src="{% static 'js/pagination.js' %}"></script>
     <script src="{% static 'js/popup.js' %}"></script>
     <script src="{% static 'diary/js/check_input.js' %}"></script>
+    <script src="{% static 'diary/js/carousel_in_modal.js' %}"></script>
     <script>
         // DjangoテンプレートタグでURLを埋め込む
         const url_photos2Locations = "{% url 'diary:photos2Locations' %}";

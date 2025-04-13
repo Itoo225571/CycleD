@@ -1,0 +1,75 @@
+<!-- モーダル本体 -->
+<div class="modal fade" id="diaryGuideModal" tabindex="-1" aria-labelledby="diaryGuideLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" style="height: 100vh;">
+        <div class="modal-content" style="height: 90vh; max-height: 700px; overflow-y: auto; border-radius:30px">
+            <div class="modal-header">
+                <h5 class="modal-title" id="diaryGuideLabel">日記作成ガイド</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+            </div>
+
+            <div class="modal-body">
+                <!-- カルーセル開始 -->
+                <div id="guideCarousel" class="carousel carousel-dark slide d-flex flex-column h-100" data-bs-interval="false" data-bs-touch="true">
+                    <div class="carousel-inner flex-grow-1">
+                        <!-- Slide 1 -->
+                        <div class="carousel-item active" data-bs-title="① 写真をアップロード">
+                            <p>下の <strong>[カメラアイコン]</strong> のフィールドに、サイクリング中に撮った写真をぶち込みます！<br>
+                            ※位置情報がついていると後々ラク！</p>
+                            <img src="#" alt="カメラを選択する様子">
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="carousel-item" data-bs-title="② 日記が自動作成されます">
+                            <p>写真のアップロード後、日記が自動で生成される様子をボーッと見ましょう。</p>
+                            <h6>※ エラーが出て動かなくなったら、制作者に報告を！</h6>
+                            <img src="#" alt="読み込み中の様子">
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="carousel-item" data-bs-title="③ 日記を編集しよう">
+                            <h6>自動で作成された日記を編集できます</h6>
+                            <ol>
+                                <li>公開・非公開を切り替え</li>
+                                <li>撮影場所の名称変更・場所変更・削除</li>
+                                <li>写真の回転やコメント入力もOK</li>
+                            </ol>
+                            <h6>※ 写真に位置情報がないときは「場所を指定する」から設定</h6>
+                            <img src="#" alt="日記を編集する様子">
+                        </div>
+
+                        <!-- Slide 4 -->
+                        <div class="carousel-item" data-bs-title="④ 作成完了！">
+                            <p>「日記作成！」ボタンを押せば完了！<br>日記に写真を追加することもできます。</p>
+                            <img src="#" alt="日記作成ボタン">
+                        </div>
+
+                        <!-- Slide 5 -->
+                        <div class="carousel-item" data-bs-title="注意事項 ⚠️">
+                            <ul>
+                            <li>📍 1日記に追加できる撮影場所は <code>{MAX_LOCATION}</code> 個まで</li>
+                            <li>📅 一度に作成できる日記数は <code>{MAX_DIARY}</code> 個まで</li>
+                            <li>🔒 他人や自分が使った写真は再使用できません</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="carousel-indicators position-relative mt-auto">
+                        <button type="button" data-bs-target="#guideCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#guideCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#guideCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        <button type="button" data-bs-target="#guideCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                        <button type="button" data-bs-target="#guideCarousel" data-bs-slide-to="4" aria-label="Slide 5"></button>
+                    </div>
+                </div>
+                <!-- カルーセル終了 -->
+            </div>
+            <div class="modal-footer d-flex justify-content-evenly">
+                <button class="btn btn-outline-primary btn-lg rounded-pill" type="button" data-bs-target="#guideCarousel" data-bs-slide="prev">
+                    <span class="potta-one-regular mx-3">戻る</span>
+                </button>
+                <button class="btn btn-primary btn-lg rounded-pill" type="button" data-bs-target="#guideCarousel" data-bs-slide="next">
+                    <span class="potta-one-regular mx-3">次へ</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
