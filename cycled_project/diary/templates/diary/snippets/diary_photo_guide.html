@@ -1,23 +1,86 @@
-・日記の新規作成
-1. 下の[カメラアイコン]がついたフィールドにサイクリング中に撮った写真をぶち込みます（またはフィールドをクリックして写真を選択する）
-※ この時，選択する画像は位置情報が付いていると後々ラクです
-2. 日記が自動で作成されるのをボーッと見ます
-※ 画像ロード中によくわからないエラーが発生し，リロードしても治らない場合は制作者に報告をお願いします
-3. 表示されている日記を編集します
-    1. 日記の公開・非公開を選択できます
-    2. 撮影場所の表示名を[名称変更アイコン]から変更できます
-    3. [場所変更アイコン]から撮影場所の変更ができます
-    4. [削除アイコン]から日記，撮影場所の削除ができます（撮影場所を全て削除すると自動で日記も削除されます）
-    5. [回転アイコン]で写真を90°ずつ回転することができます
-    6. コメント欄になんかいい感じのコメントができます
-    ※ 写真に位置情報が付随していない場合_(場所を指定する)から撮影場所を指定できます
-4. 日記作成！ボタンで日記を作成します
+<!-- モーダル本体 -->
+<div class="modal fade modal-carousel" id="diaryGuideModal" tabindex="-1" aria-labelledby="diaryGuideLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" style="height: 100vh;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="diaryGuideLabel">日記作成ガイド</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+            </div>
 
-・日記に写真を追加する
-日記が存在する日の写真を追加することができます
-その際に，その日記を編集することもできます
+            <div class="modal-body">
+                <!-- カルーセル開始 -->
+                <div id="guideCarousel" class="carousel carousel-dark slide d-flex flex-column h-100" data-bs-interval="false" data-bs-touch="true">
+                    <div class="carousel-inner px-3">
+                        <!-- Slide 1 -->
+                        <div class="carousel-item active" data-bs-title="① 写真をアップロード">
+                            <p>
+                                <i class="material-icons align-middle px-1">add_a_photo</i> 
+                                アイコンがついているフィールドに、サイクリング中に撮った写真をぶち込みます。<br>
+                                または、フィールドをクリックして写真を選択します。
+                            </p>
+                            <h6>※位置情報がついていると後々ラク</h6>
+                        </div>
 
-（注意）
-・１つの日記に追加できる撮影場所は{MAX_LOCATION}個までです
-・１度に作成できる日記の上限は{MAX_DIARY}個です
-・自分または他人が日記作成に使用した写真は新規日記作成に使用することはできません
+                        <!-- Slide 2 -->
+                        <div class="carousel-item" data-bs-title="② 日記が自動作成されます">
+                            <p>写真のアップロード後、日記が自動で生成される様子をボーッと見ましょう。</p>
+                            <h6>※ 何度もエラーが起こる場合は、制作者に報告を！</h6>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="carousel-item" data-bs-title="③ 日記を編集しよう">
+                            <h6>自動で作成された日記を編集できます</h6>
+                            <ol>
+                                <li>公開設定（公開にすると、他のユーザーに見られる可能性があります）</li>
+                                <li>撮影場所の編集（名称変更・場所の調整・削除）</li>
+                                <ul>
+                                    <li><i class="iconify text-dark" data-icon="bx:rename"></i>：名称の変更</li>
+                                    <li><i class="iconify text-primary" data-icon="material-symbols:edit-location-alt-outline-rounded"></i>：場所の変更</li>
+                                    <li><i class="iconify text-danger" data-icon="material-symbols:delete-outline-rounded"></i>：場所の削除</li>
+                                </ul>
+                                <li>写真の回転やコメントの追加も可能です</li>
+                                <li>撮影場所を選択することで、日記のサムネイル画像を変更できます</li>
+                            </ol>
+                            <h6>※ 写真に位置情報がないときは<span class="text-primary text-decoration-underline">場所を指定する</span>から設定</h6>
+
+                        </div>
+
+                        <!-- Slide 4 -->
+                        <div class="carousel-item" data-bs-title="④ 作成完了！">
+                            <p>
+                                <span class="text-primary"><i class="material-icons align-middle px-1" style="font-size: 1em;">directions_bike</i>日記作成！</span>
+                                ボタンを押せば完了！
+                            </p>
+                            <h6>※ 日記にエラーがある場合は送信できません。エラー内容を見て修正してから送信を行なってください。</h6>
+                        </div>
+
+                        <!-- Slide 5 -->
+                        <div class="carousel-item" data-bs-title="⚠️ 注意事項">
+                            <ul>
+                                <li>1つの日記に追加できる撮影場所(写真の枚数)は {{ MAX_LOCATIONS }} 個まで</li>
+                                <li>一度に作成できる日記数は {{ MAX_DIARIES }} 個まで</li>
+                                <li>他人や自分が使った写真は再使用できません</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="carousel-indicators position-relative mt-auto">
+                        <button type="button" data-bs-target="#guideCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#guideCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#guideCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        <button type="button" data-bs-target="#guideCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+                        <button type="button" data-bs-target="#guideCarousel" data-bs-slide-to="4" aria-label="Slide 5"></button>
+                    </div>
+                </div>
+                <!-- カルーセル終了 -->
+            </div>
+            <div class="modal-footer d-flex justify-content-evenly">
+                <button class="btn btn-outline-secondary btn-lg rounded-pill" type="button" data-bs-target="#guideCarousel" data-bs-slide="prev">
+                    <span class="potta-one-regular mx-3">戻る</span>
+                </button>
+                <button class="btn btn-primary btn-lg rounded-pill" type="button" data-bs-target="#guideCarousel" data-bs-slide="next">
+                    <span class="potta-one-regular mx-3">次へ</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
