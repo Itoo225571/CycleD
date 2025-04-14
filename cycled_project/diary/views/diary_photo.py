@@ -46,11 +46,15 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
     form_class = PhotosForm
 
     def get_context_data(self, **kwargs):
+        diary_formset = DiaryFormSet(queryset=Diary.objects.none())
+        location_formset = LocationFormSet(queryset=Location.objects.none())
+
         context = super().get_context_data(**kwargs)
         context['photo_form'] = context.pop('form', None)
-        context['diary_formset'] = DiaryFormSet(queryset=Diary.objects.none())
-        context['location_formset'] = LocationFormSet(queryset=Location.objects.none())
+        context['diary_formset'] = diary_formset
+        context['location_formset'] = location_formset
         context['MAX_LOCATIONS'] = Diary.MAX_LOCATIONS
+        context['MAX_DIARIES'] = diary_formset.max_num
 
         context['addressseach_form'] = AddressSearchForm()
         context['addressselect_form'] = AddressForm()
