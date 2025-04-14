@@ -1,0 +1,74 @@
+<!-- モーダル本体 -->
+<div class="modal fade modal-carousel" id="calendarGuideModal" tabindex="-1" aria-labelledby="diaryGuideLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" style="height: 80vh;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="diaryGuideLabel">カレンダー操作ガイド</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+            </div>
+
+            <div class="modal-body">
+                <!-- カルーセル開始 -->
+                <div id="guideCarousel" class="carousel carousel-dark slide d-flex flex-column h-100" data-bs-interval="false" data-bs-touch="true">
+                    <div class="carousel-inner px-3">
+                        <!-- Slide 1 -->
+                        <div class="carousel-item active" data-bs-title="カレンダーについて">
+                            <h5>ここでは、あなたが作成した日記を確認・編集することができます</h5>
+                            <p>
+                                サイクリングを行った日には、
+                                <i class="material-icons align-middle px-1 text-primary" style="font-size: 1em;">directions_bike</i>
+                                がつきます
+                            </p>
+                            <p>
+                                さらに、その日のうちに日記を作成すると、
+                                <i class="material-icons align-middle px-1 text-danger" style="font-size: 1em;">directions_bike</i>
+                                に進化して、すぐに記録したことがわかります
+                            </p>
+                        </div>
+                        <!-- Slide 2 -->
+                        <div class="carousel-item" data-bs-title="日記を閲覧する">
+                            <h5>
+                                カレンダー上の
+                                <i class="material-icons align-middle px-1 text-primary" style="font-size: 1em;">directions_bike</i>
+                                 or 
+                                <i class="material-icons align-middle px-1 text-danger" style="font-size: 1em;">directions_bike</i>
+                                を選択すると、該当する日記を開くことができます
+                            </h5>
+                            <ul class="fs-6">
+                                <li> 👁️ アイコンで日記の公開設定を確認できます</li>
+                                <li>撮影した場所を選ぶと、対応する写真が表示されます</li>
+                                <li><i class="bi bi-pencil-square text-muted mx-1"></i>アイコンから編集画面に移動できます</li>
+                                <li><i class="bi bi-trash text-danger mx-1"></i>で日記を削除できます</li>
+                            </ul>
+                        </div>
+                        <!-- Slide 3 -->
+                        <div class="carousel-item" data-bs-title="日記を編集する">
+                            <h5>
+                                <i class="bi bi-pencil-square text-muted mx-1"></i>から日記編集画面に遷移します
+                            </h5>
+                            <p>日記作成時と同じ要領で、日記を編集することができます</p>
+                            <p>詳しい操作方法は、日記ページ内のヘルプをご確認ください</p>
+                        </div>
+                    </div>
+                    <div class="carousel-indicators position-relative mt-auto">
+                        <button type="button" data-bs-target="#guideCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#guideCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#guideCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                    </div>
+                </div>
+                <!-- カルーセル終了 -->
+            </div>
+            <div class="modal-footer d-flex justify-content-evenly">
+                <button id="carouselPrevBtn" class="btn btn-outline-secondary btn-lg rounded-pill" type="button" data-bs-target="#guideCarousel" data-bs-slide="prev">
+                    <span class="potta-one-regular mx-3">戻る</span>
+                </button>
+                <button id="carouselNextBtn" class="btn btn-primary btn-lg rounded-pill" type="button" data-bs-target="#guideCarousel" data-bs-slide="next">
+                    <span class="potta-one-regular mx-3">次へ</span>
+                </button>
+                <button id="carouselCloseBtn" class="btn btn-secondary btn-lg rounded-pill" type="button" data-bs-dismiss="modal" style="display: none;">
+                    <span class="potta-one-regular mx-3">閉じる</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

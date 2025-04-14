@@ -65,6 +65,14 @@
                                                 <div class="card-thumbnail">
                                                     <img src="{{ loc.image.url }}" alt="サムネイル" class="thumbnail-img" style="transform: rotate({{ loc.rotate_angle }}deg);" onclick="zoom_image('{{ loc.image.url }}','{{ loc.rotate_angle }}')">  <!-- 画像を表示 -->
                                                     <a class="to-calendar-button" href="{% url 'diary:calendar' %}?diary_date={{ data.diary.date|date:"Y-m-d" }}"></a>
+                                                    <button type="button"
+                                                            class="is_public btn btn-sm btn-outline-secondary"
+                                                            data-ispublic="{{ data.diary.is_public }}"
+                                                            data-bs-toggle="tooltip"
+                                                            data-bs-placement="top"
+                                                            title="{{ data.diary.is_public|yesno:'公開されています,非公開です' }}">
+                                                    </button>
+
                                                 </div>
                                                 <div class="card-body row">
                                                     <div class="card-diaryinfo col-9">
@@ -159,6 +167,7 @@
 
 {% block extra_js %}
     <script src="{% static 'js/loading_overlay.js' %}"></script>
+    <script src="{% static 'js/tooltip.js' %}"></script>
     <script src="{% static 'diary/js/adjust_imgs.js' %}"></script>
     <script src="{% static 'diary/js/home.js' %}"></script>
 {% endblock %}

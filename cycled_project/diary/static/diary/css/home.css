@@ -113,6 +113,36 @@
     color: #FFFFFF;
     background-color: black;
 }
+/* 日記が公開か非公開か */
+.diary-myself-field .diary-list .card .is_public{
+    position: absolute; 
+    top: 5%;
+    left: 5%;
+    width: 35px;
+    height: 35px;
+    font-size: 20px; /* ボタンの大きさも画面サイズに応じて変化 */
+    opacity: 0.8;
+    border: none;
+    border-radius: 3px;
+    background-color: black;
+    text-decoration: none; /* 青い下線を消す */
+    /* コンテンツの中央揃え */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.diary-myself-field .diary-list .card .is_public[data-ispublic="True"]::before,
+.diary-myself-field .diary-list .card .is_public[data-ispublic="False"]::before {
+    font-family: 'Material Icons Outlined';
+    content: '\e80b';
+    color: skyblue;
+    background-color: black;
+}
+.diary-myself-field .diary-list .card .is_public[data-ispublic="False"]::before {
+    content: '\f1ca';
+    color: #6c757d; /* text-muted */
+}
+
 .diary-myself-field .card-rank0 .card-explanation {
     color: #888;       /* グレー系の薄い色 */
 }

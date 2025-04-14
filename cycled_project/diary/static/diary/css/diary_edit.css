@@ -29,11 +29,11 @@
 /* 表示・非表示アイコン(data-visibleの値で判断) */
 .diary-ispublic-field[data-visible="false"] .icon-visibility::before {
     color: #6c757d;
-    content: 'visibility_off';
+    content: 'public_off';
 }
 .diary-ispublic-field[data-visible="true"] .icon-visibility::before {
     color: #007bff;
-    content: 'visibility';
+    content: 'public';
 }
 /* ラジオボタン(通常) */
 .location-label {

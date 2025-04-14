@@ -1,6 +1,6 @@
 <!-- モーダル本体 -->
 <div class="modal fade modal-carousel" id="diaryGuideModal" tabindex="-1" aria-labelledby="diaryGuideLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered" style="height: 100vh;">
+    <div class="modal-dialog modal-lg modal-dialog-centered" style="height: 80vh;">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="diaryGuideLabel">日記作成ガイド</h5>
@@ -74,11 +74,14 @@
                 <!-- カルーセル終了 -->
             </div>
             <div class="modal-footer d-flex justify-content-evenly">
-                <button class="btn btn-outline-secondary btn-lg rounded-pill" type="button" data-bs-target="#guideCarousel" data-bs-slide="prev">
+                <button id="carouselPrevBtn" class="btn btn-outline-secondary btn-lg rounded-pill" type="button" data-bs-target="#guideCarousel" data-bs-slide="prev">
                     <span class="potta-one-regular mx-3">戻る</span>
                 </button>
-                <button class="btn btn-primary btn-lg rounded-pill" type="button" data-bs-target="#guideCarousel" data-bs-slide="next">
+                <button id="carouselNextBtn" class="btn btn-primary btn-lg rounded-pill" type="button" data-bs-target="#guideCarousel" data-bs-slide="next">
                     <span class="potta-one-regular mx-3">次へ</span>
+                </button>
+                <button id="carouselCloseBtn" class="btn btn-secondary btn-lg rounded-pill" type="button" data-bs-dismiss="modal" style="display: none;">
+                    <span class="potta-one-regular mx-3">閉じる</span>
                 </button>
             </div>
         </div>
