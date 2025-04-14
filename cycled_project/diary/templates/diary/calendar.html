@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{% static 'diary/css/flip.css' %}" type="text/css" >
     <link rel="stylesheet" href="{% static 'diary/css/diary_edit.css' %}" type="text/css" >
     <link rel="stylesheet" href="{% static 'diary/css/address_search.css' %}" type="text/css" >
+    <link rel="stylesheet" href="{% static 'diary/css/carousel_in_modal.css' %}" type="text/css" >
 
     <link rel="stylesheet" href="{% static 'css/pagination.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'css/autocomplete.css' %}" type="text/css">
@@ -18,10 +19,17 @@
 
 {% block content %}
     <div class="container-calendar">
+        {% include "diary/snippets/calendar_guide.html" %}
         <div class="justify-content-md-center text-center"> 
             <div class="container-fluid">
                 <div class="row my-md-3 my-2">
-                    <h2 class="calendarTitle"></h2>
+                    <div class="position-relative pb-2">
+                        <h2 class="calendarTitle m-0"></h2>
+                        <button class="position-absolute top-0 end-0 p-0 m-0 me-2 border-0 bg-transparent" 
+                                data-bs-toggle="modal" data-bs-target="#calendarGuideModal" aria-label="使い方を見る">
+                            <i class="bi bi-question-circle text-dark fs-4"></i>
+                        </button>
+                    </div>          
                     <div id="mycalendar"></div>
                 </div>
             </div>
@@ -172,6 +180,7 @@
         const mockUuid = "{{ mock_uuid }}"; 
     </script>
     <script src="{% static 'diary/js/adjust_imgs.js' %}"></script>
+    <script src="{% static 'diary/js/carousel_in_modal.js' %}"></script>
 
     <script src="{% static 'diary/js/address.js' %}"></script>
     <script src="{% static 'diary/js/address_in_calendar.js' %}"></script>
