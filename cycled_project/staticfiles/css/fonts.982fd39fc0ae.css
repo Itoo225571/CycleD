@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Kaisei+Decol:wght@400;700&family=Potta+One&family=Rampart+One&display=swap');
+
+.dela-gothic-one-regular {
+    font-family: "Dela Gothic One", serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.potta-one-regular {
+    font-family: "Potta One", serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.kaisei-decol-regular {
+    font-family: "Kaisei Decol", serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.rampart-one-regular {
+    font-family: "Rampart One", serif;
+    font-weight: 400;
+    font-style: normal;
+}

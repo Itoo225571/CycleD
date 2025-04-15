@@ -1,0 +1,41 @@
+.flip > div {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    transform-style: preserve-3d; /* 3D効果を維持 */
+    perspective: 1000px; /* 深度を強調する */
+}
+
+.flip-back,
+.flip-front {
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility:hidden;
+    backface-visibility:hidden;
+    transform-style: preserve-3d;
+    transition: transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55), 
+    opacity 0.5s ease-in-out; /* opacityのトランジションを追加 */
+}
+
+.flip-front {
+    transform: rotateY(0deg);
+    z-index: 2; /* 表面が前面に表示されるようにする */
+    opacity: 1; /* 表面は常に表示 */
+}
+
+.flip-back {
+    transform: rotateY(-180deg);
+    position: absolute;
+    top: 0;
+    z-index: 1; /* 裏面を背面に配置 */
+    opacity: 0; /* デフォルトで非表示 */
+}
+
+.flip.flipped .flip-front {
+    transform: rotateY(180deg); 
+    opacity: 0; /* 表面を非表示 */
+}
+.flip.flipped .flip-back {
+    transform: rotateY(0deg);
+    opacity: 1; /* 背面を表示 */
+}
