@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>🚫 アクセス拒否（403）</h1>
+    <p>このページにアクセスする権限がありません。</p>
+    {% if not request.user.is_authenticated %}
+        <p><a href="{% url 'accounts:login' %}">ログイン</a>してください。</p>
+    {% endif %}
+    <a href="{% url 'diary:top' %}">トップページへ戻る</a>
+{% endblock %}

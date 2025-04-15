@@ -1,0 +1,96 @@
+#mapid {
+    height: 600px;
+    max-height: 75vh;
+    width: 100%;
+}
+
+/* ポップアップ全体 */
+#mapid .popup-content {
+    font-family: Arial, sans-serif;
+    padding: 10px;
+    max-width: 250px; /* ポップアップの最大幅 */
+    text-align: center; /* 画像とラベルを中央に配置 */
+}
+#mapid .leaflet-popup-content {
+    width: 200px; /* 自動でサイズ調整 */
+    padding: 0;
+}
+
+/* 画像のスタイル */
+#mapid .popup-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#mapid .popup-image img {
+    border-radius: 8px; /* 画像に角丸をつける */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* 画像に影をつける */
+    transition: transform 0.3s ease-in-out; /* 回転時のスムーズなアニメーション */
+}
+#mapid .popup-image img:hover {
+    transform: scale(1.05); /* 画像をホバー時に少し拡大 */
+}
+
+/* レスポンシブ対応: 画面が小さい場合に画像を調整 */
+@media (max-width: 600px) {
+    #mapid .popup-content {
+        max-width: 200px;
+    }
+    #mapid .popup-label {
+        font-size: 14px;
+    }
+}
+
+/* ラジオボタン */
+#mapid .leaflet-bar {
+    border: none;
+}
+#filterDropdown {
+    width: 100%;  /* ボタンを親要素いっぱいに広げる */
+    height: 100%;  /* ボタンの高さも親要素いっぱいに */
+    display: flex;  /* フレックスボックスでアイコンを中央に配置 */
+    justify-content: center;  /* 横方向で中央に配置 */
+    align-items: center;  /* 縦方向で中央に配置 */
+    padding: 0;  /* パディングを0にしてアイコンがボタン全体に広がるように */
+}
+#filterDropdown .material-icons-round {
+    font-size: 1.5rem;  /* アイコンのサイズを調整 */
+}
+
+#tagFilterForm {
+    border-radius: 0.5rem; /* フォーム全体の角を丸くする */
+    overflow: hidden; /* 丸みが適切に表示されるように、オーバーフローを隠す */
+}
+/* ラジオボタンとラベルの配置を調整 */
+#tagFilterForm .dropdown-item {
+    border: none;
+    display: block;
+}
+#tagFilterForm input[type="radio"] {
+    margin-right: 5px; /* ラジオボタンとテキストの間にスペースを追加 */
+}
+
+/* ボタン全体のスタイル */
+.easy-button-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;  /* パディングをなくして、アイコンがボタンいっぱいに広がるようにする */
+    width: 50px;  /* 必要に応じてボタンの幅を調整 */
+    height: 50px; /* 必要に応じてボタンの高さを調整 */
+    border-radius: 50%; /* 丸いボタン */
+    background-color: #4CAF50;  /* ボタンの背景色 */
+    border: none; /* ボーダーなし */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);  /* 影をつけて立体感を出す */
+}
+
+/* ボタンのホバー時のスタイル */
+.easy-button-button:hover {
+    background-color: #45a049;  /* ボタンのホバー時の色を変更 */
+    cursor: pointer;
+}
+
+

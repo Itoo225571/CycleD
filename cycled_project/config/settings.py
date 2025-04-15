@@ -86,6 +86,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',   # 静的ファイル用
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -105,6 +106,8 @@ if DEBUG:
     import debug_toolbar
     INSTALLED_APPS += ['debug_toolbar']
     MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 ROOT_URLCONF = "config.urls"
 
@@ -181,7 +184,9 @@ SOCIAL_AUTH_LOGIN_REDIRECT_URL= '/home/'
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR,'static') 
+]
 STATIC_ROOT = BASE_DIR / "staticfiles"  # 本番環境で `collectstatic` 実行時に使用
 
 # Default primary key field type
