@@ -1,0 +1,268 @@
+/* ファイルinputデザイン */
+.filepond--root {
+    cursor: pointer; /* フィールド全体をクリック可能に */
+    border: 2px dashed #ccc; /* 見た目を調整 */
+    border-radius: 10px;
+    aspect-ratio: 3/1;
+    transition: background-color 0.3s, border-color 0.3s; /* スムーズな遷移 */
+}
+.filepond--root:hover {
+    background-color: #f0f0f0; /* ホバー時の背景色 */
+    border-color: #007bff; /* ホバー時のボーダー色 */
+}
+.filepond--drop-label{
+    height: 100%;
+}
+.filepond--list-scroller{
+    height: 90%!important;
+}
+.filepond--drop-label label {
+    cursor: pointer; /* ドロップエリアのラベル */
+}
+.filepond--credits {
+    cursor: default;
+}
+.filepond--item-panel .filepond--item-remove-button {
+    display: none; /* バツマークを非表示にする */
+}
+/* アップロードアイコン */
+.icon-upload {
+    position: relative; /* 擬似要素の位置を設定するために relative を使用 */
+    padding-left: 3em; /* アイコンのための余白を追加 */
+}
+.icon-upload::before {
+    font-family: 'Material Icons';
+    content: '\e439'; /* Unicodeのアイコンや他の記号を指定 */
+    position: absolute; /* 絶対位置を指定 */
+    left: 0; /* 左側に配置 */
+    top: 50%; /* 上部から50%の位置に配置 */
+    transform: translateY(-50%); /* 中央に配置するためにY軸を調整 */
+    font-size: 2em; /* アイコンのサイズを調整 */
+}
+
+/* ラジオボタン(通常) */
+.location-label {
+    margin: .1em auto; 
+    padding: .8rem .5rem;
+    font-size: 100%;
+    line-height: 1;
+    position: relative;
+    cursor: pointer;
+    border-radius: .5em;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    background-color: #fff;
+    width: 90%;
+
+    padding-left: 30px;
+}
+.location-label::before,
+.location-label::after {
+    content: "";
+    display: block; 
+    border-radius: 50%;
+    position: absolute;
+    transform: translateY(-50%);
+    top: 50%;
+}
+.location-label::before {
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    background-color: #fff;
+    width: 20px;
+    height: 20px;
+    left: 5px;
+}
+.location-label::after {
+    border-radius: 50%;
+    opacity: 0;
+    width: 10px;
+    height: 10px;
+    left: 10px;
+}
+/* ラジオボタン(hober) */
+.location-label:hover {
+    top: 1px;
+    box-shadow: 0 0 rgba(0, 0, 0, 0);
+}
+.location-label:hover::after {
+    background-color: lightskyblue;
+    opacity: 1;
+}
+/* ラジオボタン(チェック) */
+.class_location-radiobutton:checked + .location-label {
+    top: 1px;
+    box-shadow: 0 0 rgba(0, 0, 0, 0);
+    border: 1px solid deepskyblue;
+    transform: scale(1.1);
+    /* transform-origin: left center; 左端を基準に拡大 */
+    z-index: 1000;
+} 
+.class_location-radiobutton:checked + .location-label::after {
+    background-color: deepskyblue;
+    opacity: 1;
+}
+
+/* 作成ボタン */
+.diary-new-button {
+    position: relative;
+    padding: 10px 30px;
+    font-size: 1.5em;
+    border: 3px solid #3498db;
+    background-color: white;
+    color: #3498db;
+    cursor: pointer;
+    overflow: hidden;
+    width: 75%;
+    height: 3em;
+    min-width: 300px;
+    border-radius: 5px;
+    transition: color 1s ease;
+}
+.diary-new-button:hover {
+    color: white; /* ホバー時の文字色を白に */
+    
+}
+.diary-new-button::before {
+    content: "\e52f"; /* Unicode for the icon */
+    font-family: 'Material Icons'; /* Use the Material Icons font */
+    position: absolute;
+    left: 30px; /* 初期位置 */
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.5em;
+    transition: left .01s ease;
+    color: #1B85FB;
+}
+.diary-new-button:hover::before {
+    left: calc(100% - 30px - 1.5em); /* ホバー時にアイコンを右端に移動 */
+    transition: left .3s ease;
+}
+.diary-new-button::after {
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #1B85FB;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: all .5s ease;
+    transition-property: transform;
+}
+.diary-new-button:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+.diary-new-button .text {
+    position: relative;
+    z-index: 1;
+}
+.diary-new-button:disabled {
+    background-color: #e0e0e0; /* 無効化された時の背景色 */
+    color: #a0a0a0; /* 無効化された時の文字色 */
+    border-color: #a0a0a0; /* 無効化された時の枠の色 */
+    cursor: default;
+    opacity: 0.3; /* 透明度を強調 */
+}
+.diary-new-button:disabled::before {
+    color: #a0a0a0; /* アイコンの色も無効化に合わせて変更 */
+}
+.diary-new-button:disabled::after {
+    background: none; /* 背景のアニメーションを無効化 */
+}
+.diary-new-button:disabled:hover {
+    color: #a0a0a0; /* ホバーしても文字色が変わらないようにする */
+}
+.diary-new-button:disabled:hover::before {
+    left: 30px; /* アイコンはホバー時に動かない */
+}
+.diary-new-button:disabled:hover::after {
+    transform: scaleX(0); /* 背景アニメーションを無効化 */
+}
+
+/* サムネイル */
+.thumbnail-image {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+
+    opacity: 0;
+    transform: translateX(-20px); /* 左から少しずれた位置 */
+    transition: opacity .5s ease, transform 0.5s ease; /* opacityとtranslateXを同時にアニメーション */
+    transform-origin: center; /* 回転の基準点を中心に設定 */
+}
+.thumbnail-image-loaded {
+    opacity: 1;
+    transform: translateX(0); /* 元の位置に移動 */
+}
+.diary-thumbnail {
+    aspect-ratio: 1/1;
+    position: relative; /* 画像の親要素を相対位置に設定 */
+}
+/* 回転ボタン */
+.class_img-rotate-button {
+    padding: 0;
+    border: none;
+}
+.class_img-rotate-icon::before {
+    content: "\eaab";
+    font-family: 'Material Icons'; /* Material Iconsフォント */
+    font-style: normal; /* 斜体を解除 */
+    font-size: 2em;
+    display: inline-block; /* ブロック要素として扱う */
+    transform: rotate(135deg); /* 30度傾ける */
+    transform-origin: center; /* 回転の基点を中央に設定 */
+}
+/* 説明文 */
+.explanation {
+    font-size: 0.8em;  /* 小さめのフォントサイズ */
+    color: #888;       /* グレー系の薄い色 */
+    margin: 5px 0;     /* 余白を小さく */
+    line-height: 1.4;  /* 行間を少し広めに */
+}
+
+/* カード */
+.card-rank0 {
+    border: 1px solid #b39855;
+}
+.card-rank0 .card-header {
+    background: linear-gradient(90deg, #b39855 0%, #fff9e6 50%, #b39855 100%);
+    background-repeat: no-repeat;
+    color: black;
+}
+.card .card-errors-element{
+    font-size: 0.8em;  
+    color: crimson;      
+    margin: 5px 0;    
+    line-height: 1.4;
+}
+.card:has(.card-errors-element) {
+    border-color: red; /* .card-errors-elementがあるときの境界線の色 */
+    background-color: rgba(255, 238, 238, 0.5);
+}
+
+/* 編集中のLocation */
+.location-editing {
+    /* transform: scale(1.1); */
+    z-index: 1000;
+}
+
+.diary-form-wrapper .field-is_public label,
+.diary-form-wrapper .field-is_public input {
+    cursor: pointer;
+}
+@media (min-width: 768px) {
+    .diary-form-wrapper .field-is_public {
+        margin: 10px 5px !important;
+    }
+}
+
+.locations-form-wrapper .location-buttons-field {
+    display: flex;
+    align-items: center;
+}
+.locations-form-wrapper .location-buttons-field i {
+    font-size: 1.5rem;
+}

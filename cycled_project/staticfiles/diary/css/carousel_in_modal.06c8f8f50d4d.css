@@ -1,0 +1,6 @@
+.modal-carousel .modal-content{
+    height: 90vh; 
+    max-height: 700px; 
+    overflow-y: auto; 
+    border-radius:30px;
+}
