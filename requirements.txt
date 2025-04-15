@@ -20,7 +20,7 @@ cryptography==43.0.3
 debugpy==1.8.6
 decorator==5.1.1
 Django==5.0.6
-django-allauth==65.3.0
+django-allauth==65.5.0
 django-appconf==1.0.6
 django-bootstrap5==24.2
 django-cleanup==8.1.0
@@ -29,6 +29,7 @@ django-debug-toolbar==4.4.2
 django-environ==0.11.2
 django-extensions==3.2.3
 django-imagekit==5.0.0
+django-method-override==1.0.4
 django-ratelimit==4.1.0
 django-sslserver==0.22
 django-user-agents==0.4.0

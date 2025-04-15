@@ -15,7 +15,7 @@ import os
 from django.urls import reverse
 from django.contrib.messages import constants as messages
 
-#プロジェクトのベースフォルダを示す（今回の場合、/workspaces/MyDjango/CycleD_project）
+#プロジェクトのベースフォルダを示す（今回の場合、/workspaces/MyDjango/Cycled_project）
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # .envファイルを読み込む
@@ -76,8 +76,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'method_override',
 ]
-if os.environ.get('DJANGO_ENV') != 'production':
-    INSTALLED_APPS += ['debug_toolbar']
 
 SITE_ID = 1
 
@@ -103,7 +101,9 @@ MIDDLEWARE = [
     # 'django.middleware.http.HttpMethodOverrideMiddleware',
     'method_override.middleware.MethodOverrideMiddleware',  #method override用
 ]
-if os.environ.get('DJANGO_ENV') != 'production':
+if DEBUG:
+    import debug_toolbar
+    INSTALLED_APPS += ['debug_toolbar']
     MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
 
 ROOT_URLCONF = "config.urls"
