@@ -1,0 +1,197 @@
+body {
+    position: relative; /* 親要素を相対位置に設定 */
+    margin: 0;
+    display: flex;
+    flex-direction: column; /* 縦方向の配置 */
+    
+    /* フォントを統一 */
+    /* font-family: "Potta One", system-ui;
+    font-weight: 400;
+    font-style: normal; */
+}
+.wrapper-whole {
+    min-height: 100vh; /* ビューポートの高さを満たす */
+    flex: 1; /* フレックスコンテナの中で余白を埋める */
+    display: flex;
+    flex-direction: column;
+}
+.container-whole {
+    margin-top: 20px;
+    margin-bottom: 100px;
+}
+
+#loading-overlay {
+	background: rgba(0, 0, 0, .5);
+	z-index: 10000;
+}
+
+#loading-container {
+    background-color: rgba(255, 255, 255, 0.8); /* 半透明の白背景 */
+    z-index: 1075; /* 他の要素よりも前面に表示するための高い値 */
+    pointer-events: none; /* この要素を操作不可にする */
+}
+
+/* ナビゲーションバー */
+.navbar .navbar-brand {
+    font-family: "Potta One", serif;
+}
+
+/* エラーリスト */
+#error-list-container{
+    display: none;
+}
+
+/* チェックボックスを非表示にする */
+.hidden-checkbox{
+    display: none; 
+}
+
+.append-shadow {
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* エラー用のモーダルウィンドウ */
+#errorModal{
+    display: none;
+}
+
+#errorModal .modal-header, .modal-footer {
+    border: none; /* ヘッダーとフッターのボーダーを全て削除 */
+}
+
+.hidden {
+    display: none; /* hiddenクラスが適用されると要素が非表示になります */
+}
+
+.user-icon {
+    border: none;
+    background-color: transparent;
+    box-shadow: none;
+    -webkit-tap-highlight-color:transparent;
+    cursor:pointer;
+    outline: none; /* タップ時のアウトラインを無効化 */
+}
+.with-icon {
+    display: inline-flex;
+    align-items: center; /* アイコンとテキストを垂直方向に中央揃え */
+}
+.with-icon::before {
+    margin-right: 10px;
+    font-size: 1.4em;
+}
+.button-logout::before {
+    font-family: 'Material Icons';
+    content: "\e9ba";
+    opacity: .7;
+}
+.button-setting::before {
+    font-family: 'Material Icons Two Tone';
+    content: '\e8b8';
+    opacity: .7;
+}
+.button-diary::before {
+    font-family: 'Material Icons';
+    content: '\e439';
+}
+.button-calendar::before {
+    font-family: 'Material Icons';
+    content: '\ebcc';
+}
+.button-weather::before {
+    font-family: 'Material Icons';
+    content: '\e430';
+}
+.button-map::before {
+    font-family: 'Material Icons';
+    content: '\e55b';
+}
+
+/* スマホ用のナビゲーションバー */
+.navbar-mobile {
+    width: 100%;
+    height: 60px;
+    align-items: center;
+    border-top-left-radius: 20px; /* 左上角を丸く */
+    border-top-right-radius: 20px; /* 右上角を丸く */
+}
+.navbar-mobile .button-to-diary {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    background: deeppink;
+    border: 5px solid #f8f9fa;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+    transform: translateY(-15px);
+}
+.navbar-mobile .button-to-diary::before {
+    font-family: 'bootstrap-icons';
+    content: '\F64D';
+    position: absolute;
+    font-size: 2em;
+    color: #fff;
+}
+.navbar-mobile .button-to-diary.selected::before {
+    color: darkgray;
+}
+.navbar-mobile .material-icons-outlined {
+    font-size: 1.5em;
+}
+.navbar-mobile .material-icons-outlined.selected {
+    font-family: 'Material Icons';
+    color: red;
+}
+.navbar-mobile .icon-text {
+    display: flex;
+    flex-direction: column; /* アイコンと文字を縦に並べる */
+    justify-content: center;
+    align-items: center;
+    text-align: center; /* テキストの中央揃え */
+}
+.navbar-mobile .icon-text .icon-label {
+    margin-top: 5px; /* アイコンと文字の間隔を調整 */
+    font-size: 0.5em; /* 文字のサイズ */
+    text-align: center;
+}
+
+.navbar-pc .nav-link {
+    width: 100%;
+}
+.navbar-pc .nav-link:hover,
+.navbar-pc .nav-link:focus {
+    background-color: #e0e0e0; /* 好きな色に変更 */
+    transition: background-color 0.3s ease; /* なめらかに変化 */
+}
+
+/**** アイコン ****/
+.icon-in-button {
+    margin: 0 .5rem;
+    padding: 0;
+    font-size: 1.5rem;
+    border: none;
+    background-color: transparent;
+}
+
+/* 透明なボーダー */
+.border-transparent {
+    border-color: transparent !important;
+}
+
+/* テキスト風のボタン */
+.button-text {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+.button-text:disabled {
+    cursor: default; /* disabled状態のときは、通常のカーソルにする */
+}
+
+/* 仕切り線のwidth調節 */
+.dropdown-divider {
+    width: 90%;
+    margin: auto;
+}

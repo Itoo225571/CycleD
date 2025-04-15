@@ -1,0 +1,23 @@
+.ui-autocomplete {
+    z-index: 1100;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* シャドウを追加 */
+}
+/* 各リスト項目のパディング設定 */
+.ui-menu .ui-menu-item-wrapper {
+    position: relative; 
+    padding: .5em 1em;
+}
+/* リスト全体 */
+.ui-widget-content {
+    background: white!important;
+    color: black!important;
+    border-radius: 5px;
+    border: none!important;
+}
+/* リスト hover 時 */
+.ui-state-active {
+    border-radius: 5px;
+    border: 1px solid transparent!important;
+    background: #E8E8E8!important;
+    color: black!important;
+}
