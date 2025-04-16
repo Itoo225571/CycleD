@@ -1,6 +1,22 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block content %}
-    <h1>💥 サーバーエラーが発生しました（500）</h1>
-    <p>ご迷惑をおかけして申し訳ありません。現在復旧作業中です。</p>
-    <a href="{% url 'diary:top' %}">トップページへ戻る</a>
+    <div class="text-dark">
+        <div class="d-flex align-items-center justify-content-center px-2" style="min-height: 75vh;">
+            <div class="text-center">
+                <img src="{% static 'img/repair_bicycle.png' %}" class="img-fluid w-50 w-md-25 pt-2" alt="自転車修理中">
+                <div class="pt-2">
+                    <h1 class="display-1 potta-one-regular">500</h1>  <!-- エラーコードを強調 -->
+                    <p class="fs-2 fw-medium">Internal Server Error</p>
+                </div>
+
+                <p class="mt-4 mb-3">サーバー内で予期せぬエラーが発生しました</p>
+                <p>しばらくしてから再度お試しください</p>
+                <a href='{% url "diary:top" %}' class="btn btn-light border-dark fw-semibold rounded-pill px-4 py-2">
+                    トップページに戻る
+                </a>
+            </div>
+        </div>
+    </div>
 {% endblock %}

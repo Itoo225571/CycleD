@@ -4,17 +4,17 @@
 
 {% block content %}
 <div class="text-dark">
-    <div class="d-flex align-items-center justify-content-center min-vh-100 px-2">
+    <div class="d-flex align-items-center justify-content-center px-2" style="min-height: 75vh;">
         <div class="text-center">
-            <div class="w-25">
-                <img src="{% static 'img/broken_bicycle.png' %}" alt="壊れた自転車">
+            <img src="{% static 'img/broken_bicycle.png' %}" class="img-fluid w-50 w-md-25 pt-2" alt="壊れた自転車">
+            <div class="pt-2">
+                <h1 class="display-1 potta-one-regular">404</h1>  <!-- エラーコードを強調 -->
+                <p class="fs-2 fw-medium">Page Not Found</p>
             </div>
-            <h1 class="display-1 fw-bold">404</h1>
-            <p class="fs-2 fw-medium mt-4">Oops! Page not found</p>
-            <p class="mt-4 mb-3">
-                お探しのページは存在しないか、移動しています    
-            </p>
-            <a href='{% url "diary:top" %}' class="btn btn-light border-dark fw-semibold rounded-pill px-4 py-3">
+
+            <p class="mt-4 mb-3">お探しのページは存在しないか、移動した可能性があります</p>
+
+            <a href='{% url "diary:top" %}' class="btn btn-light border-dark fw-semibold rounded-pill px-4 py-2">
                 トップページに戻る
             </a>
         </div>
