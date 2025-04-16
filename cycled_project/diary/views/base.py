@@ -16,10 +16,6 @@ from subs.get_pictures import get_pictures,get_random_url,is_bright,get_main_col
 class TopView(generic.TemplateView):
     template_name="diary/top.html"
     def get(self, request, *args, **kwargs):
-        from django.core.exceptions import PermissionDenied
-        if not request.user.is_authenticated:
-            # 認証されていないユーザーに対して 403 エラーを発生させる
-            raise PermissionDenied
         if request.user.is_authenticated:
             return redirect('diary:home')  # 'home' にリダイレクト
         return super().get(request, *args, **kwargs)
