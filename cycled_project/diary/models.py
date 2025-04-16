@@ -15,8 +15,8 @@ class Location(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True, verbose_name="ユーザー")
 
     location_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
-    lat = models.FloatField()
-    lon = models.FloatField()
+    lat = models.FloatField(null=False,blank=True)
+    lon = models.FloatField(null=False,blank=True)
     # 市区町村
     state = models.CharField(max_length=128,blank=True,verbose_name="市区町村")
     # 表示名
@@ -36,24 +36,11 @@ class Location(models.Model):
         return self.label
     
     def save(self, *args, **kwargs):
-        self.rotate_angle = self.rotate_angle % 360 # 360度以内にする
-
-        if not self.is_home:  #日記作成の場合
-            if self.image and not self.image_hash:
-                self.image_hash = to_pHash(self.image)   # pHashの生成
-            # is_thumbnailがTrueの場合、同じDiary内の他のLocationのis_thumbnailをFalseにする
-            if self.is_thumbnail:
-                # Diaryを取得
-                diary = self.diary
-                if diary:
-                    # 同じDiary内の他のLocationのis_thumbnailをFalseにする
-                    Location.objects.filter(diary=diary).exclude(location_id=self.location_id).update(is_thumbnail=False)
-            # 他にis_thumbnail=Trueがなかったらself.is_thumbnailをTrueにする
-            else:
-                existing_thumbnail = self.diary.locations.filter(is_thumbnail=True).exclude(location_id=self.location_id).first()
-                if not existing_thumbnail:
-                    self.is_thumbnail = True
+        self.rotate_angle = self.rotate_angle % 360  # 360度以内にする
+        if not self.is_home and self.image and not self.image_hash:
+            self.image_hash = to_pHash(self.image)
         super().save(*args, **kwargs)
+        
     def clean(self):
         super().clean()
         if self.diary:  # 更新の場合
@@ -65,21 +52,22 @@ class Location(models.Model):
                 
         # Diaryの場合に検証するフィールドリスト
         if not self.is_home:
-            errors = {}
-            fields_to_validate = {
-                "lat": "緯度を入力してください。",
-                "lon": "経度を入力してください。",
-                "state": "都道府県を入力してください。",
-                "display": "表示名を入力してください。",
-                "label": "ラベルを入力してください。",
-            }
-            for field, message in fields_to_validate.items():
-                value = getattr(self, field, None)
-                if value is None or (isinstance(value, str) and value.strip() == ''):
-                    errors[field] = message
-            
-            if errors:
-                raise ValidationError(errors)
+             if not getattr(self, 'delete', False):  # deleteフラグがFalseの場合
+                errors = {}
+                fields_to_validate = {
+                    "lat": "緯度を入力してください。",
+                    "lon": "経度を入力してください。",
+                    "state": "都道府県を入力してください。",
+                    "display": "表示名を入力してください。",
+                    "label": "ラベルを入力してください。",
+                }
+                for field, message in fields_to_validate.items():
+                    value = getattr(self, field, None)
+                    if value is None or (isinstance(value, str) and value.strip() == ''):
+                        errors[field] = message
+                
+                if errors:
+                    raise ValidationError(errors)
 
 def upload_to(instance, filename):
     # 拡張子を取得

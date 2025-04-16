@@ -79,6 +79,7 @@ class LocationForm(forms.ModelForm):
         if phash in phash_all:
             self.add_error("image","同じ画像が既に存在します。")
         return data
+    
 LocationFormSet = forms.inlineformset_factory(
     Diary,
     Location,

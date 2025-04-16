@@ -36,6 +36,7 @@ from PIL import Image as PILImage
 import io
 from urllib.parse import urlencode
 from pprint import pprint
+import traceback 
 logger = logging.getLogger(__name__)
 
 # 外見
@@ -78,27 +79,32 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
     def form_valid(self, diary_formset, location_formset):
         try:
             with transaction.atomic():
-                for form in diary_formset.forms:
-                    diary = form.instance
+                for form_diary in diary_formset.forms:
+                    diary = form_diary.instance
                     diary.user = self.request.user  # 現在のユーザーを設定
-                    to_delete = form.cleaned_data.get('DELETE', False)
+                    to_delete = form_diary.cleaned_data.get('DELETE', False)
                     if to_delete:
                         if diary.pk:  # 既存なら削除
                             diary.delete()
                         continue
                     diary.save()  # 保存
-                for form in location_formset.forms:
+                for form_loc in location_formset.forms:
+                    to_delete = form_loc.cleaned_data.get('DELETE', False)
+                    if to_delete:
+                        if form_loc.instance.pk:
+                            form_loc.instance.delete()
+                        continue
                     # locationがすでに存在しているか確認
-                    location = form.cleaned_data.get("location_id")
+                    location = form_loc.cleaned_data.get("location_id")
                     if location:
-                        form.instance = location  # 既存のインスタンスをフォームに設定
+                        form_loc.instance = location  # 既存のインスタンスをフォームに設定
                         # フォームのデータを既存のインスタンスに適用
-                        form.instance.label = form.cleaned_data.get("label")
-                        form.instance.is_thumbnail = form.cleaned_data.get("is_thumbnail")
+                        form_loc.instance.label = form_loc.cleaned_data.get("label")
+                        form_loc.instance.is_thumbnail = form_loc.cleaned_data.get("is_thumbnail")
                     else:
-                        location = form.save(commit=False)
-                    id = form.cleaned_data.get("id_of_image")
-                    date = form.cleaned_data.get("date_of_Diary")
+                        location = form_loc.save(commit=False)
+                    id = form_loc.cleaned_data.get("id_of_image")
+                    date = form_loc.cleaned_data.get("date_of_Diary")
                     # print(id)
 
                     # tempImageの場合
@@ -111,17 +117,16 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
                                 image_file, field_name=None, name=image.name ,content_type='image/jpg',
                                 size=image.file.size, charset=None
                             )
-                            form.instance.image = image
+                            form_loc.instance.image = image
                             temp_image.delete()
                         # DELETEがtrueの場合スキップ(新規作成時)
-                        if form.cleaned_data.get('DELETE', False):
-                            continue
-                    # Location編集の場合
-                    else:
-                        if form.cleaned_data.get('DELETE', False):
-                            location.delete()   # 元のDiaryを削除
-                            continue
-                        # print(location.location_id)
+                    #     if form.cleaned_data.get('DELETE', False):
+                    #         continue
+                    # # Location編集の場合
+                    # else:
+                    #     if form.cleaned_data.get('DELETE', False):
+                    #         location.delete()   # 元のDiaryを削除
+                    #         continue
 
                     location.diary = get_object_or_404(Diary, user=self.request.user, date=date)
                     # 今日中に作成されたものかどうか(0がGOLD)
@@ -138,6 +143,7 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
                 return super().form_valid(diary_formset)
         except Exception as e:
             print(f"Error occurred: {e}")
+            traceback.print_exc()  # ここでエラー箇所とスタックトレースを表示
             return self.formset_invalid(diary_formset, location_formset)
 
     def formset_invalid(self, diary_formset=None, location_formset=None,errors=None):
