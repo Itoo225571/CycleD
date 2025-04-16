@@ -23,17 +23,33 @@ def delete_file(sender, instance, **kwargs):
 @receiver(post_delete, sender=Location)
 def set_thumbnail_on_delete(sender, instance, **kwargs):
     # instance.refresh_from_db()
-    try:
-        diary = instance.diary
+    diary = instance.diary
+    if diary and diary.pk:
         if instance.is_thumbnail:
             if diary:
                 new_thumbnail_location = Location.objects.filter(diary=diary).exclude(location_id=instance.location_id).first()
                 if new_thumbnail_location:
                     new_thumbnail_location.is_thumbnail = True
                     new_thumbnail_location.save()
-    except ObjectDoesNotExist:
+
+@receiver(post_save, sender=Location)
+def update_thumbnail_status(sender, instance, created, **kwargs):
+    if instance.is_home or not instance.diary:
         return
-    
+    # 他のLocationの is_thumbnail を False にする処理
+    if instance.is_thumbnail:
+        Location.objects.filter(
+            diary=instance.diary
+        ).exclude(location_id=instance.location_id).update(is_thumbnail=False)
+    # 他に is_thumbnail=True が存在しなければ、自動でTrueにする（ただし今回保存したやつがFalseのとき）
+    elif not instance.is_thumbnail:
+        existing = instance.diary.locations.filter(
+            is_thumbnail=True
+        ).exclude(location_id=instance.location_id).first()
+        if not existing:
+            # instanceのis_thumbnailをTrueにして再保存（無限ループ防止にupdateで）
+            Location.objects.filter(location_id=instance.location_id).update(is_thumbnail=True)
+
 @receiver(post_delete, sender=TempImage)
 def delete_file(sender, instance, **kwargs):
     if instance.image:

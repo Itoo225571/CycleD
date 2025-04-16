@@ -1,8 +1,7 @@
 $(document).ready(function () {
     var $carousel = $('.carousel');
-    var $modal_carousel = $('.modal-carousel');
     var $carouselItems = $carousel.find('.carousel-item');
-    var $titleElement = $modal_carousel.find('.modal-header .modal-title');
+    var $titleElement = $carousel.find('.modal-header .modal-title');
 
     const $nextBtn = $('#carouselNextBtn');
     const $prevBtn = $('#carouselPrevBtn');
