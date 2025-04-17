@@ -204,8 +204,17 @@ $(document).ready(function() {
 			$flipContainer.removeClass('flipped');
 			
 			initDiaryContent(event_calendar,diary);
-			const modal = new bootstrap.Modal(document.getElementById('diaryModal'));
-			modal.show();
+			const $modal = $('#diaryModal');
+			$modal.modal('show');
+
+			$modal.on('shown.bs.modal', function () {
+				const $frontContent = $modal.find('.modal-content.flip-front');
+				const $backContent = $modal.find('.modal-content.flip-back');
+				arrange_height($frontContent,$backContent);
+				
+				// イベントが複数回バインドされないようにoff
+				$modal.off('shown.bs.modal.arrangeOnce');
+			});
 		}
 		function initDiaryContent(event_calendar,diary) {
 			// カレンダー内のDiaryを最新のものに更新
@@ -551,6 +560,12 @@ $(document).ready(function() {
 				setup_addressModal($location);
 			});
 
+			// 高さ調整
+			const $frontContent = $('#diaryModal').find('.modal-content.flip-front');
+			// arrange_height($frontContent,$backContent);
+			$backContent.find('input').on('change', function (e) {
+				arrange_height($frontContent,$backContent);
+			});
 		}
 		
 		function send_form_ajax($form, event_calendar, diary, is_flip_card = true) {
@@ -628,6 +643,37 @@ $(document).ready(function() {
 				alert('ページをリロードしてください')
 			}
 		}
+
+		function arrange_height($front, $back) {
+			// 元のスタイルを記録
+			const frontOriginalStyle = {
+				position: $front.css('position'),
+				visibility: $front.css('visibility'),
+				display: $front.css('display'),
+			};
+			const backOriginalStyle = {
+			  position: $back.css('position'),
+			  visibility: $back.css('visibility'),
+			  display: $back.css('display'),
+			};
+		  
+			// 一時的に表示して高さ取得
+			$front.css({ position: 'static', visibility: 'hidden', display: 'block', height: '0'});
+			$back.css({ position: 'static', visibility: 'hidden', display: 'block', height: '0' });
+		  
+			const frontHeight = $front[0].scrollHeight;
+			const backHeight = $back[0].scrollHeight;
+			const maxHeight = Math.max(frontHeight, backHeight);
+		  
+			// 元のスタイルに戻す
+			$front.css(frontOriginalStyle);
+			$back.css(backOriginalStyle);
+			// 高さを設定
+			// $content.height(maxHeight);
+			$front.height(maxHeight);
+			$back.height(maxHeight);
+		}
+		  
 		
 		// カレンダーを表示
 		calendar.render();
