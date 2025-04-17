@@ -1,7 +1,7 @@
 /* 日記日数 */
 .diaryinformation-field .card-header {
     background-color: #f8f9fa;
-    border-bottom: 1px solid #e1e1e1;
+    border-bottom: .5px solid #e1e1e1;
 }
 .diaryinformation-field .card-body {
     background-color: #fff;
