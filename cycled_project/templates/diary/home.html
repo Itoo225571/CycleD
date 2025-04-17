@@ -8,31 +8,50 @@
 {% endblock title %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'diary/css/home.css' %}" type="text/css" >
+    <link rel="stylesheet" href="{% static 'diary/css/home.css' %}" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/flip_card.css' %}" type="text/css">
 {% endblock extra_css %}
 
 {% block content %}
-    <div class="container-home">
-        <div class="diaryinformation-field shadow rounded mb-4 mx-auto col-lg-9 col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5>
-                        <strong>作成した日記の数</strong>
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row text-center">
-                        <div class="col-6">
-                            <div class="field-label">
-                                総合計
-                            </div>
-                            <div class="field-value">{{ diary_count }} コ</div>
+    <div class="container-home row">
+
+        <div class="diaryinformation-field mb-4 row">
+            <div class="card-flip-container col-lg-9 col-12 mx-auto">
+                <div class="card-flip">
+                    <!-- 表面 -->
+                    <div class="card card-front">
+                        <div class="card-header fs-6 text-center fw-bold text-secondary">
+                            作成した日記の数
                         </div>
-                        <div class="col-6">
-                            <div class="field-label">
-                                当日作成
+                        <div class="card-body py-2">
+                            <div class="row text-center py-2 fs-6">
+                                <div class="col-6">
+                                    <div class="text-muted fw-bolder">総合計</div>
+                                    <div class="fw-bold">
+                                        <span class="fs-4">{{ diary_count }}</span> コ
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-muted fs-6 fw-bolder">当日作成</div>
+                                    <div class="fw-bold">
+                                        <span class="fs-4">{{ diary_count_ontheday }}</span> コ
+                                    </div>
+                                </div>
                             </div>
-                            <div class="field-value">{{ diary_count_ontheday }} コ</div>
+                        </div>
+                    </div>
+                    <!-- 裏面 -->
+                    <div class="card card-back">
+                        <div class="card-body row text-center py-2">
+                            <div class="text-muted fs-5 fw-bolder d-flex align-items-center justify-content-center">
+                                <span>コイン枚数</span>
+                            </div>
+                            <div class="fs-6 fw-bold d-flex align-items-center justify-content-center pb-2">
+                                <img src="{% static 'diary/img/coin_icon.gif' %}" alt="coin" style="height: 3.5em; vertical-align: middle;">
+                                <div style="vertical-align: bottom;">
+                                    <span class="fs-4 pe-1">{{ user.coin.num }}</span>枚
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -168,6 +187,7 @@
 {% block extra_js %}
     <script src="{% static 'js/loading_overlay.js' %}"></script>
     <script src="{% static 'js/tooltip.js' %}"></script>
+    <script src="{% static 'js/flip_card.js' %}"></script>
     <script src="{% static 'diary/js/adjust_imgs.js' %}"></script>
     <script src="{% static 'diary/js/home.js' %}"></script>
 {% endblock %}
