@@ -1,7 +1,12 @@
 $(document).ready(function () {
+    let isConfirmed = false;  // フラグを追加
+
     $('form').on('submit', function (e) {
+        if (isConfirmed) {
+            return; // すでに確認済みならそのまま送信
+        }
         e.preventDefault();  // デフォルトの送信を止める
-        const form = this;  // `this` を退避しておく
+        const $form = $(this);  // `this` を退避しておく
 
         Swal.fire({
             title: 'ほんまに退会しますか？',
@@ -21,9 +26,9 @@ $(document).ready(function () {
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                $('form#withdrawal-form').submit(); // 例：退会用フォームの送信
+                isConfirmed = true; // フラグを立てて
+                $form.submit();     // 再送信（次は確認なし）
             }
         });
-        
     });
 });

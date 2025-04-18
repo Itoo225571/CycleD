@@ -137,6 +137,7 @@ class Coin(models.Model):
     def _rate_convert(self, diary):
         # rankを文字列に変換してrateを取得する
         rank = diary.get_rank_display()  # 'Gold' or 'Normal'
+        print(diary.rank,rank,self.rate.get(rank, None))
         return self.rate.get(rank, 0)  # rank に対応する rate を取得
     def _date_process(self, diary):
         yesterday = timezone.now().date() - datetime.timedelta(days=1)
