@@ -23,7 +23,10 @@ def delete_file(sender, instance, **kwargs):
 @receiver(post_delete, sender=Location)
 def set_thumbnail_on_delete(sender, instance, **kwargs):
     # instance.refresh_from_db()
-    diary = instance.diary
+    try:
+        diary = instance.diary  # ForeignKey先
+    except Diary.DoesNotExist:
+        diary = None
     if diary and diary.pk:
         if instance.is_thumbnail:
             if diary:
