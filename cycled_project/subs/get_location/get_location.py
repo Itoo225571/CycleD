@@ -201,6 +201,14 @@ def _fetch_data(url,params,timeout=5.0):
 		raise Exception(f"Error: {res.status_code}")
 	return data
 
+# 文字数制限
+def _shorten(value: str,MAX_LEN: int) -> str:
+    if not isinstance(value, str):
+        return value
+    suffix = "..."
+    max_len = MAX_LEN - len(suffix)
+    return value if len(value) <= max_len else value[:max_len] + suffix
+
 class AddressData(BaseModel):
 	geotype: str
 
@@ -221,6 +229,8 @@ class AddressData(BaseModel):
 	priority: int = EMPTY_VALUE			#優先度
 	source: int = EMPTY_VALUE			#データの参照元
 	matcher: float = 1.0				#目的地の名前にどれだけマッチしているか（０の方がマッチしてる）
+
+	MAX_LEN: int = 128
 
 	def __init__(self,**data):
 		super().__init__(**data)
@@ -269,6 +279,11 @@ class AddressData(BaseModel):
 			else:
 				self.label = f"{self.name} ({self.state} {self.city})"
 			self.display = self.city
+
+		# 最後に全 str フィールドを切り詰める
+		for field_name, value in self.__dict__.items():
+			if isinstance(value, str):
+				setattr(self, field_name, _shorten(value,self.MAX_LEN))
 
 class LocationData(BaseModel):
     address: AddressData

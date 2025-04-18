@@ -36,7 +36,7 @@ $(document).ready(function() {
                 title: 'フォームの送信に失敗しました',
                 text: '画面を再度読み込んでください',
                 confirmButtonText: 'OK'
-              });
+            });
             return;
         }
         var formData = formDataCommon;  // フォームデータを流用

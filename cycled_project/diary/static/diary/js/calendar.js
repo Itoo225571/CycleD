@@ -286,6 +286,8 @@ $(document).ready(function() {
 			// 編集部分を初期化
 			initDiaryEdit(event_calendar,diary);
 			$frontContent.find('.button-to-edit').off('click').on('click', function() {
+				$(document.activeElement).blur();  // 現在フォーカスされている要素からフォーカスを外す
+
 				const editContent = this.getAttribute('data-edit-content');
 				initDiaryEdit(event_calendar,diary);
 
@@ -304,8 +306,10 @@ $(document).ready(function() {
 			// 	const $form = $('#id_diary-form');
 			// 	send_form_ajax($form, event_calendar,diary, false);
 			// });
+
 			$frontContent.find('#delete-form').on('submit', function(event){
 				event.preventDefault();
+
 				Swal.fire({
 					title: '日記を削除します',
 					text: "この操作は取り消せません",
@@ -313,7 +317,7 @@ $(document).ready(function() {
 					showCancelButton: true,
 					confirmButtonText: 'OK',
 					cancelButtonText: 'Cancel',
-					reverseButtons: true
+					reverseButtons: true,
 				}).then((result) => {
 					if (!result.isConfirmed) return;
 					const form = $(this);
