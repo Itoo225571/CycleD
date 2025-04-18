@@ -66,8 +66,13 @@ def create_coin_for_user(sender, instance, created, **kwargs):
     if created:  # ユーザーが新規作成された場合のみ
         coin = Coin.objects.create(user=instance)  # Coinインスタンスを作成
         coin.save()
-@receiver(post_save, sender=Diary)
-def add_coin_on_create_diary(sender, instance, created, **kwargs):
-    if created:     # Diary新規作成時
-        coin = instance.user.coin
-        coin.add(instance)
+@receiver(user_logged_in)
+def ensure_coin_on_login(sender, request, user, **kwargs):
+    # Coin が存在しなければ作成
+    if not hasattr(user, 'coin'):
+        Coin.objects.create(user=user)
+# @receiver(post_save, sender=Diary)
+# def add_coin_on_create_diary(sender, instance, created, **kwargs):
+#     if created:     # Diary新規作成時
+#         coin = instance.user.coin
+#         coin.add(instance)
