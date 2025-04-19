@@ -1,0 +1,13 @@
+{% extends "games/base.html" %}
+{% load static %}
+
+{% block game_css %}
+    <link rel="stylesheet" href="{% static 'games/css/run.css' %}" type="text/css">
+{% endblock game_css %}
+
+{% block game_js %}
+    <script>
+        const img_player = "{% static 'games/img/player.png' %}";
+    </script>
+    <script src="{% static 'games/js/run.js' %}"></script>
+{% endblock game_js %}

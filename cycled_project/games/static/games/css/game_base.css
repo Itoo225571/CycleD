@@ -1,0 +1,19 @@
+#game-container {
+    width: 100%;           /* 親要素の幅に合わせて自動的に調整 */
+    max-width: 800px;      /* 最大幅を800pxに設定 */
+    aspect-ratio: 4 / 3;   /* 1:1の縦横比を維持 */
+    margin: 0 auto;        /* 横方向で中央揃え */
+}
+
+#orientation-lock {
+    display: none; 
+    position: fixed; 
+    inset: 0; 
+    background: #0008; 
+    color: white; 
+    font-size: 1.5em; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    z-index: 9999;
+}

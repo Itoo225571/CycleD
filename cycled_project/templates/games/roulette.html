@@ -1,0 +1,10 @@
+{% extends "games/base.html" %}
+{% load static %}
+
+{% block game_css %}
+    <link rel="stylesheet" href="{% static 'games/css/roulette.css' %}" type="text/css">
+{% endblock game_css %}
+
+{% block game_js %}
+    <script src="{% static 'games/js/roulette.js' %}"></script>
+{% endblock game_js %}

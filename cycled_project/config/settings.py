@@ -58,6 +58,8 @@ INSTALLED_APPS = [
     
     "diary.apps.DiaryConfig",
     "accounts.apps.AccountsConfig", # アカウント管理用アプリ
+    "games.apps.GamesConfig", # Game管理用アプリ
+    
     "django_bootstrap5",#Bootstrap5追加
 	# "subs",
 	'ratelimit', #APIリクエスト制限

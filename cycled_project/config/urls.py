@@ -29,6 +29,8 @@ urlpatterns = [
     path("__debug__/",include("debug_toolbar.urls")),#Debug-toolbar追加
     path("accounts/", include("accounts.urls")),  # 追加
     path("accounts/", include("allauth.urls")),
+    path("games",include("games.urls")),    # game用
+
     path("robots.txt", robots_txt),
 ]
 
