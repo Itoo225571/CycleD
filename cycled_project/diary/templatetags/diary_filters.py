@@ -1,5 +1,6 @@
 from django import template
 from django.utils import timezone
+import jpholiday
 
 register = template.Library()
 
@@ -27,3 +28,25 @@ def get_item(dictionary, key):
         return dictionary.get(str(key))  # keyを文字列に変換して取得
     except (ValueError, TypeError):
         return None
+
+# 祝日はんてい
+@register.filter
+def is_saturday(value):
+    try:
+        date = value.date()
+    except AttributeError:
+        date = value
+    return date.weekday() == 5
+@register.filter
+def is_sunday(value):
+    try:
+        date = value.date()
+    except AttributeError:
+        date = value
+    return date.weekday() == 6
+@register.filter
+def is_holiday(value):
+    try:
+        return jpholiday.is_holiday(value.date())
+    except AttributeError:
+        return jpholiday.is_holiday(value)
