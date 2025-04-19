@@ -134,6 +134,8 @@ class Coin(models.Model):
 
     def _can_increment(self, diary):
         return str(diary.date) not in self.date_list  # diary.date を文字列に変換して比較
+    def _can_decrement(self, num):
+        return bool(self.num - num >= 0)
     def _rate_convert(self, diary):
         # rankを文字列に変換してrateを取得する
         rank = diary.get_rank_display()  # 'Gold' or 'Normal'
@@ -164,15 +166,15 @@ class Coin(models.Model):
             self.num += self._rate_convert(diary)
             self._date_process(diary)
             self.save()
-        return self.num
+            return True
+        return False
     
     def sub(self, num):
-        if self.num - num > 0:
+        if self._can_decrement(num):
             self.num -= num
             self.save()
             return True
-        else:
-            return False
+        return False
     
 class Good(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="good")
