@@ -1,4 +1,4 @@
-function checkGame(game) {
+function checkGameSize(game) {
     const $game_container = $('#game-container');
     const $lock = $('#orientation-lock');
     const GAME_WIDTH_MIN = 640;

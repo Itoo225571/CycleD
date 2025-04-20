@@ -22,7 +22,7 @@ $(document).ready(function(){
 
     // ゲームインスタンスの作成
     const game = new Phaser.Game(config);
-    checkGame(game);
+    checkGameSize(game);
     
     let wheel;
     let isSpinning = false;
