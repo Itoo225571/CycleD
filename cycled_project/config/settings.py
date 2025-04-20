@@ -231,7 +231,8 @@ ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 
 # email関係
 # EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"       # 登録後、メールアドレスに確認メールが送信される
+# ACCOUNT_EMAIL_VERIFICATION = "mandatory"       # 登録後、メールアドレスに確認メールが送信される
+ACCOUNT_EMAIL_VERIFICATION = "none"       # 登録後、メールアドレスに確認メールが送信されない
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587

@@ -1,0 +1,23 @@
+[
+    {
+        "key": "player1",
+        "img": "/static/games/img/run/player.png",
+        "frameWidth": 24,
+        "frameHeight": 48,
+        "scale": 1,
+        "speed": 160,
+        "x": 100,
+        "y": 300
+    },
+    {
+        "key": "player2",
+        "img": "/static/games/img/run/player.png",
+        "frameWidth": 24,
+        "frameHeight": 48,
+        "scale": 0.8,
+        "speed": 120,
+        "x": 300,
+        "y": 300
+    }
+]
+  

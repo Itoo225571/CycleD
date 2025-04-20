@@ -10,7 +10,13 @@ from django_ratelimit.decorators import ratelimit
 from django.core.cache import cache
 from django.contrib import messages
 from django.utils.safestring import mark_safe
+from django.contrib.staticfiles import finders
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+import json
 
 class TopView(generic.TemplateView):
     template_name="games/top.html"
