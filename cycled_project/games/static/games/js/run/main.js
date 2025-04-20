@@ -23,5 +23,5 @@ $(document).ready(function() {
     };
 
     const game = new Phaser.Game(config);
-    checkGame(game);
+    checkGameSize(game);
 });
