@@ -18,6 +18,7 @@ window.onload = function() {
         type: Phaser.AUTO,                   // 自動でWebGLかCanvasを選択
         width: 1334,
         height: 750,
+        pixelArt: true, // ピクセルパーフェクトにする（補間なし）
         scene: [preloadGame, playGame],      // ゲームで使用するシーン（preloadGameとplayGameを指定）
         backgroundColor: 0x444444,           // 背景色
         parent: 'game-container',            // 描画先のHTML ID
@@ -44,7 +45,8 @@ class preloadGame extends Phaser.Scene {
     // 🔄 アセットの読み込み
     preload() {
         this.load.image("platform", imgDir_test + "platform.png"); // プラットフォーム画像
-        this.load.spritesheet("player", imgDir_test + "player.png", { frameWidth: 24, frameHeight: 48 }); // プレイヤーのアニメーション用スプライトシート
+        // this.load.spritesheet("player", imgDir_test + "player.png", { frameWidth: 24, frameHeight: 48 }); // プレイヤーのアニメーション用スプライトシート
+        this.load.spritesheet("player", `${imgDir_test}player${2}.png`, { frameWidth: 16, frameHeight: 16 }); // プレイヤーのアニメーション用スプライトシート
     }
 
     // 🎮 プレイシーンに遷移
@@ -52,20 +54,20 @@ class preloadGame extends Phaser.Scene {
         // プレイヤーキャラを生成
         this.anims.create({
             key: 'run',
-            frames: this.anims.generateFrameNumbers('player', { start: 0, end: 1 }),
-            frameRate: 5,
+            frames: this.anims.generateFrameNumbers('player', { start: 0, end: 3 }),
+            frameRate: 15,
             repeat: -1
         });
         this.anims.create({
             key: 'jump',
-            frames: this.anims.generateFrameNumbers('player', { start: 0, end: 0 }),
+            frames: this.anims.generateFrameNumbers('player', { start: 3, end: 3 }),
             frameRate: 1,
             repeat: -1
         });
         this.anims.create({
             key: 'jump_ex',
-            frames: this.anims.generateFrameNumbers('player', { start: 0, end: 1 }),
-            frameRate: 15,
+            frames: this.anims.generateFrameNumbers('player', { start: 0, end: 3 }),
+            frameRate: 20,
             repeat: -1
         });
 
@@ -100,6 +102,7 @@ class playGame extends Phaser.Scene {
         this.addPlatform(game.config.width, game.config.width / 2);
 
         this.player = this.physics.add.sprite(gameOptions.playerStartPosition, game.config.height / 2, 'player');
+        this.player.setScale(3); // 2倍サイズに拡大
         this.player.setGravityY(gameOptions.playerGravity); // 重力設定
 
         // プレイヤーとプラットフォームの衝突設定
@@ -122,13 +125,17 @@ class playGame extends Phaser.Scene {
         this.platformSpeed = gameOptions.platformStartSpeed;
         this.isPaused = false;
         this.justPaused = false;
+        this.selfPased = false;
 
         // 別タブに移動したらポーズ
         this.game.events.on(Phaser.Core.Events.BLUR, () => {
             this.pauseGame();
         });
         this.game.events.on(Phaser.Core.Events.FOCUS, () => {
-            this.resumeGame();
+            // 自前でポーズしていなかったら
+            if (!this.selfPased) {
+                this.resumeGame();
+            }
         });
         this.pauseButton = this.add.text(game.config.width - 80, 30, '⏸', {
             fontSize: '32px',
@@ -286,7 +293,11 @@ class playGame extends Phaser.Scene {
         if (this.countdownText) {
             this.countdownText.destroy();
         }
-    
+        // 既存のカウントダウンイベントが存在している場合はリセット
+        if (this.countdownEvent) {
+            this.countdownEvent.remove();  // 以前のイベントを停止
+        }
+        
         // 新たにカウントダウンテキストを追加
         this.countdownText = this.add.text(game.config.width / 2, game.config.height / 2, '', {
             fontSize: '64px',
@@ -294,9 +305,11 @@ class playGame extends Phaser.Scene {
         }).setOrigin(0.5);
     
         let count = 3;
+        // 画面インタラクションを無効化
+        this.input.enabled = false;
     
         // 1秒ごとにカウントダウン
-        let countdownEvent = this.time.addEvent({
+        this.countdownEvent = this.time.addEvent({
             delay: 1000,
             callback: () => {
                 this.countdownText.setText(count);
@@ -309,20 +322,27 @@ class playGame extends Phaser.Scene {
                         this.countdownText.destroy();
                         this.isPaused = false;
                         this.physics.resume();
+                        // 画面インタラクションを再有効化
+                        this.input.enabled = true;
                     }, null, this);
                     // イベントを停止
-                    countdownEvent.remove();
+                    this.countdownEvent.remove();
                 }
             },
             callbackScope: this,
             repeat: 3 // 3回だけ繰り返す
         });
+            // 再描画を強制するために、一時的にカメラをリセット
+        this.cameras.main.fadeOut(0); // フェードアウト
+        this.cameras.main.fadeIn(200); // フェードインして再描画
     }
     togglePause() {
         if (this.isPaused) {
             this.resumeGame(); // カウントダウン付きで再開
             this.pauseButton.setText('⏸'); // ← 再開時は「ポーズ」アイコンに戻す
+            this.selfPased = false;
         } else {
+            this.selfPased = true;
             this.isPaused = true;
             this.physics.pause();
             this.pauseButton.setText('▶'); // ← 一時停止中は「再生」っぽく表示
