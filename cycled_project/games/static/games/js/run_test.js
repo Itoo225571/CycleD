@@ -67,7 +67,13 @@ class preloadGame extends Phaser.Scene {
         this.anims.create({
             key: 'jump_ex',
             frames: this.anims.generateFrameNumbers('player', { start: 0, end: 3 }),
-            frameRate: 20,
+            frameRate: 25,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'stop',
+            frames: this.anims.generateFrameNumbers('player', { start: 5, end: 5 }),
+            frameRate: 1,
             repeat: -1
         });
 
@@ -259,7 +265,7 @@ class playGame extends Phaser.Scene {
         }
 
         // プレイヤーが地面に接触しているかどうかを確認
-        if (this.player.body.touching.down) {
+        if (this.player.body.touching.down && !this.isPaused) {
             // 地面にいるときは「run」アニメーション
             this.player.anims.play('run', true);
         }
@@ -286,6 +292,10 @@ class playGame extends Phaser.Scene {
     pauseGame() {
         this.isPaused = true;
         this.physics.pause();
+        // アニメーションを stop に切り替え(接地していた場合)
+        if (this.player.body.touching.down){
+            this.player.anims.play('stop');
+        }
     }
     
     resumeGame() {
@@ -342,9 +352,8 @@ class playGame extends Phaser.Scene {
             this.pauseButton.setText('⏸'); // ← 再開時は「ポーズ」アイコンに戻す
             this.selfPased = false;
         } else {
+            this.pauseGame();
             this.selfPased = true;
-            this.isPaused = true;
-            this.physics.pause();
             this.pauseButton.setText('▶'); // ← 一時停止中は「再生」っぽく表示
         }
         this.justPaused = true;
