@@ -17,9 +17,9 @@ function checkGameSize(game) {
             if (windowHeight > windowWidth) {
                 $lock.show();
                 $game_container.hide();
-                if (game && game.scene) {
-                    game.scene.pause();  // ゲームをポーズ
-                }
+                if (game && game.scene && game.scene.getScene('PlayGame')) {
+                    game.scene.getScene('PlayGame').pauseGame();
+                }                
                 return;
             } else {
                 $game_container.addClass('full-screen-container');     //フルスクリーン表示用のクラス

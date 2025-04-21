@@ -150,7 +150,7 @@ class playGame extends Phaser.Scene {
         .setScrollFactor(0)
         .on('pointerdown', (pointer) => {
             pointer.event.stopPropagation(); // ← これで他のイベントに伝わらない！
-            this.togglePause();
+            this.pauseGame();
         });        
     }
 
@@ -292,10 +292,23 @@ class playGame extends Phaser.Scene {
     pauseGame() {
         this.isPaused = true;
         this.physics.pause();
+        this.selfPased = true;
+        this.pauseButton.setText('▶'); // ← 一時停止中は「再生」っぽく表示
         // アニメーションを stop に切り替え(接地していた場合)
         if (this.player.body.touching.down){
             this.player.anims.play('stop');
         }
+
+        // この最中はポーズ・再生できない
+        this.justPaused = true;
+        this.time.delayedCall(50, () => {
+            this.justPaused = false;
+            this.input.on("pointerdown", () => {
+                if (this.isPaused) {   // ゲームがポーズ中の場合のみ
+                    this.resumeGame();
+                }
+            });
+        });
     }
     
     resumeGame() {
@@ -314,6 +327,9 @@ class playGame extends Phaser.Scene {
             fill: '#ffffff'
         }).setOrigin(0.5);
     
+        this.pauseButton.setText('⏸'); // ← 再開時は「ポーズ」アイコンに戻す
+        this.selfPased = false;
+
         let count = 3;
         // 画面インタラクションを無効化
         this.input.enabled = false;
@@ -342,24 +358,13 @@ class playGame extends Phaser.Scene {
             callbackScope: this,
             repeat: 3 // 3回だけ繰り返す
         });
-            // 再描画を強制するために、一時的にカメラをリセット
+        // 再描画を強制するために、一時的にカメラをリセット
         this.cameras.main.fadeOut(0); // フェードアウト
         this.cameras.main.fadeIn(200); // フェードインして再描画
-    }
-    togglePause() {
-        if (this.isPaused) {
-            this.resumeGame(); // カウントダウン付きで再開
-            this.pauseButton.setText('⏸'); // ← 再開時は「ポーズ」アイコンに戻す
-            this.selfPased = false;
-        } else {
-            this.pauseGame();
-            this.selfPased = true;
-            this.pauseButton.setText('▶'); // ← 一時停止中は「再生」っぽく表示
-        }
+
         this.justPaused = true;
         this.time.delayedCall(50, () => {
             this.justPaused = false;
         });
-    }
-    
+    }    
 };
