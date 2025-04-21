@@ -24,7 +24,7 @@ window.onload = function() {
         physics: {
             default: "arcade",
             arcade: {
-                debug: true    // ← これ追加
+                // debug: true    // ← これ追加
             }
         }
     }
@@ -109,15 +109,36 @@ class playGame extends Phaser.Scene {
         this.input.on("pointerdown", this.jump, this);
         this.input.keyboard.on('keydown-SPACE', this.jump, this); // ←追加！
 
-        this.startTime = this.time.now; // ゲーム開始時刻
         this.elapsedText = this.add.text(10, 10, 'Time: 0.0', {
             font: '24px Arial', 
             fill: '#ffffff'
         });
-        this.lastSpeedChange30 = 0; // 30秒ごとの加速タイミング
-        this.platformSpeed = gameOptions.platformStartSpeed;    // 速度
-
         this.distanceText = this.add.text(20, 60, 'Distance: 0.0m', { fontSize: '30px', fill: '#fff' }); // 距離
+
+        this.elapsedTime = 0;
+        this.lastUpdateTime = this.time.now;
+        this.lastSpeedChange30 = 0;
+        this.distance = 0;
+        this.platformSpeed = gameOptions.platformStartSpeed;
+        this.isPaused = false;
+        this.justPaused = false;
+
+        // 別タブに移動したらポーズ
+        this.game.events.on(Phaser.Core.Events.BLUR, () => {
+            this.pauseGame();
+        });
+        this.game.events.on(Phaser.Core.Events.FOCUS, () => {
+            this.resumeGame();
+        });
+        this.pauseButton = this.add.text(game.config.width - 80, 30, '⏸', {
+            fontSize: '32px',
+            fill: '#ffffff'
+        }).setInteractive()
+        .setScrollFactor(0)
+        .on('pointerdown', (pointer) => {
+            pointer.event.stopPropagation(); // ← これで他のイベントに伝わらない！
+            this.togglePause();
+        });        
     }
 
     // ➕ プラットフォームを追加する関数
@@ -148,13 +169,16 @@ class playGame extends Phaser.Scene {
         this.nextPlatformDistance = Phaser.Math.Between(gameOptions.spawnRange[0], gameOptions.spawnRange[1]);
     }
 
-    // ⬆ ジャンプ処理
+    // ジャンプ開始時
     jump() {
+        if (this.justPaused || this.isPaused) return;   //ポーズ中及びポーズ後すぐはジャンプ不可
+        let jumpForce = gameOptions.jumpForce;
+
         if (this.player.body.touching.down || (this.playerJumps > 0 && this.playerJumps < gameOptions.jumps)) {
             if (this.player.body.touching.down) {
                 this.playerJumps = 0; // 地面に着地していたらジャンプ回数リセット
             }
-            this.player.setVelocityY(gameOptions.jumpForce * -1); // 上方向にジャンプ
+            this.player.setVelocityY(jumpForce * -1); // 上方向にジャンプ
             this.playerJumps++; // ジャンプ回数をカウント
             if(this.playerJumps === 1) {
                 this.player.anims.play('jump', true);  // 最初のジャンプは通常のジャンプアニメーション
@@ -166,25 +190,34 @@ class playGame extends Phaser.Scene {
 
     // 🔁 フレームごとの更新処理
     update() {
-        // 経過時間を計算
-        let elapsedTime = (this.time.now - this.startTime) / 1000; // 秒単位に変換
-        // 小数点1桁まで表示する
-        this.elapsedText.setText('Time: ' + elapsedTime.toFixed(1));
-        // 30秒おきに加速
-        if (elapsedTime - this.lastSpeedChange30 >= 30) {
-            this.platformSpeed += 60; // 30秒後にスピードを増加
-            this.lastSpeedChange30 = elapsedTime; // 最後にスピード変更した時間を記録
+        if (!this.isPaused) {
+            let currentTime = this.time.now;
+            let deltaTime = (currentTime - this.lastUpdateTime) / 1000;
+            this.elapsedTime += deltaTime;
+            this.lastUpdateTime = currentTime;
+    
+            // 経過時間を表示
+            this.elapsedText.setText('Time: ' + this.elapsedTime.toFixed(1));
+    
+            // 距離を積算して表示（プレイヤー縦幅を1mとして換算）
+            let meterPerPixel = 1 / this.player.displayHeight;
+            let pixelDistance = this.elapsedTime * this.platformSpeed;
+            let distanceMeters = pixelDistance * meterPerPixel;
+            this.distanceText.setText('きょり: ' + distanceMeters.toFixed(1) + 'm');
+    
+            // 30秒おきに加速
+            if (this.elapsedTime - this.lastSpeedChange30 >= 30) {
+                this.platformSpeed += 60;
+                this.lastSpeedChange30 = this.elapsedTime;
+            }
+    
+            // すべてのプラットフォーム速度更新
+            this.platformGroup.getChildren().forEach(platform => {
+                platform.setVelocityX(this.platformSpeed * -1);
+            });
+        } else {
+            this.lastUpdateTime = this.time.now; // ポーズ中は差分をリセット
         }
-        // ⬇ 既存プラットフォームの速度も更新
-        this.platformGroup.getChildren().forEach(platform => {
-            platform.setVelocityX(this.platformSpeed * -1);
-        });
-        // 移動距離計算・表示
-        let speed = gameOptions.platformStartSpeed;
-        let meterPerPixel = 1 / this.player.displayHeight;
-        let pixelDistance = elapsedTime * speed;
-        let distanceMeters = pixelDistance * meterPerPixel;
-        this.distanceText.setText('きょり: ' + distanceMeters.toFixed(1) + 'm');  
 
         // プレイヤーが画面外に落ちたらゲームリスタート
         if (this.player.y > game.config.height) {
@@ -243,4 +276,61 @@ class playGame extends Phaser.Scene {
             this.addPlatform(nextPlatformWidth, game.config.width + nextPlatformWidth / 2);
         }
     }
+    pauseGame() {
+        this.isPaused = true;
+        this.physics.pause();
+    }
+    
+    resumeGame() {
+        // もし前回のcountdownTextが残っていたら消す
+        if (this.countdownText) {
+            this.countdownText.destroy();
+        }
+    
+        // 新たにカウントダウンテキストを追加
+        this.countdownText = this.add.text(game.config.width / 2, game.config.height / 2, '', {
+            fontSize: '64px',
+            fill: '#ffffff'
+        }).setOrigin(0.5);
+    
+        let count = 3;
+    
+        // 1秒ごとにカウントダウン
+        let countdownEvent = this.time.addEvent({
+            delay: 1000,
+            callback: () => {
+                this.countdownText.setText(count);
+                count--;
+                if (count < 0) {
+                    // 0以下になったら「スタート！」表示
+                    this.countdownText.setText("Start！");
+                    // 1秒後にゲームを再開
+                    this.time.delayedCall(1000, () => {
+                        this.countdownText.destroy();
+                        this.isPaused = false;
+                        this.physics.resume();
+                    }, null, this);
+                    // イベントを停止
+                    countdownEvent.remove();
+                }
+            },
+            callbackScope: this,
+            repeat: 3 // 3回だけ繰り返す
+        });
+    }
+    togglePause() {
+        if (this.isPaused) {
+            this.resumeGame(); // カウントダウン付きで再開
+            this.pauseButton.setText('⏸'); // ← 再開時は「ポーズ」アイコンに戻す
+        } else {
+            this.isPaused = true;
+            this.physics.pause();
+            this.pauseButton.setText('▶'); // ← 一時停止中は「再生」っぽく表示
+        }
+        this.justPaused = true;
+        this.time.delayedCall(50, () => {
+            this.justPaused = false;
+        });
+    }
+    
 };
