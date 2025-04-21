@@ -1,27 +1,12 @@
-import TitleScene from './title.js';
-import RunScene from './run.js';
+import { gameConfig } from './config.js';
+import { checkGameSize } from '../resize.js';
 
-$(document).ready(function() {
-    const $container = $('#game-container');
-    const width = $container.width();
-    const height = $container.height();
+let game;
 
-    const config = {
-        type: Phaser.AUTO,
-        width: width,
-        height: height,
-        parent: 'game-container',
-        physics: {
-            default: 'arcade',
-            arcade: {
-                gravity: { y: 500 },
-                debug: false
-            }
-        },
-        scene: [TitleScene, RunScene],
-        backgroundColor: 0x87ceeb
-    };
-
-    const game = new Phaser.Game(config);
+// 🎮 ゲーム初期化
+window.onload = function() {
+    game = new Phaser.Game(gameConfig);      // ゲームインスタンス作成
+    window.focus();                          // ウィンドウにフォーカス（キー入力を確実に受けるため）
+    // リサイズ監視
     checkGameSize(game);
-});
+}
