@@ -1,88 +1,6 @@
-let game;
- 
-// 🔧 グローバルなゲーム設定（ゲームの挙動をここで調整）
-let gameOptions = {
-    platformStartSpeed: 350,          // プラットフォームの初期スピード（左向き）
-    spawnRange: [100, 350],           // 次のプラットフォーム出現までの距離範囲（ランダム）
-    platformSizeRange: [50, 250],     // プラットフォームの幅の範囲
-    playerGravity: 2400,               // プレイヤーにかかる重力
-    jumpForce: 1000,                   // ジャンプ時に上向きにかける力
-    playerStartPosition: 200,         // プレイヤーのx座標（画面左からの距離）
-    jumps: 2                          // プレイヤーがジャンプできる回数（2段ジャンプ）
-}
- 
-// 🎮 ゲーム初期化
-window.onload = function() {
-    // 🧱 Phaserのゲーム設定
-    let gameConfig = {
-        type: Phaser.AUTO,                   // 自動でWebGLかCanvasを選択
-        width: 1334,
-        height: 750,
-        pixelArt: true, // ピクセルパーフェクトにする（補間なし）
-        scene: [preloadGame, playGame],      // ゲームで使用するシーン（preloadGameとplayGameを指定）
-        backgroundColor: 0x444444,           // 背景色
-        parent: 'game-container',            // 描画先のHTML ID
-        physics: {
-            default: "arcade",
-            arcade: {
-                // debug: true    // ← これ追加
-            }
-        }
-    }
+import { gameOptions } from './config.js';
 
-    game = new Phaser.Game(gameConfig);      // ゲームインスタンス作成
-    window.focus();                          // ウィンドウにフォーカス（キー入力を確実に受けるため）
-    // リサイズ監視
-    checkGameSize(game);
-}
-
-// 🎮 preloadGame シーンの定義
-class preloadGame extends Phaser.Scene {
-    constructor() {
-        super("PreloadGame");
-    }
-
-    // 🔄 アセットの読み込み
-    preload() {
-        this.load.image("platform", imgDir_test + "platform.png"); // プラットフォーム画像
-        // this.load.spritesheet("player", imgDir_test + "player.png", { frameWidth: 24, frameHeight: 48 }); // プレイヤーのアニメーション用スプライトシート
-        this.load.spritesheet("player", `${imgDir_test}player${2}.png`, { frameWidth: 16, frameHeight: 16 }); // プレイヤーのアニメーション用スプライトシート
-    }
-
-    // 🎮 プレイシーンに遷移
-    create() {
-        // プレイヤーキャラを生成
-        this.anims.create({
-            key: 'run',
-            frames: this.anims.generateFrameNumbers('player', { start: 0, end: 3 }),
-            frameRate: 15,
-            repeat: -1
-        });
-        this.anims.create({
-            key: 'jump',
-            frames: this.anims.generateFrameNumbers('player', { start: 3, end: 3 }),
-            frameRate: 1,
-            repeat: -1
-        });
-        this.anims.create({
-            key: 'jump_ex',
-            frames: this.anims.generateFrameNumbers('player', { start: 0, end: 3 }),
-            frameRate: 25,
-            repeat: -1
-        });
-        this.anims.create({
-            key: 'stop',
-            frames: this.anims.generateFrameNumbers('player', { start: 5, end: 5 }),
-            frameRate: 1,
-            repeat: -1
-        });
-
-        this.scene.start("PlayScene");
-    }
-}
-
-// 🎮 playGame シーンの定義
-class playGame extends Phaser.Scene {
+export default class PlayScene extends Phaser.Scene {
     constructor() {
         super("PlayScene");
     }
@@ -105,9 +23,9 @@ class playGame extends Phaser.Scene {
         this.playerJumps = 0; // プレイヤーのジャンプ回数（初期化）
 
         // 最初のプラットフォームを生成
-        this.addPlatform(game.config.width, game.config.width / 2);
+        this.addPlatform(this.game.config.width, this.game.config.width / 2);
 
-        this.player = this.physics.add.sprite(gameOptions.playerStartPosition, game.config.height / 2, 'player');
+        this.player = this.physics.add.sprite(gameOptions.playerStartPosition, this.game.config.height / 2, 'player');
         this.player.setScale(3); // 2倍サイズに拡大
         this.player.setGravityY(gameOptions.playerGravity); // 重力設定
 
@@ -143,7 +61,7 @@ class playGame extends Phaser.Scene {
                 this.resumeGame();
             }
         });
-        this.pauseButton = this.add.text(game.config.width - 80, 30, '⏸', {
+        this.pauseButton = this.add.text(this.game.config.width - 80, 30, '⏸', {
             fontSize: '32px',
             fill: '#ffffff'
         }).setInteractive()
@@ -168,7 +86,7 @@ class playGame extends Phaser.Scene {
         }
         // プールが空なら新しく生成
         else {
-            platform = this.physics.add.sprite(posX, game.config.height * 0.8, "platform");
+            platform = this.physics.add.sprite(posX, this.game.config.height * 0.8, "platform");
             platform.setImmovable(true);
             platform.setVelocityX(gameOptions.platformStartSpeed * -1); // 左へ動かす
             this.platformGroup.add(platform);
@@ -205,6 +123,8 @@ class playGame extends Phaser.Scene {
     update() {
         if (!this.isPaused) {
             let currentTime = this.time.now;
+            // 最初の更新時にだけ 差を０に
+            this.lastUpdateTime ||= currentTime;
             let deltaTime = (currentTime - this.lastUpdateTime) / 1000;
             this.elapsedTime += deltaTime;
             this.lastUpdateTime = currentTime;
@@ -233,7 +153,7 @@ class playGame extends Phaser.Scene {
         }
 
         // プレイヤーが画面外に落ちたらゲームリスタート
-        if (this.player.y > game.config.height) {
+        if (this.player.y > this.game.config.height) {
             this.scene.start("PlayScene");
         }
 
@@ -271,9 +191,9 @@ class playGame extends Phaser.Scene {
         }
 
         // プラットフォームの再利用処理
-        let minDistance = game.config.width;
+        let minDistance = this.game.config.width;
         this.platformGroup.getChildren().forEach(function(platform) {
-            let platformDistance = game.config.width - platform.x - platform.displayWidth / 2;
+            let platformDistance = this.game.config.width - platform.x - platform.displayWidth / 2;
             minDistance = Math.min(minDistance, platformDistance);
 
             // 画面外に出たら非表示＆プールへ戻す
@@ -286,7 +206,7 @@ class playGame extends Phaser.Scene {
         // 一定距離空いたら新しいプラットフォームを追加
         if (minDistance > this.nextPlatformDistance) {
             let nextPlatformWidth = Phaser.Math.Between(gameOptions.platformSizeRange[0], gameOptions.platformSizeRange[1]);
-            this.addPlatform(nextPlatformWidth, game.config.width + nextPlatformWidth / 2);
+            this.addPlatform(nextPlatformWidth, this.game.config.width + nextPlatformWidth / 2);
         }
     }
     pauseGame() {
@@ -322,7 +242,7 @@ class playGame extends Phaser.Scene {
         }
         
         // 新たにカウントダウンテキストを追加
-        this.countdownText = this.add.text(game.config.width / 2, game.config.height / 2, '', {
+        this.countdownText = this.add.text(this.game.config.width / 2, this.game.config.height / 2, '', {
             fontSize: '64px',
             fill: '#ffffff'
         }).setOrigin(0.5);

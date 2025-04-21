@@ -1,4 +1,4 @@
-function checkGameSize(game) {
+export function checkGameSize(game) {
     const $game_container = $('#game-container');
     const $lock = $('#orientation-lock');
     const $canvas = $("canvas");
@@ -17,8 +17,8 @@ function checkGameSize(game) {
             if (windowHeight > windowWidth) {
                 $lock.show();
                 $game_container.hide();
-                if (game && game.scene && game.scene.getScene('PlayGame')) {
-                    game.scene.getScene('PlayGame').pauseGame();
+                if (game && game.scene && game.scene.getScene('PlayScene')) {
+                    game.scene.getScene('PlayScene').pauseGame();
                 }                
                 return;
             } else {
