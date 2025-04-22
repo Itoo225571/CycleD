@@ -8,8 +8,10 @@
 {% block game_js %}
     <script>
         const json_player = "{% static 'games/json/run/players.json' %}";
+        const imgDir = "{% static 'games/img/run/' %}";
         const imgDir_test = "{% static 'games/img/run_test/' %}";
     </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
     <script src="{% static 'games/js/run/main.js' %}" type="module"></script>
     {% comment %} <script src="{% static 'games/js/run_test.js' %}" type="module"></script> {% endcomment %}
 {% endblock game_js %}

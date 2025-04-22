@@ -25,7 +25,11 @@ export default class PlayScene extends Phaser.Scene {
         // 最初のプラットフォームを生成
         this.addPlatform(this.game.config.width, this.game.config.width / 2);
 
-        this.player = this.physics.add.sprite(gameOptions.playerStartPosition, this.game.config.height / 2, 'player');
+        this.player = this.physics.add.sprite(
+            gameOptions.playerStartPosition, 
+            this.game.config.height / 2, 
+            'tilemap',
+            261);
         this.player.setScale(3); // 2倍サイズに拡大
         this.player.setGravityY(gameOptions.playerGravity); // 重力設定
 
@@ -36,11 +40,16 @@ export default class PlayScene extends Phaser.Scene {
         this.input.on("pointerdown", this.jump, this);
         this.input.keyboard.on('keydown-SPACE', this.jump, this); // ←追加！
 
-        this.elapsedText = this.add.text(10, 10, 'Time: 0.0', {
-            font: '24px Arial', 
-            fill: '#ffffff'
+        // this.elapsedText = this.add.text(10, 10, 'Time: 0.0', {
+        //     font: '24px Arial', 
+        //     fill: '#ffffff'
+        // });
+        this.distanceText = this.add.text(20, 20, 'きょり: 0.0m', {
+            fontFamily: 'DotGothic16',
+            fontSize: '24px',
+            color: '#ffffff',
+            resolution: 2  // ← 文字が潰れないように拡大表示（オプション）
         });
-        this.distanceText = this.add.text(20, 60, 'Distance: 0.0m', { fontSize: '30px', fill: '#fff' }); // 距離
 
         this.elapsedTime = 0;
         this.lastUpdateTime = this.time.now;
@@ -130,7 +139,7 @@ export default class PlayScene extends Phaser.Scene {
             this.lastUpdateTime = currentTime;
     
             // 経過時間を表示
-            this.elapsedText.setText('Time: ' + this.elapsedTime.toFixed(1));
+            // this.elapsedText.setText('Time: ' + this.elapsedTime.toFixed(1));
     
             // 距離を積算して表示（プレイヤー縦幅を1mとして換算）
             let meterPerPixel = 1 / this.player.displayHeight;
@@ -243,6 +252,7 @@ export default class PlayScene extends Phaser.Scene {
         
         // 新たにカウントダウンテキストを追加
         this.countdownText = this.add.text(this.game.config.width / 2, this.game.config.height / 2, '', {
+            fontFamily: 'DotGothic16',
             fontSize: '64px',
             fill: '#ffffff'
         }).setOrigin(0.5);
