@@ -7,7 +7,7 @@ let game;
 window.onload = function() {
     WebFont.load({
         google: {
-          families: ['DotGothic16']
+          families: ['DotGothic16','Press Start 2P']
         },
         active: function () {
             game = new Phaser.Game(gameConfig);      // ゲームインスタンス作成
