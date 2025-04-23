@@ -147,10 +147,10 @@ export function createMsgWindow(scene, messages = [''], delay = 0) {
     scene.add.container(0, 0, [win, text]);
 }
 
-export function createBtn(x, y, scene, content = '', option = {}) {
+export function createBtn(x, y, scene, content, option = {}) {
     const per_length = 16;
     const info = {
-        width: 32,
+        width: 40,
         height: 6
     };
 
@@ -171,9 +171,9 @@ export function createBtn(x, y, scene, content = '', option = {}) {
         (info.height * per_length) / 2,
         content,
         {
-            fontFamily: 'DotGothic16',
+            fontFamily: option.fontFamily || 'DotGothic16',
             fontSize: '32px',
-            color: '0x000000'
+            color: '#000000'
         }
     ).setOrigin(0.5);
     container.add(text);
@@ -188,5 +188,5 @@ export function createBtn(x, y, scene, content = '', option = {}) {
 
     container.add(hitArea);
 
-    return container;
+    return { container, hitArea };
 }

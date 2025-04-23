@@ -6,43 +6,53 @@ export default class StartScene extends Phaser.Scene {
     }
 
     create() {
-        // タイトル表示
-        this.add.text(240, 150, '🎮 My Game Title', {
-            fontFamily: 'DotGothic16',
-            fontSize: '48px',
+        var TITLE_NAME = 'NIKI RUN';
+        // フェードインしつつ、ゆっくり上下に浮かぶ
+        const title = this.add.text(
+            this.scale.width / 2, 150, 
+            TITLE_NAME, {
+            fontFamily: '"Press Start 2P"',
+            fontSize: '60px',
             color: '#ffffff',
             resolution: 2
+        }).setOrigin(0.5).setAlpha(0).setScale(0.9);
+        // アニメーション
+        this.tweens.add({
+            targets: title,
+            alpha: 1,
+            scale: 1,
+            duration: 800,
+            ease: 'Back.Out',
+            onComplete: () => {
+                this.tweens.add({
+                    targets: title,
+                    y: title.y - 20,
+                    duration: 1000,
+                    yoyo: true,
+                    repeat: -1,
+                    ease: 'Sine.easeInOut'
+                });
+            }
         });
 
-        // スタートボタン風テキスト
-        const startText = this.add.text(320, 300, '▶ Start', {
-            fontFamily: 'DotGothic16',
-            fontSize: '32px',
-            color: '#00ff00',
-            resolution: 2
-        });
+        // var msgs = [
+        //     'NAME: ponny',
+        //     '3日に1度はパンツの前後ろを間違え、5日に1度はパンツの表裏を間違える。'
+        // ]
+        // createMsgWindow(this,msgs,0)
 
-        startText.setInteractive({ useHandCursor: true });
-
-        startText.on('pointerdown', () => {
+        var option = {centerX:true,fontFamily:'"Press Start 2P"'};
+        var {_,hitArea} = createBtn(0,300,this,'Start',option)
+        hitArea.on('pointerdown', () => {
             this.scene.start('PlayScene');
         });
-
-        // ホバー時に色変えたりもできる
-        startText.on('pointerover', () => {
-            startText.setStyle({ fill: '#ffff00' });
+        var {_,hitArea} = createBtn(0,430,this,'Choice Character', option)
+        hitArea.on('pointerdown', () => {
+            this.scene.start('PlayScene');
         });
-        startText.on('pointerout', () => {
-            startText.setStyle({ fill: '#00ff00' });
+        var {_,hitArea} = createBtn(0,560,this,'Option', option)
+        hitArea.on('pointerdown', () => {
+            this.scene.start('PlayScene');
         });
-
-        var msgs = [
-            'NAME: ponny',
-            '3日に1度はパンツの前後ろを間違え、5日に1度はパンツの表裏を間違える。'
-        ]
-        createMsgWindow(this,msgs,0)
-
-        // createBtn(100,100,this,'キャラクター選択', {centerX:true})
-
     }
 }

@@ -1,4 +1,5 @@
 import { gameOptions } from './config.js';
+import { createBtn } from './preload.js';
 
 export default class PlayScene extends Phaser.Scene {
     constructor() {
@@ -163,11 +164,10 @@ export default class PlayScene extends Phaser.Scene {
 
         // プレイヤーが画面外に落ちたらゲームリスタート
         if (this.player.y > this.game.config.height) {
-            this.scene.start("PlayScene");
+            // this.scene.start("PlayScene");
+            this.GameOver();
         }
 
-        // プレイヤーのx座標を固定（横スクロール風）
-        // this.player.x = gameOptions.playerStartPosition;
         // 地面にいる場合
         if (this.player.body.touching.down) {
             this.player.setVelocityX(this.platformSpeed);  // 横方向に動かす（platformStartSpeedと同じ速度）
@@ -228,13 +228,40 @@ export default class PlayScene extends Phaser.Scene {
             this.player.anims.play('stop');
         }
 
+        // 🔲 1. 背景を少し暗くする（透明な黒）
+        this.pauseOverlay = this.add.rectangle(
+            this.scale.width / 2,
+            this.scale.height / 2,
+            this.scale.width,
+            this.scale.height,
+            0x000000,
+            0.5 // 半透明
+        ).setDepth(99); // ここでdepthを調整
+
+        // ▶ 2. 中央に再開ボタンを表示
+        var option = {centerX:true,fontFamily:'"Press Start 2P"'};
+        this.resumeBtns = [];
+
+        var { container:container, hitArea:hitArea_restart } = createBtn(0, 200, this, 'Re Start', option);
+        container.setDepth(100);
+        this.resumeBtns.push(container); // ボタンを追加
+
+        var { container:container, hitArea:hitArea_exit } = createBtn(0, 400, this, 'Exit', option);
+        container.setDepth(100);
+        this.resumeBtns.push(container); // ボタンを追加
+
         // この最中はポーズ・再生できない
         this.justPaused = true;
         this.time.delayedCall(50, () => {
             this.justPaused = false;
-            this.input.on("pointerdown", () => {
-                if (this.isPaused) {   // ゲームがポーズ中の場合のみ
+            hitArea_restart.on('pointerdown', () => {
+                if (this.isPaused) {
                     this.resumeGame();
+                }
+            });
+            hitArea_exit.on('pointerdown', () => {
+                if (this.isPaused) {
+                    this.goToStartScreen();
                 }
             });
         });
@@ -292,9 +319,29 @@ export default class PlayScene extends Phaser.Scene {
         this.cameras.main.fadeOut(0); // フェードアウト
         this.cameras.main.fadeIn(200); // フェードインして再描画
 
+        // 🔄 ポーズ用UIを消す
+        if (this.pauseOverlay) this.pauseOverlay.destroy();
+        // 複数ボタンを削除
+        if (this.resumeBtns) {
+            this.resumeBtns.forEach(btn => {
+                btn.destroy();
+            });
+        }
+
         this.justPaused = true;
         this.time.delayedCall(50, () => {
             this.justPaused = false;
         });
-    }    
+    }
+
+    // 「Start画面」に戻る処理
+    goToStartScreen() {
+        // 現在のゲームシーンを停止し、Start画面に遷移
+        this.scene.start('StartScene');
+        this.scene.stop();  // 現在のシーンを停止
+    }
+
+    GameOver() {
+        this.scene.start("StartScene");
+    }
 };
