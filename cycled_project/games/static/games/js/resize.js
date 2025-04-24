@@ -1,6 +1,6 @@
 export function checkGameSize(game) {
     const $game_container = $('#game-container');
-    const $lock = $('#orientation-lock');
+    // const $lock = $('#orientation-lock');
     const $canvas = $("canvas");
 
     // モバイル判定関数
@@ -11,19 +11,7 @@ export function checkGameSize(game) {
     function resize() {
         $game_container.removeClass('full-screen-container');  //一旦取り外す
         if (isMobile()) {
-            let windowWidth = $(window).width();
-            let windowHeight = $(window).height();
-            // 縦長 && モバイル の場合はロック表示＋ゲーム非表示
-            if (windowHeight > windowWidth) {
-                $lock.show();
-                $game_container.hide();
-                if (game && game.scene && game.scene.getScene('PlayScene')) {
-                    game.scene.getScene('PlayScene').pauseGame();
-                }                
-                return;
-            } else {
-                $game_container.addClass('full-screen-container');     //フルスクリーン表示用のクラス
-            }
+            $game_container.addClass('full-screen-container');     //フルスクリーン表示用のクラス
         }
 
         let containerWidth = $game_container.width();
@@ -43,7 +31,7 @@ export function checkGameSize(game) {
             });
         }
 
-        $lock.hide();
+        // $lock.hide();
         $game_container.show();
         
         if (game && game.scene && game.scene.isPaused()) {
