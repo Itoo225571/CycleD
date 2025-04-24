@@ -25,5 +25,5 @@ export const gameConfig = {
         arcade: {
             // debug: true
         }
-    }
+    },
 };
