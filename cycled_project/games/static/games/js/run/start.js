@@ -9,19 +9,20 @@ export default class StartScene extends Phaser.Scene {
         var TITLE_NAME = 'NIKI RUN';
         // フェードインしつつ、ゆっくり上下に浮かぶ
         const title = this.add.text(
-            this.scale.width / 2, 150, 
+            -200, 150, // 画面の左外側から開始
             TITLE_NAME, {
-            fontFamily: '"Press Start 2P"',
-            fontSize: '60px',
-            color: '#ffffff',
-            resolution: 2
-        }).setOrigin(0.5).setAlpha(0).setScale(0.9);
+                fontFamily: '"Press Start 2P"',
+                fontSize: '60px',
+                color: '#ffffff',
+                resolution: 2
+            }).setOrigin(0.5).setAlpha(0).setScale(0.9);
         // アニメーション
         this.tweens.add({
             targets: title,
+            x: this.scale.width / 2, // 画面の中央に移動
             alpha: 1,
             scale: 1,
-            duration: 800,
+            duration: 500,
             ease: 'Back.Out',
             onComplete: () => {
                 this.tweens.add({
@@ -30,10 +31,12 @@ export default class StartScene extends Phaser.Scene {
                     duration: 1000,
                     yoyo: true,
                     repeat: -1,
+                    delay: 500,
                     ease: 'Sine.easeInOut'
                 });
             }
         });
+        
 
         // var msgs = [
         //     'NAME: ponny',
@@ -42,15 +45,15 @@ export default class StartScene extends Phaser.Scene {
         // createMsgWindow(this,msgs,0)
 
         var option = {centerX:true,fontFamily:'"Press Start 2P"'};
-        var {_,hitArea} = createBtn(0,300,this,'Start',option)
+        var { _ ,hitArea} = createBtn(0,300,this,'Start',option)
         hitArea.on('pointerdown', () => {
             this.scene.start('PlayScene');
         });
-        var {_,hitArea} = createBtn(0,430,this,'Choice Character', option)
+        var { _ ,hitArea} = createBtn(0,430,this,'Choice Character', option)
         hitArea.on('pointerdown', () => {
             this.scene.start('PlayScene');
         });
-        var {_,hitArea} = createBtn(0,560,this,'Option', option)
+        var { _ ,hitArea} = createBtn(0,560,this,'Option', option)
         hitArea.on('pointerdown', () => {
             this.scene.start('PlayScene');
         });
