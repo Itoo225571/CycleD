@@ -15,7 +15,8 @@ export default class StartScene extends Phaser.Scene {
                 fontSize: '60px',
                 color: '#ffffff',
                 resolution: 2
-            }).setOrigin(0.5).setAlpha(0).setScale(0.9);
+            }).setOrigin(0.5).setAlpha(0).setScale(0.9)
+            .setShadow(10, 10, '#660066', 0, true, true);  // ← 影を追加！;
         // アニメーション
         this.tweens.add({
             targets: title,
@@ -57,5 +58,11 @@ export default class StartScene extends Phaser.Scene {
         hitArea.on('pointerdown', () => {
             this.scene.start('PlayScene');
         });
+
+        // background
+        this.add.image(0, 0, 'sky')
+            .setOrigin(0, 0).
+            setDisplaySize(this.game.config.width, this.game.config.height)
+            .setDepth(-5);
     }
 }

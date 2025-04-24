@@ -4,12 +4,17 @@ export default class PreloadScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('platform', imgDir_test + 'platform.png');
+        // this.load.image('platform', imgDir_test + 'platform.png');
         // tilemap
         this.load.spritesheet(
             'tilemap', 
             `${imgDir}tilemap.png`, 
             { frameWidth: 16, frameHeight: 16 }
+        );
+        this.load.spritesheet(
+            'tilemap2', 
+            `${imgDir}tilemap2.png`, 
+            { frameWidth: 32, frameHeight: 32 }
         );
         // msgウィンドウ
         this.load.spritesheet(
@@ -23,6 +28,12 @@ export default class PreloadScene extends Phaser.Scene {
             `${imgDir}Panel/panel-000.png`, 
             { frameWidth: 16, frameHeight: 16 }
         );
+        // 背景画像
+        this.load.image('sky', `${imgDir}background/sky.png`);
+        this.load.image('mountain', `${imgDir}background/mountain.png`);
+        this.load.image('mountains', `${imgDir}background/mountains.png`);
+        this.load.image('mountain-trees', `${imgDir}background/mountain-trees.png`);
+        this.load.image('trees', `${imgDir}background/trees.png`);
     }
 
     create() {
@@ -50,6 +61,29 @@ export default class PreloadScene extends Phaser.Scene {
             frameRate: 1,
             repeat: -1
         });
+
+        // 背景レイヤーの初期化
+        this.backgroundLayers = {};
+        // 'sky' レイヤー（最も遠い）
+        this.backgroundLayers['sky'] = this.add.image(0, 0, 'sky')
+            .setOrigin(0, 0)
+            .setDisplaySize(this.game.config.width, this.game.config.height);
+        // 'mountain' レイヤー（遠景）
+        this.backgroundLayers['mountain'] = this.add.image(0, 0, 'mountain')
+            .setOrigin(0, 0)
+            .setDisplaySize(this.game.config.width, this.game.config.height);
+        // 'mountains' レイヤー（中景）
+        this.backgroundLayers['mountains'] = this.add.image(0, 0, 'mountains')
+            .setOrigin(0, 0)
+            .setDisplaySize(this.game.config.width, this.game.config.height);
+        // 'mountain-trees' レイヤー（手前の遠景）
+        this.backgroundLayers['mountain-trees'] = this.add.image(0, 0, 'mountain-trees')
+            .setOrigin(0, 0)
+            .setDisplaySize(this.game.config.width, this.game.config.height);
+        // 'trees' レイヤー（最も手前）
+        this.backgroundLayers['trees'] = this.add.image(0, 0, 'trees')
+            .setOrigin(0, 0)
+            .setDisplaySize(this.game.config.width, this.game.config.height);
 
         // this.scene.start('PlayScene');
         this.scene.start('StartScene');

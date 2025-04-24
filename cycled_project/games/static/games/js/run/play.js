@@ -8,6 +8,14 @@ export default class PlayScene extends Phaser.Scene {
 
     // 🎲 ゲーム初期化処理
     create() {
+        // 背景レイヤーの初期化
+        this.backgroundLayers = {};
+        this.createBackgroundLayer('sky',-5);
+        this.createBackgroundLayer('mountain',-4);
+        this.createBackgroundLayer('mountains',-3);
+        this.createBackgroundLayer('mountain-trees',-2);
+        this.createBackgroundLayer('trees',-1);
+            
         // アクティブなプラットフォームを管理するグループ
         this.platformGroup = this.add.group({
             removeCallback: function(platform) {
@@ -24,7 +32,7 @@ export default class PlayScene extends Phaser.Scene {
         this.playerJumps = 0; // プレイヤーのジャンプ回数（初期化）
 
         // 最初のプラットフォームを生成
-        this.addPlatform(this.game.config.width, this.game.config.width / 2);
+        this.addPlatform(this.game.config.width, 0);
 
         this.player = this.physics.add.sprite(
             gameOptions.playerStartPosition, 
@@ -53,7 +61,7 @@ export default class PlayScene extends Phaser.Scene {
         });
 
         this.elapsedTime = 0;
-        this.lastUpdateTime = this.time.now;
+        this.lastUpdateTime = 0;
         this.lastSpeedChange30 = 0;
         this.distance = 0;
         this.platformSpeed = gameOptions.platformStartSpeed;
@@ -115,30 +123,52 @@ export default class PlayScene extends Phaser.Scene {
 
     // ➕ プラットフォームを追加する関数
     addPlatform(platformWidth, posX) {
-        let platform;
-
-        // プールから使いまわす
-        if (this.platformPool.getLength()) {
-            platform = this.platformPool.getFirst();
-            platform.x = posX;
-            platform.active = true;
-            platform.visible = true;
-            this.platformPool.remove(platform);
+        const aspect = 1.5;
+        const tileWidth = 32 * aspect;  // タイル1つの幅
+        const tileCount = Math.ceil(platformWidth / tileWidth);  // 必要なタイル数
+        const posY = this.game.config.height * 0.8;  // プラットフォームのY座標（固定）
+    
+        // タイルを連結してプラットフォームを作成
+        for (let i = 0; i < tileCount; i++) {
+            let tile;
+            let frame = (i === 0) ? 2 : (i === tileCount - 1) ? 1 : 0;
+    
+            // プールからタイルを取得
+            if (this.platformPool.getLength()) {
+                tile = this.platformPool.getFirst();
+                tile.x = posX + i * tileWidth;  // タイルの位置を調整
+                tile.active = true;
+                tile.visible = true;
+                this.platformPool.remove(tile);  // プールから取り出す
+                tile.setFrame(frame);  // フレーム番号を設定
+            }
+            // プールが空なら新しいタイルを生成
+            else {
+                tile = this.physics.add.sprite(posX + i * tileWidth, posY, "tilemap2", frame);  // フレーム番号を動的に設定
+                tile.setImmovable(true);  // プレイヤーに押されないように
+                tile.setVelocityX(gameOptions.platformStartSpeed * -1);  // 左へ動く
+                tile.setScale(aspect);  // タイルを拡大
+                this.platformGroup.add(tile);
+            }
+    
+            tile.body.allowGravity = false;  // 重力無視
         }
-        // プールが空なら新しく生成
-        else {
-            platform = this.physics.add.sprite(posX, this.game.config.height * 0.8, "platform");
-            platform.setImmovable(true);
-            platform.setVelocityX(gameOptions.platformStartSpeed * -1); // 左へ動かす
-            this.platformGroup.add(platform);
-        }
-
-        // プラットフォームの幅を設定
-        platform.displayWidth = platformWidth;
-        // platform.displayHeight = 200; // ここで高さを変更
-
+        // プラットフォームの幅にぴったり合わせるための調整
+        const lastTile = this.platformGroup.getChildren()[this.platformGroup.getChildren().length - 1];
+        const remainingWidth = platformWidth - (tileCount - 1) * tileWidth;  // 余った幅
+        lastTile.x += remainingWidth - tileWidth;  // 最後のタイルの位置を調整して、隙間をなくす
+    
         // 次のプラットフォーム出現までの距離をランダムに決定
         this.nextPlatformDistance = Phaser.Math.Between(gameOptions.spawnRange[0], gameOptions.spawnRange[1]);
+    }
+    
+
+    // 背景レイヤーの作成関数
+    createBackgroundLayer(layerName,depth) {
+        this.backgroundLayers[layerName] = [
+            this.add.image(0, 0, layerName).setOrigin(0, 0).setDisplaySize(this.game.config.width, this.game.config.height).setDepth(depth),
+            this.add.image(this.game.config.width, 0, layerName).setOrigin(0, 0).setDisplaySize(this.game.config.width, this.game.config.height).setDepth(depth)
+        ];
     }
 
     // ジャンプ開始時
@@ -248,8 +278,36 @@ export default class PlayScene extends Phaser.Scene {
             let nextPlatformWidth = Phaser.Math.Between(gameOptions.platformSizeRange[0], gameOptions.platformSizeRange[1]);
             this.addPlatform(nextPlatformWidth, this.game.config.width + nextPlatformWidth / 2);
         }
+
+        // 背景のパララックス効果（スクロールに応じて背景を動かす）
+        this.scrollBackground('sky', 0);
+        this.scrollBackground('mountain', 0.0005);
+        this.scrollBackground('mountains', 0.001);
+        this.scrollBackground('mountain-trees', 0.002);
+        this.scrollBackground('trees', 0.005);
     }
+
+
+    // 背景レイヤーのスクロール処理
+    scrollBackground(layerName, speed) {
+        if (this.isPaused) return; // 一時停止中はスクロールしない
+
+        // 背景をスクロール
+        this.backgroundLayers[layerName].forEach(layer => {
+            layer.x -= this.platformSpeed * speed;
+        });
+
+        // 最初の背景が画面外に出たら再配置
+        if (this.backgroundLayers[layerName][0].x <= -this.game.config.width) {
+            this.backgroundLayers[layerName][0].x = this.backgroundLayers[layerName][1].x + this.game.config.width;
+        }
+        if (this.backgroundLayers[layerName][1].x <= -this.game.config.width) {
+            this.backgroundLayers[layerName][1].x = this.backgroundLayers[layerName][0].x + this.game.config.width;
+        }
+    }
+
     pauseGame() {
+        if (!this.scene.isActive('PlayScene')) return;
         if (this.countdownEvent) {
             this.countdownEvent.remove();        // カウントダウン停止
             this.countdownEvent = null;
