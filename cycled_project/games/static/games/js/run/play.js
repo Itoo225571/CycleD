@@ -79,7 +79,44 @@ export default class PlayScene extends Phaser.Scene {
         .on('pointerdown', (pointer) => {
             pointer.event.stopPropagation(); // ← これで他のイベントに伝わらない！
             this.pauseGame();
+        });
+
+        this.resumeBtns = [];  
+        var option = {centerX:true,fontFamily:'"Press Start 2P"'};
+        // 再生ボタン
+        var { container:container, hitArea:hitArea } = createBtn(0, 200, this, 'Re:Start', option);
+        container.setDepth(100);
+        hitArea.on('pointerdown', () => {
+            if (this.isPaused) {
+                this.resumeGame();
+            }
+        });
+        // ホームに戻るボタン
+        this.resumeBtns.push({ container, hitArea });
+        var { container:container, hitArea:hitArea } = createBtn(0, 400, this, 'Exit', option);
+        container.setDepth(100);
+        hitArea.on('pointerdown', () => {
+            if (this.isPaused) {
+                this.goToStartScreen();
+            }
+        });
+
+        this.resumeBtns.push({ container, hitArea });
+        //まとめて非表示&無効化
+        this.resumeBtns.forEach(btn => {
+            btn.container.setVisible(false);
+            btn.hitArea.disableInteractive();
         });        
+
+        this.pauseOverlay = this.add.rectangle(
+            this.scale.width / 2,
+            this.scale.height / 2,
+            this.scale.width,
+            this.scale.height,
+            0x000000,
+            0.5
+        ).setDepth(99);
+        this.pauseOverlay.setVisible(false);    // 非表示
     }
 
     // ➕ プラットフォームを追加する関数
@@ -219,6 +256,17 @@ export default class PlayScene extends Phaser.Scene {
         }
     }
     pauseGame() {
+        if (this.countdownEvent) {
+            this.countdownEvent.remove();        // カウントダウン停止
+            this.countdownEvent = null;
+        }
+        if (this.countdownText) {
+            this.countdownText.destroy();        // 表示中の "3", "2", ... "Start!" を消す
+            this.countdownText = null;
+        }
+        // ✅ ここでBtn入力を再有効化
+        this.input.enabled = true;
+        
         this.isPaused = true;
         this.physics.pause();
         this.selfPased = true;
@@ -229,40 +277,16 @@ export default class PlayScene extends Phaser.Scene {
         }
 
         // 🔲 1. 背景を少し暗くする（透明な黒）
-        this.pauseOverlay = this.add.rectangle(
-            this.scale.width / 2,
-            this.scale.height / 2,
-            this.scale.width,
-            this.scale.height,
-            0x000000,
-            0.5 // 半透明
-        ).setDepth(99); // ここでdepthを調整
-
-        // ▶ 2. 中央に再開ボタンを表示
-        var option = {centerX:true,fontFamily:'"Press Start 2P"'};
-        this.resumeBtns = [];
-
-        var { container:container, hitArea:hitArea_restart } = createBtn(0, 200, this, 'Re Start', option);
-        container.setDepth(100);
-        this.resumeBtns.push(container); // ボタンを追加
-
-        var { container:container, hitArea:hitArea_exit } = createBtn(0, 400, this, 'Exit', option);
-        container.setDepth(100);
-        this.resumeBtns.push(container); // ボタンを追加
+        this.pauseOverlay.setVisible(true);
 
         // この最中はポーズ・再生できない
         this.justPaused = true;
         this.time.delayedCall(50, () => {
             this.justPaused = false;
-            hitArea_restart.on('pointerdown', () => {
-                if (this.isPaused) {
-                    this.resumeGame();
-                }
-            });
-            hitArea_exit.on('pointerdown', () => {
-                if (this.isPaused) {
-                    this.goToStartScreen();
-                }
+            // ▶ 2. 中央に再開ボタンを表示
+            this.resumeBtns.forEach(btn => {
+                btn.container.setVisible(true);             // 表示
+                btn.hitArea.setInteractive();               // ヒットエリアを有効化
             });
         });
     }
@@ -315,18 +339,14 @@ export default class PlayScene extends Phaser.Scene {
             callbackScope: this,
             repeat: 3 // 3回だけ繰り返す
         });
-        // 再描画を強制するために、一時的にカメラをリセット
-        this.cameras.main.fadeOut(0); // フェードアウト
-        this.cameras.main.fadeIn(200); // フェードインして再描画
 
-        // 🔄 ポーズ用UIを消す
-        if (this.pauseOverlay) this.pauseOverlay.destroy();
-        // 複数ボタンを削除
-        if (this.resumeBtns) {
-            this.resumeBtns.forEach(btn => {
-                btn.destroy();
-            });
-        }
+        // 🔄 ポーズ用UIを非表示
+        this.pauseOverlay.setVisible(false);
+        // まとめてBtn非表示&無効化
+        this.resumeBtns.forEach(btn => {
+            btn.container.setVisible(false);
+            btn.hitArea.disableInteractive();
+        });        
 
         this.justPaused = true;
         this.time.delayedCall(50, () => {

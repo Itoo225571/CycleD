@@ -5,19 +5,6 @@
     margin: 0 auto;        /* 横方向で中央揃え */
 }
 
-#orientation-lock {
-    display: none; 
-    position: fixed; 
-    inset: 0; 
-    background: #0008; 
-    color: white; 
-    font-size: 1.5em; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    z-index: 9999;
-}
-
 /* スマホ用画面調整 */
 #game-container.full-screen-container {
     position: absolute;                /* 画面全体を覆う */
