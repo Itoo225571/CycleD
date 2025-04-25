@@ -83,32 +83,32 @@ export default class PlayScene extends Phaser.Scene {
             this.pauseGame();
         });
 
+        this.is_gameOver = false;   // gameOver判定
         this.resumeBtns = [];  
-        var option = {centerX:true,fontFamily:'"Press Start 2P"'};
-        // 再生ボタン
-        var { container:container, hitArea:hitArea } = createBtn(0, 200, this, 'Re:Start', option);
-        container.setDepth(100);
-        hitArea.on('pointerdown', () => {
-            if (this.isPaused) {
-                this.resumeGame();
-            }
+        const option = { centerX: true, fontFamily: '"Press Start 2P"' };
+        // ボタンラベルとアクションの配列
+        var buttons = [
+            { label: 'Continue', callback: () => this.resumeGame() },
+            { label: 'Restart', callback: () => this.rePlayGame() },
+            { label: 'Exit', callback: () => this.goToStartScreen() }
+        ];
+        // ボタン作成
+        buttons.forEach(({ label, callback }) => {
+            const { container, hitArea } = createBtn(0, 0, this, label, option);
+            container.setDepth(100);
+            hitArea.on('pointerdown', () => {
+                if (this.isPaused) callback();
+            });
+            this.resumeBtns.push({ container, hitArea });
         });
-        // ホームに戻るボタン
-        this.resumeBtns.push({ container, hitArea });
-        var { container:container, hitArea:hitArea } = createBtn(0, 400, this, 'Exit', option);
-        container.setDepth(100);
-        hitArea.on('pointerdown', () => {
-            if (this.isPaused) {
-                this.goToStartScreen();
-            }
-        });
-
-        this.resumeBtns.push({ container, hitArea });
-        //まとめて非表示&無効化
-        this.resumeBtns.forEach(btn => {
+        // 等間隔に並べる
+        const baseY = 150;
+        const spacing = 180;
+        this.resumeBtns.forEach((btn, index) => {
+            btn.container.y = baseY + spacing * index;
             btn.container.setVisible(false);
             btn.hitArea.disableInteractive();
-        });        
+        });
 
         this.pauseOverlay = this.add.rectangle(
             this.scale.width / 2,
@@ -121,7 +121,7 @@ export default class PlayScene extends Phaser.Scene {
         this.pauseOverlay.setVisible(false);    // 非表示
 
         // 残機の初期値
-        this.lives = 3;
+        this.lives = 0;
         this.isRespawning = false; // ← フラグを追加
         // 右上に表示するテキストの作成
         // 残機数を管理する画像を保持する配列
@@ -234,8 +234,8 @@ export default class PlayScene extends Phaser.Scene {
             // 距離を積算して表示（プレイヤー縦幅を1mとして換算）
             let meterPerPixel = 1 / this.player.displayHeight;
             let pixelDistance = this.elapsedTime * this.platformSpeed;
-            let distanceMeters = pixelDistance * meterPerPixel;
-            this.distanceText.setText('きょり: ' + distanceMeters.toFixed(1) + 'm');
+            this.score = pixelDistance * meterPerPixel;
+            this.distanceText.setText('きょり: ' + this.score.toFixed(1) + 'm');
     
             // 30秒おきに加速
             if (this.elapsedTime - this.lastSpeedChange30 >= 30) {
@@ -366,6 +366,11 @@ export default class PlayScene extends Phaser.Scene {
             this.resumeBtns.forEach(btn => {
                 btn.container.setVisible(true);             // 表示
                 btn.hitArea.setInteractive();               // ヒットエリアを有効化
+                if (this.is_gameOver) {
+                    // Continue（1番目のボタン）のみ非表示＆非インタラクティブに
+                    this.resumeBtns[0].container.setVisible(false);
+                    this.resumeBtns[0].hitArea.disableInteractive();
+                }
             });
         });
     }
@@ -425,7 +430,7 @@ export default class PlayScene extends Phaser.Scene {
         this.resumeBtns.forEach(btn => {
             btn.container.setVisible(false);
             btn.hitArea.disableInteractive();
-        });        
+        });
 
         this.justPaused = true;
         this.time.delayedCall(50, () => {
@@ -447,17 +452,19 @@ export default class PlayScene extends Phaser.Scene {
         this.lives--; // 残機を減らす
         this.updateLivesDisplay(); // 表示を更新
     
-        if (this.lives <= 0) {
+        if (this.lives < 0) {
             this.GameOver();
         } else {
             this.respawnPlayer();
         }
-    }    
+    }
     respawnPlayer() {
         // プレイヤーを一時的に非表示・無効化
         this.player.setVisible(false);
         this.player.setActive(false);
         this.player.body.enable = false;
+        // 画面インタラクションを無効化
+        this.input.enabled = false;
 
         this.physics.pause();
         this.isPaused = true;
@@ -499,12 +506,58 @@ export default class PlayScene extends Phaser.Scene {
             this.physics.resume();
             this.isPaused = false;
             this.selfPased = false;
+            this.input.enabled = true;
         });
+    }
+    rePlayGame() {
+        this.scene.restart();
     }
 
     GameOver() {
-        this.goToStartScreen();
+        const gameOverText = this.add.text(
+            this.cameras.main.centerX,
+            -100,  // 画面の上外からスタート
+            'Game Over',
+            {
+                fontFamily: '"Press Start 2P"',
+                fontSize: '64px',
+                color: '#ffffff'
+            }
+        ).setOrigin(0.5).setDepth(100);
+        // スコアを表示するテキスト
+        const scoreText = this.add.text(
+            this.cameras.main.centerX,
+            -100,  // "Game Over" の下に配置
+            `Score: ${this.score.toFixed(1)} m`,  // 実際のスコア値を表示
+            {
+                fontFamily: '"Press Start 2P"',
+                fontSize: '32px',
+                color: '#ffffff'
+            }
+        ).setOrigin(0.5).setDepth(100);
+
+    
+        // 上から落ちるアニメーション
+        this.tweens.add({
+            targets: gameOverText,
+            y: 100,  // 画面中央の位置に落ちる
+            ease: 'Bounce.easeOut',  // バウンド効果
+            duration: 1000,  // 落ちる時間
+            repeat: 0  // 繰り返しなし
+        });
+        // スコアのアニメーション
+        this.tweens.add({
+            targets: scoreText,
+            y: gameOverText.y + gameOverText.height + 250,  // Game Overのテキスト下に配置
+            ease: 'Bounce.easeOut',
+            duration: 1000,
+            repeat: 0
+        });
+    
+        this.is_gameOver = true;
+        this.pauseGame();
     }
+    
 
     handleBlur() {
         this.pauseGame();
