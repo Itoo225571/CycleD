@@ -73,8 +73,8 @@ export default class PlayScene extends Phaser.Scene {
         this.game.events.on(Phaser.Core.Events.BLUR, this.handleBlur, this);
         this.game.events.on(Phaser.Core.Events.FOCUS, this.handleFocus, this);
 
-        this.pauseButton = this.add.text(this.game.config.width - 80, 30, '⏸', {
-            fontSize: '32px',
+        this.pauseButton = this.add.text(this.game.config.width - 80, 40, '⏸', {
+            fontSize: '48px',
             fill: '#ffffff'
         }).setInteractive()
         .setScrollFactor(0)
@@ -119,6 +119,34 @@ export default class PlayScene extends Phaser.Scene {
             0.5
         ).setDepth(99);
         this.pauseOverlay.setVisible(false);    // 非表示
+
+        // 残機の初期値
+        this.lives = 3;
+        this.isRespawning = false; // ← フラグを追加
+        // 右上に表示するテキストの作成
+        // 残機数を管理する画像を保持する配列
+        this.livesIcons = []; 
+        this.updateLivesDisplay();
+    }
+
+    // 残機の表示を更新する関数
+    updateLivesDisplay() {
+        // すでに表示されているライフアイコンを削除
+        this.livesIcons.forEach(icon => {
+            icon.destroy();
+        });
+        this.livesIcons = []; // 配列をリセット
+
+        // 新たに残機アイコンを表示
+        for (let i = 0; i < this.lives; i++) {
+            let lifeIcon = this.add.sprite(
+                this.game.config.width - 60 - (i * 32), 100,  // X座標を調整して並べる
+                'tilemap', // 画像のキーを指定
+                261
+            );
+            lifeIcon.setScale(2);  // 拡大率を2に設定
+            this.livesIcons.push(lifeIcon); // 配列に追加
+        }
     }
 
     // ➕ プラットフォームを追加する関数
@@ -224,9 +252,8 @@ export default class PlayScene extends Phaser.Scene {
         }
 
         // プレイヤーが画面外に落ちたらゲームリスタート
-        if (this.player.y > this.game.config.height) {
-            // this.scene.start("PlayScene");
-            this.GameOver();
+        if (this.player.y > this.game.config.height && !this.isRespawning) {
+            this.loseLife();
         }
 
         // 地面にいる場合
@@ -236,7 +263,7 @@ export default class PlayScene extends Phaser.Scene {
             this.player.setVelocityX(0);  // 空中にいる間は横方向に動かさない
         }
         // プレイヤーのx位置がgameOptions.playerStartPosition / 2 より小さくなった場合 かつ　地面に接している時
-        if (this.player.x < gameOptions.playerStartPosition / 2 && this.player.body.touching.down) {
+        if ((this.player.x < gameOptions.playerStartPosition / 2 || this.player.x > gameOptions.playerStartPosition* 3 / 2)  && (this.player.body.touching.down)) {
             // 現在のplayerのx座標と目標位置（gameOptions.playerStartPosition）との距離を計算
             let distance = Math.abs(this.player.x - gameOptions.playerStartPosition);
             // 距離に基づいてdurationを決定（例えば、距離1あたり0.5秒）
@@ -412,6 +439,67 @@ export default class PlayScene extends Phaser.Scene {
         this.shutdown();
         this.scene.start('StartScene');
         this.scene.stop();  // 現在のシーンを停止
+    }
+
+    // ライフが減る処理など
+    loseLife() {
+        this.isRespawning = true; // フラグを立てる
+        this.lives--; // 残機を減らす
+        this.updateLivesDisplay(); // 表示を更新
+    
+        if (this.lives <= 0) {
+            this.GameOver();
+        } else {
+            this.respawnPlayer();
+        }
+    }    
+    respawnPlayer() {
+        // プレイヤーを一時的に非表示・無効化
+        this.player.setVisible(false);
+        this.player.setActive(false);
+        this.player.body.enable = false;
+
+        this.physics.pause();
+        this.isPaused = true;
+        this.selfPased = true;
+        
+        // すべての地面を一度消去
+        const platforms = this.platformGroup.getChildren().slice().sort((a, b) => a.x - b.x);
+        platforms.forEach((platform, index) => {
+            this.time.delayedCall(index * 100, () => {
+                this.tweens.add({
+                    targets: platform,
+                    alpha: 0,
+                    duration: 300,
+                    onComplete: () => {
+                        this.platformGroup.killAndHide(platform);
+                        this.platformGroup.remove(platform);
+                        this.platformPool.add(platform);
+                        platform.alpha = 1; // 次回使うとき用に戻す
+                    }
+                });
+            });
+        });
+
+        // 少し時間をおいてから再出現
+        // すべて消えるまで待ってから再構築とプレイヤー復帰
+        const totalDelay = Math.max(platforms.length * 100 + 300, 1000);
+        this.time.delayedCall(totalDelay, () => {
+            this.addPlatform(this.game.config.width, 0);
+            this.player.setPosition(
+                gameOptions.playerStartPosition, 
+                this.game.config.height / 2 
+            ); // 初期位置に配置
+    
+            // 有効化して再表示
+            this.player.setVisible(true);
+            this.player.setActive(true);
+            this.player.body.enable = true;
+            this.isRespawning = false; // フラグを戻す
+            this.physics.resume();
+            this.isPaused = false;
+            this.selfPased = false;
+        });
     }
 
     GameOver() {
