@@ -4,7 +4,7 @@ from PIL import Image
 from io import BytesIO
 from collections import Counter
 
-def get_pictures(api_key, keyword, num=50, aspect_ratios=[(16, 9), (4, 3)]):
+def get_pictures(api_key, keyword, num=50):
     url = "https://api.pexels.com/v1/search"
     headers = {"Authorization": api_key}
     params = {
@@ -17,26 +17,18 @@ def get_pictures(api_key, keyword, num=50, aspect_ratios=[(16, 9), (4, 3)]):
     response = requests.get(url, headers=headers, params=params)
     images = response.json().get("photos", [])  # 画像リストを取得
     
-    return filter_images(images,aspect_ratios)
+    return filter_images(images)
 
-def filter_images(images,aspect_ratios=[(16, 9), (4, 3)]):
-    # 縦横比を指定して画像を絞り込む
+def filter_images(images):
+    # 横長の画像だけを選ぶ
     filtered_images = []
     for image in images:
         width = image.get('width')
         height = image.get('height')
         
-        if width and height:
-            # 縦横比を計算
-            image_aspect_ratio = width / height
-            # 許可する縦横比のリストを定義
-            is_valid_aspect_ratio = any(
-                abs(image_aspect_ratio - (aspect_ratio[0] / aspect_ratio[1])) < 0.1
-                for aspect_ratio in aspect_ratios
-            )
-            # 許可された縦横比かどうかチェック
-            if is_valid_aspect_ratio:
-                filtered_images.append(image)
+        if width and height and width > height:
+            filtered_images.append(image)
+    
     return filtered_images
 
 def get_random_url(images):

@@ -1,6 +1,7 @@
 import PreloadScene from './preload.js';
 import PlayScene from './play.js';
 import StartScene from './start.js';
+import RankingScene from './ranking.js';
 
 export const gameOptions = {
     platformStartSpeed: 350,
@@ -17,7 +18,7 @@ export const gameConfig = {
     width: 1334,
     height: 750,
     pixelArt: true,
-    scene: [PreloadScene, StartScene, PlayScene], // シーンの順番
+    scene: [PreloadScene, StartScene, PlayScene, RankingScene], // シーンの順番
     backgroundColor: 0x444444,
     parent: 'game-container',
     physics: {
