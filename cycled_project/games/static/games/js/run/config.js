@@ -27,4 +27,13 @@ export const gameConfig = {
             // debug: true
         }
     },
+    plugins: {
+        scene: [
+            {
+                key: 'rexUI',
+                plugin: window.rexuiplugin,   // ここそのままでOK！
+                mapping: 'rexUI'
+            }
+        ]
+    },
 };

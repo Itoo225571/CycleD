@@ -59,7 +59,7 @@ export default class StartScene extends Phaser.Scene {
         this.add.image(0, 0, 'sky')
             .setOrigin(0, 0).
             setDisplaySize(this.game.config.width, this.game.config.height)
-            .setDepth(-5);          
+            .setDepth(-5);
 
     }
 
@@ -73,4 +73,6 @@ export default class StartScene extends Phaser.Scene {
         this.preScene = 'StartScene';
         this.scene.start('RankingScene');
     }
+
+    
 }
