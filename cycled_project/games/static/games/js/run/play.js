@@ -80,17 +80,17 @@ export default class PlayScene extends Phaser.Scene {
         .setScrollFactor(0)
         .on('pointerdown', (pointer) => {
             pointer.event.stopPropagation(); // ← これで他のイベントに伝わらない！
-            this.pauseGame();
+            this.pauseGame(this.resumeBtns);
         });
 
-        this.is_gameOver = false;   // gameOver判定
+        // ポーズ時のボタンに関するもの
         this.resumeBtns = [];  
         const option = { centerX: true, fontFamily: '"Press Start 2P"' };
         // ボタンラベルとアクションの配列
         var buttons = [
             { label: 'Continue', callback: () => this.resumeGame() },
             { label: 'Restart', callback: () => this.rePlayGame() },
-            { label: 'Exit', callback: () => this.goToStartScreen() }
+            { label: 'Exit', callback: () => this.goStartScreen() }
         ];
         // ボタン作成
         buttons.forEach(({ label, callback }) => {
@@ -102,13 +102,37 @@ export default class PlayScene extends Phaser.Scene {
             this.resumeBtns.push({ container, hitArea });
         });
         // 等間隔に並べる
-        const baseY = 150;
-        const spacing = 180;
+        var baseY = 150;
+        var spacing = 200;
         this.resumeBtns.forEach((btn, index) => {
             btn.container.y = baseY + spacing * index;
             btn.container.setVisible(false);
             btn.hitArea.disableInteractive();
         });
+
+        // gameOverに関するもの
+        this.gameoverBtns = [];  
+        buttons = [
+            { label: 'Restart', callback: () => this.rePlayGame() },
+            { label: 'Ranking', callback: () => this.goRankingScene },
+            { label: 'Exit', callback: () => this.goStartScreen() }
+        ];
+        buttons.forEach(({ label, callback }) => {
+            const { container, hitArea } = createBtn(0, 0, this, label, option);
+            container.setDepth(100);
+            hitArea.on('pointerdown', () => {
+                if (this.isPaused) callback();
+            });
+            this.gameoverBtns.push({ container, hitArea });
+        });
+        baseY = 300;
+        spacing = 150;
+        this.gameoverBtns.forEach((btn, index) => {
+            btn.container.y = baseY + spacing * index;
+            btn.container.setVisible(false);
+            btn.hitArea.disableInteractive();
+        });
+        this.is_gameover = false;
 
         this.pauseOverlay = this.add.rectangle(
             this.scale.width / 2,
@@ -333,8 +357,10 @@ export default class PlayScene extends Phaser.Scene {
         }
     }
 
-    pauseGame() {
+    pauseGame(btns) {
         if (!this.scene.isActive('PlayScene')) return;
+        if (this.is_gameover) return;
+        
         if (this.countdownEvent) {
             this.countdownEvent.remove();        // カウントダウン停止
             this.countdownEvent = null;
@@ -363,14 +389,9 @@ export default class PlayScene extends Phaser.Scene {
         this.time.delayedCall(50, () => {
             this.justPaused = false;
             // ▶ 2. 中央に再開ボタンを表示
-            this.resumeBtns.forEach(btn => {
+            btns.forEach(btn => {
                 btn.container.setVisible(true);             // 表示
                 btn.hitArea.setInteractive();               // ヒットエリアを有効化
-                if (this.is_gameOver) {
-                    // Continue（1番目のボタン）のみ非表示＆非インタラクティブに
-                    this.resumeBtns[0].container.setVisible(false);
-                    this.resumeBtns[0].hitArea.disableInteractive();
-                }
             });
         });
     }
@@ -439,7 +460,7 @@ export default class PlayScene extends Phaser.Scene {
     }
 
     // 「Start画面」に戻る処理
-    goToStartScreen() {
+    goStartScreen() {
         // イベントリスナーを削除してからシーンを停止
         this.shutdown();
         this.scene.start('StartScene');
@@ -536,7 +557,6 @@ export default class PlayScene extends Phaser.Scene {
             }
         ).setOrigin(0.5).setDepth(100);
 
-    
         // 上から落ちるアニメーション
         this.tweens.add({
             targets: gameOverText,
@@ -554,13 +574,14 @@ export default class PlayScene extends Phaser.Scene {
             repeat: 0
         });
     
-        this.is_gameOver = true;
-        this.pauseGame();
+        this.pauseGame(this.gameoverBtns);
+        this.is_gameover = true;    // pauseの後にtrueにする
+        this.postScore();
     }
     
 
     handleBlur() {
-        this.pauseGame();
+        this.pauseGame(this.resumeBtns);
     }
 
     handleFocus() {
@@ -568,6 +589,36 @@ export default class PlayScene extends Phaser.Scene {
         if (!this.selfPased) {
             this.resumeGame();
         }
+    }
+
+    postScore() {
+        var id = score_id;
+        var score = this.score;
+        $.ajax({
+            url: `/games/api/score_nikirun/${id}/`,
+            method: 'PATCH',
+            headers: {
+                "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンをヘッダーに設定
+            },
+            data: {
+                score: score,  // 更新したいデータ
+            },
+            success: function(response) {
+                console.log(response);
+            },
+            error: function(xhr, status, error) {
+                var response = xhr.responseJSON;
+                var errors = response.form.fields;
+                $.each(errors,function(_,error) {
+                    // 手動でエラーを出力
+                    append_error_ajax(error.label,error.errors);
+                })
+            },
+        }); 
+    }
+
+    goRankingScene() {
+        return;
     }
 
     // シーン終了時にイベントリスナーを削除

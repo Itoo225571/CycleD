@@ -14,6 +14,7 @@
 
 {% block extra_js %}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.87.0/phaser.min.js" integrity="sha512-e251dDfxfj70o3iWsf84M612cWbWdTXjVbFXA7MavobTcKB1sCLV+WNiduc20UrpWLXRgi1tgob1TOAfySx9Xg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    {% comment %} <script src="{% static 'games/js/game_base.js' %}"></script> {% endcomment %}
+    <script src="https://cdn.jsdelivr.net/npm/phaser3-rex-plugins@1.80.15/dist/rexuiplugin.min.js"></script>
+
     {% block game_js %}{% endblock game_js %}
 {% endblock %}

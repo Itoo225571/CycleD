@@ -86,6 +86,7 @@ export default class PreloadScene extends Phaser.Scene {
             .setDisplaySize(this.game.config.width, this.game.config.height);
 
         // this.scene.start('PlayScene');
+
         this.scene.start('StartScene');
     }
 }

@@ -47,22 +47,30 @@ export default class StartScene extends Phaser.Scene {
 
         var option = {centerX:true,fontFamily:'"Press Start 2P"'};
         var { _ ,hitArea} = createBtn(0,300,this,'Start',option)
-        hitArea.on('pointerdown', () => {
-            this.scene.start('PlayScene');
-        });
-        var { _ ,hitArea} = createBtn(0,430,this,'Choice Character', option)
-        hitArea.on('pointerdown', () => {
-            this.scene.start('PlayScene');
-        });
-        var { _ ,hitArea} = createBtn(0,560,this,'Option', option)
-        hitArea.on('pointerdown', () => {
-            this.scene.start('PlayScene');
-        });
+        hitArea.on('pointerdown', this.goPlayScene.bind(this));
+
+        var { _ ,hitArea} = createBtn(0,430,this,'Select Character', option)
+        hitArea.on('pointerdown', this.goCharaSelectScene.bind(this));
+
+        var { _ ,hitArea} = createBtn(0,560,this,'Ranking', option)
+        hitArea.on('pointerdown', this.goRankingScene.bind(this));
 
         // background
         this.add.image(0, 0, 'sky')
             .setOrigin(0, 0).
             setDisplaySize(this.game.config.width, this.game.config.height)
-            .setDepth(-5);
+            .setDepth(-5);          
+
+    }
+
+    goPlayScene() {
+        this.scene.start('PlayScene');
+    }
+    goCharaSelectScene() {
+        return;
+    }
+    goRankingScene() {
+        this.preScene = 'StartScene';
+        this.scene.start('RankingScene');
     }
 }
