@@ -108,10 +108,12 @@ export default class RankingScene extends Phaser.Scene {
         scores.forEach((scoreData, index) => {
             // スコア表示を km と m に分ける
             let scoreDisplay;
-            if (scoreData.score > 1000) {
-                scoreDisplay = (scoreData.score / 1000).toFixed(1) + ' km';
+            if (scoreData.score > 1000000) {
+                scoreDisplay = (scoreData.score / 1000).toFixed(0) + ' km';
+            } else if (scoreData.score > 1000) {
+                scoreDisplay = (scoreData.score / 1000).toPrecision(3) + ' km';
             } else {
-                scoreDisplay = scoreData.score.toFixed(1) + ' m';
+                scoreDisplay = scoreData.score.toPrecision(3) + ' m';
             }
         
             // sizerの周りを囲う
@@ -119,7 +121,11 @@ export default class RankingScene extends Phaser.Scene {
             // 1列分のSizerを作る
             const row = this.rexUI.add.sizer({
                 orientation: 'horizontal', // 横並び（x方向）
-                space: { item: 100 },
+                space: {
+                    top: 10,
+                    bottom: 10,
+                    item: 100 
+                },
                 // background: background
             });
         
@@ -136,7 +142,7 @@ export default class RankingScene extends Phaser.Scene {
 
             // 名前
             const username = this.add.text(0, 0, scoreData.user.username, {
-                fontFamily: '"Press Start 2P"',
+                fontFamily: 'DotGothic16',
                 fontSize: '24px',
                 color: '#ffffcc'
             }).setOrigin(0.5);
