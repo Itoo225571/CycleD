@@ -152,6 +152,9 @@ export default class PlayScene extends Phaser.Scene {
         // 残機数を管理する画像を保持する配列
         this.livesIcons = []; 
         this.updateLivesDisplay();
+
+        // rankingSceneが起動中だったら停止する
+        if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene');
     }
 
     // 残機の表示を更新する関数
@@ -542,7 +545,7 @@ export default class PlayScene extends Phaser.Scene {
 
     GameOver(is_newrecord = false) {
         var stHeight = 100;
-        const gameOverText = this.add.text(
+        this.gameOverText = this.add.text(
             this.cameras.main.centerX,
             -100,  // 画面の上外からスタート
             'Game Over',
@@ -554,7 +557,7 @@ export default class PlayScene extends Phaser.Scene {
         ).setOrigin(0.5).setDepth(100);
         // 上から落ちるアニメーション
         this.tweens.add({
-            targets: gameOverText,
+            targets: this.gameOverText,
             y: stHeight,
             ease: 'Bounce.easeOut',  // バウンド効果
             duration: 700,  // 落ちる時間
@@ -563,7 +566,7 @@ export default class PlayScene extends Phaser.Scene {
         if (is_newrecord) {
             const newRecordText = this.add.text(
                 -200,
-                stHeight + gameOverText.height,
+                stHeight + this.gameOverText.height,
                 'NEW RECORD!',
                 {
                     fontFamily: '"Press Start 2P"',
@@ -615,7 +618,7 @@ export default class PlayScene extends Phaser.Scene {
         // スコアのアニメーション
         this.tweens.add({
             targets: scoreText,
-            y: stHeight + gameOverText.height + 60,   // Game Overのテキスト下に配置
+            y: stHeight + this.gameOverText.height + 60,   // Game Overのテキスト下に配置
             ease: 'Bounce.easeOut',
             duration: 1000,
             repeat: 0
@@ -667,9 +670,20 @@ export default class PlayScene extends Phaser.Scene {
     }
 
     goRankingScene() {
-        this.preScene = 'PlayScene';
-        this.scene.start('RankingScene');
-        this.scene.stop();  // 現在のシーンを停止
+        // this.preScene = 'PlayScene';
+        this.scene.get('RankingScene').data.set('previousScene', 'PlayScene');
+
+        if (this.scene.isActive('RankingScene')) {
+            // すでに起動している場合はbringToTopで最前面に移動
+            this.scene.bringToTop('RankingScene');
+        } else {
+            // 起動していなければ、RankingSceneをオーバーレイとして開始
+            this.scene.launch('RankingScene');
+        }
+        this.gameOverText.setAlpha(0);  //titleを隠す
+    }
+    preBackScene() {
+        this.gameOverText.setAlpha(1);  //titleを見せる
     }
 
     // シーン終了時にイベントリスナーを削除
