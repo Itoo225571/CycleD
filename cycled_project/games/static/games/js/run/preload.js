@@ -28,6 +28,12 @@ export default class PreloadScene extends Phaser.Scene {
             `${imgDir}Panel/panel-000.png`, 
             { frameWidth: 16, frameHeight: 16 }
         );
+        // 入力用
+        this.load.spritesheet(
+            'inputPrompts', 
+            `${imgDir}/input_prompts.png`, 
+            { frameWidth: 16, frameHeight: 16 }
+        );
         // 背景画像
         this.load.image('sky', `${imgDir}background/sky.png`);
         this.load.image('mountain', `${imgDir}background/mountain.png`);
@@ -185,36 +191,57 @@ export function createMsgWindow(scene, messages = [''], delay = 0) {
 export function createBtn(x, y, scene, content, option = {}) {
     const per_length = 16;
     const info = {
-        width: 40,
-        height: 6
+        contentWidth: option.width || 36,  // option.contentWidth が undefined の場合、デフォルトで36
+        contentHeight: option.height || 36,  // option.contentHeight が undefined の場合、デフォルトで36
+        contentColor: option.color || 0,    // デフォは黒
+
+        btnWidth: option.button ? option.button.width || 40 : 40,  // option.button が undefined の場合、デフォルトで40
+        btnHeight: option.button ? option.button.height || 6 : 6,  // option.button が undefined の場合、デフォルトで6
+        btnColor: option.button ? option.button.color || 0xffffff : 0xffffff,  // option.button が undefined の場合、デフォルトで白
     };
 
     // 中央配置処理
     const gameWidth = scene.scale.width;
     const gameHeight = scene.scale.height;
 
-    const posX = option.centerX ? (gameWidth - info.width * per_length) / 2 : x;
-    const posY = option.centerY ? (gameHeight - info.height * per_length) / 2 : y;
+    const posX = option.centerX ? (gameWidth - info.btnWidth * per_length) / 2 : x;
+    const posY = option.centerY ? (gameHeight - info.btnHeight * per_length) / 2 : y;
 
     const container = scene.add.container(posX, posY);
 
-    createFrame(scene, container, info.width, info.height, 'btnTile', 0xffffff);
+    createFrame(scene, container, info.btnWidth, info.btnHeight, 'btnTile', 0xffffff);
 
     // テキスト作成
-    const text = scene.add.text(
-        (info.width * per_length) / 2,
-        (info.height * per_length) / 2,
-        content,
-        {
-            fontFamily: option.fontFamily || 'DotGothic16',
-            fontSize: '32px',
-            color: '#000000'
-        }
-    ).setOrigin(0.5);
-    container.add(text);
+    const hexColor = info.contentColor;
+    if (option.type === 'image') {
+        // 'content'に指定された画像を表示
+        const image = scene.add.image(
+            (info.btnWidth * per_length) / 2,
+            (info.btnHeight * per_length) / 2,
+            content,  // 'content'は画像のキー
+            option.order || 0,
+        ).setOrigin(0.5);
+        image.setDisplaySize(info.contentWidth, info.contentHeight);
+        image.setTint(hexColor);
+        container.add(image);
+    } else {
+        var cssColor = `#${hexColor.toString(16).padStart(6, '0')}`;  // 変換
+        const text = scene.add.text(
+            (info.btnWidth * per_length) / 2,
+            (info.btnHeight * per_length) / 2,
+            content,
+            {
+                fontFamily: option.fontFamily || 'DotGothic16',
+                fontSize: `${info.contentWidth}px`,
+                color: cssColor,
+            }
+        ).setOrigin(0.5);
+        container.add(text);
+    }
 
     // ヒットエリア（透明）
-    const hitArea = scene.add.rectangle(0, 0, info.width * per_length, info.height * per_length, 0xffffff, 0);
+    const buttonColor = info.btnColor;
+    const hitArea = scene.add.rectangle(0, 0, info.btnWidth * per_length, info.btnHeight * per_length, buttonColor, 0);
     hitArea.setOrigin(0);
     hitArea.setInteractive({ useHandCursor: true });
 

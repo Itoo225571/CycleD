@@ -3,18 +3,30 @@ export default class RankingScene extends Phaser.Scene {
         super({ key: 'RankingScene' });
     }
 
-    create() {      
+    create() {
+        this.createBackBtn();
         this.getScores();
         // this.showConfirmPopup();
     }
 
     goBackScene() {
-        var scene = this.preScene || 'StartScene';
-        // RankingSceneを停止
-        this.scene.stop('RankingScene');
-        // 前のシーンを再起動
-        this.scene.launch(scene);  // 前のシーンのキーを指定
+        // previousSceneを取得
+        const previousSceneKey = this.scene.get('RankingScene').data.get('previousScene') || 'StartScene';
+        // シーンがアクティブか確認し、関数を呼び出す
+        const previousScene = this.scene.get(previousSceneKey);
+    
+        if (previousScene) {
+            // シーンがアクティブでない場合、再起動する
+            if (!this.scene.isActive(previousSceneKey)) {
+                this.scene.start(previousSceneKey);  // シーンを再起動
+            }
+            if (previousScene.preBackScene) {
+                previousScene.preBackScene();   //戻る前に実行したい関数があれば実行
+            }
+        }
+        this.scene.bringToTop(previousSceneKey);
     }
+    
 
     getScores() {
         $.ajax({
@@ -23,10 +35,10 @@ export default class RankingScene extends Phaser.Scene {
             headers: {
                 "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンをヘッダーに設定
             },
-            success: (response) => {
+            success: (scores) => {
                 // => を使えば，外側のthisをそのまま使える
                 // スコアをランキングに表示する処理
-                this.displayScores(response);
+                this.displayScores(scores);
             },
             error: function(xhr, status, error) {
                 var response = xhr.responseJSON;
@@ -44,15 +56,16 @@ export default class RankingScene extends Phaser.Scene {
         const centerX = this.scale.width / 2;
         const centerY = this.scale.height / 2;
     
+        // テキストの位置を設定
         const title = this.add.text(
-            centerX, 80, 
+            centerX, 90, 
             'Ranking', {
             fontFamily: '"Press Start 2P"',
             fontSize: '64px',
             color: '#ffffff',
             align: 'center'
         }).setOrigin(0.5);
-    
+
         if (scores.length === 0) {
             this.add.text(
                 centerX, centerY, 
@@ -191,6 +204,21 @@ export default class RankingScene extends Phaser.Scene {
             thumb.setDisplaySize(20, Math.max(40, (centerY + 100) * thumbHeightRatio));
         }
     }
-    
-    
+    createBackBtn() {
+        const button = this.add.sprite(100, 80, 'inputPrompts', 608);  // (x, y, key, frame)
+        // ボタンにインタラクションを追加（クリックイベント）
+        button.setDisplaySize(48 * 2, 48);
+        button.setInteractive({ useHandCursor: true });
+        button.setFlipX(true);  // 水平方向に反転
+        button.on('pointerdown', this.goBackScene.bind(this));
+
+        // ホバー時の色変更（マウスオーバー）
+        button.on('pointerover', () => {
+            button.setTint(0x44ff44);  // ホバー時に緑色に変更
+        });
+        // ホバーを外した時の色を戻す（マウスアウト）
+        button.on('pointerout', () => {
+            button.clearTint();  // 色を元に戻す
+        });
+    }
 }

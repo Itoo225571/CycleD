@@ -8,7 +8,7 @@ export default class StartScene extends Phaser.Scene {
     create() {
         var TITLE_NAME = 'NIKI RUN';
         // フェードインしつつ、ゆっくり上下に浮かぶ
-        const title = this.add.text(
+        this.title = this.add.text(
             -200, 150, // 画面の左外側から開始
             TITLE_NAME, {
                 fontFamily: '"Press Start 2P"',
@@ -19,7 +19,7 @@ export default class StartScene extends Phaser.Scene {
             .setShadow(10, 10, '#660066', 0, true, true);  // ← 影を追加！;
         // アニメーション
         this.tweens.add({
-            targets: title,
+            targets: this.title,
             x: this.scale.width / 2, // 画面の中央に移動
             alpha: 1,
             scale: 1,
@@ -27,8 +27,8 @@ export default class StartScene extends Phaser.Scene {
             ease: 'Back.Out',
             onComplete: () => {
                 this.tweens.add({
-                    targets: title,
-                    y: title.y - 20,
+                    targets: this.title,
+                    y: this.title.y - 20,
                     duration: 1000,
                     yoyo: true,
                     repeat: -1,
@@ -61,6 +61,8 @@ export default class StartScene extends Phaser.Scene {
             setDisplaySize(this.game.config.width, this.game.config.height)
             .setDepth(-5);
 
+        // rankingSceneが起動中だったら停止する
+        if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene');
     }
 
     goPlayScene() {
@@ -70,9 +72,17 @@ export default class StartScene extends Phaser.Scene {
         return;
     }
     goRankingScene() {
-        this.preScene = 'StartScene';
-        this.scene.start('RankingScene');
+        this.scene.get('RankingScene').data.set('previousScene', 'StartScene');
+        if (this.scene.isActive('RankingScene')) {
+            // すでに起動している場合はbringToTopで最前面に移動
+            this.scene.bringToTop('RankingScene');
+        } else {
+            // 起動していなければ、RankingSceneをオーバーレイとして開始
+            this.scene.launch('RankingScene');
+        }
+        this.title.setAlpha(0);  //titleを隠す
     }
-
-    
+    preBackScene() {
+        this.title.setAlpha(1);  //titleを見せる
+    }
 }
