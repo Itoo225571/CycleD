@@ -37,9 +37,9 @@ export default class PlayScene extends Phaser.Scene {
         this.player = this.physics.add.sprite(
             gameOptions.playerStartPosition, 
             this.game.config.height / 2, 
-            'tilemap',
-            261);
-        this.player.setScale(3); // 2倍サイズに拡大
+            'NinjaFrogRun',
+            0);
+        this.player.setDisplaySize(64, 64);  // プレイヤーのサイズ設定
         this.player.setGravityY(gameOptions.playerGravity); // 重力設定
 
         // プレイヤーとプラットフォームの衝突設定
@@ -49,10 +49,6 @@ export default class PlayScene extends Phaser.Scene {
         this.input.on("pointerdown", this.jump, this);
         this.input.keyboard.on('keydown-SPACE', this.jump, this); // ←追加！
 
-        // this.elapsedText = this.add.text(10, 10, 'Time: 0.0', {
-        //     font: '24px Arial', 
-        //     fill: '#ffffff'
-        // });
         this.distanceText = this.add.text(20, 20, 'きょり: 0.0m', {
             fontFamily: 'DotGothic16',
             fontSize: '24px',
@@ -170,8 +166,8 @@ export default class PlayScene extends Phaser.Scene {
             var size = 48;
             let lifeIcon = this.add.sprite(
                 (i * size) + size/2 + 10, 64 + 10,  // X座標を調整して並べる
-                'tilemap', // 画像のキーを指定
-                260
+                'NinjaFrogIdle', // 画像のキーを指定
+                0
             );
             // スプライトの大きさを指定（幅と高さ）
             lifeIcon.setDisplaySize(size, size); // 幅高さ設定
@@ -183,14 +179,13 @@ export default class PlayScene extends Phaser.Scene {
     // ➕ プラットフォームを追加する関数
     addPlatform(platformWidth, posX) {
         const aspect = 1.5;
-        const tileWidth = 32 * aspect;  // タイル1つの幅
+        const tileWidth = 16 * aspect;  // タイル1つの幅
         const tileCount = Math.ceil(platformWidth / tileWidth);  // 必要なタイル数
         const posY = this.game.config.height * 0.8;  // プラットフォームのY座標（固定）
     
         // タイルを連結してプラットフォームを作成
         for (let i = 0; i < tileCount; i++) {
             let tile;
-            let frame = (i === 0) ? 2 : (i === tileCount - 1) ? 1 : 0;
     
             // プールからタイルを取得
             if (this.platformPool.getLength()) {
@@ -199,11 +194,10 @@ export default class PlayScene extends Phaser.Scene {
                 tile.active = true;
                 tile.visible = true;
                 this.platformPool.remove(tile);  // プールから取り出す
-                tile.setFrame(frame);  // フレーム番号を設定
             }
             // プールが空なら新しいタイルを生成
             else {
-                tile = this.physics.add.sprite(posX + i * tileWidth, posY, "tilemap2", frame);  // フレーム番号を動的に設定
+                tile = this.physics.add.sprite(posX + i * tileWidth, posY, "terrain", 3);
                 tile.setImmovable(true);  // プレイヤーに押されないように
                 tile.setVelocityX(gameOptions.platformStartSpeed * -1);  // 左へ動く
                 tile.setScale(aspect);  // タイルを拡大
