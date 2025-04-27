@@ -62,3 +62,13 @@ class NIKIRunScoreViewSet(
     def perform_create(self, serializer):
         # 保存時にログインユーザーを自動セット
         serializer.save(user=self.request.user)
+
+    def perform_update(self, serializer):
+        # 現在のスコアを取得
+        instance = self.get_object()
+        # 新しいスコアが現在のスコア以上かどうかを確認
+        new_score = serializer.validated_data.get('score', instance.score)  # 新しいスコアが渡されていない場合は現在のスコアを使用
+        if new_score >= instance.score:
+            # 新しいスコアが現在のスコア以上であれば更新
+            serializer.save()
+            serializer._is_newrecord = True  # ★ここで動的にフラグを立てる！
