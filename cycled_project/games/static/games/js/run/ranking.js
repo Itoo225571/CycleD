@@ -207,7 +207,7 @@ export default class RankingScene extends Phaser.Scene {
     createBackBtn() {
         const button = this.add.sprite(100, 80, 'inputPrompts', 608);  // (x, y, key, frame)
         // ボタンにインタラクションを追加（クリックイベント）
-        button.setDisplaySize(48 * 2, 48);
+        button.setDisplaySize(48 *3/2, 48);
         button.setInteractive({ useHandCursor: true });
         button.setFlipX(true);  // 水平方向に反転
         button.on('pointerdown', this.goBackScene.bind(this));

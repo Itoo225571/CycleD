@@ -73,6 +73,7 @@ export default class StartScene extends Phaser.Scene {
     }
     goRankingScene() {
         this.scene.get('RankingScene').data.set('previousScene', 'StartScene');
+        this.title.setAlpha(0);  //titleを隠す
         if (this.scene.isActive('RankingScene')) {
             // すでに起動している場合はbringToTopで最前面に移動
             this.scene.bringToTop('RankingScene');
@@ -80,7 +81,6 @@ export default class StartScene extends Phaser.Scene {
             // 起動していなければ、RankingSceneをオーバーレイとして開始
             this.scene.launch('RankingScene');
         }
-        this.title.setAlpha(0);  //titleを隠す
     }
     preBackScene() {
         this.title.setAlpha(1);  //titleを見せる

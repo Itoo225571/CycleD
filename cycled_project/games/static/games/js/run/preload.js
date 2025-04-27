@@ -4,18 +4,6 @@ export default class PreloadScene extends Phaser.Scene {
     }
 
     preload() {
-        // this.load.image('platform', imgDir_test + 'platform.png');
-        // tilemap
-        this.load.spritesheet(
-            'tilemap', 
-            `${imgDir}tilemap.png`, 
-            { frameWidth: 16, frameHeight: 16 }
-        );
-        this.load.spritesheet(
-            'tilemap2', 
-            `${imgDir}tilemap2.png`, 
-            { frameWidth: 32, frameHeight: 32 }
-        );
         // msgウィンドウ
         this.load.spritesheet(
             'msgWindowTile', 
@@ -40,31 +28,59 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('mountains', `${imgDir}background/mountains.png`);
         this.load.image('mountain-trees', `${imgDir}background/mountain-trees.png`);
         this.load.image('trees', `${imgDir}background/trees.png`);
+
+        //player
+        var situations = [
+            'DoubleJump',
+            'Fall',
+            'Hit',
+            'Idle',
+            'Jump',
+            'Run',
+            'WallJump'
+        ]
+        var charaNames = [
+            'NinjaFrog'
+        ]
+        charaNames.forEach((chara) => {  // アロー関数に変更
+            situations.forEach((situation) => {  // アロー関数に変更
+                this.load.spritesheet(
+                    chara + situation, 
+                    `${imgDir}${chara}/${situation}.png`, 
+                    { frameWidth: 32, frameHeight: 32 }
+                );
+            });
+        });
+        // 地面
+        this.load.spritesheet('terrain', `${imgDir}/Terrain.png`, {
+            frameWidth: 32,
+            frameHeight: 32,
+        });
     }
 
     create() {
         this.anims.create({
             key: 'run',
-            frames: this.anims.generateFrameNumbers('tilemap', { start: 261, end: 264 }),
-            frameRate: 15,
+            frames: this.anims.generateFrameNumbers('NinjaFrogRun', { start: 0, end: 11 }),
+            frameRate: 30,
             repeat: -1
         });
         this.anims.create({
             key: 'jump',
-            frames: this.anims.generateFrameNumbers('tilemap', { start: 264, end: 264 }),
+            frames: this.anims.generateFrameNumbers('NinjaFrogJump', { start: 0, end: 0 }),
             frameRate: 1,
             repeat: -1
         });
         this.anims.create({
             key: 'jump_ex',
-            frames: this.anims.generateFrameNumbers('tilemap', { start: 261, end: 264 }),
-            frameRate: 25,
+            frames: this.anims.generateFrameNumbers('NinjaFrogDoubleJump', { start: 0, end: 5 }),
+            frameRate: 40,
             repeat: -1
         });
         this.anims.create({
             key: 'stop',
-            frames: this.anims.generateFrameNumbers('tilemap', { start: 266, end: 266 }),
-            frameRate: 1,
+            frames: this.anims.generateFrameNumbers('NinjaFrogIdle', { start: 0, end: 10 }),
+            frameRate: 10,
             repeat: -1
         });
 
