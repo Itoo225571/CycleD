@@ -4,13 +4,21 @@ import StartScene from './start.js';
 import RankingScene from './ranking.js';
 
 export const gameOptions = {
-    platformStartSpeed: 350,
-    spawnRange: [100, 350],
-    platformSizeRange: [50, 250],
-    playerGravity: 2400,
-    jumpForce: 1000,
+    playerStartSpeed: 350,
+    playerAccel: 60,
+    // spawnRange: [100, 350],
+    // platformSizeRange: [50, 250],
+    playerGravity: 1500,
+    jumpForce: 800,
     playerStartPosition: 200,
-    jumps: 2
+    // playerStartPosition: 600,
+    jumps: 2,
+    oneBlockSize: 64,
+    lives: 2,
+    tileName: 'Tiles1',
+    startChunk: 'startMap',
+    // startChunk: 'flatMap',
+    chunks: ['flatMap'],
 };
 
 export const gameConfig = {

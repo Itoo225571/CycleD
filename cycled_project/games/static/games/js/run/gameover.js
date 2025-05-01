@@ -123,3 +123,15 @@ export default class GameoverScene extends Phaser.Scene {
         }); 
     }
 }
+
+function strScore(score) {
+    let scoreDisplay;
+    if (score > 1000000) {
+        scoreDisplay = (score / 1000).toFixed(0) + ' km';
+    } else if (score > 1000) {
+        scoreDisplay = (score / 1000).toPrecision(3) + ' km';
+    } else {
+        scoreDisplay = score.toPrecision(3) + ' m';
+    }
+    return scoreDisplay;
+}
