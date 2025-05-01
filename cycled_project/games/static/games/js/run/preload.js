@@ -52,10 +52,12 @@ export default class PreloadScene extends Phaser.Scene {
             });
         });
         // 地面
-        this.load.spritesheet('terrain', `${imgDir}/Terrain.png`, {
-            frameWidth: 32,
-            frameHeight: 32,
-        });
+        // this.load.spritesheet('terrain', `${imgDir}/Terrain.png`, {
+        //     frameWidth: 32,
+        //     frameHeight: 32,
+        // });
+        // map読み込み
+        this.loadMap();
     }
 
     create() {
@@ -109,7 +111,21 @@ export default class PreloadScene extends Phaser.Scene {
 
         // this.scene.start('PlayScene');
 
+        // デバッグ用: マップデータが正しくロードされたか確認
+        // const startMap = this.cache.tilemap.get('startMap');
+        // console.log(startMap);  // startMap のデータがログに出力されるか確認
         this.scene.start('StartScene');
+    }
+
+    loadMap() {
+        // 地面
+        this.load.spritesheet('Tiles1', `${imgDir}Tiles1.png`, {
+            frameWidth: 32,
+            frameHeight: 32,
+        });
+        this.load.tilemapTiledJSON('startMap', `${jsonDir}startMap.json`); // スタートマップ
+        this.load.tilemapTiledJSON('flatMap', `${jsonDir}flatMap.json`);   // フラットマップ
+        // this.load.tilemapTiledJSON('flatMap2', `${jsonDir}flatMap2.json`);   // フラットマップ2
     }
 }
 
