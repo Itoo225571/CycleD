@@ -21,19 +21,37 @@ export default class MapManager {
         const tileset = chunkMap.addTilesetImage(gameOptions.tileName, this.tilesetKey);
         
         // プールからレイヤーを取得または新規作成
-        this.groundLayer = this.getLayerFromPool(chunkMap, 'Ground', tileset);
-        this.backgroundLayer = this.getLayerFromPool(chunkMap, 'Background', tileset);
-        this.decoLayer = this.getLayerFromPool(chunkMap, 'Deco', tileset);
+        this.backgroundLayer = this.getLayerFromPool(chunkMap, 'Background', tileset); // 一番奥の背景
+        this.decoLayer = this.getLayerFromPool(chunkMap, 'Deco', tileset);             // 背景装飾（背景の上に花や木など）
+        this.groundLayer = this.getLayerFromPool(chunkMap, 'Ground', tileset);         // プレイヤーが立つ地面
+        this.blockLayer = this.getLayerFromPool(chunkMap, 'Block', tileset);           // ブロック・壁など（地面の上）
+        this.itemLayer = this.getLayerFromPool(chunkMap, 'Item', tileset);             // アイテム（ブロックより手前）
+        this.enemyLayer = this.getLayerFromPool(chunkMap, 'Enemy', tileset);           // 敵キャラなど（さらに手前）
 
         this.groundLayer.setCollisionByProperty({ collides: true });
-        this.groundLayer.setCollisionByExclusion([-1]);
+        // this.groundLayer.setCollisionByExclusion([-1]);
+        this.groundLayer.setCollisionFromCollisionGroup(); // ← Tiled で設定したポリゴンを読み込む
+        this.scene.physics.add.collider(this.scene.player, this.groundLayer);    // プレイヤーと地面の衝突を有効化
 
+        if (this.blockLayer) {
+            this.blockLayer.setCollisionByProperty({ collides: true });
+            // this.groundLayer.setCollisionByExclusion([-1]);
+            this.blockLayer.setCollisionFromCollisionGroup(); // ← Tiled で設定したポリゴンを読み込む
+            this.scene.physics.add.collider(this.scene.player, this.blockLayer);    // プレイヤーと地面の衝突を有効化
+        }
+        
+        this.groundLayer.renderDebug(this.scene.add.graphics(), {
+            tileColor: null,
+            collidingTileColor: new Phaser.Display.Color(255, 0, 0, 100),
+            faceColor: new Phaser.Display.Color(0, 255, 0, 100)
+        });        
+        
         this.chunkWidth = chunkMap.widthInPixels;
         this.nextChunkX += this.chunkWidth;
 
         // レイヤーをプールに追加
-        this.addedChunks.push(this.groundLayer, this.backgroundLayer, this.decoLayer);
-        this.manageLayerPool(3);
+        this.addedChunks.push(this.backgroundLayer, this.decoLayer, this.groundLayer, this.blockLayer, this.itemLayer, this.enemyLayer);
+        this.manageLayerPool(6);
     }
 
     getLayerFromPool(chunkMap, name, tileset) {
