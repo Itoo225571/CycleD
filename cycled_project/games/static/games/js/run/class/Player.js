@@ -1,102 +1,108 @@
 import { gameOptions } from '../config.js';
 
-export default class Player extends Phaser.Physics.Arcade.Sprite {
+export default class Player extends Phaser.Physics.Matter.Sprite {
     constructor(scene, texture, config) {
-        super(scene, gameOptions.playerStartPosition, scene.game.config.height/2, texture + 'Run');
-        scene.add.existing(this);
-        scene.physics.add.existing(this);
+        // Matterでは座標指定が必須（this.scene.game.config などにアクセス不可なため scene.scale.height を使用）
+        const startX = gameOptions.playerStartPosition;
+        const startY = scene.scale.height / 2;
+        super(scene.matter.world, startX, startY, texture + 'Run');
+
         this.scene = scene;
+        scene.add.existing(this);
 
         // 個別性能をプロパティに保存
         this.initSpeed = config.speed || gameOptions.playerStartSpeed;
         this.accel = config.accel || gameOptions.playerAccel;
         this.jumpForce = config.jumpForce || gameOptions.jumpForce;
-        this.gravity = config.gravity || gameOptions.playerGravity;
         this.jumps = config.jumps || gameOptions.jumps;
         this.jump_count = 0;
         this.lives = config.lives || gameOptions.lives;
 
-        this.lastAccelTime = 0; // 最後に加速した時刻（秒単位）
-        this.accelInterval = 30; // 加速の間隔（秒）
+        this.lastAccelTime = 0;
+        this.accelInterval = 30;
         this.speed = this.initSpeed;
 
         this.distPre = 0;
         this.dist = 0;
 
-        // 物理プロパティに反映
+        // サイズ・物理設定
         this.setDisplaySize(gameOptions.oneBlockSize, gameOptions.oneBlockSize);
-        this.body.setGravityY(this.gravity);
+        // プレイヤーの当たり判定を円形に設定
+        this.setBody({
+            type: 'circle',  // 形状を円形に設定
+            radius: gameOptions.oneBlockSize / 2  // 半径を設定
+        });
+        this.setFixedRotation(); // 回転しないように固定
 
-        this.defaultBodyHeight = this.body.height;
-        this.enlargedBodyHeight = this.defaultBodyHeight + 10;
+        // センサーや補助判定が必要なら、ここで `this.setBody()` をカスタム形状で定義することも可能
+        this.setDepth(0);   // プレイヤーの表示順を設定
     }
 
-    update(elapsedTime,cam) {
+    update(elapsedTime, cam) {
         if (this.scene.isPaused) return;
 
-        // 現在の時間（秒）に変換
+        // 現在の時間（秒）
         const currentTimeInSec = Math.floor(elapsedTime / 1000);
-        // 30秒経過しているかどうかを確認
         if (currentTimeInSec - this.lastAccelTime >= this.accelInterval) {
-            // 加速の実行
             this.speed += this.accel;
-            // 最後に加速した時刻を更新
             this.lastAccelTime = currentTimeInSec;
         }
+
+        // 水平方向の速度を維持（Matter.jsでは setVelocity を毎フレーム使う）
         this.setVelocityX(this.speed);
 
+        // 移動距離の加算
         if (this.distPre === 0) this.dist = this.x;
-        else this.dist = this.distPre + this.x;     // loseLife以前の距離も含める
+        else this.dist = this.distPre + this.x;
 
-        // 位置合わせ
-        let playerPos = cam.scrollX + gameOptions.playerStartPosition;   //本来いるべき位置
-        var diff = playerPos - this.x;
-        if (diff > 10 && this.body.blocked.down) {
-            // 目標位置に向かってduration秒かけて戻すための速度調整
-            let duration = 2;
-            let targetSpeed = diff / duration; // 目標速度（距離 / 時間）
-            this.setVelocityX(Math.sign(diff) * targetSpeed + this.speed); // 目標位置に向かって移動
+        // カメラ位置に合わせる
+        let playerPos = cam.scrollX + gameOptions.playerStartPosition;
+        let diff = playerPos - this.x;
+        if (Math.abs(diff) > 50 && this.body.velocity.y ===0) {
+            let correction = diff /10;
+            this.setVelocityX(this.speed + correction);
         }
 
-        if (this.body.blocked.down) {
-            // 地面にいるときは「run」アニメーション
+        // 地面にいるときは run アニメーション
+        if (this.body.velocity.y === 0) {
             this.anims.play('run', true);
-            // ⬇️ 着地したら当たり判定を元に戻す
-            // this.body.setSize(this.body.width, this.defaultBodyHeight);
-            // this.body.setOffset(0, this.originalOffsetY); // 必要なら元のオフセットにも戻す
         }
     }
 
     jump() {
-        if (this.body.blocked.down || (this.jump_count > 0 && this.jump_count < this.jumps)) {
-            if(this.body.blocked.down) {
-                this.jump_count = 0; // 地面に着地していたらジャンプ回数リセット
+        // 着地判定は body.velocity.y === 0 で代替（またはセンサー判定でも可能）
+        const isGrounded = Math.abs(this.body.velocity.y) < 0.01;
+
+        if (isGrounded || (this.jump_count > 0 && this.jump_count < this.jumps)) {
+            if (isGrounded) {
+                this.jump_count = 0;
             }
 
-            this.setVelocityY(this.jumpForce * -1); // 上方向にジャンプ
-            this.jump_count++; // ジャンプ回数をカウント
-            if(this.jump_count === 1) {
-                this.anims.play('jump', true);  // 最初のジャンプは通常のジャンプアニメーション
+            // Matterでは setVelocityY はないので force を使う方が自然
+            this.setVelocityY(-Math.abs(this.jumpForce)); // jumpForce を適度に調整
+            this.jump_count++;
+
+            if (this.jump_count === 1) {
+                this.anims.play('jump', true);
             } else {
                 this.anims.play(this.scene.anims.get('jump_ex') ? 'jump_ex' : 'jump', true);
             }
-
-            // ⬆️ ジャンプ中はY当たり判定を増やす
-            // this.body.setSize(this.body.width, this.enlargedBodyHeight);
-            // this.body.setOffset(0, this.body.offset.y + 10); // オフセット調整（下に伸ばす）
         }
     }
 
     loseLife() {
-        this.lives--; // 残機を減らす
-        this.distPre += this.dist;  // 今の距離を追加
+        this.lives--;
+        this.distPre += this.dist;
         this.initPlayer();
-        return Boolean(this.lives > 0);     //gameoverか否か
+        return this.lives > 0;
     }
 
     initPlayer() {
-        this.lastAccelTime = 0  // 加速時間のリセット
-        this.speed = this.initSpeed;    //速度のリセット
+        this.lastAccelTime = 0;
+        this.speed = this.initSpeed;
 
+        // 位置と速度を初期化するならここ
+        this.setVelocity(0, 0);
+        this.setPosition(gameOptions.playerStartPosition, this.scene.scale.height / 2);
     }
 }
