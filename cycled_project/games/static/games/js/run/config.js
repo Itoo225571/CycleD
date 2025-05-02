@@ -4,21 +4,18 @@ import StartScene from './start.js';
 import RankingScene from './ranking.js';
 
 export const gameOptions = {
-    playerStartSpeed: 350,
-    playerAccel: 60,
-    // spawnRange: [100, 350],
-    // platformSizeRange: [50, 250],
-    playerGravity: 1500,
-    jumpForce: 800,
+    playerStartSpeed: 5,
+    // playerStartSpeed: 15,
+    playerAccel: 1,
+    jumpForce: 20,
+    garavityForce: 3,
     playerStartPosition: 200,
-    // playerStartPosition: 600,
     jumps: 2,
     oneBlockSize: 64,
     lives: 2,
     tileName: 'Tiles1',
     startChunk: 'startMap',
-    // startChunk: 'flatMap',
-    chunks: ['flatMap','jumpMap'],
+    chunks: ['Map1','Map2'],
 };
 
 export const gameConfig = {
@@ -30,9 +27,17 @@ export const gameConfig = {
     backgroundColor: 0x444444,
     parent: 'game-container',
     physics: {
-        default: 'arcade',
-        arcade: {
-            // debug: true
+        default: 'matter',
+        matter: {
+            enableSleeping: true,
+            debug: {
+                showBody: true,
+                showStaticBody: true
+            },
+            gravity: {
+                y: gameOptions.garavityForce,
+            },
+            enableSleep: true
         }
     },
     plugins: {
@@ -41,6 +46,11 @@ export const gameConfig = {
                 key: 'rexUI',
                 plugin: window.rexuiplugin,   // ここそのままでOK！
                 mapping: 'rexUI'
+            },
+            {
+                plugin: window.PhaserMatterCollisionPlugin.default,
+                key: 'matterCollision',
+                mapping: 'matterCollision'
             }
         ]
     },
