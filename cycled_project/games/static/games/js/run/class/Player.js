@@ -2,7 +2,7 @@ import { gameOptions } from '../config.js';
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, texture, config) {
-        super(scene, gameOptions.playerStartPosition, 0, texture + 'Run');
+        super(scene, gameOptions.playerStartPosition, scene.game.config.height/2, texture + 'Run');
         scene.add.existing(this);
         scene.physics.add.existing(this);
         this.scene = scene;
@@ -52,8 +52,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         let playerPos = cam.scrollX + gameOptions.playerStartPosition;   //本来いるべき位置
         var diff = playerPos - this.x;
         if (diff > 10 && this.body.blocked.down) {
-            // 目標位置に向かって0.5秒かけて戻すための速度調整
-            let duration = 0.5; // 0.5秒
+            // 目標位置に向かってduration秒かけて戻すための速度調整
+            let duration = 2;
             let targetSpeed = diff / duration; // 目標速度（距離 / 時間）
             this.setVelocityX(Math.sign(diff) * targetSpeed + this.speed); // 目標位置に向かって移動
         }
@@ -95,7 +95,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     initPlayer() {
-        this.xCalc = gameOptions.playerStartPosition;
         this.lastAccelTime = 0  // 加速時間のリセット
         this.speed = this.initSpeed;    //速度のリセット
 

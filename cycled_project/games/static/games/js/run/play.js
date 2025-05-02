@@ -34,10 +34,7 @@ export default class PlayScene extends Phaser.Scene {
 
         // map
         this.mapManager = new MapManager(this, 'Tiles1');
-        this.mapManager.addNextChunk();  // 最初のチャンクを表示
-        var groundLayer = this.mapManager.groundLayer;
-        groundLayer.setCollisionByProperty({ collides: true }); //一応
-        this.physics.add.collider(this.player, groundLayer);    // プレイヤーと地面の衝突を有効化
+        this.mapManager.addNextChunk();  // 最初のチャンクを表示        
 
         // カメラが追いかけるもの
         this.centerPoint = this.physics.add.sprite(this.scale.width / 2, this.scale.height / 2, null);
@@ -50,6 +47,7 @@ export default class PlayScene extends Phaser.Scene {
 
         // 世界全体のタイル衝突の精度を上げる
         this.physics.world.TILE_BIAS = 40;
+        this.physics.world.createDebugGraphic();
     }
 
     // 🔁 フレームごとの更新処理
@@ -62,9 +60,6 @@ export default class PlayScene extends Phaser.Scene {
         var guideX = this.mapManager.nextChunkX - this.mapManager.chunkWidth/2;
         if (this.player.x > guideX) {
             this.mapManager.addNextChunk();  // 最初のチャンクを表示
-            var groundLayer = this.mapManager.groundLayer;
-            groundLayer.setCollisionByProperty({ collides: true }); //一応
-            this.physics.add.collider(this.player, groundLayer);    // プレイヤーと地面の衝突を有効化
         }
 
         // 死亡判定
@@ -117,7 +112,7 @@ export default class PlayScene extends Phaser.Scene {
         this.time.delayedCall(totalDelay, () => {            
             this.player.setPosition(
                 gameOptions.playerStartPosition, 
-                0
+                this.game.config.height /2, 
             ); // 初期位置に配置
             // this.initMap();
     
@@ -130,15 +125,13 @@ export default class PlayScene extends Phaser.Scene {
             // map
             this.mapManager.resetMap();
             this.mapManager.addNextChunk();  // 最初のチャンクを表示
-            var groundLayer = this.mapManager.groundLayer;
-            groundLayer.setCollisionByProperty({ collides: true }); //一応
-            this.physics.add.collider(this.player, groundLayer);    // プレイヤーと地面の衝突を有効化
 
             // 中心点
             this.centerPoint.setPosition(this.scale.width / 2, this.scale.height / 2); // 初期位置に配置
             this.cameras.main.startFollow(this.centerPoint, false, 1, 0);    // カメラ追従を再開
 
             this.isPaused = false;
+            this.input.enabled = true; // 画面インタラクションを有効化
         });
     }
     rePlayGame() {

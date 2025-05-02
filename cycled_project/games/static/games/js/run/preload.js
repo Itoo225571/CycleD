@@ -1,3 +1,5 @@
+import { gameOptions } from './config.js';
+
 export default class PreloadScene extends Phaser.Scene {
     constructor() {
         super('PreloadScene');
@@ -123,9 +125,12 @@ export default class PreloadScene extends Phaser.Scene {
             frameWidth: 32,
             frameHeight: 32,
         });
-        this.load.tilemapTiledJSON('startMap', `${jsonDir}startMap.json`); // スタートマップ
-        this.load.tilemapTiledJSON('flatMap', `${jsonDir}flatMap.json`);   // フラットマップ
-        // this.load.tilemapTiledJSON('flatMap2', `${jsonDir}flatMap2.json`);   // フラットマップ2
+        var mapList = gameOptions.chunks;
+        var startMap = gameOptions.startChunk;
+        mapList.forEach((name) => {  // アロー関数に変更
+            this.load.tilemapTiledJSON(name, `${jsonDir}${name}.json`); // mapをロード
+        });
+        this.load.tilemapTiledJSON(startMap, `${jsonDir}${startMap}.json`);
     }
 }
 

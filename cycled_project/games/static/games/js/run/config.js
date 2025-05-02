@@ -18,7 +18,7 @@ export const gameOptions = {
     tileName: 'Tiles1',
     startChunk: 'startMap',
     // startChunk: 'flatMap',
-    chunks: ['flatMap'],
+    chunks: ['flatMap','jumpMap'],
 };
 
 export const gameConfig = {
