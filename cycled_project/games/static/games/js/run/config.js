@@ -15,6 +15,7 @@ export const gameOptions = {
     lives: 2,
     startChunk: 'startMap',
     chunks: ['Map1','Map2'],
+    // chunks: ['startMap'],
     tilesets: [
         { nameInTiled: 'Tiles1', textureKey: 'Tiles1' },
     ]

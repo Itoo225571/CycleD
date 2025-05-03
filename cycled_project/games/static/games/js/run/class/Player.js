@@ -112,17 +112,31 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 
     isOnGround() {
         this.raycaster.mapGameObjects(this.scene.mapManager.collisionTiles, true);
-
+    
         // プレイヤーの現在位置から少し下にRayを飛ばす（角度=π/2）
         this.ray.setOrigin(this.x, this.y + this.displayHeight / 2 - 2); // 足元付近
         this.ray.setAngle(Math.PI / 2); // 下向き
         const intersection = this.ray.cast();
-        // gameOptions.oneBlockSize 以内に地面があるかどうかで接地を判断
+        
+        // 地面の判定
+        let isGround = false;
         if (intersection && Phaser.Math.Distance.Between(this.x, this.y, intersection.x, intersection.y) <= gameOptions.oneBlockSize) {
-            return true;
+            isGround = true;
         }
-        return false;
-    }    
+    
+        // enemyとの接触判定
+        const enemies = this.scene.mapManager.enemies; // enemyが格納されている配列
+        for (let enemy of enemies) {
+            const distanceToEnemy = Phaser.Math.Distance.Between(this.x, this.y, enemy.x, enemy.y);
+            if (distanceToEnemy <= gameOptions.oneBlockSize) {
+                isGround = true; // enemyが地面として接触したとみなす
+                break;
+            }
+        }
+    
+        return isGround;
+    }
+    
 
     loseLife() {
         this.lives--;
