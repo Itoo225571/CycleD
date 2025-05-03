@@ -77,9 +77,6 @@ export default class MapManager {
                 const enemy = this.getEnemyFromPool(name, obj.x + this.nextChunkX, obj.y); // x 座標に nextChunkX を加算
                 enemy.chunkX = this.nextChunkX;
     
-                // 位置調整
-                enemy.setFixedRotation();  // 回転しないようにする
-    
                 // アニメーション再生
                 enemy.play(name + 'Run');
     
@@ -99,6 +96,9 @@ export default class MapManager {
                 enemy.body.frictionStatic = 0;  // 敵が動き出すための摩擦
                 enemy.body.frictionAir = 0;  // 敵の空気抵抗
                 enemy.body.gravityScale = 1;  // 重力を適用（1倍の重力）
+
+                // 位置調整
+                enemy.setFixedRotation();  // 回転しないようにする
 
                 this.enemies.push(enemy);  // 現在の敵リストにも追加
             });
@@ -161,7 +161,7 @@ export default class MapManager {
 
         // X軸とY軸両方の変化に基づいて方向を判定
         let collisionDirection = '';
-        if (Math.abs(dx) > Math.abs(dy) +  gameOptions.oneBlockSize/4 ) {  // X方向の変化が大きい場合
+        if (Math.abs(dx) > Math.abs(dy) +  gameOptions.oneBlockSize/6 ) {  // X方向の変化が大きい場合
             collisionDirection = dx > 0 ? 'right' : 'left';
         } else {  // Y方向の変化が大きい場合
             collisionDirection = dy > 0 ? 'down' : 'up';
