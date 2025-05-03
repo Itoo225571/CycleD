@@ -48,9 +48,14 @@ export const gameConfig = {
                 mapping: 'rexUI'
             },
             {
-                plugin: window.PhaserMatterCollisionPlugin.default,
                 key: 'matterCollision',
+                plugin: window.PhaserMatterCollisionPlugin.default,
                 mapping: 'matterCollision'
+            },
+            {
+                key: 'PhaserRaycaster',
+                plugin: window.PhaserRaycaster,
+                mapping: 'raycasterPlugin'
             }
         ]
     },

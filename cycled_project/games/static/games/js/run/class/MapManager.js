@@ -9,6 +9,7 @@ export default class MapManager {
         this.chunks = gameOptions.chunks;
         this.addedChunks = [];
         this.layerPool = [];
+        this.collisionTiles = [];
     }
 
     addNextChunk() {
@@ -28,9 +29,9 @@ export default class MapManager {
         this.groundLayer = safeCreateLayer(chunkMap, 'Ground', tileset, this.nextChunkX, 0).setDepth(2);
         this.blockLayer = safeCreateLayer(chunkMap, 'Block', tileset, this.nextChunkX, 0).setDepth(3);
 
-        this.convertLayerToMatterBodies(this.groundLayer);
+        this.convertLayerToMatterBodies(this.groundLayer,'ground');
         if (this.blockLayer) {
-            this.convertLayerToMatterBodies(this.blockLayer);
+            this.convertLayerToMatterBodies(this.blockLayer,'block');
         }
 
         this.chunkWidth = chunkMap.widthInPixels;
@@ -40,11 +41,24 @@ export default class MapManager {
         this.manageLayerPool(6);
     }
 
-    convertLayerToMatterBodies(layer) {
+    convertLayerToMatterBodies = (layer, label) => {
         if (!layer) return;
+    
         layer.setCollisionByProperty({ collides: true });
+    
+        // タイルレイヤーをMatterボディに変換
         this.scene.matter.world.convertTilemapLayer(layer);
-    }
+    
+        // タイルごとの処理
+        layer.forEachTile(tile => {
+            if (tile.properties.collides) {
+                // 物理ボディを追加
+                const matterBody = tile.physics.matterBody.body;
+                this.collisionTiles.push(matterBody);
+            }
+        });
+    };
+    
 
     getLayerFromPool(chunkMap, name, tileset) {
         let layer = this.layerPool.find(layer => layer.name === name && !layer.visible);

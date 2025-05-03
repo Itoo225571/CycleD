@@ -28,18 +28,32 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         // サイズ・物理設定
         this.setDisplaySize(gameOptions.oneBlockSize, gameOptions.oneBlockSize);
         // プレイヤーの当たり判定を円形に設定
-        this.setBody({
-            type: 'circle',  // 形状を円形に設定
-            radius: gameOptions.oneBlockSize / 2  // 半径を設定
-        });
+        // this.setBody({
+        //     type: 'circle',  // 形状を円形に設定
+        //     radius: gameOptions.oneBlockSize / 2  // 半径を設定
+        // });
         this.setFixedRotation(); // 回転しないように固定
 
         // センサーや補助判定が必要なら、ここで `this.setBody()` をカスタム形状で定義することも可能
         this.setDepth(0);   // プレイヤーの表示順を設定
+        // ray
+        this.raycaster = scene.raycasterPlugin.createRaycaster();
+        this.ray = this.raycaster.createRay({
+            origin: { x: this.x, y: this.y },
+            autoSlice: true
+        });
+
+        this.setFriction(0);          // 地面との摩擦
+        this.setFrictionStatic(0);    // 静止摩擦
+        this.setFrictionAir(0);       // 空気抵抗
+
     }
 
     update(elapsedTime, cam) {
         if (this.scene.isPaused) return;
+        // var isGrounded = this.scene.skaterTouchingGround;
+        // var isGrounded = this.body.velocity.y ===0;
+        var isGrounded = this.isOnGround();
 
         // 現在の時間（秒）
         const currentTimeInSec = Math.floor(elapsedTime / 1000);
@@ -58,20 +72,27 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         // カメラ位置に合わせる
         let playerPos = cam.scrollX + gameOptions.playerStartPosition;
         let diff = playerPos - this.x;
-        if (Math.abs(diff) > 50 && this.body.velocity.y ===0) {
+        if (Math.abs(diff) > 50 && isGrounded) {
             let correction = diff /10;
             this.setVelocityX(this.speed + correction);
         }
 
         // 地面にいるときは run アニメーション
-        if (this.body.velocity.y === 0) {
+        if (isGrounded) {
             this.anims.play('run', true);
-        }
+            // this.setIgnoreGravity(true);  // 重力を無効にする
+            // this.setVelocityY(0);         // ついでに下方向の速度をリセット
+        } else {
+            this.setIgnoreGravity(false); // 空中では重力あり
+        }        
     }
 
     jump() {
         // 着地判定は body.velocity.y === 0 で代替（またはセンサー判定でも可能）
-        const isGrounded = Math.abs(this.body.velocity.y) < 0.01;
+        // const isGrounded = Math.abs(this.body.velocity.y) < 0.01;
+        // var isGrounded = this.body.velocity.y ===0;
+        // var isGrounded = this.scene.skaterTouchingGround;
+        var isGrounded = this.isOnGround();
 
         if (isGrounded || (this.jump_count > 0 && this.jump_count < this.jumps)) {
             if (isGrounded) {
@@ -89,6 +110,20 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             }
         }
     }
+
+    isOnGround() {
+        this.raycaster.mapGameObjects(this.scene.mapManager.collisionTiles, true);
+
+        // プレイヤーの現在位置から少し下にRayを飛ばす（角度=π/2）
+        this.ray.setOrigin(this.x, this.y + this.displayHeight / 2 - 2); // 足元付近
+        this.ray.setAngle(Math.PI / 2); // 下向き
+        const intersection = this.ray.cast();
+        // gameOptions.oneBlockSize 以内に地面があるかどうかで接地を判断
+        if (intersection && Phaser.Math.Distance.Between(this.x, this.y, intersection.x, intersection.y) <= gameOptions.oneBlockSize) {
+            return true;
+        }
+        return false;
+    }    
 
     loseLife() {
         this.lives--;
