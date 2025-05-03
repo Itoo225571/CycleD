@@ -13,9 +13,11 @@ export const gameOptions = {
     jumps: 2,
     oneBlockSize: 64,
     lives: 2,
-    tileName: 'Tiles1',
     startChunk: 'startMap',
     chunks: ['Map1','Map2'],
+    tilesets: [
+        { nameInTiled: 'Tiles1', textureKey: 'Tiles1' },
+    ]
 };
 
 export const gameConfig = {
@@ -37,7 +39,8 @@ export const gameConfig = {
             gravity: {
                 y: gameOptions.garavityForce,
             },
-            enableSleep: true
+            enableSleep: true,
+            // debug: false,
         }
     },
     plugins: {
