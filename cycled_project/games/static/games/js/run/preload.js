@@ -31,8 +31,30 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('mountain-trees', `${imgDir}background/mountain-trees.png`);
         this.load.image('trees', `${imgDir}background/trees.png`);
 
+        // coin
+        this.load.image('coin_bronze', `${imgDir}coin_bronze.png`);
+
+        // Enemy
+        this.enemySituations = [
+            'Hit',
+            'Idle',
+            'Run',
+        ]
+        this.enemyNames = [
+            'MonsieurMush'
+        ]
+        this.enemyNames.forEach((chara) => {  // アロー関数に変更
+            this.enemySituations.forEach((situation) => {  // アロー関数に変更
+                this.load.spritesheet(
+                    chara + situation, 
+                    `${imgDir}${chara}/${situation}.png`, 
+                    { frameWidth: 64, frameHeight: 64 },    // 拡大して使う
+                );
+            });
+        });
+
         //player
-        var situations = [
+        this.playerSituations = [
             'DoubleJump',
             'Fall',
             'Hit',
@@ -41,11 +63,11 @@ export default class PreloadScene extends Phaser.Scene {
             'Run',
             'WallJump'
         ]
-        var charaNames = [
+        this.playerNames = [
             'NinjaFrog'
         ]
-        charaNames.forEach((chara) => {  // アロー関数に変更
-            situations.forEach((situation) => {  // アロー関数に変更
+        this.playerNames.forEach((chara) => {  // アロー関数に変更
+            this.playerSituations.forEach((situation) => {  // アロー関数に変更
                 this.load.spritesheet(
                     chara + situation, 
                     `${imgDir}${chara}/${situation}.png`, 
@@ -63,30 +85,10 @@ export default class PreloadScene extends Phaser.Scene {
     }
 
     create() {
-        this.anims.create({
-            key: 'run',
-            frames: this.anims.generateFrameNumbers('NinjaFrogRun', { start: 0, end: 11 }),
-            frameRate: 30,
-            repeat: -1
-        });
-        this.anims.create({
-            key: 'jump',
-            frames: this.anims.generateFrameNumbers('NinjaFrogJump', { start: 0, end: 0 }),
-            frameRate: 1,
-            repeat: -1
-        });
-        this.anims.create({
-            key: 'jump_ex',
-            frames: this.anims.generateFrameNumbers('NinjaFrogDoubleJump', { start: 0, end: 5 }),
-            frameRate: 40,
-            repeat: -1
-        });
-        this.anims.create({
-            key: 'stop',
-            frames: this.anims.generateFrameNumbers('NinjaFrogIdle', { start: 0, end: 10 }),
-            frameRate: 10,
-            repeat: -1
-        });
+        // Charachter Animation
+        this.createCharaAnims();
+        // Enemy Animation
+        this.createEnemyAnims()
 
         // 背景レイヤーの初期化
         this.backgroundLayers = {};
@@ -117,6 +119,63 @@ export default class PreloadScene extends Phaser.Scene {
         // const startMap = this.cache.tilemap.get('startMap');
         // console.log(startMap);  // startMap のデータがログに出力されるか確認
         this.scene.start('StartScene');
+    }
+
+    createCharaAnims() {
+        this.playerNames.forEach((name) => {  // アロー関数に変更
+            this.anims.create({
+                key: name + 'Run',
+                frames: this.anims.generateFrameNumbers(name + 'Run', { start: 0, end: 11 }),
+                frameRate: 30,
+                repeat: -1
+            });
+            this.anims.create({
+                key: name + 'Jump',
+                frames: this.anims.generateFrameNumbers(name + 'Jump', { start: 0, end: 0 }),
+                frameRate: 1,
+                repeat: -1
+            });
+            this.anims.create({
+                key: name + 'Jump_ex',
+                frames: this.anims.generateFrameNumbers(name + 'DoubleJump', { start: 0, end: 5 }),
+                frameRate: 40,
+                repeat: -1
+            });
+            this.anims.create({
+                key: name + 'Stop',
+                frames: this.anims.generateFrameNumbers(name + 'Idle', { start: 0, end: 10 }),
+                frameRate: 10,
+                repeat: -1
+            });
+            this.anims.create({
+                key: name + 'Dead',
+                frames: this.anims.generateFrameNumbers(name + 'Hit', { start: 6, end: 0, reverse: true }),
+                frameRate: 1,
+                repeat: 0
+            });
+        });
+    }
+    createEnemyAnims() {
+        this.enemyNames.forEach((name) => {  // アロー関数に変更
+            this.anims.create({
+                key: name + 'Run',
+                frames: this.anims.generateFrameNumbers(name + 'Run', { start: 0, end: 13 }),
+                frameRate: 30,
+                repeat: -1
+            });
+            this.anims.create({
+                key: name + 'Stop',
+                frames: this.anims.generateFrameNumbers(name + 'Idle', { start: 0, end: 13 }),
+                frameRate: 10,
+                repeat: -1
+            });
+            this.anims.create({
+                key: name + 'Dead',
+                frames: this.anims.generateFrameNumbers(name + 'Hit', { start: 0, end: 4 }),
+                frameRate: 10,
+                repeat: -1
+            });
+        });
     }
 
     loadMap() {

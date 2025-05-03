@@ -24,7 +24,8 @@ export default class PlayScene extends Phaser.Scene {
         this.input.on("pointerdown", this.player.jump.bind(this.player), this);
         this.input.keyboard.on('keydown-SPACE', this.player.jump.bind(this.player), this);
 
-        this.mapManager = new MapManager(this, 'Tiles1');
+        var tilesets = gameOptions.tilesets;
+        this.mapManager = new MapManager(this, tilesets);
         this.mapManager.addNextChunk();
 
         // center point for camera follow
@@ -36,6 +37,21 @@ export default class PlayScene extends Phaser.Scene {
 
         if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene'); 
         
+        // 衝突のリスナーを追加
+        Phaser.Physics.Matter.Matter.Events.on(this.matter.world, 'collisionstart', event => {
+            event.pairs.forEach(pair => {
+                console.log('Collision:', pair.bodyA.label, pair.bodyB.label);
+            });
+        });
+        
+    }
+
+    handlePlayerEnemyCollision(player, enemy) {
+        // playerがenemyと衝突したときの処理
+        if (player && enemy) {
+            player.loseLife();  // プレイヤーのライフを減らす
+            console.log('Player collided with enemy! Life lost.');
+        }
     }
 
     update(time, delta) {
@@ -50,7 +66,8 @@ export default class PlayScene extends Phaser.Scene {
         const guideX = this.mapManager.nextChunkX - this.mapManager.chunkWidth / 2;
         if (this.player.x > guideX) {
             this.mapManager.addNextChunk();
-        }        
+        }
+        this.mapManager.updateEnemies();
 
         const leftBound = cam.scrollX - (cam.width / 6);
         const bottomBound = cam.scrollY + cam.height * 7 / 6;
@@ -59,16 +76,21 @@ export default class PlayScene extends Phaser.Scene {
         if (outOfBounds) {
             this.loseLife();
         }
+
     }
 
     loseLife() {
         const is_alive = this.player.loseLife();
-
         if (is_alive) {
             this.respawnPlayer();
         } else {
             this.scene.start('StartScene');
         }
+        // var animName = this.player.playerName + 'Dead';
+        // this.player.anims.play(animName, true);
+        // this.player.once('animationcomplete', (animation, frame) => {
+
+        // });
     }
 
     respawnPlayer() {

@@ -1,15 +1,34 @@
 import { gameOptions } from '../config.js';
 
 export default class MapManager {
-    constructor(scene, tilesetKey) {
+    constructor(scene, tilesetKeyArray) {
         this.scene = scene;
-        this.tilesetKey = tilesetKey;
+        this.tilesetKeyArray = tilesetKeyArray; // 複数 tileset に対応
         this.chunkWidth = 0;
         this.nextChunkX = 0;
         this.chunks = gameOptions.chunks;
         this.addedChunks = [];
         this.layerPool = [];
         this.collisionTiles = [];
+        this.enemyPool = [];  // プールを初期化
+        this.enemies = [];  // プールを使用して再利用される敵の配列
+
+        this.scene.matter.world.on('collisionstart', (event) => {
+            event.pairs.forEach(pair => {
+                const bodyA = pair.bodyA;
+                const bodyB = pair.bodyB;
+        
+                const spriteA = bodyA.gameObject;
+                const spriteB = bodyB.gameObject;
+        
+                // どちらかがenemyであるか確認（enemyはスプライト）
+                if ((this.isEnemy(spriteA) && bodyB.label === 'player') || (this.isEnemy(spriteB) && bodyA.label === 'player')) {
+                    const enemy = this.isEnemy(spriteA) ? spriteA : spriteB;
+                    const player = bodyA.label === 'player' ? spriteA : spriteB;
+                    this.onEnemyCollision(player,enemy);
+                }
+            });
+        });
     }
 
     addNextChunk() {
@@ -17,22 +36,27 @@ export default class MapManager {
         const chunkKey = this.nextChunkX === 0 ? gameOptions.startChunk : this.chunks[randomIndex];
         const chunkMap = this.scene.make.tilemap({ key: chunkKey });
 
-        const tileset = chunkMap.addTilesetImage(gameOptions.tileName, this.tilesetKey);
+        // 複数 tileset の登録
+        const tilesets = this.tilesetKeyArray.map(key => {
+            return chunkMap.addTilesetImage(key.nameInTiled, key.textureKey);
+        });
 
-        // レイヤーの作成（背景や装飾はそのまま）
-        this.backgroundLayer = this.getLayerFromPool(chunkMap, 'Background', tileset).setDepth(-2);
-        this.decoLayer = this.getLayerFromPool(chunkMap, 'Deco', tileset).setDepth(-1);
-        this.itemLayer = this.getLayerFromPool(chunkMap, 'Item', tileset).setDepth(0);
-        this.enemyLayer = this.getLayerFromPool(chunkMap, 'Enemy', tileset).setDepth(1);
+        // 各レイヤーを作成（適切な tileset を自動選択）
+        this.backgroundLayer = this.getLayerFromPool(chunkMap, 'Background', tilesets).setDepth(-2);
+        this.decoLayer = this.getLayerFromPool(chunkMap, 'Deco', tilesets).setDepth(-1);
+        this.itemLayer = this.getLayerFromPool(chunkMap, 'Item', tilesets).setDepth(0);
+        // this.enemyLayer = this.getLayerFromPool(chunkMap, 'Enemy', tilesets).setDepth(1);
 
-        // Matter 対応：コリジョンレイヤーの作成
-        this.groundLayer = safeCreateLayer(chunkMap, 'Ground', tileset, this.nextChunkX, 0).setDepth(2);
-        this.blockLayer = safeCreateLayer(chunkMap, 'Block', tileset, this.nextChunkX, 0).setDepth(3);
+        this.groundLayer = safeCreateLayer(chunkMap, 'Ground', tilesets, this.nextChunkX, 0).setDepth(2);
+        this.blockLayer = safeCreateLayer(chunkMap, 'Block', tilesets, this.nextChunkX, 0).setDepth(3);
 
-        this.convertLayerToMatterBodies(this.groundLayer,'ground');
+        this.convertLayerToMatterBodies(this.groundLayer, 'ground');
         if (this.blockLayer) {
-            this.convertLayerToMatterBodies(this.blockLayer,'block');
+            this.convertLayerToMatterBodies(this.blockLayer, 'block');
         }
+
+        // 敵キャラクターの生成
+        this.setEnemies(chunkMap);
 
         this.chunkWidth = chunkMap.widthInPixels;
         this.nextChunkX += this.chunkWidth;
@@ -41,29 +65,129 @@ export default class MapManager {
         this.manageLayerPool(6);
     }
 
+    setEnemies(chunkMap) {
+        const objectLayer = chunkMap.getObjectLayer('EnemyObjects');
+        if (objectLayer) {
+            objectLayer.objects.forEach(obj => {
+                const name = obj.name;
+                const width = obj.width;
+                const height = obj.height;
+    
+                // 敵スプライトをプールから取得
+                const enemy = this.getEnemyFromPool(name, obj.x, obj.y);
+    
+                // 位置調整
+                enemy.setFixedRotation();  // 回転しないようにする
+    
+                // アニメーション再生
+                enemy.play(name + 'Run');
+    
+                // Tiledのプロパティからspeedとdirectionを取得
+                enemy.speed = obj.properties.find(prop => prop.name === 'speed')?.value || 1;  // speedのデフォルト値は5
+                enemy.direction = obj.properties.find(prop => prop.name === 'direction')?.value || 'left';  // directionのデフォルトは'left'
+                enemy.weak = obj.properties.find(prop => prop.name === 'weak')?.value || 'none';  // 弱点 通常はなし
+    
+                // 元のボディを削除して、Tiledのサイズで矩形ボディを作り直す
+                const { Bodies } = Phaser.Physics.Matter.Matter;
+                const newBody = Bodies.rectangle(obj.x, obj.y, width, height, { label: 'enemy' });
+    
+                enemy.setExistingBody(newBody);
+                enemy.setPosition(obj.x, obj.y);  // スプライトの位置を再設定
+    
+                enemy.body.friction = 0;  // 敵の動摩擦
+                enemy.body.frictionStatic = 0;  // 敵が動き出すための摩擦
+                enemy.body.frictionAir = 0;  // 敵の空気抵抗
+
+                this.enemies.push(enemy);  // 現在の敵リストにも追加
+            });
+        }
+    }
+
+    getEnemyFromPool(name, x, y) {
+        // プールから非アクティブな敵を探して取得
+        let enemy = this.enemyPool.find(e => !e.active);
+        if (enemy) {
+            // 再利用
+            enemy.setTexture(name + 'Idle');
+            enemy.setPosition(x, y);
+            enemy.setActive(true);
+            enemy.setVisible(true);
+        } else {
+            // 新規作成
+            enemy = this.scene.matter.add.sprite(x, y, name + 'Idle');
+            enemy.setOrigin(0.5, 1);  // 中央下基準
+            this.enemyPool.push(enemy);  // プールに追加
+        }
+        
+        return enemy;
+    }
+
+    addEnemyToPool(enemy) {
+        // プールに戻す処理
+        enemy.setActive(false);
+        enemy.setVisible(false);
+    }
+
+    updateEnemies() {
+        // Phaserのupdateメソッドで毎フレームの速度を設定
+        this.enemies.forEach(enemy => {
+            const speed = enemy.speed;  // 各敵の速度
+            const direction = enemy.direction;  // 各敵の移動方向
+            const patrol = enemy.patrol;
+
+            if (direction === 'left') {
+                enemy.setVelocityX(-speed);  // 左に移動
+            } else if (direction === 'right') {
+                enemy.setVelocityX(speed);   // 右に移動
+            }
+        });
+    }
+
+    isEnemy(sprite) {
+        return this.enemies.includes(sprite);
+    }
+    
+    onEnemyCollision(player,enemy) {
+        // プレイヤーと敵の位置を取得
+        const dx = player.x - enemy.x;
+        const dy = player.y - enemy.y;
+
+        // X軸とY軸両方の変化に基づいて方向を判定
+        let collisionDirection = '';
+        if (Math.abs(dx) > Math.abs(dy) + 0.5) {  // X方向の変化が大きい場合
+            collisionDirection = dx > 0 ? 'right' : 'left';
+        } else {  // Y方向の変化が大きい場合
+            collisionDirection = dy > 0 ? 'down' : 'up';
+        }
+
+        if (collisionDirection === enemy.weak) {
+            return;
+        } else {
+            this.scene.loseLife();
+        }
+    }
+    
+
     convertLayerToMatterBodies = (layer, label) => {
         if (!layer) return;
-    
+
         layer.setCollisionByProperty({ collides: true });
-    
-        // タイルレイヤーをMatterボディに変換
         this.scene.matter.world.convertTilemapLayer(layer);
-    
-        // タイルごとの処理
+
         layer.forEachTile(tile => {
             if (tile.properties.collides) {
-                // 物理ボディを追加
-                const matterBody = tile.physics.matterBody.body;
-                this.collisionTiles.push(matterBody);
+                const matterBody = tile.physics.matterBody?.body;
+                if (matterBody) {
+                    this.collisionTiles.push(matterBody);
+                }
             }
         });
     };
-    
 
-    getLayerFromPool(chunkMap, name, tileset) {
+    getLayerFromPool(chunkMap, name, tilesets) {
         let layer = this.layerPool.find(layer => layer.name === name && !layer.visible);
         if (!layer) {
-            layer = safeCreateLayer(chunkMap, name, tileset, this.nextChunkX, 0);
+            layer = safeCreateLayer(chunkMap, name, tilesets, this.nextChunkX, 0);
         }
         return layer;
     }
@@ -87,33 +211,44 @@ export default class MapManager {
     resetMap(exBodies = []) {
         const Matter = Phaser.Physics.Matter.Matter;
         const world = this.scene.matter.world.localWorld;
-    
+
         const allBodies = Matter.Composite.allBodies(world);
-    
+
         allBodies.forEach(body => {
             if (!exBodies.includes(body)) {
                 Matter.World.remove(world, body);
             }
         });
-    
+
+        // スプライトとしての enemy を破棄
+        this.enemies.forEach(enemy => {
+            // プールに戻す
+            this.addEnemyToPool(enemy);
+        });
+        this.enemies = [];
+
+        // レイヤーの非表示＆プール戻し
         this.addedChunks.forEach(layer => {
             if (layer) {
                 layer.setVisible(false);
                 this.layerPool.push(layer);
             }
         });
-    
+
         this.addedChunks = [];
         this.nextChunkX = 0;
     }
-     
-    
 }
 
-function safeCreateLayer(map, name, tileset, x, y) {
+// 複数タイルセット対応
+function safeCreateLayer(map, name, tilesets, x, y) {
     const layerData = map.layers.find(layer => layer.name === name);
-    if (layerData) {
-        return map.createLayer(name, tileset, x, y);
+    if (!layerData) return null;
+
+    // 対応する tileset を自動判定
+    for (let tileset of tilesets) {
+        const layer = map.createLayer(name, tileset, x, y);
+        if (layer) return layer;
     }
     return null;
 }

@@ -10,6 +10,8 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         this.scene = scene;
         scene.add.existing(this);
 
+        this.playerName = texture;  //player名を保存
+
         // 個別性能をプロパティに保存
         this.initSpeed = config.speed || gameOptions.playerStartSpeed;
         this.accel = config.accel || gameOptions.playerAccel;
@@ -27,11 +29,6 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 
         // サイズ・物理設定
         this.setDisplaySize(gameOptions.oneBlockSize, gameOptions.oneBlockSize);
-        // プレイヤーの当たり判定を円形に設定
-        // this.setBody({
-        //     type: 'circle',  // 形状を円形に設定
-        //     radius: gameOptions.oneBlockSize / 2  // 半径を設定
-        // });
         this.setFixedRotation(); // 回転しないように固定
 
         // センサーや補助判定が必要なら、ここで `this.setBody()` をカスタム形状で定義することも可能
@@ -47,6 +44,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         this.setFrictionStatic(0);    // 静止摩擦
         this.setFrictionAir(0);       // 空気抵抗
 
+        this.body.label = 'player';
     }
 
     update(elapsedTime, cam) {
@@ -79,12 +77,12 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 
         // 地面にいるときは run アニメーション
         if (isGrounded) {
-            this.anims.play('run', true);
+            this.anims.play(this.playerName + 'Run', true);
             // this.setIgnoreGravity(true);  // 重力を無効にする
             // this.setVelocityY(0);         // ついでに下方向の速度をリセット
         } else {
             this.setIgnoreGravity(false); // 空中では重力あり
-        }        
+        }
     }
 
     jump() {
@@ -104,9 +102,10 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             this.jump_count++;
 
             if (this.jump_count === 1) {
-                this.anims.play('jump', true);
+                this.anims.play(this.playerName + 'Jump', true);
             } else {
-                this.anims.play(this.scene.anims.get('jump_ex') ? 'jump_ex' : 'jump', true);
+                var name = this.scene.anims.get(this.playerName + 'Jump_ex') ? this.playerName + 'Jump_ex' : this.playerName + 'Jump';
+                this.anims.play(name, true);
             }
         }
     }
