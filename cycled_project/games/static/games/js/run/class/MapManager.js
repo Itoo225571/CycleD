@@ -61,8 +61,8 @@ export default class MapManager {
         this.chunkWidth = chunkMap.widthInPixels;
         this.nextChunkX += this.chunkWidth;
 
-        this.addedChunks.push(this.backgroundLayer, this.decoLayer, this.groundLayer, this.blockLayer, this.itemLayer, this.enemyLayer);
-        this.manageLayerPool(6);
+        this.addedChunks.push(this.backgroundLayer, this.decoLayer, this.groundLayer, this.blockLayer, this.itemLayer);
+        this.manageLayerPool(5);
     }
 
     setEnemies(chunkMap) {
@@ -74,7 +74,8 @@ export default class MapManager {
                 const height = obj.height;
     
                 // 敵スプライトをプールから取得
-                const enemy = this.getEnemyFromPool(name, obj.x, obj.y);
+                const enemy = this.getEnemyFromPool(name, obj.x + this.nextChunkX, obj.y); // x 座標に nextChunkX を加算
+                enemy.chunkX = this.nextChunkX;
     
                 // 位置調整
                 enemy.setFixedRotation();  // 回転しないようにする
@@ -83,38 +84,39 @@ export default class MapManager {
                 enemy.play(name + 'Run');
     
                 // Tiledのプロパティからspeedとdirectionを取得
-                enemy.speed = obj.properties.find(prop => prop.name === 'speed')?.value || 1;  // speedのデフォルト値は5
+                enemy.speed = obj.properties.find(prop => prop.name === 'speed')?.value || 1;  // speedのデフォルト値は1
                 enemy.direction = obj.properties.find(prop => prop.name === 'direction')?.value || 'left';  // directionのデフォルトは'left'
                 enemy.weak = obj.properties.find(prop => prop.name === 'weak')?.value || 'none';  // 弱点 通常はなし
     
                 // 元のボディを削除して、Tiledのサイズで矩形ボディを作り直す
                 const { Bodies } = Phaser.Physics.Matter.Matter;
-                const newBody = Bodies.rectangle(obj.x, obj.y, width, height, { label: 'enemy' });
+                const newBody = Bodies.rectangle(obj.x + this.nextChunkX, obj.y, width, height, { label: 'enemy' });
     
                 enemy.setExistingBody(newBody);
-                enemy.setPosition(obj.x, obj.y);  // スプライトの位置を再設定
+                enemy.setPosition(obj.x + this.nextChunkX, obj.y);  // スプライトの位置を再設定
     
                 enemy.body.friction = 0;  // 敵の動摩擦
                 enemy.body.frictionStatic = 0;  // 敵が動き出すための摩擦
                 enemy.body.frictionAir = 0;  // 敵の空気抵抗
+                enemy.body.gravityScale = 1;  // 重力を適用（1倍の重力）
 
                 this.enemies.push(enemy);  // 現在の敵リストにも追加
             });
         }
-    }
+    }    
 
     getEnemyFromPool(name, x, y) {
         // プールから非アクティブな敵を探して取得
         let enemy = this.enemyPool.find(e => !e.active);
         if (enemy) {
             // 再利用
-            enemy.setTexture(name + 'Idle');
+            enemy.setTexture(name + 'Run');
             enemy.setPosition(x, y);
             enemy.setActive(true);
             enemy.setVisible(true);
         } else {
             // 新規作成
-            enemy = this.scene.matter.add.sprite(x, y, name + 'Idle');
+            enemy = this.scene.matter.add.sprite(x, y, name + 'Run');
             enemy.setOrigin(0.5, 1);  // 中央下基準
             this.enemyPool.push(enemy);  // プールに追加
         }
@@ -129,12 +131,17 @@ export default class MapManager {
     }
 
     updateEnemies() {
-        // Phaserのupdateメソッドで毎フレームの速度を設定
-        this.enemies.forEach(enemy => {
-            const speed = enemy.speed;  // 各敵の速度
-            const direction = enemy.direction;  // 各敵の移動方向
-            const patrol = enemy.patrol;
+        const cameraRight = this.scene.cameras.main.scrollX + this.scene.cameras.main.width;
 
+        this.enemies.forEach(enemy => {
+            // プレイヤーが敵のチャンクに入ったかどうかをチェック
+            var speed = enemy.speed;
+            if (cameraRight < enemy.chunkX || cameraRight > enemy.chunkX + this.chunkWidth) {
+                speed = speed / 3;  // ちょっとは動かす
+            }
+            const direction = enemy.direction;  // 敵の移動方向
+    
+            // プレイヤーがチャンク内にいる間、敵を動かす
             if (direction === 'left') {
                 enemy.setVelocityX(-speed);  // 左に移動
             } else if (direction === 'right') {
@@ -154,7 +161,7 @@ export default class MapManager {
 
         // X軸とY軸両方の変化に基づいて方向を判定
         let collisionDirection = '';
-        if (Math.abs(dx) > Math.abs(dy) + 0.5) {  // X方向の変化が大きい場合
+        if (Math.abs(dx) > Math.abs(dy) +  gameOptions.oneBlockSize/4 ) {  // X方向の変化が大きい場合
             collisionDirection = dx > 0 ? 'right' : 'left';
         } else {  // Y方向の変化が大きい場合
             collisionDirection = dy > 0 ? 'down' : 'up';
@@ -166,7 +173,6 @@ export default class MapManager {
             this.scene.loseLife();
         }
     }
-    
 
     convertLayerToMatterBodies = (layer, label) => {
         if (!layer) return;
