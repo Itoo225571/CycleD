@@ -50,7 +50,7 @@ export default class PlayScene extends Phaser.Scene {
         const guideX = this.mapManager.nextChunkX - this.mapManager.chunkWidth / 2;
         if (this.player.x > guideX) {
             this.mapManager.addNextChunk();
-        }
+        }        
 
         const leftBound = cam.scrollX - (cam.width / 6);
         const bottomBound = cam.scrollY + cam.height * 7 / 6;
