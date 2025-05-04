@@ -16,8 +16,6 @@ export default class MapManager {
         this.items = [];
         this.itemPool = this.scene.add.group();  // Phaser Group に変更
 
-        this.bgImagePool = this.scene.add.group();
-
         this.scene.matter.world.on('collisionstart', (event) => {
             event.pairs.forEach(pair => {
                 const bodyA = pair.bodyA;
@@ -50,7 +48,10 @@ export default class MapManager {
             return chunkMap.addTilesetImage(key.nameInTiled, key.textureKey);
         });
 
-        this.backgroundLayer = this.getLayerFromPool(chunkMap, 'Background', tilesets).setDepth(-2);
+        this.backgroundLayer = this.getLayerFromPool(chunkMap, 'Background', tilesets)
+            .setDepth(-2)
+            .setAlpha(0.75); // 透明度を設定
+
         this.decoLayer = this.getLayerFromPool(chunkMap, 'Deco', tilesets).setDepth(-1);
         // this.itemLayer = this.getLayerFromPool(chunkMap, 'Item', tilesets).setDepth(0);
 
@@ -101,11 +102,21 @@ export default class MapManager {
 
                 const enemy = this.getObjFromPool(this.enemyPool, name, obj.x + this.nextChunkX, obj.y);
                 enemy.chunkX = this.nextChunkX;
-                enemy.play(name + 'Run');
+
+                // 画像のサイズをオブジェクトのサイズに合わせて変更
+                const largerSize = Math.max(width, height);
+                enemy.setDisplaySize(largerSize,largerSize);
 
                 enemy.speed = getProp(obj, 'speed', 0);
                 enemy.direction = getProp(obj, 'direction', 'left');
                 enemy.weak = getProp(obj, 'weak', 'none');
+
+                if (enemy.speed != 0 && (enemy.direction === 'left' || enemy.direction === 'right')) {
+                    enemy.play(name + 'Run');
+                }
+                else {
+                    enemy.play(name + 'Idle');
+                }
 
                 const { Bodies, Vertices } = Phaser.Physics.Matter.Matter;
 
@@ -121,7 +132,11 @@ export default class MapManager {
                 }
 
                 const ellipseVertices = Vertices.fromPath(
-                    generateEllipsePath(width / 2, height / 2, 20)
+                    generateEllipsePath(
+                        width / 2, 
+                        height/2,
+                        20
+                    )
                 );
                 const newBody = Bodies.fromVertices(
                     obj.x + this.nextChunkX,
@@ -131,7 +146,10 @@ export default class MapManager {
                     true
                 );
                 enemy.setExistingBody(newBody);
-                enemy.setPosition(obj.x + this.nextChunkX + width/2, obj.y + height/2);
+                enemy.setPosition(
+                    obj.x + this.nextChunkX + width/2, 
+                    obj.y + height/2,
+                );
                 enemy.body.friction = 0;
                 enemy.body.frictionStatic = 0;
                 enemy.body.frictionAir = 0;
@@ -168,6 +186,7 @@ export default class MapManager {
             obj.setOrigin(0.5, 1);
             pool.add(obj);
         }
+        obj.clearTint();    //色をなおす
         return obj;
     }
 
@@ -223,7 +242,14 @@ export default class MapManager {
         }
 
         if (collisionDirection === enemy.weak) {
-            return;
+            player.setVelocityY(-player.jumpForce); // 上に弾む（速度を調整）
+        
+            // 敵を消すまたは反応させる場合
+            enemy.setTint(0xff0000); // 敵に赤い色をつける（オプション）
+            enemy.setVelocityY(-10); // 敵も少し跳ねる（オプション）
+            enemy.setCollisionCategory(null);
+            enemy.setDepth(10);   //この時だけ最前線で表示
+
         } else {
             this.scene.loseLife(true);     //ジャンプしながら消滅
         }

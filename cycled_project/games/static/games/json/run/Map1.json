@@ -123,7 +123,7 @@
          "name":"EnemyObjects",
          "objects":[
                 {
-                 "height":50,
+                 "height":96,
                  "id":2,
                  "name":"MonsieurMush",
                  "properties":[
@@ -155,9 +155,46 @@
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
-                 "width":64,
-                 "x":477.953,
-                 "y":641.518
+                 "width":96,
+                 "x":475.727810858923,
+                 "y":614.815730307076
+                }, 
+                {
+                 "height":96,
+                 "id":56,
+                 "name":"MonsieurMush",
+                 "properties":[
+                        {
+                         "name":"direction",
+                         "type":"string",
+                         "value":"left"
+                        }, 
+                        {
+                         "name":"patrol",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"range",
+                         "type":"float",
+                         "value":-1
+                        }, 
+                        {
+                         "name":"speed",
+                         "type":"float",
+                         "value":0
+                        }, 
+                        {
+                         "name":"weak",
+                         "type":"string",
+                         "value":"up"
+                        }],
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":96,
+                 "x":1772.61863370275,
+                 "y":593.140387649733
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -172,7 +209,7 @@
          "objects":[
                 {
                  "ellipse":true,
-                 "height":63.2911392405063,
+                 "height":63.2911,
                  "id":54,
                  "name":"coin_bronze",
                  "properties":[
@@ -185,7 +222,79 @@
                  "type":"item",
                  "visible":true,
                  "width":64,
-                 "x":193.913277673041,
+                 "x":192,
+                 "y":64
+                }, 
+                {
+                 "ellipse":true,
+                 "height":63.2911,
+                 "id":57,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":2112,
+                 "y":256
+                }, 
+                {
+                 "ellipse":true,
+                 "height":63.2911,
+                 "id":58,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":2176,
+                 "y":256
+                }, 
+                {
+                 "ellipse":true,
+                 "height":63.2911,
+                 "id":59,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":320,
+                 "y":64
+                }, 
+                {
+                 "ellipse":true,
+                 "height":63.2911,
+                 "id":60,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":256,
                  "y":64
                 }],
          "opacity":1,
@@ -195,7 +304,7 @@
          "y":0
         }],
  "nextlayerid":9,
- "nextobjectid":56,
+ "nextobjectid":61,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
