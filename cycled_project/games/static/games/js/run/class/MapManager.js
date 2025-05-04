@@ -217,7 +217,7 @@ export default class MapManager {
         if (collisionDirection === enemy.weak) {
             return;
         } else {
-            this.scene.loseLife();
+            this.scene.loseLife(true);     //ジャンプしながら消滅
         }
     }
 
@@ -371,6 +371,7 @@ export default class MapManager {
         // this.addNextChunk();
         this.currentChunkIndex = 0;
     }
+    
 }
 
 // 複数タイルセット対応
