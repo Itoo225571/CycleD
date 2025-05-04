@@ -166,7 +166,7 @@ export default class PreloadScene extends Phaser.Scene {
             });
             this.anims.create({
                 key: name + 'Dead',
-                frames: this.anims.generateFrameNumbers(name + 'Hit', { start: 6, end: 0, reverse: true }),
+                frames: this.anims.generateFrameNumbers(name + 'Hit', { start: 0, end: 6 }),
                 frameRate: 1,
                 repeat: 0
             });

@@ -36,6 +36,7 @@ export default class PlayScene extends Phaser.Scene {
         this.centerPoint.body.isSensor = true;
 
         if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene'); 
+
     }
 
     update(time, delta) {
@@ -58,52 +59,102 @@ export default class PlayScene extends Phaser.Scene {
         const outOfBounds = this.player.x < leftBound || this.player.y > bottomBound;
 
         if (outOfBounds) {
-            this.loseLife();
+            this.loseLife(false);
         }
 
     }
 
-    loseLife() {
+    loseLifeAfetr() {
         const is_alive = this.player.loseLife();
+
         if (is_alive) {
             this.respawnPlayer();
         } else {
             this.scene.start('StartScene');
         }
     }
-
-    respawnPlayer() {
+    loseLife(jump=false) {
         this.isPaused = true;
         this.cameras.main.stopFollow();
-
-        this.player.setVisible(false);
-        this.player.setActive(false);
-        this.player.setStatic(true); // Matter.jsでは無効化の代替
-
         this.input.enabled = false;
         this.matter.world.pause();
+        
+        // Matterの影響を受けないように静的化＆非衝突化
+        this.player.setStatic(true);
+        this.player.setCollisionCategory(null); // 衝突カテゴリを解除（またはマスクを0に）
+        this.player.setVisible(true);
+        this.player.setActive(false);
 
-        const totalDelay = 1000;
+        this.player.anims.stop(); // アニメーション停止
+        // フレーム指定でテクスチャを一時的に切り替え
+        this.player.setTexture(this.player.playerName + 'Hit', 6); // 第2引数にフレーム番号（または名前）
+    
+        if (jump) {
+            this.cameras.main.shake(500,0.01);  //画面振動
 
-        this.time.delayedCall(totalDelay, () => {
-            this.player.setPosition(
-                gameOptions.playerStartPosition,
-                this.game.config.height / 2
-            );
+            // 上昇して落下するTween
+            this.time.delayedCall(500, () => {
+                // 回転アニメーション
+                this.tweens.add({
+                    targets: this.player,
+                    angle: 360 * 4,               // 4回転（視覚だけ）
+                    duration: 1000,
+                    ease: 'Linear',
+                });
+                // 落下
+                this.tweens.add({
+                    targets: this.player,
+                    y: this.player.y - 200,          // 100px上昇
+                    duration: 500,
+                    ease: 'Sine.easeOut',
+                    onComplete: () => {
+                        // 上昇が完了したら急降下
+                        this.tweens.add({
+                            targets: this.player,
+                            y: this.scale.height + 200,      // 急降下
+                            duration: 500,               // 速い落下
+                            ease: 'Sine.easeIn',         // 急激に落ちるように設定
+                            onComplete: () => {
+                                this.player.setAngle(0);             // 角度リセット
+                                this.player.setStatic(false);       // 動的に戻す
+                                this.player.setCollisionCategory(this.matter.world.nextCategory()); // 元のカテゴリに再設定
+                                this.player.setVelocity(0, 0);      // 慣性などリセット    
+                                
+                                this.loseLifeAfetr(); // アニメーション後に後処理を呼び出し
+                            }
+                        });
+                    }
+                });
+            });
+        } else {
             this.player.setStatic(false);
-            this.player.setActive(true);
-            this.player.setVisible(true);
+            this.player.setCollisionCategory(this.matter.world.nextCategory()); // 元のカテゴリに再設定
+            this.cameras.main.shake(500,0.01);  //画面振動
+            this.time.delayedCall(1500, () => {
+                this.loseLifeAfetr();
+            });
+        }
 
-            this.mapManager.resetMap([this.player.body,this.centerPoint.body]);
-            this.mapManager.addNextChunk();
+    }
 
-            this.centerPoint.setPosition(this.scale.width / 2, this.scale.height / 2);
-            this.cameras.main.startFollow(this.centerPoint, false, 1, 0);
+    respawnPlayer() {
+        this.player.setPosition(
+            gameOptions.playerStartPosition,
+            this.game.config.height / 2
+        );
+        this.player.setStatic(false);
+        this.player.setActive(true);
+        this.player.setVisible(true);
 
-            this.isPaused = false;
-            this.input.enabled = true;
-            this.matter.world.resume();
-        });
+        this.mapManager.resetMap([this.player.body,this.centerPoint.body]);
+        this.mapManager.addNextChunk();
+
+        this.centerPoint.setPosition(this.scale.width / 2, this.scale.height / 2);
+        this.cameras.main.startFollow(this.centerPoint, false, 1, 0);
+
+        this.isPaused = false;
+        this.input.enabled = true;
+        this.matter.world.resume();
     }
     rePlayGame() {
         this.scene.restart();
