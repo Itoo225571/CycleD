@@ -123,12 +123,16 @@ export default class MapManager {
                     true
                 );
                 enemy.setExistingBody(newBody);
-                enemy.setPosition(obj.x + this.nextChunkX, obj.y);
+                enemy.setPosition(obj.x + this.nextChunkX + width/2, obj.y + height/2);
                 enemy.body.friction = 0;
                 enemy.body.frictionStatic = 0;
                 enemy.body.frictionAir = 0;
                 enemy.body.gravityScale = 1;
                 enemy.setFixedRotation();
+
+                // 重力
+                const gravityIgnore = getProp(obj, 'gravityIgnore', false);
+                enemy.setIgnoreGravity(gravityIgnore);
 
                 enemy.chunkIndex = this.currentChunkIndex;
 
@@ -162,10 +166,6 @@ export default class MapManager {
     addObjToPool(obj) {
         obj.setActive(false);
         obj.setVisible(false);
-        // if (obj.body) {
-        //     this.scene.matter.world.remove(obj.body);
-        //     obj.body = null;
-        // }
     }
 
     updateEnemies() {
@@ -199,12 +199,19 @@ export default class MapManager {
     onEnemyCollision(player, enemy) {
         const dx = player.x - enemy.x;
         const dy = player.y - enemy.y;
+        const angle = Math.atan2(dy, dx); // ラジアン
 
+        // 角度から方向を判定（8方向で割り当て）
         let collisionDirection = '';
-        if (Math.abs(dx) > Math.abs(dy) + gameOptions.oneBlockSize / 6) {
-            collisionDirection = dx > 0 ? 'right' : 'left';
+        var angular_width = Math.PI / 6;
+        if (angle >= - angular_width && angle < angular_width) {
+            collisionDirection = 'right';
+        } else if (angle >=  angular_width && angle < angular_width * 5) {
+            collisionDirection = 'down';
+        } else if (angle >= - angular_width * 5 && angle < -angular_width) {
+            collisionDirection = 'up';
         } else {
-            collisionDirection = dy > 0 ? 'down' : 'up';
+            collisionDirection = 'left';
         }
 
         if (collisionDirection === enemy.weak) {
@@ -226,6 +233,11 @@ export default class MapManager {
                 item.chunkX = this.nextChunkX;
 
                 item.setDisplaySize(width, height);
+                const anims = this.scene.anims;
+                if (!anims.exists(name)) {
+                    console.warn(`Animation '${name}' が見つかりません. アイテムをスキップしました.`);
+                    return;
+                }
                 item.play(name);
 
                 const { Bodies, Vertices } = Phaser.Physics.Matter.Matter;
@@ -252,15 +264,14 @@ export default class MapManager {
                 );
 
                 item.setExistingBody(newBody);
-                item.setPosition(obj.x + this.nextChunkX, obj.y);
+                item.setPosition(obj.x + this.nextChunkX + width/2, obj.y +height/2);
+                item.setMass(0.1); // 非常に軽い質量に設定
 
                 const gravityIgnore = getProp(obj, 'gravityIgnore', false);
-                if (gravityIgnore) {
-                    item.body.plugin.gravityScale = 0;
-                }
+                item.setIgnoreGravity(gravityIgnore);
 
                 item.setFixedRotation();
-
+                
                 item.chunkIndex = this.currentChunkIndex;
 
                 this.items.push(item);

@@ -156,8 +156,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":64,
-                 "x":395.846852693056,
-                 "y":579.710144927536
+                 "x":395.847,
+                 "y":579.71
                 }, 
                 {
                  "height":50,
@@ -193,8 +193,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":64,
-                 "x":774.835388276011,
-                 "y":572.014925373134
+                 "x":774.835,
+                 "y":572.015
                 }, 
                 {
                  "height":50,
@@ -230,8 +230,163 @@
                  "type":"enemy",
                  "visible":true,
                  "width":64,
-                 "x":1019.26541207008,
-                 "y":258.365779796669
+                 "x":1019.27,
+                 "y":258.366
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":8,
+         "name":"ItemObjects",
+         "objects":[
+                {
+                 "ellipse":true,
+                 "height":64,
+                 "id":13,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":896.169841195885,
+                 "y":511.44847725574
+                }, 
+                {
+                 "ellipse":true,
+                 "height":64,
+                 "id":16,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":960.234685073339,
+                 "y":511.833503281303
+                }, 
+                {
+                 "ellipse":true,
+                 "height":64,
+                 "id":17,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":1024.03053834288,
+                 "y":511.833503281303
+                }, 
+                {
+                 "ellipse":true,
+                 "height":64,
+                 "id":18,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":1663.82772543742,
+                 "y":127.060320567723
+                }, 
+                {
+                 "ellipse":true,
+                 "height":64,
+                 "id":19,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":2368.79285463929,
+                 "y":64.2415950559389
+                }, 
+                {
+                 "ellipse":true,
+                 "height":64,
+                 "id":20,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":2432.46482091457,
+                 "y":64.1452862102733
+                }, 
+                {
+                 "ellipse":true,
+                 "height":64,
+                 "id":21,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":2496.26493367756,
+                 "y":63.5517967892222
+                }, 
+                {
+                 "ellipse":true,
+                 "height":64,
+                 "id":22,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":639.406456051832,
+                 "y":512.120176595379
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -239,8 +394,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":8,
- "nextobjectid":5,
+ "nextlayerid":10,
+ "nextobjectid":23,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
