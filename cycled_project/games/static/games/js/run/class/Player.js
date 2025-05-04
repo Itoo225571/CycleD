@@ -20,8 +20,6 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         this.jump_count = 0;
         this.lives = config.lives || gameOptions.lives;
 
-        this.lastAccelTime = 0;
-        this.accelInterval = 30;
         this.speed = this.initSpeed;
 
         this.distPre = 0;
@@ -53,12 +51,9 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         // var isGrounded = this.body.velocity.y ===0;
         var isGrounded = this.isOnGround();
 
-        // 現在の時間（秒）
-        const currentTimeInSec = Math.floor(elapsedTime / 1000);
-        if (currentTimeInSec - this.lastAccelTime >= this.accelInterval) {
-            this.speed += this.accel;
-            this.lastAccelTime = currentTimeInSec;
-        }
+        // 60秒後にspeed + accel 分だけになっている
+        this.speed = this.initSpeed + this.accel * elapsedTime / 1000 / 60;
+        // this.speed = this.initSpeed;
 
         // 水平方向の速度を維持（Matter.jsでは setVelocity を毎フレーム使う）
         this.setVelocityX(this.speed);
@@ -127,6 +122,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         // enemyとの接触判定
         const enemies = this.scene.mapManager.enemies; // enemyが格納されている配列
         for (let enemy of enemies) {
+            if (!enemy.active) continue;
             const distanceToEnemy = Phaser.Math.Distance.Between(this.x, this.y, enemy.x, enemy.y);
             if (distanceToEnemy <= gameOptions.oneBlockSize) {
                 isGround = true; // enemyが地面として接触したとみなす
@@ -146,7 +142,6 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
     }
 
     initPlayer() {
-        this.lastAccelTime = 0;
         this.speed = this.initSpeed;
 
         // 位置と速度を初期化するならここ
