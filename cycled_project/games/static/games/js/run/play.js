@@ -28,7 +28,7 @@ export default class PlayScene extends Phaser.Scene {
         this.mapManager = new MapManager(this, tilesets);
         this.mapManager.addNextChunk();
 
-        // center point for camera follow
+        // カメラが追いかける中心点
         this.centerPoint = this.matter.add.sprite(this.scale.width / 2, this.scale.height / 2, null);
         this.centerPoint.setVisible(false);
         this.centerPoint.setIgnoreGravity(true);
