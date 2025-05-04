@@ -59,7 +59,7 @@ export default class StartScene extends Phaser.Scene {
         this.add.image(0, 0, 'sky')
             .setOrigin(0, 0)
             .setDisplaySize(this.game.config.width, this.game.config.height)
-            .setDepth(-5);
+            .setDepth(-7);
 
         // rankingSceneが起動中だったら停止する
         if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene');

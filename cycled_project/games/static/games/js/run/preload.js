@@ -107,29 +107,6 @@ export default class PreloadScene extends Phaser.Scene {
         // Item Animation
         this.createItemAnims();
 
-        // 背景レイヤーの初期化
-        this.backgroundLayers = {};
-        // 'sky' レイヤー（最も遠い）
-        this.backgroundLayers['sky'] = this.add.image(0, 0, 'sky')
-            .setOrigin(0, 0)
-            .setDisplaySize(this.game.config.width, this.game.config.height);
-        // 'mountain' レイヤー（遠景）
-        this.backgroundLayers['mountain'] = this.add.image(0, 0, 'mountain')
-            .setOrigin(0, 0)
-            .setDisplaySize(this.game.config.width, this.game.config.height);
-        // 'mountains' レイヤー（中景）
-        this.backgroundLayers['mountains'] = this.add.image(0, 0, 'mountains')
-            .setOrigin(0, 0)
-            .setDisplaySize(this.game.config.width, this.game.config.height);
-        // 'mountain-trees' レイヤー（手前の遠景）
-        this.backgroundLayers['mountain-trees'] = this.add.image(0, 0, 'mountain-trees')
-            .setOrigin(0, 0)
-            .setDisplaySize(this.game.config.width, this.game.config.height);
-        // 'trees' レイヤー（最も手前）
-        this.backgroundLayers['trees'] = this.add.image(0, 0, 'trees')
-            .setOrigin(0, 0)
-            .setDisplaySize(this.game.config.width, this.game.config.height);
-
         // this.scene.start('PlayScene');
 
         // デバッグ用: マップデータが正しくロードされたか確認

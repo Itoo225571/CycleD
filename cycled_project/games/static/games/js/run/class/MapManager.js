@@ -16,6 +16,8 @@ export default class MapManager {
         this.items = [];
         this.itemPool = this.scene.add.group();  // Phaser Group に変更
 
+        this.bgImagePool = this.scene.add.group();
+
         this.scene.matter.world.on('collisionstart', (event) => {
             event.pairs.forEach(pair => {
                 const bodyA = pair.bodyA;
@@ -81,6 +83,12 @@ export default class MapManager {
         this.manageLayerPool(4);
 
         this.currentChunkIndex += 1;
+        this.createBackgrounds();
+    }
+
+    update() {
+        this.updateEnemies();
+        this.updateBackgrounds();
     }
 
     setEnemies(chunkMap) {
@@ -372,6 +380,65 @@ export default class MapManager {
         this.currentChunkIndex = 0;
     }
     
+    createBackgrounds() {
+        this.backgroundLayers = {
+            sky: this.scene.add.image(0, 0, 'sky')
+                .setOrigin(0, 0)
+                .setDisplaySize(this.scene.game.config.width, this.scene.game.config.height)
+                .setDepth(-7)
+                .setScrollFactor(0)
+        };
+    
+        const width = this.scene.game.config.width;
+        const height = this.scene.game.config.height;
+    
+        const layerConfigs = [
+            { key: 'mountain', depth: -6, parallaxFactor: 0.2 },
+            { key: 'mountains', depth: -5, parallaxFactor: 0.4 },
+            { key: 'mountain-trees', depth: -4, parallaxFactor: 0.6 },
+            { key: 'trees', depth: -3, parallaxFactor: 0.8 }
+        ];
+    
+        this.parallaxLayers = [];
+    
+        for (const config of layerConfigs) {
+            const layerPair = [];
+    
+            for (let i = 0; i < 4; i++) {
+                const image = this.scene.add.image(i * width, 0, config.key)
+                    .setOrigin(0, 0)
+                    .setDisplaySize(width, height)
+                    .setDepth(config.depth)
+                    .setScrollFactor(config.parallaxFactor, 0);  // x方向のみ動く
+    
+                layerPair.push(image);
+            }
+    
+            this.parallaxLayers.push({
+                images: layerPair,
+                parallaxFactor: config.parallaxFactor,
+                width: width
+            });
+        }
+    }
+    updateBackgrounds() {
+        const cameraX = this.scene.cameras.main.scrollX;
+    
+        for (const layer of this.parallaxLayers) {
+            for (const image of layer.images) {
+                // パララックス位置に合わせる
+                image.x = Math.floor(image.x);
+    
+                const relX = cameraX * layer.parallaxFactor;
+                const offsetX = relX % layer.width;
+    
+                // 背景を左から右に無限ループさせる
+                if (image.x + layer.width < cameraX - layer.width) {
+                    image.x += layer.width * 4;
+                }
+            }
+        }
+    } 
 }
 
 // 複数タイルセット対応
