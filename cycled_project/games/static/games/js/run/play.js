@@ -36,7 +36,6 @@ export default class PlayScene extends Phaser.Scene {
         this.centerPoint.body.isSensor = true;
 
         if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene'); 
-
     }
 
     update(time, delta) {
@@ -52,7 +51,7 @@ export default class PlayScene extends Phaser.Scene {
         if (this.player.x > guideX) {
             this.mapManager.addNextChunk();
         }
-        this.mapManager.updateEnemies();
+        this.mapManager.update();
 
         const leftBound = cam.scrollX - (cam.width / 6);
         const bottomBound = cam.scrollY + cam.height * 7 / 6;
@@ -61,8 +60,7 @@ export default class PlayScene extends Phaser.Scene {
         if (outOfBounds) {
             this.loseLife(false);
         }
-
-    }
+    }    
 
     loseLifeAfetr() {
         const is_alive = this.player.loseLife();
