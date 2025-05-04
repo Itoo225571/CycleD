@@ -123,7 +123,7 @@
          "name":"EnemyObjects",
          "objects":[
                 {
-                 "height":50,
+                 "height":96,
                  "id":1,
                  "name":"MonsieurMush",
                  "properties":[
@@ -155,12 +155,12 @@
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
-                 "width":64,
-                 "x":395.847,
-                 "y":579.71
+                 "width":96,
+                 "x":391.674411558759,
+                 "y":531.211396117963
                 }, 
                 {
-                 "height":50,
+                 "height":96,
                  "id":3,
                  "name":"MonsieurMush",
                  "properties":[
@@ -192,12 +192,12 @@
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
-                 "width":64,
-                 "x":774.835,
-                 "y":572.015
+                 "width":96,
+                 "x":770.662411558759,
+                 "y":523.516396117963
                 }, 
                 {
-                 "height":50,
+                 "height":96,
                  "id":4,
                  "name":"MonsieurMush",
                  "properties":[
@@ -219,7 +219,7 @@
                         {
                          "name":"speed",
                          "type":"float",
-                         "value":2
+                         "value":1
                         }, 
                         {
                          "name":"weak",
@@ -229,9 +229,9 @@
                  "rotation":0,
                  "type":"enemy",
                  "visible":true,
-                 "width":64,
-                 "x":1019.27,
-                 "y":258.366
+                 "width":96,
+                 "x":997.839501683399,
+                 "y":198.362122867723
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -259,8 +259,8 @@
                  "type":"item",
                  "visible":true,
                  "width":64,
-                 "x":896.169841195885,
-                 "y":511.44847725574
+                 "x":896.17,
+                 "y":511.448
                 }, 
                 {
                  "ellipse":true,
@@ -277,8 +277,8 @@
                  "type":"item",
                  "visible":true,
                  "width":64,
-                 "x":960.234685073339,
-                 "y":511.833503281303
+                 "x":960.235,
+                 "y":511.834
                 }, 
                 {
                  "ellipse":true,
@@ -295,8 +295,8 @@
                  "type":"item",
                  "visible":true,
                  "width":64,
-                 "x":1024.03053834288,
-                 "y":511.833503281303
+                 "x":1024.03,
+                 "y":511.834
                 }, 
                 {
                  "ellipse":true,
@@ -313,8 +313,8 @@
                  "type":"item",
                  "visible":true,
                  "width":64,
-                 "x":1663.82772543742,
-                 "y":127.060320567723
+                 "x":1663.83,
+                 "y":127.06
                 }, 
                 {
                  "ellipse":true,
@@ -331,8 +331,8 @@
                  "type":"item",
                  "visible":true,
                  "width":64,
-                 "x":2368.79285463929,
-                 "y":64.2415950559389
+                 "x":2368.79,
+                 "y":64.2416
                 }, 
                 {
                  "ellipse":true,
@@ -349,8 +349,8 @@
                  "type":"item",
                  "visible":true,
                  "width":64,
-                 "x":2432.46482091457,
-                 "y":64.1452862102733
+                 "x":2432.46,
+                 "y":64.1453
                 }, 
                 {
                  "ellipse":true,
@@ -367,8 +367,8 @@
                  "type":"item",
                  "visible":true,
                  "width":64,
-                 "x":2496.26493367756,
-                 "y":63.5517967892222
+                 "x":2496.26,
+                 "y":63.5518
                 }, 
                 {
                  "ellipse":true,
@@ -385,8 +385,8 @@
                  "type":"item",
                  "visible":true,
                  "width":64,
-                 "x":639.406456051832,
-                 "y":512.120176595379
+                 "x":639.406,
+                 "y":512.12
                 }],
          "opacity":1,
          "type":"objectgroup",

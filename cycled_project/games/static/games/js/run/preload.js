@@ -63,7 +63,7 @@ export default class PreloadScene extends Phaser.Scene {
                 this.load.spritesheet(
                     chara + situation, 
                     `${imgDir}${chara}/${situation}.png`, 
-                    { frameWidth: 64, frameHeight: 64 },    // 拡大して使う
+                    { frameWidth: 32, frameHeight: 32 },
                 );
             });
         });
@@ -136,7 +136,7 @@ export default class PreloadScene extends Phaser.Scene {
                 repeat: -1
             });
             this.anims.create({
-                key: name + 'Stop',
+                key: name + 'Idle',
                 frames: this.anims.generateFrameNumbers(name + 'Idle', { start: 0, end: 10 }),
                 frameRate: 10,
                 repeat: -1
@@ -158,7 +158,7 @@ export default class PreloadScene extends Phaser.Scene {
                 repeat: -1
             });
             this.anims.create({
-                key: name + 'Stop',
+                key: name + 'Idle',
                 frames: this.anims.generateFrameNumbers(name + 'Idle', { start: 0, end: 13 }),
                 frameRate: 10,
                 repeat: -1

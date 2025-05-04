@@ -86,6 +86,7 @@ export default class PlayScene extends Phaser.Scene {
         this.player.anims.stop(); // アニメーション停止
         // フレーム指定でテクスチャを一時的に切り替え
         this.player.setTexture(this.player.playerName + 'Hit', 6); // 第2引数にフレーム番号（または名前）
+        this.player.setDepth(10);   //この時だけ最前線で表示
     
         if (jump) {
             this.cameras.main.shake(500,0.01);  //画面振動
@@ -116,7 +117,8 @@ export default class PlayScene extends Phaser.Scene {
                                 this.player.setAngle(0);             // 角度リセット
                                 this.player.setStatic(false);       // 動的に戻す
                                 this.player.setCollisionCategory(this.matter.world.nextCategory()); // 元のカテゴリに再設定
-                                this.player.setVelocity(0, 0);      // 慣性などリセット    
+                                this.player.setVelocity(0, 0);      // 慣性などリセット 
+                                this.player.setDepth(10);   
                                 
                                 this.loseLifeAfetr(); // アニメーション後に後処理を呼び出し
                             }
@@ -126,6 +128,7 @@ export default class PlayScene extends Phaser.Scene {
             });
         } else {
             this.player.setStatic(false);
+            this.player.setDepth(10);
             this.player.setCollisionCategory(this.matter.world.nextCategory()); // 元のカテゴリに再設定
             this.cameras.main.shake(500,0.01);  //画面振動
             this.time.delayedCall(1500, () => {
