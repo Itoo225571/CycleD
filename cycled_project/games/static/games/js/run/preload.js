@@ -31,8 +31,23 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('mountain-trees', `${imgDir}background/mountain-trees.png`);
         this.load.image('trees', `${imgDir}background/trees.png`);
 
-        // coin
-        this.load.image('coin_bronze', `${imgDir}coin_bronze.png`);
+        // item
+        this.items = [
+            { name : 'coin_bronze', size: 32, start:0, end:5 }
+        ];
+        this.items.forEach(({ name, size}) => {
+            this.load.spritesheet(
+                name, 
+                `${imgDir}${name}.png`, 
+                { frameWidth: size, frameHeight: size },    // 拡大して使う
+            );
+        });
+
+        this.load.spritesheet(
+            'coin_bronze', 
+            `${imgDir}coin_bronze.png`, 
+            { frameWidth: 32, frameHeight: 32 },
+        );
 
         // Enemy
         this.enemySituations = [
@@ -88,7 +103,9 @@ export default class PreloadScene extends Phaser.Scene {
         // Charachter Animation
         this.createCharaAnims();
         // Enemy Animation
-        this.createEnemyAnims()
+        this.createEnemyAnims();
+        // Item Animation
+        this.createItemAnims();
 
         // 背景レイヤーの初期化
         this.backgroundLayers = {};
@@ -175,6 +192,17 @@ export default class PreloadScene extends Phaser.Scene {
                 frameRate: 10,
                 repeat: -1
             });
+        });
+    }
+
+    createItemAnims() {
+        this.items.forEach(({ name, size, start, end }) => {
+            this.anims.create({
+                key: name,
+                frames: this.anims.generateFrameNumbers(name, { start: start, end: end }),
+                frameRate: 15,
+                repeat: -1
+            }); 
         });
     }
 
