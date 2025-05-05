@@ -156,8 +156,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":475.727810858923,
-                 "y":614.815730307076
+                 "x":475.728,
+                 "y":614.816
                 }, 
                 {
                  "height":96,
@@ -172,17 +172,17 @@
                         {
                          "name":"patrol",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"range",
                          "type":"float",
-                         "value":-1
+                         "value":2
                         }, 
                         {
                          "name":"speed",
                          "type":"float",
-                         "value":0
+                         "value":2
                         }, 
                         {
                          "name":"weak",
@@ -193,8 +193,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":1772.61863370275,
-                 "y":593.140387649733
+                 "x":1816.70951002412,
+                 "y":603.954408119125
                 }],
          "opacity":1,
          "type":"objectgroup",
