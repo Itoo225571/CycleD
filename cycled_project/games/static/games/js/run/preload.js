@@ -140,12 +140,12 @@ export default class PreloadScene extends Phaser.Scene {
                 frameRate: 10,
                 repeat: -1
             });
-            // this.anims.create({
-            //     key: name + 'Dead',
-            //     frames: this.anims.generateFrameNumbers(name + 'Hit', { start: 0, end: 6 }),
-            //     frameRate: 1,
-            //     repeat: 0
-            // });
+            this.anims.create({
+                key: name + 'Dead',
+                frames: this.anims.generateFrameNumbers(name + 'Hit', { start: 0, end: 6 }),
+                frameRate: 1,
+                repeat: 0
+            });
         });
     }
     createEnemyAnims() {
@@ -188,9 +188,9 @@ export default class PreloadScene extends Phaser.Scene {
     
             this.anims.create({
                 key: name + 'Dead',
-                frames: this.anims.generateFrameNumbers(deadKey, { start: 0, end: deadEnd }),
-                frameRate: 10,
-                repeat: -1
+                frames: this.anims.generateFrameNumbers(deadKey, { start: deadEnd, end: deadEnd }),     //アニメーションにしない
+                frameRate: 100,
+                repeat: 0
             });
         });
     }

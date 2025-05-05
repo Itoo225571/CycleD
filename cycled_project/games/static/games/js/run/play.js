@@ -35,6 +35,20 @@ export default class PlayScene extends Phaser.Scene {
         this.cameras.main.startFollow(this.centerPoint, false, 1, 0);
         this.centerPoint.body.isSensor = true;
 
+        // スコアの表示
+        this.distText = this.add.text(30, 20, `0.0`, {
+            fontFamily: '"Press Start 2P"',
+            fontSize: '32px',
+            fill: '#ffffff'
+        }).setScrollFactor(0);
+        // ポーズボタン
+        this.pauseButton = this.add.sprite(this.cameras.main.width - 50, 50, 'inputPrompts', 538)
+                            .setOrigin(0.5)
+                            .setScrollFactor(0)
+                            .setDisplaySize(64,64)
+                            .setInteractive({ useHandCursor: true });
+        // this.pauseButton.on('pointerdown', this.pauseGame, this);
+
         if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene'); 
     }
 
@@ -53,10 +67,13 @@ export default class PlayScene extends Phaser.Scene {
         }
         this.mapManager.update();
 
+        // スコア更新表示
+        this.score = this.player.dist;
+        this.distText.setText(`${strScore(this.score)}`);
+
         const leftBound = cam.scrollX - (cam.width / 6);
         const bottomBound = cam.scrollY + cam.height * 7 / 6;
         const outOfBounds = this.player.x < leftBound || this.player.y > bottomBound;
-
         if (outOfBounds) {
             this.loseLife(false);
         }
@@ -69,6 +86,7 @@ export default class PlayScene extends Phaser.Scene {
             this.respawnPlayer();
         } else {
             this.scene.start('StartScene');
+            // this.GameOver();
         }
     }
     loseLife(jump=false) {
@@ -161,6 +179,16 @@ export default class PlayScene extends Phaser.Scene {
     }
     rePlayGame() {
         this.scene.restart();
+    }
+
+    pauseGame() {
+        this.input.enabled = false;  // 全てのインタラクションを無効化
+        this.scene.pause();
+        this.input.once('pointerdown', this.resumeGame, this);
+    }
+    resumeGame() {
+        this.scene.resume();
+        this.input.enabled = true;
     }
 
     GameOver(is_newrecord = false) {
