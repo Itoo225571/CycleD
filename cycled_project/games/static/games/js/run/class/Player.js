@@ -68,7 +68,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         // カメラ位置に合わせる
         let playerPos = cam.scrollX + gameOptions.playerStartPosition;
         let diff = playerPos - this.x;
-        if (Math.abs(diff) > 50 && isGrounded) {
+        if (Math.abs(diff) > 10 && isGrounded) {
             let correction = diff /10;
             this.setVelocityX(this.speed + correction);
         }
@@ -90,11 +90,11 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             // Matterでは setVelocityY はないので force を使う方が自然
             this.setVelocityY(-Math.abs(this.jumpForce)); // jumpForce を適度に調整
             this.jump_count++;
-            if (!isGrounded) this.jump_count++; //地面じゃない場合さらに加算
 
-            if (this.jump_count === 1) {
+            if (isGrounded) {
                 this.anims.play(this.playerName + 'Jump', true);
             } else {
+                // 空中にいる場合は特殊ジャンプにする
                 var name = this.scene.anims.get(this.playerName + 'Jump_ex') ? this.playerName + 'Jump_ex' : this.playerName + 'Jump';
                 this.anims.play(name, true);
             }

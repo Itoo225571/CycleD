@@ -42,7 +42,7 @@ export const gameConfig = {
                 y: gameOptions.garavityForce,
             },
             enableSleep: true,
-            // debug: false,
+            debug: false,
         }
     },
     plugins: {
