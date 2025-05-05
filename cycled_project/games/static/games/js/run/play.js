@@ -47,7 +47,7 @@ export default class PlayScene extends Phaser.Scene {
                             .setScrollFactor(0)
                             .setDisplaySize(64,64)
                             .setInteractive({ useHandCursor: true });
-        // this.pauseButton.on('pointerdown', this.pauseGame, this);
+        this.pauseButton.on('pointerdown', this.pauseGame, this);
 
         if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene'); 
     }
@@ -172,6 +172,7 @@ export default class PlayScene extends Phaser.Scene {
 
         this.centerPoint.setPosition(this.scale.width / 2, this.scale.height / 2);
         this.cameras.main.startFollow(this.centerPoint, false, 1, 0);
+        this.player.setVelocity(1,1)
 
         this.isPaused = false;
         this.input.enabled = true;
@@ -179,18 +180,31 @@ export default class PlayScene extends Phaser.Scene {
     }
     rePlayGame() {
         this.scene.restart();
+        this.isPaused = false;
     }
 
     pauseGame() {
-        this.input.enabled = false;  // 全てのインタラクションを無効化
+        if (this.scene.isPaused('PlayScene')) return;  //重複を避ける
+        this.isPaused = true;
+        this.input.enabled = false;  // 全体の入力を一時的に無効化
         this.scene.pause();
-        this.input.once('pointerdown', this.resumeGame, this);
+
+        if (!this.scene.isActive('PauseScene')) {
+            // 起動していなければ、RankingSceneをオーバーレイとして開始
+            this.scene.launch('PauseScene');
+        }
+        const pauseScene = this.scene.get('PauseScene');
+        pauseScene.onBringToTop?.();  // ポーズ時に実行する関数
+        this.scene.bringToTop('PauseScene');
     }
+    
     resumeGame() {
         this.scene.resume();
-        this.input.enabled = true;
+        this.matter.world.resume();     // これを入れないと動かない
+        this.input.enabled = true; 
+        this.isPaused = false;
     }
-
+    
     GameOver(is_newrecord = false) {
         var stHeight = 100;
         this.gameOverText = this.add.text(
@@ -281,13 +295,6 @@ export default class PlayScene extends Phaser.Scene {
         this.pauseGame(this.resumeBtns);
     }
 
-    handleFocus() {
-        // 自前でポーズしていなかったら
-        if (!this.selfPased) {
-            this.resumeGame();
-        }
-    }
-
     postScore() {
         var id = score_id;
         var score = this.score;
@@ -329,9 +336,6 @@ export default class PlayScene extends Phaser.Scene {
             this.scene.launch('RankingScene');
         }
         this.gameOverText.setAlpha(0);  //titleを隠す
-    }
-    preBackScene() {
-        this.gameOverText.setAlpha(1);  //titleを見せる
     }
 
     // シーン終了時にイベントリスナーを削除

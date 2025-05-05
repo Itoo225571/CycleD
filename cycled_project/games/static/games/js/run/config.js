@@ -2,6 +2,7 @@ import PreloadScene from './preload.js';
 import PlayScene from './play.js';
 import StartScene from './start.js';
 import RankingScene from './ranking.js';
+import PauseScene from './pause.js'
 
 export const gameOptions = {
     playerStartSpeed: 5,
@@ -26,7 +27,7 @@ export const gameConfig = {
     width: 1334,
     height: 750,
     pixelArt: true,
-    scene: [PreloadScene, StartScene, PlayScene, RankingScene], // シーンの順番
+    scene: [PreloadScene, StartScene, PlayScene, RankingScene, PauseScene], // シーンの順番
     backgroundColor: 0x444444,
     parent: 'game-container',
     physics: {
@@ -41,7 +42,7 @@ export const gameConfig = {
                 y: gameOptions.garavityForce,
             },
             enableSleep: true,
-            debug: false,
+            // debug: false,
         }
     },
     plugins: {

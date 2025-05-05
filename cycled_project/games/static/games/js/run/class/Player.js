@@ -42,13 +42,16 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         this.setFrictionStatic(0);    // 静止摩擦
         this.setFrictionAir(0);       // 空気抵抗
 
+        this.just_jumped = false;
+
         this.body.label = 'player';
     }
 
     update(elapsedTime, cam) {
-        if (this.scene.isPaused) return;
-        // var isGrounded = this.scene.skaterTouchingGround;
-        // var isGrounded = this.body.velocity.y ===0;
+        if (this.scene.scene.isPaused('PlayScene')) {
+            return;
+        }
+
         var isGrounded = this.isOnGround();
 
         // 60秒後にspeed + accel 分だけになっている
@@ -73,26 +76,21 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         // 地面にいるときは run アニメーション
         if (isGrounded) {
             this.anims.play(this.playerName + 'Run', true);
+            this.jump_count = 0;
+            
             // this.setIgnoreGravity(true);  // 重力を無効にする
             // this.setVelocityY(0);         // ついでに下方向の速度をリセット
         }
     }
 
     jump() {
-        // 着地判定は body.velocity.y === 0 で代替（またはセンサー判定でも可能）
-        // const isGrounded = Math.abs(this.body.velocity.y) < 0.01;
-        // var isGrounded = this.body.velocity.y ===0;
-        // var isGrounded = this.scene.skaterTouchingGround;
         var isGrounded = this.isOnGround();
 
-        if (isGrounded || (this.jump_count > 0 && this.jump_count < this.jumps)) {
-            if (isGrounded) {
-                this.jump_count = 0;
-            }
-
+        if (this.jump_count < this.jumps) {
             // Matterでは setVelocityY はないので force を使う方が自然
             this.setVelocityY(-Math.abs(this.jumpForce)); // jumpForce を適度に調整
             this.jump_count++;
+            if (!isGrounded) this.jump_count++; //地面じゃない場合さらに加算
 
             if (this.jump_count === 1) {
                 this.anims.play(this.playerName + 'Jump', true);
@@ -100,10 +98,17 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
                 var name = this.scene.anims.get(this.playerName + 'Jump_ex') ? this.playerName + 'Jump_ex' : this.playerName + 'Jump';
                 this.anims.play(name, true);
             }
+
+            // just_jumped を 0.5秒だけ true にする
+            this.just_jumped = true;
+            this.scene.time.delayedCall(500, () => {
+                this.just_jumped = false;
+            });
         }
     }
 
     isOnGround() {
+        if (this.just_jumped)   return false;   //ジャンプしたばかりはfalseを返す
         this.raycaster.mapGameObjects(this.scene.mapManager.collisionTiles, true);
     
         // プレイヤーの現在位置から少し下にRayを飛ばす（角度=π/2）
@@ -145,4 +150,5 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         this.setVelocity(0, 0);
         this.setPosition(gameOptions.playerStartPosition, this.scene.scale.height / 2);
     }
+
 }
