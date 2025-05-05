@@ -102,6 +102,7 @@ export default class MapManager {
 
                 const enemy = this.getObjFromPool(this.enemyPool, name, obj.x + this.nextChunkX, obj.y);
                 enemy.chunkX = this.nextChunkX;
+                enemy.name = name;
 
                 // 画像のサイズをオブジェクトのサイズに合わせて変更
                 const largerSize = Math.max(width, height);
@@ -174,6 +175,7 @@ export default class MapManager {
                 enemy.body.frictionAir = 0;
                 enemy.body.gravityScale = 1;
                 enemy.setFixedRotation();
+                enemy.setAlpha(1);  //見た目をなおす
 
                 // 重力
                 enemy.setIgnoreGravity(enemy.gravityIgnore);
@@ -299,7 +301,8 @@ export default class MapManager {
         
             enemy.is_alive = false;
             // 敵を消すまたは反応させる場合
-            enemy.setTint(0xff0000); // 敵に赤い色をつける（オプション）
+            enemy.setAlpha(0.7);
+            enemy.play(enemy.name + 'Dead');
             enemy.setVelocityY(-10); // 敵も少し跳ねる（オプション）
             enemy.setCollisionCategory(null);
             enemy.setDepth(10);   //この時だけ最前線で表示

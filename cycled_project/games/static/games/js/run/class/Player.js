@@ -58,9 +58,9 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         // 水平方向の速度を維持（Matter.jsでは setVelocity を毎フレーム使う）
         this.setVelocityX(this.speed);
 
-        // 移動距離の加算
-        if (this.distPre === 0) this.dist = this.x;
-        else this.dist = this.distPre + this.x;
+        // 移動距離の加算 (1ブロック当たり1mとする)
+        if (this.distPre === 0) this.dist = this.x / gameOptions.oneBlockSize;
+        else this.dist = this.distPre + this.x / gameOptions.oneBlockSize;
 
         // カメラ位置に合わせる
         let playerPos = cam.scrollX + gameOptions.playerStartPosition;
@@ -75,8 +75,6 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             this.anims.play(this.playerName + 'Run', true);
             // this.setIgnoreGravity(true);  // 重力を無効にする
             // this.setVelocityY(0);         // ついでに下方向の速度をリセット
-        } else {
-            this.setIgnoreGravity(false); // 空中では重力あり
         }
     }
 
@@ -133,7 +131,6 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         return isGround;
     }
     
-
     loseLife() {
         this.lives--;
         this.distPre += this.dist;
