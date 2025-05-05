@@ -1,4 +1,4 @@
-import { gameOptions } from '../config.js';
+import { gameOptions,CATEGORY } from '../config.js';
 
 export default class MapManager {
     constructor(scene, tilesetKeyArray) {
@@ -105,7 +105,20 @@ export default class MapManager {
 
                 // 画像のサイズをオブジェクトのサイズに合わせて変更
                 const largerSize = Math.max(width, height);
-                enemy.setDisplaySize(largerSize,largerSize);
+                const frame = this.scene.textures.get(name).getSourceImage();
+                const aspect = frame.width/frame.height;
+
+                let displayWidth, displayHeight;
+                if (aspect >= 1) {
+                    // 横長画像：横をlargerSizeに合わせる
+                    displayWidth = largerSize;
+                    displayHeight = largerSize / aspect;
+                } else {
+                    // 縦長画像：縦をlargerSizeに合わせる
+                    displayHeight = largerSize;
+                    displayWidth = largerSize * aspect;
+                }
+                enemy.setDisplaySize(displayWidth, displayHeight);
 
                 // プロパティ
                 enemy.speed = getProp(obj, 'speed', 0);
@@ -168,6 +181,9 @@ export default class MapManager {
                 enemy.chunkIndex = this.currentChunkIndex;
 
                 enemy.originCoord = [obj.x + this.nextChunkX, obj.y];
+
+                enemy.setCollisionCategory(CATEGORY.ENEMY);
+                enemy.setCollidesWith(CATEGORY.PLAYER | CATEGORY.WALL);
 
                 this.enemies.push(enemy);
             });
@@ -346,6 +362,9 @@ export default class MapManager {
                 
                 item.chunkIndex = this.currentChunkIndex;
 
+                item.setCollisionCategory(CATEGORY.ITEM);
+                item.setCollidesWith(CATEGORY.PLAYER); // 敵とは衝突させない
+
                 this.items.push(item);
             });
         }
@@ -370,19 +389,28 @@ export default class MapManager {
 
     convertLayerToMatterBodies = (layer, label) => {
         if (!layer) return;
-
+    
         layer.setCollisionByProperty({ collides: true });
         this.scene.matter.world.convertTilemapLayer(layer);
-
+    
         layer.forEachTile(tile => {
             if (tile.properties.collides) {
                 const matterBody = tile.physics.matterBody?.body;
+    
                 if (matterBody) {
+                    // collisionCategory と collisionMask を設定
+                    matterBody.collisionFilter = {
+                        category: CATEGORY.WALL,  // 壁カテゴリを設定
+                        mask: CATEGORY.PLAYER | CATEGORY.ITEM | CATEGORY.ENEMY,  // 衝突する相手カテゴリ
+                    };
+    
+                    // 衝突する物体をリストに追加
                     this.collisionTiles.push(matterBody);
                 }
             }
         });
     };
+    
 
     getLayerFromPool(chunkMap, name, tilesets) {
         let layer = this.layerPool.getFirstDead(false);

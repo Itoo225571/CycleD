@@ -55,18 +55,23 @@ export default class PreloadScene extends Phaser.Scene {
             'Idle',
             'Run',
         ]
-        this.enemyNames = [
-            'MonsieurMush'
+        this.enemyList = [
+            {name:'MonsieurMush', height: 32, width: 32},
+            {name:'TBird', height: 32, width: 32},
+            {name:'AngryPig', height: 30, width: 36},
         ]
-        this.enemyNames.forEach((chara) => {  // アロー関数に変更
-            this.enemySituations.forEach((situation) => {  // アロー関数に変更
+        this.enemyList.forEach((enemy) => {
+            this.enemySituations.forEach((situation) => {
                 this.load.spritesheet(
-                    chara + situation, 
-                    `${imgDir}${chara}/${situation}.png`, 
-                    { frameWidth: 32, frameHeight: 32 },
+                    enemy.name + situation, 
+                    `${imgDir}${enemy.name}/${situation}.png`, 
+                    {
+                        frameWidth: enemy.width,
+                        frameHeight: enemy.height
+                    }
                 );
             });
-        });
+        });        
 
         //player
         this.playerSituations = [
@@ -90,11 +95,7 @@ export default class PreloadScene extends Phaser.Scene {
                 );
             });
         });
-        // 地面
-        // this.load.spritesheet('terrain', `${imgDir}/Terrain.png`, {
-        //     frameWidth: 32,
-        //     frameHeight: 32,
-        // });
+        
         // map読み込み
         this.loadMap();
     }
@@ -106,8 +107,6 @@ export default class PreloadScene extends Phaser.Scene {
         this.createEnemyAnims();
         // Item Animation
         this.createItemAnims();
-
-        // this.scene.start('PlayScene');
 
         // デバッグ用: マップデータが正しくロードされたか確認
         // const startMap = this.cache.tilemap.get('startMap');
@@ -141,16 +140,17 @@ export default class PreloadScene extends Phaser.Scene {
                 frameRate: 10,
                 repeat: -1
             });
-            this.anims.create({
-                key: name + 'Dead',
-                frames: this.anims.generateFrameNumbers(name + 'Hit', { start: 0, end: 6 }),
-                frameRate: 1,
-                repeat: 0
-            });
+            // this.anims.create({
+            //     key: name + 'Dead',
+            //     frames: this.anims.generateFrameNumbers(name + 'Hit', { start: 0, end: 6 }),
+            //     frameRate: 1,
+            //     repeat: 0
+            // });
         });
     }
     createEnemyAnims() {
-        this.enemyNames.forEach((name) => {
+        this.enemyList.forEach((enemy) => {
+            var name = enemy.name;
             const getFrameCount = (key) => {
                 const texture = this.textures.get(key);
                 if (!texture) {

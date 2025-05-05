@@ -1,4 +1,4 @@
-import { gameOptions } from './config.js';
+import { gameOptions, CATEGORY } from './config.js';
 import { createBtn } from './preload.js';
 import Player from './class/Player.js';
 import MapManager from './class/MapManager.js';
@@ -116,7 +116,8 @@ export default class PlayScene extends Phaser.Scene {
                             onComplete: () => {
                                 this.player.setAngle(0);             // 角度リセット
                                 this.player.setStatic(false);       // 動的に戻す
-                                this.player.setCollisionCategory(this.matter.world.nextCategory()); // 元のカテゴリに再設定
+                                this.player.setCollisionCategory(CATEGORY.PLAYER); // 元のカテゴリに再設定
+                                this.player.setCollidesWith(CATEGORY.ENEMY | CATEGORY.WALL | CATEGORY.ITEM);    //enemy,wall,itemとぶつかる設定
                                 this.player.setVelocity(0, 0);      // 慣性などリセット 
                                 this.player.setDepth(10);   
                                 
@@ -129,7 +130,8 @@ export default class PlayScene extends Phaser.Scene {
         } else {
             this.player.setStatic(false);
             this.player.setDepth(10);
-            this.player.setCollisionCategory(this.matter.world.nextCategory()); // 元のカテゴリに再設定
+            this.player.setCollisionCategory(CATEGORY.PLAYER);
+            this.player.setCollidesWith(CATEGORY.ENEMY | CATEGORY.WALL | CATEGORY.ITEM);
             this.cameras.main.shake(500,0.01);  //画面振動
             this.time.delayedCall(1500, () => {
                 this.loseLifeAfetr();
