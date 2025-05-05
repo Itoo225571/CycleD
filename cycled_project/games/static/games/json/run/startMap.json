@@ -140,7 +140,7 @@
                         {
                          "name":"range",
                          "type":"float",
-                         "value":-1
+                         "value":1
                         }, 
                         {
                          "name":"speed",
@@ -156,8 +156,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":1867.03761819907,
-                 "y":523.726076472847
+                 "x":1867.04,
+                 "y":523.726
                 }, 
                 {
                  "height":96,
@@ -193,8 +193,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":1274.38251967087,
-                 "y":527.476378401466
+                 "x":1274.38,
+                 "y":527.476
                 }],
          "opacity":1,
          "type":"objectgroup",

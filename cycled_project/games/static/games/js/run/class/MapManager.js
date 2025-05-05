@@ -107,9 +107,15 @@ export default class MapManager {
                 const largerSize = Math.max(width, height);
                 enemy.setDisplaySize(largerSize,largerSize);
 
+                // プロパティ
                 enemy.speed = getProp(obj, 'speed', 0);
                 enemy.direction = getProp(obj, 'direction', 'left');
                 enemy.weak = getProp(obj, 'weak', 'none');
+                enemy.gravityIgnore = getProp(obj, 'gravityIgnore', false);
+                enemy.patrol = getProp(obj, 'patrol', false);
+                enemy.range = getProp(obj, 'range', -1);    // -1は無限を表す
+
+                enemy.is_alive = true;  //生きてる
 
                 if (enemy.speed != 0 && (enemy.direction === 'left' || enemy.direction === 'right')) {
                     enemy.play(name + 'Run');
@@ -157,10 +163,11 @@ export default class MapManager {
                 enemy.setFixedRotation();
 
                 // 重力
-                const gravityIgnore = getProp(obj, 'gravityIgnore', false);
-                enemy.setIgnoreGravity(gravityIgnore);
+                enemy.setIgnoreGravity(enemy.gravityIgnore);
 
                 enemy.chunkIndex = this.currentChunkIndex;
+
+                enemy.originCoord = [obj.x + this.nextChunkX, obj.y];
 
                 this.enemies.push(enemy);
             });
@@ -202,15 +209,45 @@ export default class MapManager {
             if (!enemy.active) return;  // enemyがアクティブでない場合は処理をスキップ
 
             var speed = enemy.speed;
-            if (cameraRight < enemy.chunkX || cameraRight > enemy.chunkX + this.chunkWidth) {
-                speed = speed / 3;
-            }
-            const direction = enemy.direction;
-
-            if (direction === 'left') {
-                enemy.setVelocityX(-speed);
-            } else if (direction === 'right') {
-                enemy.setVelocityX(speed);
+            if (cameraRight < enemy.chunkX) {
+                // カメラ外の場合動かない
+                enemy.setVelocityY(0);
+                enemy.setVelocityX(0);
+            } else{
+                if (enemy.is_alive) {
+                    var block = gameOptions.oneBlockSize;
+                    switch (enemy.direction) {
+                        case 'left':
+                            if (enemy.patrol && enemy.x <= enemy.originCoord[0] - enemy.range * block) {
+                                enemy.direction = 'right';
+                            }
+                            enemy.setVelocityX(-speed);
+                            enemy.flipX = false;
+                            break;
+                    
+                        case 'right':
+                            if (enemy.patrol && enemy.x >= enemy.originCoord[0]) {
+                                enemy.direction = 'left';
+                            }
+                            enemy.setVelocityX(speed);
+                            enemy.flipX = true;
+                            break;
+                    
+                        case 'up':
+                            if (enemy.patrol && enemy.y <= enemy.originCoord[1] - enemy.range * block) {
+                                enemy.direction = 'down';
+                            }
+                            enemy.setVelocityY(-speed);
+                            break;
+                    
+                        case 'down':
+                            if (enemy.patrol && enemy.y >= enemy.originCoord[1]) {
+                                enemy.direction = 'up';
+                            }
+                            enemy.setVelocityY(speed);
+                            break;
+                    }
+                }
             }
         });
     }
@@ -244,6 +281,7 @@ export default class MapManager {
         if (collisionDirection === enemy.weak) {
             player.setVelocityY(-player.jumpForce); // 上に弾む（速度を調整）
         
+            enemy.is_alive = false;
             // 敵を消すまたは反応させる場合
             enemy.setTint(0xff0000); // 敵に赤い色をつける（オプション）
             enemy.setVelocityY(-10); // 敵も少し跳ねる（オプション）

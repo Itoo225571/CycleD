@@ -150,27 +150,51 @@ export default class PreloadScene extends Phaser.Scene {
         });
     }
     createEnemyAnims() {
-        this.enemyNames.forEach((name) => {  // アロー関数に変更
+        this.enemyNames.forEach((name) => {
+            const getFrameCount = (key) => {
+                const texture = this.textures.get(key);
+                if (!texture) {
+                    console.warn(`Texture for ${key} not found`);
+                    return 0;
+                }
+    
+                // フレーム数 = キーに紐づくフレームの数（frameNumberが整数のものだけ）
+                return Object.keys(texture.frames)
+                    .filter(f => !isNaN(parseInt(f)))  // "0", "1", ..., "13" のようなものだけ
+                    .length;
+            };
+    
+            const runKey = name + 'Run';
+            const idleKey = name + 'Idle';
+            const deadKey = name + 'Hit';
+    
+            const runEnd = getFrameCount(runKey) - 1;
+            const idleEnd = getFrameCount(idleKey) - 1;
+            const deadEnd = getFrameCount(deadKey) - 1;
+    
             this.anims.create({
                 key: name + 'Run',
-                frames: this.anims.generateFrameNumbers(name + 'Run', { start: 0, end: 13 }),
+                frames: this.anims.generateFrameNumbers(runKey, { start: 0, end: runEnd }),
                 frameRate: 30,
                 repeat: -1
             });
+    
             this.anims.create({
                 key: name + 'Idle',
-                frames: this.anims.generateFrameNumbers(name + 'Idle', { start: 0, end: 13 }),
+                frames: this.anims.generateFrameNumbers(idleKey, { start: 0, end: idleEnd }),
                 frameRate: 10,
                 repeat: -1
             });
+    
             this.anims.create({
                 key: name + 'Dead',
-                frames: this.anims.generateFrameNumbers(name + 'Hit', { start: 0, end: 4 }),
+                frames: this.anims.generateFrameNumbers(deadKey, { start: 0, end: deadEnd }),
                 frameRate: 10,
                 repeat: -1
             });
         });
     }
+    
 
     createItemAnims() {
         this.items.forEach(({ name, size, start, end }) => {
