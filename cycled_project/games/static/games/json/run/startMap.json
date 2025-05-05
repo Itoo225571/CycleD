@@ -125,27 +125,27 @@
                 {
                  "height":96,
                  "id":15,
-                 "name":"MonsieurMush",
+                 "name":"TBird",
                  "properties":[
                         {
                          "name":"direction",
                          "type":"string",
-                         "value":"left"
+                         "value":"up"
                         }, 
                         {
                          "name":"patrol",
                          "type":"bool",
-                         "value":false
+                         "value":true
                         }, 
                         {
                          "name":"range",
                          "type":"float",
-                         "value":1
+                         "value":6
                         }, 
                         {
                          "name":"speed",
                          "type":"float",
-                         "value":2
+                         "value":3
                         }, 
                         {
                          "name":"weak",
@@ -156,8 +156,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":1867.04,
-                 "y":523.726
+                 "x":2224.24930232558,
+                 "y":512
                 }, 
                 {
                  "height":96,
@@ -195,6 +195,43 @@
                  "width":96,
                  "x":1274.38,
                  "y":527.476
+                }, 
+                {
+                 "height":96,
+                 "id":26,
+                 "name":"MonsieurMush",
+                 "properties":[
+                        {
+                         "name":"direction",
+                         "type":"string",
+                         "value":"left"
+                        }, 
+                        {
+                         "name":"patrol",
+                         "type":"bool",
+                         "value":false
+                        }, 
+                        {
+                         "name":"range",
+                         "type":"float",
+                         "value":1
+                        }, 
+                        {
+                         "name":"speed",
+                         "type":"float",
+                         "value":2
+                        }, 
+                        {
+                         "name":"weak",
+                         "type":"string",
+                         "value":"up"
+                        }],
+                 "rotation":0,
+                 "type":"enemy",
+                 "visible":true,
+                 "width":96,
+                 "x":1896.18604651163,
+                 "y":523.162790697674
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -265,7 +302,7 @@
          "y":0
         }],
  "nextlayerid":10,
- "nextobjectid":26,
+ "nextobjectid":27,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

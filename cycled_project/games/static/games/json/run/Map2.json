@@ -156,8 +156,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":391.674411558759,
-                 "y":531.211396117963
+                 "x":391.674,
+                 "y":531.211
                 }, 
                 {
                  "height":96,
@@ -193,13 +193,13 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":770.662411558759,
-                 "y":523.516396117963
+                 "x":770.662,
+                 "y":523.516
                 }, 
                 {
                  "height":96,
                  "id":4,
-                 "name":"MonsieurMush",
+                 "name":"AngryPig",
                  "properties":[
                         {
                          "name":"direction",
@@ -219,7 +219,7 @@
                         {
                          "name":"speed",
                          "type":"float",
-                         "value":1
+                         "value":5
                         }, 
                         {
                          "name":"weak",
@@ -230,8 +230,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":997.839501683399,
-                 "y":198.362122867723
+                 "x":997.84,
+                 "y":198.362
                 }],
          "opacity":1,
          "type":"objectgroup",
