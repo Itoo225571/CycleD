@@ -3,17 +3,9 @@ import Player from './class/Player.js';
 import MapManager from './class/MapManager.js';
 
 const chargeSkillTable = {
-    speedBoost: (player) => {
-        player.setSpeed(20);
-        player.scene.time.delayedCall(3000, () => player.setSpeed(10));
-    },
-    jumpBoost: (player) => {
-        player.jumpPower *= 1.5;
-        player.scene.time.delayedCall(3000, () => player.jumpPower /= 1.5);
-    },
     GainLife: (player) => {
         player.lives++;
-    }
+    },
 };
 
 export default class PlayScene extends Phaser.Scene {
