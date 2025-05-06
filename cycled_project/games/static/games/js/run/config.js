@@ -3,6 +3,7 @@ import PlayScene from './play.js';
 import StartScene from './start.js';
 import RankingScene from './ranking.js';
 import PauseScene from './pause.js'
+import GameoverScene from './gameover.js';
 
 export const gameOptions = {
     playerStartSpeed: 5,
@@ -27,7 +28,7 @@ export const gameConfig = {
     width: 1334,
     height: 750,
     pixelArt: true,
-    scene: [PreloadScene, StartScene, PlayScene, RankingScene, PauseScene], // シーンの順番
+    scene: [PreloadScene, StartScene, PlayScene, RankingScene, PauseScene , GameoverScene], // シーンの順番
     backgroundColor: 0x444444,
     parent: 'game-container',
     physics: {

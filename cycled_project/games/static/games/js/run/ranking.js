@@ -4,31 +4,62 @@ export default class RankingScene extends Phaser.Scene {
     }
 
     create() {
-        this.createBackBtn();
+        // 戻るボタン
+        this.backButton = this.add.sprite(100, 80, 'inputPrompts', 608);  // (x, y, key, frame)
+        // ボタンにインタラクションを追加（クリックイベント）
+        this.backButton.setDisplaySize(48 *3/2, 48);
+        this.backButton.setInteractive({ useHandCursor: true });
+        this.backButton.setFlipX(true);  // 水平方向に反転
+        this.backButton.on('pointerdown', this.goBackScene.bind(this));
+        // ホバー時の色変更（マウスオーバー）
+        this.backButton.on('pointerover', () => {
+            this.backButton.setTint(0x44ff44);  // ホバー時に緑色に変更
+        });
+        // ホバーを外した時の色を戻す（マウスアウト）
+        this.backButton.on('pointerout', () => {
+            this.backButton.clearTint();  // 色を元に戻す
+        });
+
         const { width, height } = this.scale;
-        this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.5)
+        this.overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.5)
             .setScrollFactor(0)
             .setDepth(-1);
-        this.getScores();
+        this.createDisplay();
+        // this.getScores();
         // this.showConfirmPopup();
     }
 
+    preBackScene() {
+        // 非表示にする
+        this.overlay.setVisible(false);  // オーバーレイを非表示にする
+        this.panel.setVisible(false);
+        this.scoreTitle.setVisible(false);
+        this.notyetText.setVisible(false); 
+        this.backButton.setVisible(false);
+    }
     goBackScene() {
         // previousSceneを取得
-        const previousSceneKey = this.scene.get('RankingScene').data.get('previousScene') || 'StartScene';
-        // シーンがアクティブか確認し、関数を呼び出す
+        const previousSceneKey = this.scene.get('RankingScene').data.get('previousScene') || 'StartScene';        
         const previousScene = this.scene.get(previousSceneKey);
-    
-        if (previousScene) {
-            // シーンがアクティブでない場合、再起動する
-            if (!this.scene.isActive(previousSceneKey)) {
-                this.scene.start(previousSceneKey);  // シーンを再起動
-            }
-            if (previousScene.preBackScene) {
-                previousScene.preBackScene();   //戻る前に実行したい関数があれば実行
-            }
-        }
+        this.preBackScene();    //戻る前に色々非表示にする
+        previousScene.onBringToTop()?.();   //戻る前に実行したい関数があれば実行
         this.scene.bringToTop(previousSceneKey);
+    }
+
+    onBringToTop() {
+        const now = Date.now();
+        const THRESHOLD_MS = 30 * 1000;  // 30秒以内なら再取得しない
+        if ((now - this.lastGetScoresTime) < THRESHOLD_MS && this.preScores) {
+            this.showDisplayScores(this.preScores);
+        } else {
+            this.getScores();
+        }
+        
+        this.overlay?.setVisible(true);
+        this.panel?.setVisible(true);
+        this.scoreTitle?.setVisible(true);
+        // this.notyetText?.setVisible(true); 
+        this.backButton?.setVisible(true);
     }
     
     getScores() {
@@ -39,9 +70,10 @@ export default class RankingScene extends Phaser.Scene {
                 "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンをヘッダーに設定
             },
             success: (scores) => {
-                // => を使えば，外側のthisをそのまま使える
                 // スコアをランキングに表示する処理
-                this.displayScores(scores);
+                this.preScores = scores;
+                this.lastGetScoresTime = Date.now();  // ← 時刻更新
+                this.showDisplayScores(scores);
             },
             error: function(xhr, status, error) {
                 var response = xhr.responseJSON;
@@ -50,17 +82,18 @@ export default class RankingScene extends Phaser.Scene {
                     // 手動でエラーを出力
                     append_error_ajax(error.label,error.errors);
                 })
+                goBackScene();  //戻す
             },
         });
     }
 
     // スコア表示用のメソッド
-    displayScores(scores) {
+    createDisplay() {
         const centerX = this.scale.width / 2;
         const centerY = this.scale.height / 2;
     
         // テキストの位置を設定
-        const title = this.add.text(
+        this.scoreTitle = this.add.text(
             centerX, 90, 
             'Ranking', {
             fontFamily: '"Press Start 2P"',
@@ -69,20 +102,18 @@ export default class RankingScene extends Phaser.Scene {
             align: 'center'
         }).setOrigin(0.5);
 
-        if (scores.length === 0) {
-            this.add.text(
-                centerX, centerY, 
-                'No scores yet!', {
-                fontFamily: '"Press Start 2P"',
-                fontSize: '32px',
-                color: '#ffcccc',
-                align: 'center'
-            }).setOrigin(0.5);
-            return;
-        }
+        // まだ投稿されてないメッセージ
+        this.notyetText = this.add.text(
+            centerX, centerY, 
+            'No scores yet!', {
+            fontFamily: '"Press Start 2P"',
+            fontSize: '32px',
+            color: '#ffcccc',
+            align: 'center'
+        }).setOrigin(0.5).setVisible(false);
     
         // スクロールパネル作成
-        const panel = this.rexUI.add.scrollablePanel({
+        this.panel = this.rexUI.add.scrollablePanel({
             x: centerX,
             y: centerY + 50,
             width: this.scale.width - 200,
@@ -117,21 +148,27 @@ export default class RankingScene extends Phaser.Scene {
             }
         })
         .layout();
-    
-        const sizer = panel.getElement('panel');  // FixWidthSizer
-    
+    }
+
+    showDisplayScores(scores) {
+        const centerX = this.scale.width / 2;
+        const centerY = this.scale.height / 2;
+        this.sizer = this.panel.getElement('panel');  // FixWidthSizer
+        // 中身を削除（子オブジェクトも破棄される）
+        this.sizer.clear(true);  // true を指定すると PhaserのGameObjectも一緒に destroy される
+
+        this.scoreTitle.setVisible(true);
+        this.panel.setVisible(true);
+        if (scores.length === 0) {
+            this.notyetText.setVisible(true);
+            return;
+        }
+
         // スコアリストを作成
         scores.forEach((scoreData, index) => {
             // スコア表示を km と m に分ける
-            let scoreDisplay;
-            if (scoreData.score > 1000000) {
-                scoreDisplay = (scoreData.score / 1000).toFixed(0) + ' km';
-            } else if (scoreData.score > 1000) {
-                scoreDisplay = (scoreData.score / 1000).toPrecision(3) + ' km';
-            } else {
-                scoreDisplay = scoreData.score.toPrecision(3) + ' m';
-            }
-        
+            let scoreDisplay = strScore(scoreData.score);
+
             // sizerの周りを囲う
             // const background = this.add.rectangle(0, 0, 600, 60, 0x333333)
             // 1列分のSizerを作る
@@ -144,7 +181,7 @@ export default class RankingScene extends Phaser.Scene {
                 },
                 // background: background
             });
-        
+
             // 順位
             const rankText = this.add.text(0, 0, `${index + 1}.`, {
                 fontFamily: '"Press Start 2P"',
@@ -178,19 +215,17 @@ export default class RankingScene extends Phaser.Scene {
                 align: 'right'
             }).setOrigin(0.5);
 
-        
+
             // rowにパーツを追加
             row.add(rankText, 1, 'center');
             // row.add(avatar, 0, 'center');  // avatarにのみx軸マージンを追加
             row.add(username, 1, 'center');
             row.add(updatedAt, 1, 'center');
             row.add(scoreLabel, 1, 'right');  // ← scoreLabelだけ伸びる (proportion:1)
-        
+
             // 全体のsizerに追加
-            sizer.add(row, 0, 'left', 0, true);
+            this.sizer.add(row, 0, 'left', 0, true);
         });
-    
-        panel.layout();
 
         // スライダー調整
         const itemHeight = 50; // 1項目あたりの高さ（だいたい）
@@ -198,30 +233,28 @@ export default class RankingScene extends Phaser.Scene {
 
         if (scores.length <= visibleItemCount) {
             // 項目数が少ない → スライダー非表示
-            panel.getElement('slider.track').setVisible(false);
-            panel.getElement('slider.thumb').setVisible(false);
+            this.panel.getElement('slider.track').setVisible(false);
+            this.panel.getElement('slider.thumb').setVisible(false);
         } else {
             // 項目数が多い → スライダーをリストに合わせて調整（オプションで）
-            const thumb = panel.getElement('slider.thumb');
+            const thumb = this.panel.getElement('slider.thumb');
             let thumbHeightRatio = visibleItemCount / scores.length;
             thumb.setDisplaySize(20, Math.max(40, (centerY + 100) * thumbHeightRatio));
         }
-    }
-    createBackBtn() {
-        const button = this.add.sprite(100, 80, 'inputPrompts', 608);  // (x, y, key, frame)
-        // ボタンにインタラクションを追加（クリックイベント）
-        button.setDisplaySize(48 *3/2, 48);
-        button.setInteractive({ useHandCursor: true });
-        button.setFlipX(true);  // 水平方向に反転
-        button.on('pointerdown', this.goBackScene.bind(this));
 
-        // ホバー時の色変更（マウスオーバー）
-        button.on('pointerover', () => {
-            button.setTint(0x44ff44);  // ホバー時に緑色に変更
-        });
-        // ホバーを外した時の色を戻す（マウスアウト）
-        button.on('pointerout', () => {
-            button.clearTint();  // 色を元に戻す
-        });
+        // パネルを再レイアウト
+        this.panel.layout();
     }
+}
+
+function strScore(score) {
+    let scoreDisplay;
+    if (score > 1000000) {
+        scoreDisplay = (score / 1000).toFixed(0) + ' km';
+    } else if (score > 1000) {
+        scoreDisplay = (score / 1000).toPrecision(3) + ' km';
+    } else {
+        scoreDisplay = score.toPrecision(3) + ' m';
+    }
+    return scoreDisplay;
 }

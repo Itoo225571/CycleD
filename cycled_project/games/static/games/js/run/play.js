@@ -99,8 +99,9 @@ export default class PlayScene extends Phaser.Scene {
         if (is_alive) {
             this.respawnPlayer();
         } else {
-            this.scene.start('StartScene');
-            // this.GameOver();
+            // this.scene.start('StartScene');
+            this.GameOver();
+            // this.postScore();
         }
     }
     loseLife(jump=false) {
@@ -169,7 +170,6 @@ export default class PlayScene extends Phaser.Scene {
                 this.loseLifeAfetr();
             });
         }
-
     }
 
     respawnPlayer() {
@@ -223,94 +223,21 @@ export default class PlayScene extends Phaser.Scene {
         this.isPaused = false;
     }
     
-    GameOver(is_newrecord = false) {
-        var stHeight = 100;
-        this.gameOverText = this.add.text(
-            this.cameras.main.centerX,
-            -100,  // 画面の上外からスタート
-            'Game Over',
-            {
-                fontFamily: '"Press Start 2P"',
-                fontSize: '64px',
-                color: '#ffffff'
-            }
-        ).setOrigin(0.5).setDepth(100);
-        // 上から落ちるアニメーション
-        this.tweens.add({
-            targets: this.gameOverText,
-            y: stHeight,
-            ease: 'Bounce.easeOut',  // バウンド効果
-            duration: 700,  // 落ちる時間
-            repeat: 0  // 繰り返しなし
-        });
-        if (is_newrecord) {
-            const newRecordText = this.add.text(
-                -200,
-                stHeight + this.gameOverText.height,
-                'NEW RECORD!',
-                {
-                    fontFamily: '"Press Start 2P"',
-                    fontSize: '24px',
-                    color: '#FFD700',   // 金色っぽい
-                    stroke: '#FF0000',  // 赤い縁取り
-                    strokeThickness: 8, // 縁取りの太さ
-                    shadow: {
-                        offsetX: 4,
-                        offsetY: 4,
-                        color: '#000000',
-                        blur: 4,
-                        fill: true
-                    }
-                }
-            ).setOrigin(0.5).setDepth(100);
-            // New Record
-            this.tweens.add({
-                targets: newRecordText,
-                x: this.cameras.main.centerX, // 中央までスライド
-                ease: 'Power2', // スムーズな加速＆減速
-                duration: 700, // 移動
-                delay: 1000,    //1秒後に実行
-            });
-            // 点滅アニメーションを追加
-            this.tweens.add({
-                targets: newRecordText,
-                alpha: { from: 1, to: 0 }, // 透明度を1から0に変更
-                yoyo: true,                // アニメーションが終わったら元に戻る
-                repeat: -1,                // 永遠に繰り返す
-                duration: 500,             // 500msでフェードイン・フェードアウト
-                ease: 'Sine.inOut',        // スムーズに点滅
-                delay: 2000,
-            });
+    GameOver() {
+        if (!this.scene.isActive('PlayScene')) return;
+        if (this.scene.isPaused('PlayScene')) return;  //重複を避ける
+
+        this.isPaused = true;
+        this.input.enabled = false;  // 全体の入力を一時的に無効化
+        this.scene.pause();
+
+        if (!this.scene.isActive('GameoverScene')) {
+            // 起動していなければ、RankingSceneをオーバーレイとして開始
+            this.scene.launch('GameoverScene');
         }
-
-        // スコアを表示するテキスト
-        var scoreDisplay = strScore(this.score);
-        const scoreText = this.add.text(
-            this.cameras.main.centerX,
-            -100,  // "Game Over" の下に配置
-            scoreDisplay,  // 実際のスコア値を表示
-            {
-                fontFamily: '"Press Start 2P"',
-                fontSize: '32px',
-                color: '#ffffff'
-            }
-        ).setOrigin(0.5).setDepth(100);
-        // スコアのアニメーション
-        this.tweens.add({
-            targets: scoreText,
-            y: stHeight + this.gameOverText.height + 60,   // Game Overのテキスト下に配置
-            ease: 'Bounce.easeOut',
-            duration: 1000,
-            repeat: 0
-        });
-    
-        this.pauseGame(this.gameoverBtns);
-        this.is_gameover = true;    // pauseの後にtrueにする
-    }
-    
-
-    handleBlur() {
-        this.pauseGame(this.resumeBtns);
+        const GameoverScene = this.scene.get('GameoverScene');
+        GameoverScene.onBringToTop?.(true);  // 引数 true を渡す(投稿する)
+        this.scene.bringToTop('GameoverScene');
     }
 
     postScore() {
@@ -346,14 +273,13 @@ export default class PlayScene extends Phaser.Scene {
         // this.preScene = 'PlayScene';
         this.scene.get('RankingScene').data.set('previousScene', 'PlayScene');
 
-        if (this.scene.isActive('RankingScene')) {
-            // すでに起動している場合はbringToTopで最前面に移動
-            this.scene.bringToTop('RankingScene');
-        } else {
-            // 起動していなければ、RankingSceneをオーバーレイとして開始
+        if (!this.scene.isActive('RankingScene')) {
             this.scene.launch('RankingScene');
         }
+        const RankingScene = this.scene.get('RankingScene');
+        RankingScene.onBringToTop?.();
         this.gameOverText.setAlpha(0);  //titleを隠す
+        this.scene.bringToTop('RankingScene');
     }
 
     // シーン終了時にイベントリスナーを削除

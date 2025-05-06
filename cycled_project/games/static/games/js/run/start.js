@@ -6,6 +6,8 @@ export default class StartScene extends Phaser.Scene {
     }
 
     create() {
+        this.titleReady = false;  // ← アニメーション完了フラグ
+
         var TITLE_NAME = 'NIKI RUN';
         // フェードインしつつ、ゆっくり上下に浮かぶ
         this.title = this.add.text(
@@ -26,6 +28,7 @@ export default class StartScene extends Phaser.Scene {
             duration: 500,
             ease: 'Back.Out',
             onComplete: () => {
+                this.titleReady = true;  // ← アニメ完了フラグ立てる
                 this.tweens.add({
                     targets: this.title,
                     y: this.title.y - 20,
@@ -45,15 +48,35 @@ export default class StartScene extends Phaser.Scene {
         // ]
         // createMsgWindow(this,msgs,0)
 
-        var option = {centerX:true,fontFamily:'"Press Start 2P"'};
-        var { _ ,hitArea} = createBtn(0,300,this,'Start',option)
-        hitArea.on('pointerdown', this.goPlayScene.bind(this));
-
-        var { _ ,hitArea} = createBtn(0,430,this,'Select Character', option)
-        hitArea.on('pointerdown', this.goCharaSelectScene.bind(this));
-
-        var { _ ,hitArea} = createBtn(0,560,this,'Ranking', option)
-        hitArea.on('pointerdown', this.goRankingScene.bind(this));
+        var option = { centerX: true, fontFamily: '"Press Start 2P"' };
+        var btnList = [
+            { y: 300, label: 'Start', callBack: this.goPlayScene.bind(this) },
+            { y: 430, label: 'Select Character', callBack: this.goCharaSelectScene.bind(this) },
+            { y: 560, label: 'Ranking', callBack: this.goRankingScene.bind(this) }
+        ];        
+        
+        btnList.forEach((btn) => {
+            // btn.y と btn.label を使う
+            let { container, hitArea } = createBtn(0, btn.y, this, btn.label, option);
+        
+            // 初期状態で透明にする
+            container.setAlpha(0);
+        
+            // 順番にフェードインさせる（100msずつ遅らせて）
+            this.tweens.add({
+                targets: container,
+                alpha: 1,
+                duration: 400,
+                delay: 500,  // 開始500ms後から順に
+                ease: 'Power1',
+                onComplete: () => {
+                    // フェードインが完了した後に hitArea にイベントをバインド
+                    hitArea.setInteractive({ useHandCursor: true });
+                    hitArea.on('pointerdown', btn.callBack);
+                }
+            });
+        });
+        
 
         // background
         this.add.image(0, 0, 'sky')
@@ -72,17 +95,18 @@ export default class StartScene extends Phaser.Scene {
         return;
     }
     goRankingScene() {
+        if (!this.titleReady) return;  // ← ここで弾く！
+
         this.scene.get('RankingScene').data.set('previousScene', 'StartScene');
-        this.title.setAlpha(0);  //titleを隠す
-        if (this.scene.isActive('RankingScene')) {
-            // すでに起動している場合はbringToTopで最前面に移動
-            this.scene.bringToTop('RankingScene');
-        } else {
-            // 起動していなければ、RankingSceneをオーバーレイとして開始
+        this.title.setVisible(false);  //titleを隠す
+        if (!this.scene.isActive('RankingScene')) {
             this.scene.launch('RankingScene');
         }
+        const RankingScene = this.scene.get('RankingScene');
+        RankingScene.onBringToTop?.();
+        this.scene.bringToTop('RankingScene');
     }
-    preBackScene() {
-        this.title.setAlpha(1);  //titleを見せる
+    onBringToTop() {
+        this.title.setVisible(true);  //titleを見せる
     }
 }
