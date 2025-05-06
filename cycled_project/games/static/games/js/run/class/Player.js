@@ -18,8 +18,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         this.jumpForce = config.jumpForce;
         this.jumps = config.jumps;
         this.lives = config.lives;
-        this.chargeSkill = config.chargeSkill;  // デフォルト
-        console.log(this.initSpeed,this.accel,this.jumpForce,this.jumps,this.lives)
+        this.chargeSkill = config.chargeSkill || (() => {});
 
         this.speed = this.initSpeed;
         this.jump_count = 0;
@@ -174,6 +173,8 @@ class ChargeBar {
 
     onChargeFull() {
         this.reset();
-        this.player.chargeSkill();
+        if (this.player.chargeSkill) this.player.chargeSkill(this.player);
+        this.player.emit('chargeFull'); // 外部でも監視可能
     }
+    
 }
