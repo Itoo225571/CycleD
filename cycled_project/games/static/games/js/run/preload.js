@@ -64,7 +64,7 @@ export default class PreloadScene extends Phaser.Scene {
             this.enemySituations.forEach((situation) => {
                 this.load.spritesheet(
                     enemy.name + situation, 
-                    `${imgDir}${enemy.name}/${situation}.png`, 
+                    `${imgEnemyDir}${enemy.name}/${situation}.png`, 
                     {
                         frameWidth: enemy.width,
                         frameHeight: enemy.height
@@ -84,13 +84,16 @@ export default class PreloadScene extends Phaser.Scene {
             'WallJump'
         ]
         this.playerNames = [
-            'NinjaFrog'
+            'NinjaFrog',
+            'MaskDude',
+            'PigMan',
+            'VirtualGuy',
         ]
         this.playerNames.forEach((chara) => {  // アロー関数に変更
             this.playerSituations.forEach((situation) => {  // アロー関数に変更
                 this.load.spritesheet(
                     chara + situation, 
-                    `${imgDir}${chara}/${situation}.png`, 
+                    `${imgPlayerDir}${chara}/${situation}.png`, 
                     { frameWidth: 32, frameHeight: 32 }
                 );
             });
