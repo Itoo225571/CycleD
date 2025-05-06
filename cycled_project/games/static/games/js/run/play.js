@@ -1,5 +1,4 @@
 import { gameOptions, CATEGORY } from './config.js';
-import { createBtn } from './preload.js';
 import Player from './class/Player.js';
 import MapManager from './class/MapManager.js';
 
@@ -19,7 +18,7 @@ export default class PlayScene extends Phaser.Scene {
             jumps: 1,
             lives: 2,
         };
-        this.player = new Player(this, 'NinjaFrog', config);
+        this.player = new Player(this, 'VirtualGuy', config);
 
         this.input.on("pointerdown", () => this.player.jump(false), this);
         this.input.keyboard.on("keydown-SPACE", () => this.player.jump(false), this);        
