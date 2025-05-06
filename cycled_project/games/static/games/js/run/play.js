@@ -41,6 +41,17 @@ export default class PlayScene extends Phaser.Scene {
             fontSize: '32px',
             fill: '#ffffff'
         }).setScrollFactor(0);
+        // チャージバー
+        var barX = 30, barY = 80, barWidth = 200, barHeight = 20;
+        var bgBar = this.add.rectangle(barX, barY, barWidth, barHeight, 0x444444)
+                    .setOrigin(0, 0.5)
+                    .setScrollFactor(0)
+                    .setAlpha(0.7);
+        var chargeBar = this.add.rectangle(barX, barY, 0, barHeight, 0x00ff00)
+                    .setOrigin(0, 0.5)
+                    .setScrollFactor(0);
+        this.player.createChargeBar(bgBar,chargeBar);
+
         // ポーズボタン
         this.pauseButton = this.add.sprite(this.cameras.main.width - 50, 50, 'inputPrompts', 538)
                             .setOrigin(0.5)
@@ -48,6 +59,9 @@ export default class PlayScene extends Phaser.Scene {
                             .setDisplaySize(64,64)
                             .setInteractive({ useHandCursor: true });
         this.pauseButton.on('pointerdown', this.pauseGame, this);
+        window.addEventListener('blur', () => {
+            this.pauseGame();
+        });        
 
         if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene'); 
     }
@@ -68,7 +82,7 @@ export default class PlayScene extends Phaser.Scene {
         this.mapManager.update();
 
         // スコア更新表示
-        this.score = this.player.dist;
+        this.score = this.player.dist + this.player.distPre;
         this.distText.setText(`${strScore(this.score)}`);
 
         const leftBound = cam.scrollX - (cam.width / 6);
@@ -80,7 +94,7 @@ export default class PlayScene extends Phaser.Scene {
     }    
 
     loseLifeAfetr() {
-        const is_alive = this.player.loseLife();
+        const is_alive = this.player.loseLifePlayer();
 
         if (is_alive) {
             this.respawnPlayer();
@@ -172,7 +186,9 @@ export default class PlayScene extends Phaser.Scene {
 
         this.centerPoint.setPosition(this.scale.width / 2, this.scale.height / 2);
         this.cameras.main.startFollow(this.centerPoint, false, 1, 0);
-        this.player.setVelocity(1,1)
+        this.player.setVelocity(1,1);
+
+        this.elapsedTime = 0;
 
         this.isPaused = false;
         this.input.enabled = true;
@@ -184,7 +200,9 @@ export default class PlayScene extends Phaser.Scene {
     }
 
     pauseGame() {
+        if (!this.scene.isActive('PlayScene')) return;
         if (this.scene.isPaused('PlayScene')) return;  //重複を避ける
+
         this.isPaused = true;
         this.input.enabled = false;  // 全体の入力を一時的に無効化
         this.scene.pause();
@@ -340,10 +358,7 @@ export default class PlayScene extends Phaser.Scene {
 
     // シーン終了時にイベントリスナーを削除
     shutdown() {
-        if (this.game) {
-            this.game.events.removeListener(Phaser.Core.Events.BLUR, this.handleBlur, this);
-            this.game.events.removeListener(Phaser.Core.Events.FOCUS, this.handleFocus, this);
-        }
+        // window.removeEventListener('blur', this.handleBlur);
     }
 };
 
@@ -358,3 +373,4 @@ function strScore(score) {
     }
     return scoreDisplay;
 }
+

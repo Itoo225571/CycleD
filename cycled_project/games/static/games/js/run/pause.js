@@ -101,8 +101,7 @@ export default class PauseScene extends Phaser.Scene {
     
     // 「Start画面」に戻る処理
     goStartScreen() {
-        // イベントリスナーを削除してからシーンを停止
-        this.shutdown();
+        this.scene.stop('PlayScene');
         this.scene.start('StartScene');
         this.scene.stop();  // 現在のシーンを停止
     }
@@ -117,5 +116,7 @@ export default class PauseScene extends Phaser.Scene {
         if(this.overlay) {
             this.overlay.setVisible(true);
         }
+        if(this.countdownEvent) this.countdownEvent.destroy();
+        if(this.countdownText) this.countdownText.setVisible(false);
     }
 }

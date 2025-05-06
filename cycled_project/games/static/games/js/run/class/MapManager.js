@@ -384,7 +384,7 @@ export default class MapManager {
         const itemName = item.texture.key;
         switch (itemName) {
             case 'coin_bronze':
-                console.log('Coin!')
+                player.chargeBar.chargeUp(0.01);
                 break;
         }
         item.setActive(false);
