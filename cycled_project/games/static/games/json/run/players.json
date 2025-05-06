@@ -1,23 +1,38 @@
 [
     {
-        "key": "player1",
-        "img": "/static/games/img/run/player.png",
-        "frameWidth": 24,
-        "frameHeight": 48,
-        "scale": 1,
-        "speed": 160,
-        "x": 100,
-        "y": 300
+        "key": "NinjaFrog",
+        "speed": 5,
+        "accel": 2,
+        "jumps": 1,
+        "lives": 2,
+        "jumpForce": 20,
+        "chargeSkill": "GainLife"
     },
     {
-        "key": "player2",
-        "img": "/static/games/img/run/player.png",
-        "frameWidth": 24,
-        "frameHeight": 48,
-        "scale": 0.8,
-        "speed": 120,
-        "x": 300,
-        "y": 300
+        "key": "MaskDude",
+        "speed": 5,
+        "accel": 2,
+        "jumps": 1,
+        "lives": 2,
+        "jumpForce": 20,
+        "chargeSkill": "GainLife"
+    },
+    {
+        "key": "PigMan",
+        "speed": 5,
+        "accel": 2,
+        "jumps": 1,
+        "lives": 2,
+        "jumpForce": 20,
+        "chargeSkill": "GainLife"
+    },
+    {
+        "key": "Diver",
+        "speed": 5,
+        "accel": 2,
+        "jumps": 1,
+        "lives": 2,
+        "jumpForce": 20,
+        "chargeSkill": "GainLife"
     }
 ]
-  
