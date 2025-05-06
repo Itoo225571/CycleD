@@ -1,26 +1,28 @@
 import { gameOptions } from '../config.js';
 
 export default class Player extends Phaser.Physics.Matter.Sprite {
-    constructor(scene, texture, config) {
+    constructor(scene, config) {
         // Matterでは座標指定が必須（this.scene.game.config などにアクセス不可なため scene.scale.height を使用）
         const startX = gameOptions.playerStartPosition;
         const startY = scene.scale.height / 2;
-        super(scene.matter.world, startX, startY, texture + 'Run');
+
+        super(scene.matter.world, startX, startY, config.key + 'Run');
+        this.playerName = config.key;
 
         this.scene = scene;
         scene.add.existing(this);
 
-        this.playerName = texture;  //player名を保存
-
         // 個別性能をプロパティに保存
-        this.initSpeed = config.speed || gameOptions.playerStartSpeed;
-        this.accel = config.accel || gameOptions.playerAccel;
-        this.jumpForce = config.jumpForce || gameOptions.jumpForce;
-        this.jumps = config.jumps || gameOptions.jumps;
-        this.jump_count = 0;
-        this.lives = config.lives || gameOptions.lives;
+        this.initSpeed = config.speed;
+        this.accel = config.accel;
+        this.jumpForce = config.jumpForce;
+        this.jumps = config.jumps;
+        this.lives = config.lives;
+        this.chargeSkill = config.chargeSkill;  // デフォルト
+        console.log(this.initSpeed,this.accel,this.jumpForce,this.jumps,this.lives)
 
         this.speed = this.initSpeed;
+        this.jump_count = 0;
 
         this.distPre = 0;
         this.dist = 0;
@@ -143,10 +145,6 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
     createChargeBar(bgBar, chargeBar) {
         this.chargeBar = new ChargeBar(this, bgBar, chargeBar);
         this.chargeBar.reset();
-    }
-
-    chargeSkill() {
-        this.lives++;
     }
 }
 

@@ -82,13 +82,13 @@ export default class PreloadScene extends Phaser.Scene {
             'Jump',
             'Run',
             'WallJump'
-        ]
+        ];
         this.playerNames = [
             'NinjaFrog',
             'MaskDude',
             'PigMan',
-            'VirtualGuy',
-        ]
+            'Diver',
+        ];
         this.playerNames.forEach((chara) => {  // アロー関数に変更
             this.playerSituations.forEach((situation) => {  // アロー関数に変更
                 this.load.spritesheet(

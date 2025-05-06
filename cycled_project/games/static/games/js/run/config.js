@@ -6,15 +6,16 @@ import PauseScene from './pause.js'
 import GameoverScene from './gameover.js';
 
 export const gameOptions = {
-    playerStartSpeed: 5,
+    playerNameDefault: "NinjaFrog",
+    // playerStartSpeed: 5,
     // playerStartSpeed: 15,
-    playerAccel: 1,
-    jumpForce: 20,
+    // playerAccel: 1,
+    // jumpForce: 20,
     garavityForce: 3,
     playerStartPosition: 200,
-    jumps: 2,
+    // jumps: 2,
     oneBlockSize: 64,
-    lives: 2,
+    // lives: 2,
     startChunk: 'startMap',
     chunks: ['Map1','Map2','Map3'],
     // chunks: ['Map3'],

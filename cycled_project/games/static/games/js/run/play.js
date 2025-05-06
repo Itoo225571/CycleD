@@ -2,9 +2,27 @@ import { gameOptions, CATEGORY } from './config.js';
 import Player from './class/Player.js';
 import MapManager from './class/MapManager.js';
 
+const chargeSkillTable = {
+    speedBoost: (player) => {
+        player.setSpeed(20);
+        player.scene.time.delayedCall(3000, () => player.setSpeed(10));
+    },
+    jumpBoost: (player) => {
+        player.jumpPower *= 1.5;
+        player.scene.time.delayedCall(3000, () => player.jumpPower /= 1.5);
+    },
+    GainLife: (player) => {
+        player.lives++;
+    }
+};
+
 export default class PlayScene extends Phaser.Scene {
     constructor() {
         super("PlayScene");
+    }
+
+    preload() {
+        this.load.json('charaData', jsonPlayers);
     }
 
     create() {
@@ -12,13 +30,18 @@ export default class PlayScene extends Phaser.Scene {
         this.isPaused = false;
         this.score = 0;
 
-        const config = {
-            // speed: 10,
-            // accel: 2,
-            jumps: 1,
-            lives: 2,
-        };
-        this.player = new Player(this, 'VirtualGuy', config);
+        // 読み込んだJSONにスキル関数を追加
+        const charaData = this.cache.json.get('charaData');
+        const characterConfigs = {};
+        for (const chara of charaData) {
+            characterConfigs[chara.key] = {
+                ...chara,
+                chargeSkill: chargeSkillTable[chara.chargeSkill]
+            };
+        }        
+        const selectedCharKey = 'Diver';  // 操作キャラのキー（ここでは固定）
+        const playerConfig = characterConfigs[selectedCharKey] || characterConfigs[gameOptions.playerNameDefault];
+        this.player = new Player(this, playerConfig);
 
         this.input.on("pointerdown", () => this.player.jump(false), this);
         this.input.keyboard.on("keydown-SPACE", () => this.player.jump(false), this);        
