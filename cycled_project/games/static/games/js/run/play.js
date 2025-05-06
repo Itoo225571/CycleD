@@ -16,13 +16,13 @@ export default class PlayScene extends Phaser.Scene {
         const config = {
             // speed: 10,
             // accel: 2,
-            jumps: 2,
+            jumps: 1,
             lives: 2,
         };
         this.player = new Player(this, 'NinjaFrog', config);
 
-        this.input.on("pointerdown", this.player.jump.bind(this.player), this);
-        this.input.keyboard.on('keydown-SPACE', this.player.jump.bind(this.player), this);
+        this.input.on("pointerdown", () => this.player.jump(false), this);
+        this.input.keyboard.on("keydown-SPACE", () => this.player.jump(false), this);        
 
         var tilesets = gameOptions.tilesets;
         this.mapManager = new MapManager(this, tilesets);

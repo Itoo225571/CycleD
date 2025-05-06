@@ -83,13 +83,12 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         }
     }
 
-    jump() {
-        var isGrounded = this.isOnGround();
+    jump(onEnemy=false) {
+        var isGrounded = onEnemy || this.isOnGround();
 
         if (this.jump_count < this.jumps) {
             // Matterでは setVelocityY はないので force を使う方が自然
             this.setVelocityY(-Math.abs(this.jumpForce)); // jumpForce を適度に調整
-            this.jump_count++;
 
             if (isGrounded) {
                 this.anims.play(this.playerName + 'Jump', true);
@@ -97,6 +96,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
                 // 空中にいる場合は特殊ジャンプにする
                 var name = this.scene.anims.get(this.playerName + 'Jump_ex') ? this.playerName + 'Jump_ex' : this.playerName + 'Jump';
                 this.anims.play(name, true);
+                this.jump_count++;
             }
 
             // just_jumped を 0.5秒だけ true にする
@@ -123,15 +123,15 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         }
     
         // enemyとの接触判定
-        const enemies = this.scene.mapManager.enemies; // enemyが格納されている配列
-        for (let enemy of enemies) {
-            if (!enemy.active) continue;
-            const distanceToEnemy = Phaser.Math.Distance.Between(this.x, this.y, enemy.x, enemy.y);
-            if (distanceToEnemy <= gameOptions.oneBlockSize) {
-                isGround = true; // enemyが地面として接触したとみなす
-                break;
-            }
-        }
+        // const enemies = this.scene.mapManager.enemies; // enemyが格納されている配列
+        // for (let enemy of enemies) {
+        //     if (!enemy.active) continue;
+        //     const distanceToEnemy = Phaser.Math.Distance.Between(this.x, this.y, enemy.x, enemy.y);
+        //     if (distanceToEnemy <= gameOptions.oneBlockSize) {
+        //         isGround = true; // enemyが地面として接触したとみなす
+        //         break;
+        //     }
+        // }
     
         return isGround;
     }

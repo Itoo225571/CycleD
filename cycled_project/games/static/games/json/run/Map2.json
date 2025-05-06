@@ -145,7 +145,7 @@
                         {
                          "name":"speed",
                          "type":"float",
-                         "value":2
+                         "value":1
                         }, 
                         {
                          "name":"weak",
@@ -182,7 +182,7 @@
                         {
                          "name":"speed",
                          "type":"float",
-                         "value":2
+                         "value":1
                         }, 
                         {
                          "name":"weak",
