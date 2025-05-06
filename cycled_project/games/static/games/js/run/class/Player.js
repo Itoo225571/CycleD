@@ -62,8 +62,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         this.setVelocityX(this.speed);
 
         // 移動距離の加算 (1ブロック当たり1mとする)
-        if (this.distPre === 0) this.dist = this.x / gameOptions.oneBlockSize;
-        else this.dist = this.distPre + this.x / gameOptions.oneBlockSize;
+        this.dist = (this.x - gameOptions.playerStartPosition) / gameOptions.oneBlockSize;
 
         // カメラ位置に合わせる
         let playerPos = cam.scrollX + gameOptions.playerStartPosition;
@@ -122,21 +121,10 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
             isGround = true;
         }
     
-        // enemyとの接触判定
-        // const enemies = this.scene.mapManager.enemies; // enemyが格納されている配列
-        // for (let enemy of enemies) {
-        //     if (!enemy.active) continue;
-        //     const distanceToEnemy = Phaser.Math.Distance.Between(this.x, this.y, enemy.x, enemy.y);
-        //     if (distanceToEnemy <= gameOptions.oneBlockSize) {
-        //         isGround = true; // enemyが地面として接触したとみなす
-        //         break;
-        //     }
-        // }
-    
         return isGround;
     }
     
-    loseLife() {
+    loseLifePlayer() {
         this.lives--;
         this.distPre += this.dist;
         this.initPlayer();
@@ -145,10 +133,49 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 
     initPlayer() {
         this.speed = this.initSpeed;
+        // this.chargeBar.reset();  // リセットしなくてもいい
 
         // 位置と速度を初期化するならここ
         this.setVelocity(0, 0);
         this.setPosition(gameOptions.playerStartPosition, this.scene.scale.height / 2);
     }
 
+    createChargeBar(bgBar, chargeBar) {
+        this.chargeBar = new ChargeBar(this, bgBar, chargeBar);
+        this.chargeBar.reset();
+    }
+
+    chargeSkill() {
+        this.lives++;
+    }
+}
+
+class ChargeBar {
+    constructor(player, bgBar, chargeBar) {
+        this.player = player;
+        // 背景バー
+        this.bgBar = bgBar;
+        // チャージバー（前面）
+        this.chargeBar = chargeBar;
+
+        this.maxWidth = bgBar.width;
+        this.charge = 0;     // 現在のチャージ量（0〜1）
+        this.speed = 0.01;   // チャージ速度（任意）
+    }
+
+    chargeUp(amount = this.speed) {
+        this.charge = Phaser.Math.Clamp(this.charge + amount, 0, 1);
+        this.chargeBar.width = this.maxWidth * this.charge;
+        if (this.charge >= 1)   this.onChargeFull();
+    }
+
+    reset() {
+        this.charge = 0;
+        this.chargeBar.width = 0;
+    }
+
+    onChargeFull() {
+        this.reset();
+        this.player.chargeSkill();
+    }
 }

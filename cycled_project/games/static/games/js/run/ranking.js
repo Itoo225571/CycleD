@@ -5,6 +5,10 @@ export default class RankingScene extends Phaser.Scene {
 
     create() {
         this.createBackBtn();
+        const { width, height } = this.scale;
+        this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.5)
+            .setScrollFactor(0)
+            .setDepth(-1);
         this.getScores();
         // this.showConfirmPopup();
     }
@@ -27,7 +31,6 @@ export default class RankingScene extends Phaser.Scene {
         this.scene.bringToTop(previousSceneKey);
     }
     
-
     getScores() {
         $.ajax({
             url: '/games/api/score_nikirun/',
