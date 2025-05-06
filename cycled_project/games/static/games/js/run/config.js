@@ -15,8 +15,8 @@ export const gameOptions = {
     oneBlockSize: 64,
     lives: 2,
     startChunk: 'startMap',
-    chunks: ['Map1','Map2'],
-    // chunks: ['startMap'],
+    chunks: ['Map1','Map2','Map3'],
+    // chunks: ['Map3'],
     tilesets: [
         { nameInTiled: 'Tiles1', textureKey: 'Tiles1' },
     ]

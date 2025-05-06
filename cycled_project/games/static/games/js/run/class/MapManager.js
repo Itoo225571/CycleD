@@ -221,19 +221,22 @@ export default class MapManager {
     }
 
     updateEnemies() {
-        const cameraRight = this.scene.cameras.main.scrollX + this.scene.cameras.main.width;
+        const cameraLeft = this.scene.cameras.main.scrollX;
+        const cameraRight = cameraLeft + this.scene.cameras.main.width;
 
         this.enemies.forEach(enemy => {
             if (!enemy.active) return;  // enemyがアクティブでない場合は処理をスキップ
 
             var speed = enemy.speed;
-            if (cameraRight < enemy.chunkX) {
+            
+            if (cameraRight < enemy.chunkX ) {
                 // カメラ外の場合動かない
                 enemy.setVelocityY(0);
                 enemy.setVelocityX(0);
-            } else{
+            } else {
                 if (enemy.is_alive) {
                     var block = gameOptions.oneBlockSize;
+                    enemy.flipX = false;
                     switch (enemy.direction) {
                         case 'left':
                             if (enemy.patrol && enemy.x <= enemy.originCoord[0] - enemy.range * block) {
@@ -296,8 +299,11 @@ export default class MapManager {
             collisionDirection = 'left';
         }
 
+        // enemyの弱点にぶつかった時(踏んだ時)
         if (collisionDirection === enemy.weak) {
-            player.setVelocityY(-player.jumpForce); // 上に弾む（速度を調整）
+            // player.setVelocityY(-player.jumpForce); // 上に弾む（速度を調整）
+            player.jump_count = 0;
+            player.jump(true);
         
             enemy.is_alive = false;
             // 敵を消すまたは反応させる場合
@@ -306,6 +312,7 @@ export default class MapManager {
             enemy.setVelocityY(-10); // 敵も少し跳ねる（オプション）
             enemy.setCollisionCategory(null);
             enemy.setDepth(10);   //この時だけ最前線で表示
+            enemy.setIgnoreGravity(false);      //重力適用
 
         } else {
             this.scene.loseLife(true);     //ジャンプしながら消滅

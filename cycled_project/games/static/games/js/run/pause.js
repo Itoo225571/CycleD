@@ -44,7 +44,7 @@ export default class PauseScene extends Phaser.Scene {
 
         // カウントダウン(非表示)
         this.countdownText = this.add.text(this.game.config.width / 2, this.game.config.height / 2, '', {
-            fontFamily: 'DotGothic16',
+            fontFamily: '"Press Start 2P"',
             fontSize: '64px',
             fill: '#ffffff'
         }).setOrigin(0.5).setVisible(false);
@@ -71,7 +71,7 @@ export default class PauseScene extends Phaser.Scene {
                 count--;
                 if (count < 0) {
                     // 0以下になったら「スタート！」表示
-                    this.countdownText.setText("Start！");
+                    this.countdownText.setText("GO!");
                     // 1秒後にゲームを再開
                     this.time.delayedCall(1000, () => {
                         this.countdownText.setVisible(false);
