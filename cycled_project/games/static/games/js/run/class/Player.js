@@ -1,4 +1,4 @@
-import { gameOptions } from '../config.js';
+import { gameOptions,gameConfig } from '../config.js';
 
 export default class Player extends Phaser.Physics.Matter.Sprite {
     constructor(scene, config) {
@@ -19,6 +19,9 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         this.jumps = config.jumps;
         this.lives = config.lives;
         this.chargeSkill = config.chargeSkill || (() => {});
+
+        if (gameConfig.physics.matter.debug)    this.jumps=1000;
+        if (gameConfig.physics.matter.debug)    this.lives=1000;
 
         this.speed = this.initSpeed;
         this.jump_count = 0;
@@ -56,7 +59,9 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         var isGrounded = this.isOnGround();
 
         // 60秒後にspeed + accel 分だけになっている
-        this.speed = this.initSpeed + this.accel * elapsedTime / 1000 / 60;
+        // スピード計算と最大スピードの制限
+        this.speed = Math.min(this.initSpeed + (this.accel * elapsedTime) / 1000 / 60, gameOptions.maxSpeed);
+
         // this.speed = this.initSpeed;
 
         // 水平方向の速度を維持（Matter.jsでは setVelocity を毎フレーム使う）

@@ -2,7 +2,7 @@
     {
         "key": "NinjaFrog",
         "speed": 5,
-        "accel": 2,
+        "accel": 1,
         "jumps": 1,
         "lives": 2,
         "jumpForce": 20,
@@ -11,7 +11,7 @@
     {
         "key": "MaskDude",
         "speed": 5,
-        "accel": 2,
+        "accel": 1,
         "jumps": 1,
         "lives": 2,
         "jumpForce": 20,
@@ -20,7 +20,7 @@
     {
         "key": "PigMan",
         "speed": 5,
-        "accel": 2,
+        "accel": 1,
         "jumps": 1,
         "lives": 2,
         "jumpForce": 20,
@@ -29,7 +29,7 @@
     {
         "key": "Diver",
         "speed": 5,
-        "accel": 2,
+        "accel": 1,
         "jumps": 1,
         "lives": 2,
         "jumpForce": 20,
