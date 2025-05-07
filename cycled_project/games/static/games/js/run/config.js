@@ -7,18 +7,13 @@ import GameoverScene from './gameover.js';
 
 export const gameOptions = {
     playerNameDefault: "NinjaFrog",
-    // playerStartSpeed: 5,
-    // playerStartSpeed: 15,
-    // playerAccel: 1,
-    // jumpForce: 20,
     garavityForce: 3,
     playerStartPosition: 200,
-    // jumps: 2,
     oneBlockSize: 64,
-    // lives: 2,
     startChunk: 'startMap',
-    chunks: ['Map1','Map2','Map3'],
-    // chunks: ['Map3'],
+    // chunks: ['Map1','Map2','Map3','Map4','Map5'],
+    chunks: ['Map5'],
+    maxSpeed: 10,   // 暫定最大速度
     tilesets: [
         { nameInTiled: 'Tiles1', textureKey: 'Tiles1' },
     ]
@@ -44,7 +39,7 @@ export const gameConfig = {
                 y: gameOptions.garavityForce,
             },
             enableSleep: true,
-            debug: false,
+            // debug: false,
         }
     },
     plugins: {
@@ -73,4 +68,5 @@ export const CATEGORY = {
     ENEMY:  0x0002,
     ITEM:   0x0004,
     WALL:   0x0008,
+    TRAP:   0x0010, // 追加
 };

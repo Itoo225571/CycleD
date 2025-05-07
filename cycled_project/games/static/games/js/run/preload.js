@@ -43,11 +43,17 @@ export default class PreloadScene extends Phaser.Scene {
             );
         });
 
-        this.load.spritesheet(
-            'coin_bronze', 
-            `${imgDir}coin_bronze.png`, 
-            { frameWidth: 32, frameHeight: 32 },
-        );
+        // trap
+        this.traps = [
+            { name : 'SpikeBall', size: 28, start:0, end:0 }
+        ];
+        this.traps.forEach(({ name, size}) => {
+            this.load.spritesheet(
+                name, 
+                `${imgDir}${name}.png`, 
+                { frameWidth: size, frameHeight: size },    // 拡大して使う
+            );
+        });
 
         // Enemy
         this.enemySituations = [
@@ -110,6 +116,8 @@ export default class PreloadScene extends Phaser.Scene {
         this.createEnemyAnims();
         // Item Animation
         this.createItemAnims();
+        // Trap Animation
+        this.createTrapAnims();
 
         // デバッグ用: マップデータが正しくロードされたか確認
         // const startMap = this.cache.tilemap.get('startMap');
@@ -198,7 +206,6 @@ export default class PreloadScene extends Phaser.Scene {
         });
     }
     
-
     createItemAnims() {
         this.items.forEach(({ name, size, start, end }) => {
             this.anims.create({
@@ -207,6 +214,26 @@ export default class PreloadScene extends Phaser.Scene {
                 frameRate: 15,
                 repeat: -1
             }); 
+        });
+    }
+
+    createTrapAnims() {
+        this.traps.forEach(({ name, size, start, end }) => {
+            if(start === end) {
+                this.anims.create({
+                    key: name,
+                    frames: this.anims.generateFrameNumbers(name, { start: start, end: end }),
+                    frameRate: 0,
+                    repeat: 0,
+                }); 
+            } else {
+                this.anims.create({
+                    key: name,
+                    frames: this.anims.generateFrameNumbers(name, { start: start, end: end }),
+                    frameRate: 15,
+                    repeat: -1
+                }); 
+            }
         });
     }
 

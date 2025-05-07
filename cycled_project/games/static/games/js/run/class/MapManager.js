@@ -11,10 +11,12 @@ export default class MapManager {
         this.addedChunks = [];
         this.layerPool = this.scene.add.group();  // Phaser Group に変更
         this.collisionTiles = [];
-        this.enemyPool = this.scene.add.group();  // Phaser Group に変更
         this.enemies = [];  
+        this.enemyPool = this.scene.add.group();  // Phaser Group に変更
         this.items = [];
         this.itemPool = this.scene.add.group();  // Phaser Group に変更
+        this.traps = [];
+        this.trapPool = this.scene.add.group();  // Phaser Group に変更
 
         this.scene.matter.world.on('collisionstart', (event) => {
             event.pairs.forEach(pair => {
@@ -34,6 +36,12 @@ export default class MapManager {
                     const item = this.isItem(spriteA) ? spriteA : spriteB;
                     const player = bodyA.label === 'player' ? spriteA : spriteB;
                     this.onItemPickup(player, item);
+                }
+
+                if ((this.isTrap(spriteA) && bodyB.label === 'player') || (this.isTrap(spriteB) && bodyA.label === 'player')) {
+                    const item = this.isTrap(spriteA) ? spriteA : spriteB;
+                    const player = bodyA.label === 'player' ? spriteA : spriteB;
+                    this.onTrap(player, item);
                 }
             });
         });
@@ -65,6 +73,7 @@ export default class MapManager {
 
         this.setEnemies(chunkMap);
         this.setItems(chunkMap);
+        this.setTraps(chunkMap);
 
         this.items.forEach(item => {
             if (item.chunkIndex + 1 < this.currentChunkIndex) {
@@ -89,6 +98,9 @@ export default class MapManager {
 
     update() {
         this.updateEnemies();
+        this.updateObjects(this.items,this.itemPool);
+        this.updateObjects(this.traps,this.trapPool);
+
         this.updateBackgrounds();
     }
 
@@ -200,11 +212,11 @@ export default class MapManager {
             obj.setTexture(name + 'Run');
             // bodyがnullでないか確認
             if (!obj.body) {
-                // bodyがnullの場合、物理エンジンに追加して新しいbodyを設定
-                obj = this.scene.matter.add.sprite(x, y, name + 'Run');  // 物理エンジンに新しいスプライトを追加
-                obj.setOrigin(0.5, 1); // オリジン設定
-                pool.add(obj);  // プールに追加
-            }
+                pool.killAndHide(obj); // 一旦元のを無効化
+                obj = this.scene.matter.add.sprite(x, y, name + 'Run');  // 新規作成
+                obj.setOrigin(0.5, 1);
+                pool.add(obj);
+            }            
             obj.setPosition(x, y);
         } else {
             obj = this.scene.matter.add.sprite(x, y, name + 'Run');
@@ -223,52 +235,55 @@ export default class MapManager {
     updateEnemies() {
         const cameraLeft = this.scene.cameras.main.scrollX;
         const cameraRight = cameraLeft + this.scene.cameras.main.width;
+        const block = gameOptions.oneBlockSize;
 
         this.enemies.forEach(enemy => {
-            if (!enemy.active) return;  // enemyがアクティブでない場合は処理をスキップ
+            if (!enemy.is_alive) return;  // enemyがアクティブでない場合は処理をスキップ
 
-            var speed = enemy.speed;
-            
-            if (cameraRight < enemy.chunkX ) {
-                // カメラ外の場合動かない
-                enemy.setVelocityY(0);
+            if (enemy.chunkX > cameraRight) {
                 enemy.setVelocityX(0);
-            } else {
-                if (enemy.is_alive) {
-                    var block = gameOptions.oneBlockSize;
-                    enemy.flipX = false;
-                    switch (enemy.direction) {
-                        case 'left':
-                            if (enemy.patrol && enemy.x <= enemy.originCoord[0] - enemy.range * block) {
-                                enemy.direction = 'right';
-                            }
-                            enemy.setVelocityX(-speed);
-                            enemy.flipX = false;
-                            break;
-                    
-                        case 'right':
-                            if (enemy.patrol && enemy.x >= enemy.originCoord[0]) {
-                                enemy.direction = 'left';
-                            }
-                            enemy.setVelocityX(speed);
-                            enemy.flipX = true;
-                            break;
-                    
-                        case 'up':
-                            if (enemy.patrol && enemy.y <= enemy.originCoord[1] - enemy.range * block) {
-                                enemy.direction = 'down';
-                            }
-                            enemy.setVelocityY(-speed);
-                            break;
-                    
-                        case 'down':
-                            if (enemy.patrol && enemy.y >= enemy.originCoord[1]) {
-                                enemy.direction = 'up';
-                            }
-                            enemy.setVelocityY(speed);
-                            break;
+                enemy.setVelocityY(0);
+                return;
+            }
+            if (enemy.x < cameraLeft) {
+                enemy.setVisible(false);  // レイヤーを非表示にする
+                this.enemyPool.add(enemy);  // プールに戻す
+                enemy.is_alive = false;
+                return;
+            }
+
+            enemy.flipX = false;
+            var speed = enemy.speed;
+            switch (enemy.direction) {
+                case 'left':
+                    if (enemy.patrol && enemy.x <= enemy.originCoord[0] - enemy.range * block) {
+                        enemy.direction = 'right';
                     }
-                }
+                    enemy.setVelocityX(-speed);
+                    enemy.flipX = false;
+                    break;
+            
+                case 'right':
+                    if (enemy.patrol && enemy.x >= enemy.originCoord[0]) {
+                        enemy.direction = 'left';
+                    }
+                    enemy.setVelocityX(speed);
+                    enemy.flipX = true;
+                    break;
+            
+                case 'up':
+                    if (enemy.patrol && enemy.y <= enemy.originCoord[1] - enemy.range * block) {
+                        enemy.direction = 'down';
+                    }
+                    enemy.setVelocityY(-speed);
+                    break;
+            
+                case 'down':
+                    if (enemy.patrol && enemy.y >= enemy.originCoord[1]) {
+                        enemy.direction = 'up';
+                    }
+                    enemy.setVelocityY(speed);
+                    break;
             }
         });
     }
@@ -276,9 +291,11 @@ export default class MapManager {
     isEnemy(sprite) {
         return this.enemies.includes(sprite);
     }
-
     isItem(sprite) {
         return this.items.includes(sprite);
+    }
+    isTrap(sprite) {
+        return this.traps.includes(sprite);
     }
     
     onEnemyCollision(player, enemy) {
@@ -304,7 +321,12 @@ export default class MapManager {
             // player.setVelocityY(-player.jumpForce); // 上に弾む（速度を調整）
             player.jump_count = 0;
             player.jump(true);
-        
+            enemyDead(enemy);
+        } else {
+            this.scene.loseLife(true);     //ジャンプしながら消滅
+        }
+
+        function enemyDead(enemy) {
             enemy.is_alive = false;
             // 敵を消すまたは反応させる場合
             enemy.setAlpha(0.7);
@@ -313,9 +335,6 @@ export default class MapManager {
             enemy.setCollisionCategory(null);
             enemy.setDepth(10);   //この時だけ最前線で表示
             enemy.setIgnoreGravity(false);      //重力適用
-
-        } else {
-            this.scene.loseLife(true);     //ジャンプしながら消滅
         }
     }
 
@@ -379,6 +398,66 @@ export default class MapManager {
             });
         }
     }
+    setTraps(chunkMap) {
+        const objectLayer = chunkMap.getObjectLayer('TrapObjects');
+        if (objectLayer) {
+            objectLayer.objects.forEach(obj => {
+                const name = obj.name;
+                const width = obj.width;
+                const height = obj.height;
+
+                const trap = this.getObjFromPool(this.trapPool, name, obj.x + this.nextChunkX, obj.y);
+                trap.chunkX = this.nextChunkX;
+
+                trap.setDisplaySize(width, height);
+                const anims = this.scene.anims;
+                if (!anims.exists(name)) {
+                    console.warn(`Animation '${name}' が見つかりません. トラップをスキップしました.`);
+                    return;
+                }
+                trap.play(name);
+
+                const { Bodies, Vertices } = Phaser.Physics.Matter.Matter;
+
+                function generateEllipsePath(rx, ry, sides = 20) {
+                    const path = [];
+                    for (let i = 0; i < sides; i++) {
+                        const angle = (Math.PI * 2 * i) / sides;
+                        const x = Math.cos(angle) * rx;
+                        const y = Math.sin(angle) * ry;
+                        path.push(`${x},${y}`);
+                    }
+                    return path.join(' ');
+                }
+
+                const ellipseVertices = Vertices.fromPath(generateEllipsePath(width / 2, height / 2, 20));
+
+                const newBody = Bodies.fromVertices(
+                    obj.x + this.nextChunkX,
+                    obj.y,
+                    [ellipseVertices],
+                    { label: 'item' },
+                    true
+                );
+
+                trap.setExistingBody(newBody);
+                trap.setPosition(obj.x + this.nextChunkX + width/2, obj.y +height/2);
+                trap.setMass(1);
+
+                const gravityIgnore = getProp(obj, 'gravityIgnore', false);
+                trap.setIgnoreGravity(gravityIgnore);
+
+                // trap.setFixedRotation();
+                
+                trap.chunkIndex = this.currentChunkIndex;
+
+                trap.setCollisionCategory(CATEGORY.TRAP);
+                trap.setCollidesWith(CATEGORY.PLAYER);
+
+                this.traps.push(trap);
+            });
+        }
+    }
 
     onItemPickup(player, item) {
         const itemName = item.texture.key;
@@ -395,6 +474,32 @@ export default class MapManager {
             // item.body = null;
         }
         this.itemPool.add(item);
+    }
+
+    onTrap(player, trap) {
+        const trapName = trap.texture.key;
+        switch (trapName) {
+            case 'SpikeBall':
+                this.scene.loseLife(true);
+                break;
+        }
+
+        if (trap.body) {
+            this.scene.matter.world.remove(trap.body);
+            // item.body = null;
+        }
+    }
+
+    // 画面外処理
+    updateObjects(objs,objPool) {
+        const cameraLeft = this.scene.cameras.main.scrollX;
+        objs.forEach(obj => {
+            if (obj.x < cameraLeft) {
+                obj.setVisible(false);  // レイヤーを非表示にする
+                objPool.add(obj);  // プールに戻す
+                return;
+            }
+        })
     }
 
     convertLayerToMatterBodies = (layer, label) => {
@@ -421,7 +526,6 @@ export default class MapManager {
         });
     };
     
-
     getLayerFromPool(chunkMap, name, tilesets) {
         let layer = this.layerPool.getFirstDead(false);
         if (!layer) {
@@ -474,7 +578,13 @@ export default class MapManager {
             item.setVisible(false);  // レイヤーを非表示にする
             this.itemPool.add(item);  // プールに戻す
         });
-        this.items = [];  // 配列を空にして、次のチャンク追加に備える        
+        this.items = [];  // 配列を空にして、次のチャンク追加に備える   
+        // すべて非表示にしてプールに戻す
+        this.traps.forEach(trap => {
+            trap.setVisible(false);  // レイヤーを非表示にする
+            this.trapPool.add(trap);  // プールに戻す
+        });
+        this.traps = [];  // 配列を空にして、次のチャンク追加に備える        
 
         this.nextChunkX = 0;
         this.chunkWidth = 0;
