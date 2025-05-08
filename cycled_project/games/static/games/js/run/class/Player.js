@@ -1,4 +1,4 @@
-import { gameOptions,gameConfig } from '../config.js';
+import { gameOptions,gameConfig,CATEGORY } from '../config.js';
 
 export default class Player extends Phaser.Physics.Matter.Sprite {
     constructor(scene, config) {
@@ -19,12 +19,13 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         this.jumps = config.jumps;
         this.lives = config.lives;
         this.chargeSkill = config.chargeSkill || (() => {});
-        this.skillTime = 10;
         this.skillEndEvent = null;
         this.onSkill = false;
+        this.invincible = false;
 
         if (gameConfig.physics.matter.debug)    this.jumps=1000;
         if (gameConfig.physics.matter.debug)    this.lives=1000;
+        // if (gameConfig.physics.matter.debug)    this.invincible=true;
 
         this.speed = this.initSpeed;
         this.jump_count = 0;
@@ -49,6 +50,8 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         this.setFriction(0);          // 地面との摩擦
         this.setFrictionStatic(0);    // 静止摩擦
         this.setFrictionAir(0);       // 空気抵抗
+        this.setCollisionCategory(CATEGORY.PLAYER);
+        this.setCollidesWith(CATEGORY.ENEMY | CATEGORY.WALL | CATEGORY.ITEM | CATEGORY.TRAP);
 
         this.just_jumped = false;
 
@@ -78,7 +81,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         const currentBlockX = Math.floor(this.dist);
         if (currentBlockX > this.prevBlockX) {
             for (let i = this.prevBlockX + 1; i <= currentBlockX; i++) {
-                this.chargeBar.chargeUp(0.1);
+                this.chargeBar.chargeUp(0.001);
             }
             this.prevBlockX = currentBlockX;
         }
@@ -101,8 +104,8 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         }
     }
 
-    jump(onEnemy=false) {
-        var isGrounded = onEnemy || this.isOnGround();
+    jump(onObject=false) {
+        var isGrounded = onObject || this.isOnGround();
 
         if (this.jump_count < this.jumps) {
             // Matterでは setVelocityY はないので force を使う方が自然
@@ -127,7 +130,10 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 
     isOnGround() {
         if (this.just_jumped)   return false;   //ジャンプしたばかりはfalseを返す
-        this.raycaster.mapGameObjects(this.scene.mapManager.collisionTiles, true);
+        var targets = this.scene.mapManager.collisionTiles
+            .concat(this.scene.mapManager.traps);   // trapにも足場判定を
+
+        this.raycaster.mapGameObjects(targets, true);
     
         // プレイヤーの現在位置から少し下にRayを飛ばす（角度=π/2）
         this.ray.setOrigin(this.x, this.y + this.displayHeight / 2 - 2); // 足元付近
@@ -157,12 +163,19 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         // スキル周りをリセット
         if (this.skillEndEvent) {
             clearTimeout(this.skillEndEvent);
-            this.skillEndEvent = null; // 忘れずにクリーンアップ
             if (this._onSkillEnd) {
                 this._onSkillEnd();         // 保存された関数を呼び出す
                 this._onSkillEnd = null;
             }
-        }        
+            this.onSkill = false; // 明示的にfalseに
+            this.skillEndEvent = null; // 忘れずにクリーンアップ
+        }
+        
+        this.setRotation(0);             // 角度リセット
+        this.setStatic(false);       // 動的に戻す
+        this.setCollisionCategory(CATEGORY.PLAYER); // 元のカテゴリに再設定
+        this.setCollidesWith(CATEGORY.ENEMY | CATEGORY.WALL | CATEGORY.ITEM | CATEGORY.TRAP);
+        this.setDepth(0);  
 
         // 位置と速度を初期化するならここ
         this.setVelocity(0, 0);
