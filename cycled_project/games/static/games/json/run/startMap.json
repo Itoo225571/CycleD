@@ -140,7 +140,7 @@
                         {
                          "name":"range",
                          "type":"float",
-                         "value":6
+                         "value":3
                         }, 
                         {
                          "name":"speed",
@@ -156,8 +156,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":2224.25,
-                 "y":512
+                 "x":2222.06707050862,
+                 "y":594.951320672342
                 }, 
                 {
                  "height":96,
@@ -243,18 +243,7 @@
          "draworder":"topdown",
          "id":10,
          "name":"TrapObjects",
-         "objects":[
-                {
-                 "height":96,
-                 "id":27,
-                 "name":"SpikeBall",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":96,
-                 "x":1039.63414634146,
-                 "y":403.963414634146
-                }],
+         "objects":[],
          "opacity":1,
          "type":"objectgroup",
          "visible":true,

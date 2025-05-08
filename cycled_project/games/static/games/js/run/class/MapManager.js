@@ -67,8 +67,10 @@ export default class MapManager {
         this.blockLayer = safeCreateLayer(chunkMap, 'Block', tilesets, this.nextChunkX, 0).setDepth(3);
 
         this.convertLayerToMatterBodies(this.groundLayer, 'ground');
+        this.groundLayer.setCollisionCategory(CATEGORY.WALL);
         if (this.blockLayer) {
             this.convertLayerToMatterBodies(this.blockLayer, 'block');
+            this.blockLayer.setCollisionCategory(CATEGORY.WALL); // ブロックカテゴリを設定
         }
 
         this.setEnemies(chunkMap);
@@ -140,6 +142,9 @@ export default class MapManager {
                 enemy.gravityIgnore = getProp(obj, 'gravityIgnore', false);
                 enemy.patrol = getProp(obj, 'patrol', false);
                 enemy.range = getProp(obj, 'range', -1);    // -1は無限を表す
+                enemy.delay = getProp(obj, 'delay', 0);    // -1は無限を表す
+
+                enemy.delayTimer = null;
 
                 enemy.is_alive = true;  //生きてる
 
@@ -188,6 +193,7 @@ export default class MapManager {
                 enemy.body.gravityScale = 1;
                 enemy.setFixedRotation();
                 enemy.setAlpha(1);  //見た目をなおす
+                enemy.isMove = false;
 
                 // 重力
                 enemy.setIgnoreGravity(enemy.gravityIgnore);
@@ -197,7 +203,7 @@ export default class MapManager {
                 enemy.originCoord = [obj.x + this.nextChunkX, obj.y];
 
                 enemy.setCollisionCategory(CATEGORY.ENEMY);
-                enemy.setCollidesWith(CATEGORY.PLAYER | CATEGORY.WALL);
+                enemy.setCollidesWith(CATEGORY.PLAYER | CATEGORY.WALL | CATEGORY.TRAP);
 
                 this.enemies.push(enemy);
             });
@@ -240,7 +246,8 @@ export default class MapManager {
         this.enemies.forEach(enemy => {
             if (!enemy.is_alive) return;  // enemyがアクティブでない場合は処理をスキップ
 
-            if (enemy.chunkX > cameraRight) {
+            var margin = block;
+            if (enemy.x > cameraRight + margin) {
                 enemy.setVelocityX(0);
                 enemy.setVelocityY(0);
                 return;
@@ -252,6 +259,20 @@ export default class MapManager {
                 return;
             }
 
+            if (enemy.delay) {
+                // delay秒が経過していない場合は処理をスキップ
+                if (!enemy.delayTimer) {
+                    enemy.delayTimer = this.scene.time.now;  // 現在の時間でtimerを初期化
+                }
+                if (this.scene.time.now - enemy.delayTimer < enemy.delay * 1000) {
+                    return;  // delay秒が経過していなければ何もせず戻る
+                }
+            }
+            // ちょっと力を入れてやる
+            if (!enemy.isMove) {
+                Phaser.Physics.Matter.Matter.Body.applyForce(enemy.body, enemy.body.position, { x: -0.00001, y: 0 });
+                enemy.isMove=true;
+            }
             enemy.flipX = false;
             var speed = enemy.speed;
             switch (enemy.direction) {
