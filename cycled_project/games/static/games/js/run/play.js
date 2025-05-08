@@ -1,12 +1,6 @@
-import { gameOptions, CATEGORY } from './config.js';
+import { gameOptions, CATEGORY, chargeSkillTable } from './config.js';
 import Player from './class/Player.js';
 import MapManager from './class/MapManager.js';
-
-const chargeSkillTable = {
-    GainLife: (player) => {
-        player.lives++;
-    },
-};
 
 export default class PlayScene extends Phaser.Scene {
     constructor() {
@@ -65,6 +59,12 @@ export default class PlayScene extends Phaser.Scene {
                     .setOrigin(0, 0.5)
                     .setScrollFactor(0);
         this.player.createChargeBar(bgBar,chargeBar);
+        // life
+        this.lifeText = this.add.text(30, 120, `0`, {
+            fontFamily: '"Press Start 2P"',
+            fontSize: '32px',
+            fill: '#ffffff'
+        }).setScrollFactor(0);
 
         // ポーズボタン
         this.pauseButton = this.add.sprite(this.cameras.main.width - 50, 50, 'inputPrompts', 538)
@@ -98,6 +98,7 @@ export default class PlayScene extends Phaser.Scene {
         // スコア更新表示
         this.score = this.player.dist + this.player.distPre;
         this.distText.setText(`${strScore(this.score)}`);
+        this.lifeText.setText(`${this.player.lives}`);
 
         const leftBound = cam.scrollX - (cam.width / 6);
         const bottomBound = cam.scrollY + cam.height * 7 / 6;

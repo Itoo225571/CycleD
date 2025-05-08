@@ -19,6 +19,9 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         this.jumps = config.jumps;
         this.lives = config.lives;
         this.chargeSkill = config.chargeSkill || (() => {});
+        this.skillTime = 10;
+        this.skillEndEvent = null;
+        this.onSkill = false;
 
         if (gameConfig.physics.matter.debug)    this.jumps=1000;
         if (gameConfig.physics.matter.debug)    this.lives=1000;
@@ -28,6 +31,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 
         this.distPre = 0;
         this.dist = 0;
+        this.prevBlockX = 0;
 
         // サイズ・物理設定
         this.setDisplaySize(gameOptions.oneBlockSize, gameOptions.oneBlockSize);
@@ -69,6 +73,15 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 
         // 移動距離の加算 (1ブロック当たり1mとする)
         this.dist = (this.x - gameOptions.playerStartPosition) / gameOptions.oneBlockSize;
+
+        // ✅ 前回のブロックXと比較して、ブロック境界を超えたときに関数を呼ぶ
+        const currentBlockX = Math.floor(this.dist);
+        if (currentBlockX > this.prevBlockX) {
+            for (let i = this.prevBlockX + 1; i <= currentBlockX; i++) {
+                this.chargeBar.chargeUp(0.1);
+            }
+            this.prevBlockX = currentBlockX;
+        }
 
         // カメラ位置に合わせる
         let playerPos = cam.scrollX + gameOptions.playerStartPosition;
@@ -140,6 +153,16 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
     initPlayer() {
         this.speed = this.initSpeed;
         // this.chargeBar.reset();  // リセットしなくてもいい
+        this.prevBlockX = 0;
+        // スキル周りをリセット
+        if (this.skillEndEvent) {
+            clearTimeout(this.skillEndEvent);
+            this.skillEndEvent = null; // 忘れずにクリーンアップ
+            if (this._onSkillEnd) {
+                this._onSkillEnd();         // 保存された関数を呼び出す
+                this._onSkillEnd = null;
+            }
+        }        
 
         // 位置と速度を初期化するならここ
         this.setVelocity(0, 0);
@@ -178,6 +201,9 @@ class ChargeBar {
 
     onChargeFull() {
         this.reset();
+        if (this.player.onSkill)   return;
+        
+        this.player.onSkill = true;
         if (this.player.chargeSkill) this.player.chargeSkill(this.player);
         this.player.emit('chargeFull'); // 外部でも監視可能
     }
