@@ -70,3 +70,28 @@ export const CATEGORY = {
     WALL:   0x0008,
     TRAP:   0x0010, // 追加
 };
+
+export const chargeSkillTable = {
+    GainLife: (player) => {
+        player.lives++;
+        createSkillEndEvent(player,false,() => {
+            player.lives = Math.max(0, player.lives - 1);
+        });
+    },
+};
+
+function createSkillEndEvent(player,isDeadTriggered=true, func) {
+    if (player.skillEndEvent) return;
+
+    player.onSkill = true;
+
+    player._onSkillEnd = (timer=false) => {
+        if (isDeadTriggered || timer) func();    //死語発動するタイプだったら || 時間発動だったら
+        player.skillEndEvent = null;
+        player.onSkill = false;
+    };
+
+    player.skillEndEvent = setTimeout(() => {
+        player._onSkillEnd(true); // ← 外側の player をそのまま使う
+    }, player.skillTime * 1000);
+}
