@@ -151,7 +151,7 @@
                         {
                          "name":"speed",
                          "type":"float",
-                         "value":3
+                         "value":0
                         }, 
                         {
                          "name":"weak",
@@ -162,8 +162,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":397.524726634119,
-                 "y":370.276186189873
+                 "x":398.900265021695,
+                 "y":320
                 }, 
                 {
                  "ellipse":true,
@@ -205,8 +205,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":1103.0132552856,
-                 "y":593.264679811415
+                 "x":1103.01,
+                 "y":593.265
                 }, 
                 {
                  "ellipse":true,
@@ -237,7 +237,7 @@
                         {
                          "name":"speed",
                          "type":"float",
-                         "value":3
+                         "value":0
                         }, 
                         {
                          "name":"weak",
@@ -248,8 +248,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":655.10425653071,
-                 "y":371.263342671559
+                 "x":656.479265021695,
+                 "y":320
                 }, 
                 {
                  "ellipse":true,
@@ -280,7 +280,7 @@
                         {
                          "name":"speed",
                          "type":"float",
-                         "value":3
+                         "value":0
                         }, 
                         {
                          "name":"weak",
@@ -291,8 +291,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":913.830511407173,
-                 "y":370.769842671559
+                 "x":915.206265021695,
+                 "y":320
                 }, 
                 {
                  "ellipse":true,
@@ -323,7 +323,7 @@
                         {
                          "name":"speed",
                          "type":"float",
-                         "value":3
+                         "value":0
                         }, 
                         {
                          "name":"weak",
@@ -334,8 +334,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":1171.41051140717,
-                 "y":371.756842671559
+                 "x":1172.7852650217,
+                 "y":320
                 }, 
                 {
                  "ellipse":true,
@@ -366,7 +366,7 @@
                         {
                          "name":"speed",
                          "type":"float",
-                         "value":3
+                         "value":0
                         }, 
                         {
                          "name":"weak",
@@ -377,8 +377,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":1421.54640922065,
-                 "y":374.042513793114
+                 "x":1422.92526502169,
+                 "y":320
                 }, 
                 {
                  "ellipse":true,
@@ -409,7 +409,7 @@
                         {
                          "name":"speed",
                          "type":"float",
-                         "value":3
+                         "value":0
                         }, 
                         {
                          "name":"weak",
@@ -420,8 +420,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":1679.12540922065,
-                 "y":375.030513793114
+                 "x":1680.5052650217,
+                 "y":320
                 }, 
                 {
                  "ellipse":true,
@@ -452,7 +452,7 @@
                         {
                          "name":"speed",
                          "type":"float",
-                         "value":3
+                         "value":0
                         }, 
                         {
                          "name":"weak",
@@ -463,8 +463,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":1937.85140922065,
-                 "y":374.536513793114
+                 "x":1939.2252650217,
+                 "y":320
                 }, 
                 {
                  "ellipse":true,
@@ -495,7 +495,7 @@
                         {
                          "name":"speed",
                          "type":"float",
-                         "value":3
+                         "value":0
                         }, 
                         {
                          "name":"weak",
@@ -506,8 +506,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":2195.42840922065,
-                 "y":375.523513793114
+                 "x":2196.8052650217,
+                 "y":320
                 }, 
                 {
                  "ellipse":true,
@@ -538,7 +538,7 @@
                         {
                          "name":"speed",
                          "type":"float",
-                         "value":1
+                         "value":0
                         }, 
                         {
                          "name":"weak",
@@ -549,8 +549,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":974.645861478245,
-                 "y":592.718189417479
+                 "x":1042.46450476344,
+                 "y":595.947452607783
                 }, 
                 {
                  "ellipse":true,
@@ -581,7 +581,7 @@
                         {
                          "name":"speed",
                          "type":"float",
-                         "value":1
+                         "value":0
                         }, 
                         {
                          "name":"weak",
@@ -592,51 +592,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":1362.94207005254,
-                 "y":591.50292206655
-                }, 
-                {
-                 "ellipse":true,
-                 "height":96,
-                 "id":52,
-                 "name":"MonsieurMush",
-                 "properties":[
-                        {
-                         "name":"direction",
-                         "type":"string",
-                         "value":"left"
-                        }, 
-                        {
-                         "name":"gravityIgnore",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"patrol",
-                         "type":"bool",
-                         "value":false
-                        }, 
-                        {
-                         "name":"range",
-                         "type":"float",
-                         "value":-1
-                        }, 
-                        {
-                         "name":"speed",
-                         "type":"float",
-                         "value":1
-                        }, 
-                        {
-                         "name":"weak",
-                         "type":"string",
-                         "value":"up"
-                        }],
-                 "rotation":0,
-                 "type":"enemy",
-                 "visible":true,
-                 "width":96,
-                 "x":1809.13505128205,
-                 "y":585.271937012263
+                 "x":1550.24825125141,
+                 "y":599.576631519458
                 }, 
                 {
                  "ellipse":true,
@@ -667,7 +624,7 @@
                         {
                          "name":"speed",
                          "type":"float",
-                         "value":1
+                         "value":0
                         }, 
                         {
                          "name":"weak",
@@ -678,13 +635,13 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":2069.06905128205,
-                 "y":583.509937012263
+                 "x":2069.07,
+                 "y":583.51
                 }, 
                 {
                  "ellipse":true,
                  "height":96,
-                 "id":69,
+                 "id":94,
                  "name":"AngryPig",
                  "properties":[
                         {
@@ -721,8 +678,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":2320.74025298908,
-                 "y":589.671114191648
+                 "x":1874.01412342647,
+                 "y":587.554190973288
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -738,114 +695,6 @@
                 {
                  "ellipse":true,
                  "height":64,
-                 "id":35,
-                 "name":"coin_bronze",
-                 "properties":[
-                        {
-                         "name":"gravityIgnore",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"item",
-                 "visible":true,
-                 "width":64,
-                 "x":640,
-                 "y":640
-                }, 
-                {
-                 "ellipse":true,
-                 "height":64,
-                 "id":47,
-                 "name":"coin_bronze",
-                 "properties":[
-                        {
-                         "name":"gravityIgnore",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"item",
-                 "visible":true,
-                 "width":64,
-                 "x":704,
-                 "y":640
-                }, 
-                {
-                 "ellipse":true,
-                 "height":64,
-                 "id":55,
-                 "name":"coin_bronze",
-                 "properties":[
-                        {
-                         "name":"gravityIgnore",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"item",
-                 "visible":true,
-                 "width":64,
-                 "x":768.050338041368,
-                 "y":638.727625677756
-                }, 
-                {
-                 "ellipse":true,
-                 "height":64,
-                 "id":56,
-                 "name":"coin_bronze",
-                 "properties":[
-                        {
-                         "name":"gravityIgnore",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"item",
-                 "visible":true,
-                 "width":64,
-                 "x":832.050338041368,
-                 "y":638.727625677756
-                }, 
-                {
-                 "ellipse":true,
-                 "height":64,
-                 "id":57,
-                 "name":"coin_bronze",
-                 "properties":[
-                        {
-                         "name":"gravityIgnore",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"item",
-                 "visible":true,
-                 "width":64,
-                 "x":1152.79343291342,
-                 "y":639.40794241604
-                }, 
-                {
-                 "ellipse":true,
-                 "height":64,
-                 "id":58,
-                 "name":"coin_bronze",
-                 "properties":[
-                        {
-                         "name":"gravityIgnore",
-                         "type":"bool",
-                         "value":true
-                        }],
-                 "rotation":0,
-                 "type":"item",
-                 "visible":true,
-                 "width":64,
-                 "x":1216.79343291342,
-                 "y":639.40794241604
-                }, 
-                {
-                 "ellipse":true,
-                 "height":64,
                  "id":59,
                  "name":"coin_bronze",
                  "properties":[
@@ -858,8 +707,8 @@
                  "type":"item",
                  "visible":true,
                  "width":64,
-                 "x":1280.84343291342,
-                 "y":638.135942416039
+                 "x":1024,
+                 "y":448
                 }, 
                 {
                  "ellipse":true,
@@ -876,13 +725,13 @@
                  "type":"item",
                  "visible":true,
                  "width":64,
-                 "x":1344.84343291342,
-                 "y":638.135942416039
+                 "x":1088,
+                 "y":448
                 }, 
                 {
                  "ellipse":true,
                  "height":64,
-                 "id":65,
+                 "id":70,
                  "name":"coin_bronze",
                  "properties":[
                         {
@@ -894,13 +743,13 @@
                  "type":"item",
                  "visible":true,
                  "width":64,
-                 "x":1601.27623311803,
-                 "y":640.000259150519
+                 "x":1280.5056782451,
+                 "y":447.775077090513
                 }, 
                 {
                  "ellipse":true,
                  "height":64,
-                 "id":66,
+                 "id":71,
                  "name":"coin_bronze",
                  "properties":[
                         {
@@ -912,13 +761,13 @@
                  "type":"item",
                  "visible":true,
                  "width":64,
-                 "x":1665.27623311803,
-                 "y":640.000259150519
+                 "x":1344.5056782451,
+                 "y":447.775077090513
                 }, 
                 {
                  "ellipse":true,
                  "height":64,
-                 "id":67,
+                 "id":74,
                  "name":"coin_bronze",
                  "properties":[
                         {
@@ -930,13 +779,13 @@
                  "type":"item",
                  "visible":true,
                  "width":64,
-                 "x":1729.32623311803,
-                 "y":638.728259150519
+                 "x":512.101269210142,
+                 "y":448.567892103154
                 }, 
                 {
                  "ellipse":true,
                  "height":64,
-                 "id":68,
+                 "id":75,
                  "name":"coin_bronze",
                  "properties":[
                         {
@@ -948,8 +797,175 @@
                  "type":"item",
                  "visible":true,
                  "width":64,
-                 "x":1793.32623311803,
-                 "y":638.728259150519
+                 "x":576.101269210142,
+                 "y":448.567892103154
+                }, 
+                {
+                 "ellipse":true,
+                 "height":64,
+                 "id":76,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":768.611269210142,
+                 "y":448.342892103154
+                }, 
+                {
+                 "ellipse":true,
+                 "height":64,
+                 "id":77,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":832.611269210142,
+                 "y":448.342892103154
+                }, 
+                {
+                 "ellipse":true,
+                 "height":64,
+                 "id":90,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":1535.94337916465,
+                 "y":449.5144533144
+                }, 
+                {
+                 "ellipse":true,
+                 "height":64,
+                 "id":91,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":1599.94337916465,
+                 "y":449.5144533144
+                }, 
+                {
+                 "ellipse":true,
+                 "height":64,
+                 "id":92,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":1791.05614568693,
+                 "y":640.710439761236
+                }, 
+                {
+                 "ellipse":true,
+                 "height":64,
+                 "id":93,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":1855.05614568693,
+                 "y":640.710439761236
+                }, 
+                {
+                 "ellipse":true,
+                 "height":64,
+                 "id":96,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":2239.43897505057,
+                 "y":639.611598111935
+                }, 
+                {
+                 "ellipse":true,
+                 "height":64,
+                 "id":97,
+                 "name":"coin_bronze",
+                 "properties":[
+                        {
+                         "name":"gravityIgnore",
+                         "type":"bool",
+                         "value":true
+                        }],
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":64,
+                 "x":2303.43897505057,
+                 "y":639.611598111935
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":10,
+         "name":"TrapObjects",
+         "objects":[
+                {
+                 "ellipse":true,
+                 "height":96,
+                 "id":95,
+                 "name":"SpikeBall",
+                 "rotation":0,
+                 "type":"trap",
+                 "visible":true,
+                 "width":96,
+                 "x":1808.02012016208,
+                 "y":448.511946346234
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -957,8 +973,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":10,
- "nextobjectid":70,
+ "nextlayerid":11,
+ "nextobjectid":98,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
