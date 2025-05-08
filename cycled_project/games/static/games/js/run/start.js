@@ -92,7 +92,7 @@ export default class StartScene extends Phaser.Scene {
         this.scene.start('PlayScene');
     }
     goCharaSelectScene() {
-        return;
+        this.scene.start('SelectCharacterScene');
     }
     goRankingScene() {
         if (!this.titleReady) return;  // ← ここで弾く！

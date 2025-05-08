@@ -4,6 +4,7 @@ import StartScene from './start.js';
 import RankingScene from './ranking.js';
 import PauseScene from './pause.js'
 import GameoverScene from './gameover.js';
+import SelectCharacterScene from './select_character.js';
 
 export const gameOptions = {
     playerNameDefault: "NinjaFrog",
@@ -24,7 +25,11 @@ export const gameConfig = {
     width: 1334,
     height: 750,
     pixelArt: true,
-    scene: [PreloadScene, StartScene, PlayScene, RankingScene, PauseScene , GameoverScene], // シーンの順番
+    scene: [
+        PreloadScene, 
+        StartScene, PlayScene, RankingScene, SelectCharacterScene,
+        PauseScene , GameoverScene, 
+    ], // シーンの順番
     backgroundColor: 0x444444,
     parent: 'game-container',
     physics: {

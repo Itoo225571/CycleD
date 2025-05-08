@@ -148,7 +148,7 @@ export default class PreloadScene extends Phaser.Scene {
             this.anims.create({
                 key: name + 'Idle',
                 frames: this.anims.generateFrameNumbers(name + 'Idle', { start: 0, end: 10 }),
-                frameRate: 10,
+                frameRate: 12,
                 repeat: -1
             });
             this.anims.create({
