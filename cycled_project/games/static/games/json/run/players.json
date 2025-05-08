@@ -24,7 +24,7 @@
         "jumps": 1,
         "lives": 2,
         "jumpForce": 20,
-        "chargeSkill": "GainLife"
+        "chargeSkill": "Invincibled"
     },
     {
         "key": "Diver",

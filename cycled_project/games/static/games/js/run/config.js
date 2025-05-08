@@ -39,7 +39,7 @@ export const gameConfig = {
                 y: gameOptions.garavityForce,
             },
             enableSleep: true,
-            // debug: false,
+            debug: false,
         }
     },
     plugins: {
@@ -74,13 +74,22 @@ export const CATEGORY = {
 export const chargeSkillTable = {
     GainLife: (player) => {
         player.lives++;
-        createSkillEndEvent(player,false,() => {
+        var skillTime = 10;
+        createSkillEndEvent(player, skillTime, false,() => {
             player.lives = Math.max(0, player.lives - 1);
+        });
+    },
+    // 無敵化
+    Invincibled: (player) => {
+        player.invincible = true;
+        var skillTime = 10;
+        createSkillEndEvent(player, skillTime, true,() => {
+            player.invincible = false;
         });
     },
 };
 
-function createSkillEndEvent(player,isDeadTriggered=true, func) {
+function createSkillEndEvent(player, skillTime,isDeadTriggered=true, func) {
     if (player.skillEndEvent) return;
 
     player.onSkill = true;
@@ -93,5 +102,5 @@ function createSkillEndEvent(player,isDeadTriggered=true, func) {
 
     player.skillEndEvent = setTimeout(() => {
         player._onSkillEnd(true); // ← 外側の player をそのまま使う
-    }, player.skillTime * 1000);
+    }, skillTime * 1000);
 }

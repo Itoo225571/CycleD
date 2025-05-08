@@ -25,7 +25,8 @@ export default class PlayScene extends Phaser.Scene {
                 chargeSkill: chargeSkillTable[chara.chargeSkill]
             };
         }        
-        const selectedCharKey = 'Diver';  // 操作キャラのキー（ここでは固定）
+        const selectedCharKey = 'PigMan';  // 操作キャラのキー（ここでは固定）
+        // const selectedCharKey = 'Diver';  // 操作キャラのキー（ここでは固定）
         const playerConfig = characterConfigs[selectedCharKey] || characterConfigs[gameOptions.playerNameDefault];
         this.player = new Player(this, playerConfig);
 
@@ -98,7 +99,7 @@ export default class PlayScene extends Phaser.Scene {
         // スコア更新表示
         this.score = this.player.dist + this.player.distPre;
         this.distText.setText(`${strScore(this.score)}`);
-        this.lifeText.setText(`${this.player.lives}`);
+        this.lifeText.setText(`${this.player.onSkill}`);
 
         const leftBound = cam.scrollX - (cam.width / 6);
         const bottomBound = cam.scrollY + cam.height * 7 / 6;
@@ -162,13 +163,6 @@ export default class PlayScene extends Phaser.Scene {
                             duration: 500,               // 速い落下
                             ease: 'Sine.easeIn',         // 急激に落ちるように設定
                             onComplete: () => {
-                                this.player.setAngle(0);             // 角度リセット
-                                this.player.setStatic(false);       // 動的に戻す
-                                this.player.setCollisionCategory(CATEGORY.PLAYER); // 元のカテゴリに再設定
-                                this.player.setCollidesWith(CATEGORY.ENEMY | CATEGORY.WALL | CATEGORY.ITEM);    //enemy,wall,itemとぶつかる設定
-                                this.player.setVelocity(0, 0);      // 慣性などリセット 
-                                this.player.setDepth(10);   
-                                
                                 this.loseLifeAfetr(); // アニメーション後に後処理を呼び出し
                             }
                         });
@@ -176,10 +170,6 @@ export default class PlayScene extends Phaser.Scene {
                 });
             });
         } else {
-            this.player.setStatic(false);
-            this.player.setDepth(10);
-            this.player.setCollisionCategory(CATEGORY.PLAYER);
-            this.player.setCollidesWith(CATEGORY.ENEMY | CATEGORY.WALL | CATEGORY.ITEM);
             this.cameras.main.shake(500,0.01);  //画面振動
             this.time.delayedCall(1500, () => {
                 this.loseLifeAfetr();

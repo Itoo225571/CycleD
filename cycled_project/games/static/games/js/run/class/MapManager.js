@@ -304,17 +304,7 @@ export default class MapManager {
         const angle = Math.atan2(dy, dx); // ラジアン
 
         // 角度から方向を判定（8方向で割り当て）
-        let collisionDirection = '';
-        var angular_width = Math.PI / 6;
-        if (angle >= - angular_width && angle < angular_width) {
-            collisionDirection = 'right';
-        } else if (angle >=  angular_width && angle < angular_width * 5) {
-            collisionDirection = 'down';
-        } else if (angle >= - angular_width * 5 && angle < -angular_width) {
-            collisionDirection = 'up';
-        } else {
-            collisionDirection = 'left';
-        }
+        let collisionDirection = judgeDirection(angle);
 
         // enemyの弱点にぶつかった時(踏んだ時)
         if (collisionDirection === enemy.weak) {
@@ -322,6 +312,8 @@ export default class MapManager {
             player.jump_count = 0;
             player.jump(true);
             enemyDead(enemy);
+        } else if (player.invincible) {
+            enemyDead(enemy);   // playerが無敵状態
         } else {
             this.scene.loseLife(true);     //ジャンプしながら消滅
         }
@@ -442,10 +434,11 @@ export default class MapManager {
 
                 trap.setExistingBody(newBody);
                 trap.setPosition(obj.x + this.nextChunkX + width/2, obj.y +height/2);
-                trap.setMass(1);
+                trap.setStatic(true); // プレイヤーが乗れるように固定
+                // trap.setMass(1); // 静的だけど衝突判定は有効
 
-                const gravityIgnore = getProp(obj, 'gravityIgnore', false);
-                trap.setIgnoreGravity(gravityIgnore);
+                // const gravityIgnore = getProp(obj, 'gravityIgnore', false);
+                // trap.setIgnoreGravity(gravityIgnore);
 
                 // trap.setFixedRotation();
                 
@@ -480,13 +473,8 @@ export default class MapManager {
         const trapName = trap.texture.key;
         switch (trapName) {
             case 'SpikeBall':
-                this.scene.loseLife(true);
+                if(!player.invincible)   this.scene.loseLife(true);
                 break;
-        }
-
-        if (trap.body) {
-            this.scene.matter.world.remove(trap.body);
-            // item.body = null;
         }
     }
 
@@ -667,4 +655,19 @@ function safeCreateLayer(map, name, tilesets, x, y) {
 // プロパティ取得
 function getProp(obj, name, defaultValue) {
     return obj.properties?.find(p => p.name === name)?.value ?? defaultValue;
+}
+
+function judgeDirection(angle) {
+    let collisionDirection = '';
+    var angular_width = Math.PI / 6;
+    if (angle >= - angular_width && angle < angular_width) {
+        collisionDirection = 'right';
+    } else if (angle >=  angular_width && angle < angular_width * 5) {
+        collisionDirection = 'down';
+    } else if (angle >= - angular_width * 5 && angle < -angular_width) {
+        collisionDirection = 'up';
+    } else {
+        collisionDirection = 'left';
+    }
+    return collisionDirection;
 }
