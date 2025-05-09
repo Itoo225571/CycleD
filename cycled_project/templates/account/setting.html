@@ -17,7 +17,7 @@
         <div class="userprofile-field my-3 row">
             <div class="usericon-container col-md-3 col-12 mb-2">
                 <div class="usericon-field position-relative d-inline-block">
-                    <img src="{{user.icon}}" class="border border-dark img-fluid" alt="icon" loading="lazy">
+                    <img src="{% static 'accounts/img/user_icons/' %}{{ user.icon }}" class="border border-dark img-fluid" alt="icon" loading="lazy">
                     <button class="user-edit-button" data-bs-toggle="modal" data-bs-target="#usericonModal" onclick="resetAllEditButtons()">
                         <i class="bi bi-pencil-square"></i>
                     </button>
@@ -137,7 +137,7 @@
                                         </div>
                                         <img 
                                             class="icon-img-radio rounded-circle p-1 w-100 border border-3 border-transparent" 
-                                            src="{{ radio.data.value }}" 
+                                            src="{% static 'accounts/img/user_icons/' %}{{ radio.data.value }}"
                                             alt="{{ radio.choice_label }}">
                                     </label>
                                 {% endfor %}

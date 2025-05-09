@@ -8,13 +8,12 @@ from django.core.exceptions import ValidationError
 import uuid
 
 class User(AbstractUser):
-    ICON_BASE_PATH = f'{settings.STATIC_URL}accounts/img/user_icons/'
     ICON_CHOICES = [
-        (f'{ICON_BASE_PATH}user_icon_1.png', 'User Image1'),
-        (f'{ICON_BASE_PATH}user_icon_2.png', 'User Image2'),
-        (f'{ICON_BASE_PATH}user_icon_3.png', 'User Image3'),
-        (f'{ICON_BASE_PATH}user_icon_4.png', 'User Image4'),
-        (f'{ICON_BASE_PATH}user_icon_5.png', 'User Image5'),
+        ('user_icon_1.png', 'User Image1'),
+        ('user_icon_2.png', 'User Image2'),
+        ('user_icon_3.png', 'User Image3'),
+        ('user_icon_4.png', 'User Image4'),
+        ('user_icon_5.png', 'User Image5'),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
@@ -25,7 +24,7 @@ class User(AbstractUser):
     icon = models.CharField(
         max_length=100,
         choices=ICON_CHOICES,
-        default=f'{ICON_BASE_PATH}user_icon_1.png',  # ここでデフォルト画像を指定
+        default='user_icon_1.png',  # ここでデフォルト画像を指定
         verbose_name="アイコン",
     )
     class Meta:

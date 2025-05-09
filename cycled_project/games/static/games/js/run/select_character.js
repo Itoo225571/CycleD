@@ -3,14 +3,10 @@ export default class SelectCharacterScene extends Phaser.Scene {
         super({ key: 'SelectCharacterScene' });
     }
 
-    preload() {
-        this.load.json('charaData', jsonPlayers);
-    }
-
     create() {
-        const charaData = this.cache.json.get('charaData');
+        this.charaData = this.registry.get('playersData');
         this.characterConfigs = {};
-        for (const chara of charaData) {
+        for (const chara of this.charaData) {
             this.characterConfigs[chara.key] = { ...chara };
         }
 
@@ -29,7 +25,15 @@ export default class SelectCharacterScene extends Phaser.Scene {
             const sprite = this.add.sprite(0, 0, key + 'Idle').setInteractive({ useHandCursor: true });
 
             sprite.on('pointerdown', () => {
-                this.updateCarousel(i); // 更新時に selectedIndex を渡す
+                // タップしたキャラが中央かどうかをチェック
+                const tappedIndex = i;
+                if (tappedIndex === this.selectedIndex) {
+                    // console.log("Selected character:", this.characterKeys[tappedIndex]);
+                    // ここで選択したキャラクターの処理を行う
+                    this.selectCharacter(tappedIndex);
+                } else {
+                    this.updateCarousel(tappedIndex); // 新しいキャラクターを選択
+                }
             });
 
             this.characterSprites.push(sprite);
@@ -47,7 +51,24 @@ export default class SelectCharacterScene extends Phaser.Scene {
         });
 
         this.input.keyboard.on('keydown-ENTER', () => {
-            console.log("Selected character:", this.characterKeys[this.selectedIndex]);
+            // console.log("Selected character:", this.characterKeys[this.selectedIndex]);
+            this.selectCharacter(this.selectedIndex);
+        });
+
+        // 戻るボタン
+        this.backButton = this.add.sprite(100, 80, 'inputPrompts', 608);  // (x, y, key, frame)
+        // ボタンにインタラクションを追加（クリックイベント）
+        this.backButton.setDisplaySize(48 *3/2, 48);
+        this.backButton.setInteractive({ useHandCursor: true });
+        this.backButton.setFlipX(true);  // 水平方向に反転
+        this.backButton.on('pointerdown', this.goStart.bind(this));
+        // ホバー時の色変更（マウスオーバー）
+        this.backButton.on('pointerover', () => {
+            this.backButton.setTint(0x44ff44);  // ホバー時に緑色に変更
+        });
+        // ホバーを外した時の色を戻す（マウスアウト）
+        this.backButton.on('pointerout', () => {
+            this.backButton.clearTint();  // 色を元に戻す
         });
     }
 
@@ -122,5 +143,15 @@ export default class SelectCharacterScene extends Phaser.Scene {
                 sprite.anims.stop();
             }
         }
+    }
+
+    selectCharacter(charaIndex) {
+        var selectedChara = this.charaData[charaIndex];
+        console.log(selectedChara);
+        this.scene.get('PlayScene').data.set('selectedCharacter', selectedChara);
+    }
+
+    goStart() {
+        this.scene.start('StartScene');
     }
 }
