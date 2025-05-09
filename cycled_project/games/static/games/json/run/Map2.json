@@ -241,6 +241,29 @@
         }, 
         {
          "draworder":"topdown",
+         "id":10,
+         "name":"TrapObjects",
+         "objects":[
+                {
+                 "ellipse":true,
+                 "height":96,
+                 "id":23,
+                 "name":"SpikeBall",
+                 "rotation":0,
+                 "type":"item",
+                 "visible":true,
+                 "width":96,
+                 "x":690,
+                 "y":320
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":8,
          "name":"ItemObjects",
          "objects":[
@@ -394,8 +417,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":10,
- "nextobjectid":23,
+ "nextlayerid":11,
+ "nextobjectid":24,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
