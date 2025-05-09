@@ -64,7 +64,7 @@ export default class RankingScene extends Phaser.Scene {
     
     getScores() {
         $.ajax({
-            url: '/games/api/score_nikirun/',
+            url: '/games/api/nikirun_score/',
             method: 'GET',
             headers: {
                 "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンをヘッダーに設定

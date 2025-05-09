@@ -291,3 +291,13 @@ APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"  # タスクの日時形式
 APSCHEDULER_RUN_NOW_TIMEOUT = 25  # タスクが今すぐ実行されるときのタイムアウト秒数
 
 ACCOUNT_SESSION_REMEMBER = None  # ← チェックボックスに任せる！
+
+# レート制限の設定
+DEFAULT_THROTTLE_CLASSES = [
+    'rest_framework.throttling.AnonRateThrottle',  # 匿名ユーザー向けのレート制限
+    'rest_framework.throttling.UserRateThrottle',  # 認証済みユーザー向けのレート制限
+]
+DEFAULT_THROTTLE_RATES = {
+    'anon': '5/minute',  # 匿名ユーザーのレート制限：5リクエスト/分
+    'user': '20/minute',  # 認証ユーザーのレート制限：20リクエスト/分
+}

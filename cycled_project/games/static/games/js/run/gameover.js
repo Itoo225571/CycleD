@@ -125,7 +125,7 @@ export default class GameoverScene extends Phaser.Scene {
         
         var is_newrecord = false;
         $.ajax({
-            url: `/games/api/score_nikirun/${id}/`,
+            url: `/games/api/nikirun_score/${id}/`,
             method: 'PATCH',
             headers: {
                 "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンをヘッダーに設定

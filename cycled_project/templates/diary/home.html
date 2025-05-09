@@ -138,7 +138,7 @@
                                             <div class="card-userinfo col-9">
                                                 <div class="row">
                                                     <div class="card-user">
-                                                        <img src="{{ diary.user.icon_url}}" class="rounded-circle bg-white border" width="30" height="30" alt="icon" loading="lazy">
+                                                        <img src="{% static 'accounts/img/user_icons/' %}{{ diary.user.icon_url }}" class="rounded-circle bg-white border" width="30" height="30" alt="icon" loading="lazy">
                                                         <span class="card-explanation px-2">{{ diary.user.username }}</span>
                                                     </div>
                                                     <div class="card-date">

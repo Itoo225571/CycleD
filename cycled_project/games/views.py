@@ -12,17 +12,19 @@ from django.contrib import messages
 from django.utils.safestring import mark_safe
 from django.contrib.staticfiles import finders
 
-from rest_framework import viewsets, permissions, mixins
+from rest_framework import views, viewsets, permissions, mixins, throttling
+from rest_framework.response import Response
 
 from .models import NIKIRunScore
 from .serializers import NIKIRunScoreSerializer
 
 import json
+import os
 
 class TopView(LoginRequiredMixin,generic.TemplateView):
     template_name="games/top.html"
 
-class RunGameView(LoginRequiredMixin,generic.TemplateView):
+class NIKIRunScoreView(LoginRequiredMixin,generic.TemplateView):
     template_name="games/run.html"
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -42,7 +44,6 @@ class RunGameView(LoginRequiredMixin,generic.TemplateView):
 class RouletteView(generic.TemplateView):
     template_name = 'games/roulette.html'
 
-
 class NIKIRunScoreViewSet(
     mixins.ListModelMixin,
     # mixins.CreateModelMixin,
@@ -52,6 +53,10 @@ class NIKIRunScoreViewSet(
 
     serializer_class = NIKIRunScoreSerializer
     permission_classes = [permissions.IsAuthenticated]
+    throttle_classes = [
+        throttling.UserRateThrottle, 
+        throttling.AnonRateThrottle,
+    ]  # レート制限（ユーザー、匿名ユーザー）
 
     def get_queryset(self):
         if self.action == 'list':
@@ -72,3 +77,42 @@ class NIKIRunScoreViewSet(
             # 新しいスコアが現在のスコア以上であれば更新
             serializer.save()
             serializer._is_newrecord = True  # ★ここで動的にフラグを立てる！
+
+class NIKIRunDataAPIView(views.APIView):
+    # ログイン必須とレート制限を追加
+    permission_classes = [permissions.IsAuthenticated]  # ログイン必須
+    throttle_classes = [
+        throttling.UserRateThrottle, 
+        throttling.AnonRateThrottle,
+    ]  # レート制限（ユーザー、匿名ユーザー）
+
+    def get(self, request, format=None):
+        base_dir = os.path.dirname(__file__)
+        json_path = os.path.join(base_dir, 'data', 'players.json')
+        map_dir = os.path.join(base_dir, 'data', 'map')
+
+        # キャラクターデータ読み込み
+        with open(json_path, 'r') as f:
+            players_data = json.load(f)
+
+        # マップデータ読み込み
+        maps = []
+        for filename in os.listdir(map_dir):
+            if filename.endswith('.json'):
+                filepath = os.path.join(map_dir, filename)
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    try:
+                        map_data = json.load(f)
+                        map_name = os.path.splitext(filename)[0]    # 拡張子 .json を取り除く
+                        maps.append({
+                            'name': map_name,
+                            'data': map_data
+                        })
+                    except json.JSONDecodeError:
+                        continue
+
+        # 両方まとめて返す
+        return Response({
+            'players': players_data,
+            'maps': maps
+        })

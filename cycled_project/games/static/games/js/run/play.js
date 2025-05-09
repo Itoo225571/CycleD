@@ -8,7 +8,13 @@ export default class PlayScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.json('charaData', jsonPlayers);
+        // mapsData がロードされていることを確認
+        const mapsData = this.registry.get('mapsData');
+        if (mapsData) {
+            mapsData.forEach((map) => {
+                this.load.tilemapTiledJSON(map.name, map.data);
+            });
+        }
     }
 
     create() {
@@ -16,19 +22,15 @@ export default class PlayScene extends Phaser.Scene {
         this.isPaused = false;
         this.score = 0;
 
-        // 読み込んだJSONにスキル関数を追加
-        const charaData = this.cache.json.get('charaData');
-        const characterConfigs = {};
-        for (const chara of charaData) {
-            characterConfigs[chara.key] = {
-                ...chara,
-                chargeSkill: chargeSkillTable[chara.chargeSkill]
-            };
-        }        
-        const selectedCharKey = 'PigMan';  // 操作キャラのキー（ここでは固定）
-        // const selectedCharKey = 'Diver';  // 操作キャラのキー（ここでは固定）
-        const playerConfig = characterConfigs[selectedCharKey] || characterConfigs[gameOptions.playerNameDefault];
-        this.player = new Player(this, playerConfig);
+        // // 読み込んだJSONにスキル関数を追加
+        const charaData = this.registry.get('playersData');
+
+        const selectedCharacter = this.data.get('selectedCharacter') || charaData[0];   // 本来は前回使ったキャラにするべき
+        const characterConfig = {
+            ...selectedCharacter,
+            chargeSkill: chargeSkillTable[selectedCharacter.chargeSkill]
+        };
+        this.player = new Player(this, characterConfig);
 
         this.input.on("pointerdown", () => this.player.jump(false), this);
         this.input.keyboard.on("keydown-SPACE", () => this.player.jump(false), this);        
@@ -250,7 +252,7 @@ export default class PlayScene extends Phaser.Scene {
         var score = this.score;
         var is_newrecord = false;
         $.ajax({
-            url: `/games/api/score_nikirun/${id}/`,
+            url: `/games/api/nikirun_score/${id}/`,
             method: 'PATCH',
             headers: {
                 "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンをヘッダーに設定
