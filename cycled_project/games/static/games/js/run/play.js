@@ -13,14 +13,21 @@ export default class PlayScene extends Phaser.Scene {
         this.score = 0;
 
         // // 読み込んだJSONにスキル関数を追加
+        // プレイヤーデータを取得
         const charaData = this.registry.get('playersData');
-
-        const selectedCharacter = this.data.get('selectedCharacter') || charaData[0];   // 本来は前回使ったキャラにするべき
+        // null のキャラクターを除外して選択可能なキャラだけにする
+        const validCharaData = Object.values(charaData).filter(chara => chara !== null);
+        // 選択したキャラクターを取得、もし選択されていなければ最初のキャラを使う
+        const selectedCharacter = this.data.get('selectedCharacter') || validCharaData[0];
+        // 選択されたキャラの設定を作成
         const characterConfig = {
             ...selectedCharacter,
-            chargeSkill: chargeSkillTable[selectedCharacter.chargeSkill]
+            chargeSkill: chargeSkillTable[selectedCharacter.chargeSkill]  // スキルのマッピング
         };
+
+        // プレイヤーオブジェクトを作成
         this.player = new Player(this, characterConfig);
+
 
         this.input.on("pointerdown", () => this.player.jump(false), this);
         this.input.keyboard.on("keydown-SPACE", () => this.player.jump(false), this);        
