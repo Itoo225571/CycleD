@@ -105,6 +105,10 @@ export default class PreloadScene extends Phaser.Scene {
             });
         });
         
+        // 鍵アイコン
+        this.load.image('lock', `${imgDir}lock.png`);
+        this.load.image('unlock', `${imgDir}unlock.png`);
+
         // map読み込み
         this.loadMap();
     }

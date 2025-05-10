@@ -11,11 +11,11 @@
     },
     {
         "key": "NinjaFrog",
-        "speed": 5,
-        "accel": 1,
-        "jumps": 1,
+        "speed": 7,
+        "accel": 0.5,
+        "jumps": 2,
         "lives": 2,
-        "jumpForce": 20,
+        "jumpForce": 21,
         "chargeSkill": "GainLife",
         "price": 200
     },

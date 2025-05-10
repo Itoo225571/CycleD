@@ -99,8 +99,18 @@ class NIKIRunDataAPIView(views.APIView):
         score_data, _ = NIKIRunScore.objects.get_or_create(user=user)
         score_serialized = NIKIRunScoreSerializer(score_data).data
 
+        # 使えるキャラクターだけ情報を乗せる
+        owned_characters = user_info.owned_characters
+        players_with_info = {}
+        for player in players_data:
+            player_key = player['key']
+            if player_key in owned_characters:
+                players_with_info[player_key] = player
+            else:
+                players_with_info[player_key] = None
+
         return Response({
-            'players': players_data,
+            'players': players_with_info,
             'user_info': user_info_serialized,
             'score': score_serialized,
         })
