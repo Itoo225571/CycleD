@@ -1,12 +1,23 @@
 [
     {
+        "key": "PigMan",
+        "speed": 5,
+        "accel": 1,
+        "jumps": 1,
+        "lives": 2,
+        "jumpForce": 20,
+        "chargeSkill": "Invincibled",
+        "price": 0
+    },
+    {
         "key": "NinjaFrog",
         "speed": 5,
         "accel": 1,
         "jumps": 1,
         "lives": 2,
         "jumpForce": 20,
-        "chargeSkill": "GainLife"
+        "chargeSkill": "GainLife",
+        "price": 200
     },
     {
         "key": "MaskDude",
@@ -15,16 +26,8 @@
         "jumps": 1,
         "lives": 2,
         "jumpForce": 20,
-        "chargeSkill": "GainLife"
-    },
-    {
-        "key": "PigMan",
-        "speed": 5,
-        "accel": 1,
-        "jumps": 1,
-        "lives": 2,
-        "jumpForce": 20,
-        "chargeSkill": "Invincibled"
+        "chargeSkill": "GainLife",
+        "price": 200
     },
     {
         "key": "Diver",
@@ -33,6 +36,7 @@
         "jumps": 1,
         "lives": 2,
         "jumpForce": 20,
-        "chargeSkill": "GainLife"
+        "chargeSkill": "GainLife",
+        "price": 200
     }
 ]

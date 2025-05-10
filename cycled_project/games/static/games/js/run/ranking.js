@@ -1,6 +1,7 @@
 export default class RankingScene extends Phaser.Scene {
     constructor() {
         super({ key: 'RankingScene' });
+        this.isReady = false;
     }
 
     create() {
@@ -27,6 +28,7 @@ export default class RankingScene extends Phaser.Scene {
         this.createDisplay();
         // this.getScores();
         // this.showConfirmPopup();
+        this.isReady = true;
     }
 
     preBackScene() {
@@ -47,6 +49,8 @@ export default class RankingScene extends Phaser.Scene {
     }
 
     onBringToTop() {
+        if (!this.isReady)  return;
+
         const now = Date.now();
         const THRESHOLD_MS = 30 * 1000;  // 30秒以内なら再取得しない
         if ((now - this.lastGetScoresTime) < THRESHOLD_MS && this.preScores) {
@@ -55,11 +59,15 @@ export default class RankingScene extends Phaser.Scene {
             this.getScores();
         }
         
-        this.overlay?.setVisible(true);
-        this.panel?.setVisible(true);
-        this.scoreTitle?.setVisible(true);
-        // this.notyetText?.setVisible(true); 
-        this.backButton?.setVisible(true);
+        this.overlay.setVisible(true);
+        this.panel.setVisible(true);
+        this.scoreTitle.setVisible(true);
+        // this.notyetText.setVisible(true); 
+        this.backButton.setVisible(true);
+    }
+
+    goScore() {
+        
     }
     
     getScores() {
@@ -110,7 +118,7 @@ export default class RankingScene extends Phaser.Scene {
             fontSize: '32px',
             color: '#ffcccc',
             align: 'center'
-        }).setOrigin(0.5).setVisible(false);
+        }).setOrigin(0.5).setDepth(1).setVisible(false);
     
         // スクロールパネル作成
         this.panel = this.rexUI.add.scrollablePanel({
@@ -148,18 +156,24 @@ export default class RankingScene extends Phaser.Scene {
             }
         })
         .layout();
+
+        if (!this.isReady)  this.getScores();   //displayがちゃんと完成してから実行
     }
 
     showDisplayScores(scores) {
         const centerX = this.scale.width / 2;
         const centerY = this.scale.height / 2;
+        
+        this.panel.setVisible(true);
+        this.scoreTitle.setVisible(true);
         this.sizer = this.panel.getElement('panel');  // FixWidthSizer
         // 中身を削除（子オブジェクトも破棄される）
         this.sizer.clear(true);  // true を指定すると PhaserのGameObjectも一緒に destroy される
 
-        this.scoreTitle.setVisible(true);
         this.panel.setVisible(true);
         if (scores.length === 0) {
+            this.panel.getElement('slider.track').setVisible(false);
+            this.panel.getElement('slider.thumb').setVisible(false);
             this.notyetText.setVisible(true);
             return;
         }

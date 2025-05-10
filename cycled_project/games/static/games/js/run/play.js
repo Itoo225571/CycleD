@@ -7,16 +7,6 @@ export default class PlayScene extends Phaser.Scene {
         super("PlayScene");
     }
 
-    preload() {
-        // mapsData がロードされていることを確認
-        const mapsData = this.registry.get('mapsData');
-        if (mapsData) {
-            mapsData.forEach((map) => {
-                this.load.tilemapTiledJSON(map.name, map.data);
-            });
-        }
-    }
-
     create() {
         this.elapsedTime = 0;
         this.isPaused = false;
@@ -119,7 +109,6 @@ export default class PlayScene extends Phaser.Scene {
         } else {
             // this.scene.start('StartScene');
             this.GameOver();
-            // this.postScore();
         }
     }
     loseLife(jump=false) {
@@ -245,35 +234,6 @@ export default class PlayScene extends Phaser.Scene {
         const GameoverScene = this.scene.get('GameoverScene');
         GameoverScene.onBringToTop?.(true);  // 引数 true を渡す(投稿する)
         this.scene.bringToTop('GameoverScene');
-    }
-
-    postScore() {
-        var id = score_id;
-        var score = this.score;
-        var is_newrecord = false;
-        $.ajax({
-            url: `/games/api/nikirun_score/${id}/`,
-            method: 'PATCH',
-            headers: {
-                "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンをヘッダーに設定
-            },
-            data: {
-                score: score,  // 更新したいデータ
-            },
-            success: (response) => {
-                is_newrecord = Boolean(response.is_newrecord)
-                this.GameOver(is_newrecord);
-            },
-            error: function(xhr, status, error) {
-                var response = xhr.responseJSON;
-                var errors = response.form.fields;
-                $.each(errors,function(_,error) {
-                    // 手動でエラーを出力
-                    append_error_ajax(error.label,error.errors);
-                })
-                this.GameOver(is_newrecord);
-            },
-        }); 
     }
 
     goRankingScene() {
