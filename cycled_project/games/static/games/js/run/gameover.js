@@ -3,6 +3,7 @@ import { createBtn } from './preload.js';
 export default class GameoverScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameoverScene' });
+        this.isReady = false;
     }
 
     create() {
@@ -44,7 +45,7 @@ export default class GameoverScene extends Phaser.Scene {
                 fontSize: '64px',
                 color: '#ffffff'
             }
-        ).setOrigin(0.5).setDepth(100);
+        ).setOrigin(0.5);
         this.newRecordText = this.add.text(
             -200,
             this.stHeight + this.gameOverText.height,       //左端から
@@ -63,7 +64,7 @@ export default class GameoverScene extends Phaser.Scene {
                     fill: true
                 }
             }
-        ).setOrigin(0.5).setDepth(100);
+        ).setOrigin(0.5);
         this.scoreText = this.add.text(
             this.cameras.main.centerX,
             -100,  // "Game Over" の下に配置
@@ -73,10 +74,15 @@ export default class GameoverScene extends Phaser.Scene {
                 fontSize: '32px',
                 color: '#ffffff'
             }
-        ).setOrigin(0.5).setDepth(100);
+        ).setOrigin(0.5);
+
+        var score = this.scene.get('PlayScene').score;
+        this.postScore(score);      // score投稿
+
+        this.isReady = true;    // 準備完了
     }
 
-    startAnim(is_newrecord = false) {
+    startAnim(score, is_newrecord = false) {
         // 上から落ちるアニメーション
         this.tweens.add({
             targets: this.gameOverText,
@@ -107,7 +113,7 @@ export default class GameoverScene extends Phaser.Scene {
         }
 
         // スコアを表示するテキスト
-        var scoreDisplay = strScore(this.score);
+        var scoreDisplay = strScore(score);
         this.scoreText.setText(scoreDisplay);
         // スコアのアニメーション
         this.tweens.add({
@@ -120,41 +126,49 @@ export default class GameoverScene extends Phaser.Scene {
     
     }
 
-    postScore() {
-        var id = score_id;
+    postScore(score_new) {
+        // var id = score_id;
+        const scoreData = this.registry.get('scoreData');
+        const id = scoreData.id;
         
-        var is_newrecord = false;
-        $.ajax({
-            url: `/games/api/nikirun_score/${id}/`,
-            method: 'PATCH',
-            headers: {
-                "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンをヘッダーに設定
-            },
-            data: {
-                score: this.score,  // 更新したいデータ
-            },
-            success: (response) => {
-                is_newrecord = Boolean(response.is_newrecord)
-            },
-            error: function(xhr, status, error) {
-                var response = xhr.responseJSON;
-            
-                // response.formが存在するか確認
-                if (response && response.form && response.form.fields) {
-                    var errors = response.form.fields;
-                    $.each(errors, function(_, error) {
-                        // 手動でエラーを出力
-                        append_error_ajax(error.label, error.errors);
-                    });
-                } else {
-                    // response.formが存在しない場合のエラーハンドリング（必要に応じて）
-                    console.error("Error response structure is invalid or missing fields.");
-                }
-            },            
-            complete: () => {
-                this.startAnim(is_newrecord);  // 成功・失敗に関わらず呼び出す
-            },
-        }); 
+        // 新記録か，そもそも存在しない場合
+        if (scoreData.score || scoreData.score < score_new) {
+            var is_newrecord = false;
+            $.ajax({
+                url: `/games/api/nikirun_score/${id}/`,
+                method: 'PATCH',
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンをヘッダーに設定
+                },
+                data: {
+                    score: score_new,  // 更新したいデータ
+                },
+                success: (response) => {
+                    is_newrecord = Boolean(response.is_newrecord)   // サーバー側でも確認
+                    this.registry.set('scoreData', response);   // 新しい情報をセット
+                },
+                error: function(xhr, status, error) {
+                    var response = xhr.responseJSON;
+                
+                    // response.formが存在するか確認
+                    if (response && response.form && response.form.fields) {
+                        var errors = response.form.fields;
+                        $.each(errors, function(_, error) {
+                            // 手動でエラーを出力
+                            append_error_ajax(error.label, error.errors);
+                        });
+                    } else {
+                        // response.formが存在しない場合のエラーハンドリング（必要に応じて）
+                        console.error("Error response structure is invalid or missing fields.");
+                    }
+                },            
+                complete: () => {
+                    this.startAnim(score_new,is_newrecord);  // 成功・失敗に関わらず呼び出す
+                },
+            }); 
+        } else {
+            this.startAnim(score_new,false);  // newrecordじゃない場合，速攻でfalse
+        }
     }
 
     rePlayGame() {
@@ -186,13 +200,14 @@ export default class GameoverScene extends Phaser.Scene {
     }
 
     onBringToTop(post_score = false) {
+        if (!this.isReady)  return;
+
         this.gameoverBtns?.forEach(btn => btn.container.setVisible(true));
         this.overlay?.setVisible(true);
         this.gameOverText?.setVisible(true);
-    
         if (post_score) {
-            this.score = this.scene.get('PlayScene').score;
-            this.postScore();
+            var score = this.scene.get('PlayScene').score;
+            this.postScore(score);
         }
     }
     

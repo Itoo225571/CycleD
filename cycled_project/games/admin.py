@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import NIKIRunUserInfo
+
+class NIKIRunUserInfoAdmin(admin.ModelAdmin):
+    pass
+
+admin.site.register(NIKIRunUserInfo,NIKIRunUserInfoAdmin)

@@ -122,10 +122,8 @@ export default class PreloadScene extends Phaser.Scene {
         // ユーザー情報取得
         this.getGameData();
 
-        // デバッグ用: マップデータが正しくロードされたか確認
-        // const startMap = this.cache.tilemap.get('startMap');
-        // console.log(startMap);  // startMap のデータがログに出力されるか確認
-        this.events.on('mapsDataLoaded', (mapsData) => {
+        // ajaxで情報を取得してからスタート
+        this.events.on('gameDataLoaded', (data) => {
             this.scene.start('StartScene');
         });   
     }
@@ -248,12 +246,12 @@ export default class PreloadScene extends Phaser.Scene {
             frameWidth: 32,
             frameHeight: 32,
         });
-        // var mapList = gameOptions.chunks;
-        // var startMap = gameOptions.startChunk;
-        // mapList.forEach((name) => {  // アロー関数に変更
-        //     this.load.tilemapTiledJSON(name, `${jsonDir}${name}.json`); // mapをロード
-        // });
-        // this.load.tilemapTiledJSON(startMap, `${jsonDir}${startMap}.json`);
+        var mapList = gameOptions.chunks;
+        var startMap = gameOptions.startChunk;
+        mapList.forEach((name) => {  // アロー関数に変更
+            this.load.tilemapTiledJSON(name, `${jsonDir}${name}.json`); // mapをロード
+        });
+        this.load.tilemapTiledJSON(startMap, `${jsonDir}${startMap}.json`);
     }
 
     getGameData() {
@@ -267,9 +265,10 @@ export default class PreloadScene extends Phaser.Scene {
             success: (data) => {
                 // データを registry に保存
                 this.registry.set('playersData', data.players);
-                this.events.emit('playersDataLoaded', data.players);
-                this.registry.set('mapsData', data.maps);
-                this.events.emit('mapsDataLoaded', data.maps);
+                this.registry.set('userInfo', data.user_info);
+                this.registry.set('scoreData', data.score);
+
+                this.events.emit('gameDataLoaded', data);
             },
             error: function(xhr, status, error) {
                 console.error('エラー:', error);
