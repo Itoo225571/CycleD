@@ -91,8 +91,8 @@ export default class PreloadScene extends Phaser.Scene {
         ];
         this.playerNames = [
             'NinjaFrog',
-            'MaskDude',
-            'PigMan',
+            'MaskMen',
+            'Pigger',
             'Diver',
         ];
         this.playerNames.forEach((chara) => {  // アロー関数に変更
@@ -109,6 +109,13 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('lock', `${imgDir}lock.png`);
         this.load.image('unlock', `${imgDir}unlock.png`);
 
+        // エフェクト
+        this.load.spritesheet(
+            'SelectEffect', 
+            `${imgDir}Select.png`, 
+            { frameWidth: 96, frameHeight: 96 }
+        );
+
         // map読み込み
         this.loadMap();
     }
@@ -123,11 +130,21 @@ export default class PreloadScene extends Phaser.Scene {
         // Trap Animation
         this.createTrapAnims();
 
+        this.anims.create({
+            key: 'SelectAnim',
+            frames: this.anims.generateFrameNumbers('SelectEffect', { start: 2, end: 6 }),
+            frameRate: 10,
+            repeat: 0
+        });        
+
         // ユーザー情報取得
         this.getGameData();
 
         // ajaxで情報を取得してからスタート
         this.events.on('gameDataLoaded', (data) => {
+            var players = data.players;
+            var key = data.user_info.character_last;
+            this.registry.set('selectedCharacter', players[key]);   // 前回使用したキャラをセット
             this.scene.start('StartScene');
         });   
     }
@@ -305,134 +322,4 @@ function createFrame(scene, container, widthInTiles, heightInTiles, imgKey, colo
         }
     }
     return container;
-}
-
-export function createMsgWindow(scene, messages = [''], delay = 0) {
-    const info = {
-        x: 0,
-        y: 500,
-        width: 75,
-        height: 15,
-    };
-    const per_length = 16;
-
-    let container = scene.add.container(info.x, info.y);
-    const widthInTiles = info.width;
-    const heightInTiles = info.height;
-    // ウィンドウの幅を計算（16px × タイル数）
-    const windowWidth = widthInTiles * 16;
-    // ウィンドウをゲーム画面の中央に配置するために、オフセットを調整
-    container.setPosition((scene.scale.width - windowWidth) / 2, info.y); // x軸中央に
-    const win = createFrame(scene, container, widthInTiles, heightInTiles,'msgWindowTile',0x000000, 0.5)
-
-    const maxWidth = info.width * per_length - 16 * 5;
-
-    const text = scene.add.text(
-        win.x + per_length * 2,
-        info.y + per_length * 2,
-        '',
-        {
-            fontFamily: 'DotGothic16',
-            fontSize: '32px',
-            color: '#fff',
-            wordWrap: { width: maxWidth, useAdvancedWrap: true },
-            lineSpacing: 16
-        }
-    );
-
-    // 全文を即時表示
-    if (delay === 0) {
-        text.setText(messages.join('\n'));
-    } else {
-        let currentMessageIndex = 0;
-        let currentCharIndex = 0;
-        let currentText = '';
-
-        scene.time.addEvent({
-            delay: delay,
-            loop: true,
-            callback: () => {
-                if (currentMessageIndex < messages.length) {
-                    const message = messages[currentMessageIndex];
-
-                    if (currentCharIndex < message.length) {
-                        currentText += message[currentCharIndex];
-                        text.setText(currentText);
-                        currentCharIndex++;
-                    } else {
-                        currentMessageIndex++;
-                        currentCharIndex = 0;
-                        currentText += '\n';
-                    }
-                }
-            },
-        });
-    }
-
-    scene.add.container(0, 0, [win, text]);
-}
-
-export function createBtn(x, y, scene, content, option = {}) {
-    const per_length = 16;
-    const info = {
-        contentWidth: option.width || 36,  // option.contentWidth が undefined の場合、デフォルトで36
-        contentHeight: option.height || 36,  // option.contentHeight が undefined の場合、デフォルトで36
-        contentColor: option.color || 0,    // デフォは黒
-
-        btnWidth: option.button ? option.button.width || 40 : 40,  // option.button が undefined の場合、デフォルトで40
-        btnHeight: option.button ? option.button.height || 6 : 6,  // option.button が undefined の場合、デフォルトで6
-        btnColor: option.button ? option.button.color || 0xffffff : 0xffffff,  // option.button が undefined の場合、デフォルトで白
-    };
-
-    // 中央配置処理
-    const gameWidth = scene.scale.width;
-    const gameHeight = scene.scale.height;
-
-    const posX = option.centerX ? (gameWidth - info.btnWidth * per_length) / 2 : x;
-    const posY = option.centerY ? (gameHeight - info.btnHeight * per_length) / 2 : y;
-
-    const container = scene.add.container(posX, posY);
-
-    createFrame(scene, container, info.btnWidth, info.btnHeight, 'btnTile', 0xffffff);
-
-    // テキスト作成
-    const hexColor = info.contentColor;
-    if (option.type === 'image') {
-        // 'content'に指定された画像を表示
-        const image = scene.add.image(
-            (info.btnWidth * per_length) / 2,
-            (info.btnHeight * per_length) / 2,
-            content,  // 'content'は画像のキー
-            option.order || 0,
-        ).setOrigin(0.5);
-        image.setDisplaySize(info.contentWidth, info.contentHeight);
-        image.setTint(hexColor);
-        container.add(image);
-    } else {
-        var cssColor = `#${hexColor.toString(16).padStart(6, '0')}`;  // 変換
-        const text = scene.add.text(
-            (info.btnWidth * per_length) / 2,
-            (info.btnHeight * per_length) / 2,
-            content,
-            {
-                fontFamily: option.fontFamily || 'DotGothic16',
-                fontSize: `${info.contentWidth}px`,
-                color: cssColor,
-            }
-        ).setOrigin(0.5);
-        container.add(text);
-    }
-
-    // ヒットエリア（透明）
-    const buttonColor = info.btnColor;
-    const hitArea = scene.add.rectangle(0, 0, info.btnWidth * per_length, info.btnHeight * per_length, buttonColor, 0);
-    hitArea.setOrigin(0);
-    hitArea.setInteractive({ useHandCursor: true });
-
-    hitArea.on('pointerover', () => container.setAlpha(0.8));
-    hitArea.on('pointerout', () => container.setAlpha(1));
-
-    container.add(hitArea);
-
-    return { container, hitArea };
 }

@@ -18,7 +18,7 @@ export default class PlayScene extends Phaser.Scene {
         // null のキャラクターを除外して選択可能なキャラだけにする
         const validCharaData = Object.values(charaData).filter(chara => chara !== null);
         // 選択したキャラクターを取得、もし選択されていなければ最初のキャラを使う
-        const selectedCharacter = this.data.get('selectedCharacter') || validCharaData[0];
+        const selectedCharacter = this.registry.get('selectedCharacter') || validCharaData[0];
         // 選択されたキャラの設定を作成
         const characterConfig = {
             ...selectedCharacter,

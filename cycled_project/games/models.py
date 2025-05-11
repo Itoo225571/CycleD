@@ -20,7 +20,7 @@ class ScoreBase(models.Model):
     class Meta:
         abstract = True
 
-DEFAULT_CHARACTER = 'PigMan'
+DEFAULT_CHARACTER = 'Pigger'
 def default_owned_characters():
     return [DEFAULT_CHARACTER]
 # json内にあるキャラだけを選択できる

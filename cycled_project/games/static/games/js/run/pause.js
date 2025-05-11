@@ -1,4 +1,4 @@
-import { createBtn } from './preload.js';
+import { createBtn } from './start.js';
 
 export default class PauseScene extends Phaser.Scene {
     constructor() {
