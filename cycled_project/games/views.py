@@ -107,7 +107,7 @@ class NIKIRunDataAPIView(views.APIView):
             if player_key in owned_characters:
                 players_with_info[player_key] = player
             else:
-                players_with_info[player_key] = None
+                players_with_info[player_key] = {'price': player.get('price')}
 
         return Response({
             'players': players_with_info,

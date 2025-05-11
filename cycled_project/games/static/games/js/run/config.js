@@ -7,7 +7,6 @@ import GameoverScene from './gameover.js';
 import SelectCharacterScene from './select_character.js';
 
 export const gameOptions = {
-    playerNameDefault: "NinjaFrog",
     garavityForce: 3,
     playerStartPosition: 200,
     oneBlockSize: 64,

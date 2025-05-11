@@ -1,3 +1,5 @@
+import { createMsgWindow } from './start.js';
+
 export default class SelectCharacterScene extends Phaser.Scene {
     constructor() {
         super({ key: 'SelectCharacterScene' });
@@ -24,14 +26,23 @@ export default class SelectCharacterScene extends Phaser.Scene {
 
         this.animsDuration = 200;
 
+        // キャラステータス
+        this.statusGraphics = this.add.graphics();
+        this.statusHexLength = 200;
+        this.currentValues = [0, 0, 0];
+        this.statusNote = this.add.text(
+            this.game.config.width - this.statusHexLength, this.statusHexLength * 2 +20 , '', {
+            fontFamily: 'DotGothic16',
+            fontSize: '32px',       // フォントサイズ
+            color: '#ffffff',       // 文字色（白）
+            lineSpacing: 10,        // ← この値を大きくすると行間が広がる
+            fontWeight: 'bold',     // これで全体が太字になる
+        }).setOrigin(0.5).setDepth(2);
+        this.drawStatusGraph(this.game.config.width - this.statusHexLength, this.statusHexLength, this.statusHexLength, this.currentValues);  // 初回描画
+
         // キャラ画像生成
         this.updateCharacterSprites();
         this.updateCarousel(this.selectedIndex, false);
-
-        this.statusGraphics = this.add.graphics();
-        this.statusHexLength = 200;
-        this.currentValues = [0, 0, 0, 0, 0];
-        this.drawStatusGraph(this.game.config.width - this.statusHexLength, this.statusHexLength, this.statusHexLength, this.currentValues);  // 初回描画
 
         // キーボードでも選択可
         this.input.keyboard.on('keydown-LEFT', () => {
@@ -93,10 +104,11 @@ export default class SelectCharacterScene extends Phaser.Scene {
             const targetX = isVisibleRange ? this.centerX + relativeIndex * 300 : this.centerX;
             const targetY = this.centerY;
             
-            const finalAlpha = isCenter
-                                ? 1.0            // 中央なら常に濃く表示
-                                : (isVisibleRange ? 0.2 : 0);  // 左右は薄め、範囲外は透明
-        
+            const isOwned = this.userInfo.owned_characters.includes(key);
+            const finalAlpha = isCenter ? 1.0
+                                : (isVisibleRange
+                                    ? (isOwned ? 0.7 : 1.0)  // 所有していれば少し薄く、未所持なら濃い
+                                    : 0);                    // 範囲外は完全に透明        
     
             sprite.setDepth(targetDepth);
     
@@ -135,24 +147,36 @@ export default class SelectCharacterScene extends Phaser.Scene {
                     var newValues = [
                         charaInfo.speed || null,
                         charaInfo.accel || null,
-                        charaInfo.jumps || null,
                         charaInfo.jumpForce || null,
-                        charaInfo.lives || null,
+                        // charaInfo.jumps || null,
+                        // charaInfo.lives || null,
                     ];
                     const isOwned = this.userInfo.owned_characters.includes(key);
-                    this.updateStatusHex(newValues,isOwned);
+                    this.updateStatusGraph(newValues,isOwned);
+                    this.statusNote.setText(`残機: ${charaInfo.lives}\nジャンプ回数: ${charaInfo.jumps+1}`).setVisible(isOwned);
+
+
+                    var charaMsg = charaInfo.msg || '???';
+                    var skillName = charaInfo.skillName || '???';
+                    var skillDescription = charaInfo.skillDescription || '?????';
+                    const msg = `NAME: ${formatKey(key)}\n${charaMsg}\n[color=#ffff00]SKILL: ${skillName}\n${skillDescription}[/color]`;
+                    createMsgWindow(this,msg,10);
                 }
             }
+        }
+        function formatKey(key) {
+            // 大文字の前にスペースを挿入する関数
+            return key.replace(/([a-z])([A-Z])/g, '$1 $2');
         }
     }
 
     selectCharacter(charaIndex) {
-        const selectedChara = this.charaData[charaIndex];
         const key = this.characterKeys[charaIndex];
+        const selectedChara = this.charaData[key];
         const isOwned = this.userInfo.owned_characters.includes(key);
 
         if (isOwned) {
-            this.scene.get('PlayScene').data.set('selectedCharacter', selectedChara);
+            this.registry.set('selectedCharacter', selectedChara);
             const selectedSprite = this.characterSprites[charaIndex];
             selectedSprite.anims.stop();
 
@@ -164,6 +188,18 @@ export default class SelectCharacterScene extends Phaser.Scene {
 
             selectedSprite.play(key + randomAnimation);
             selectedSprite.anims.timeScale = randomTimeScale;
+
+            // 登場アニメーション（スプライト）
+            const appearingEffect = this.add.sprite(selectedSprite.x, selectedSprite.y - 50, 'SelectEffect')
+                .setScale(6)
+                .setDepth(selectedSprite.depth - 1)
+                .play('SelectAnim');
+
+            appearingEffect.on('animationcomplete', () => {
+                appearingEffect.destroy();
+            });
+
+        
             // 少し上がって戻るアニメーションを追加
             this.tweens.add({
                 targets: selectedSprite,
@@ -176,14 +212,19 @@ export default class SelectCharacterScene extends Phaser.Scene {
                     // tweenが完了したらアニメーションを停止
                     selectedSprite.play(key + 'Idle');
                     selectedSprite.anims.timeScale = 1; // 戻す
+                    this.inputEnabled = false;
                     // start画面に戻る
                     this.time.delayedCall(100, () => {
                         this.goStart();
+                        this.inputEnabled = true;
                     });
                 }
             });
         } else {
-            console.log('選べないよ');
+            // console.log(selectedChara)
+            const msg = `このキャラをアンロックするには金コインが [color=#ffd700]${selectedChara.price}コ[/color] 必要です`;
+            createMsgWindow(this,msg,30);
+            
         }
     }
 
@@ -235,7 +276,7 @@ export default class SelectCharacterScene extends Phaser.Scene {
         }
     }
 
-    drawStatusGraph(x, y, length, values) {    
+    drawStatusGraph(x, y, length, values) {
         const g = this.statusGraphics;
         const radius = length / 2;
         g.clear();
@@ -259,9 +300,12 @@ export default class SelectCharacterScene extends Phaser.Scene {
         }
         this.graphQ.setVisible(false);  // valuesがnull以外の場合は非表示にする
 
-        const maxValues = [10, 3, 3, 30, 3];  // 最大値の配列
-        const labels = ['Speed', 'Accel', 'Jump\nLimit', 'Jump\nForce', 'Life'];  // ラベル名（改行あり）
-        const relativeValues = values.map((v, i) => Phaser.Math.Clamp(v / maxValues[i], 0, 1));
+        const minValues = [4, 0, 15,];   // 最小値 - ちょっと(最小値にすると見ずらい)
+        const maxValues = [10, 3, 30,];  // 最大値の配列
+        const labels = ['Speed', 'Accel', 'Jump',];  // ラベル名（改行あり）
+        const relativeValues = values.map((v, i) =>
+            Phaser.Math.Clamp((v - minValues[i]) / (maxValues[i] - minValues[i]), 0, 1)
+        );
     
         // === 補助円 ===
         g.lineStyle(1, 0xaaaaaa, 0.3);
@@ -271,17 +315,15 @@ export default class SelectCharacterScene extends Phaser.Scene {
     
         // === 多角形の描画 ===
         const angleStep = Phaser.Math.PI2 / relativeValues.length;
-        g.lineStyle(2, 0xffffff, 1);
+        g.lineStyle(1.5, 0xffffff, 1);
         g.fillStyle(0x00aaff, 0.3);
         g.beginPath();
     
-        const points = [];
         for (let i = 0; i < relativeValues.length; i++) {
             const value = relativeValues[i];
             const angle = angleStep * i - Phaser.Math.PI2 / 4;
             const px = x + Math.cos(angle) * radius * value;
             const py = y + Math.sin(angle) * radius * value;
-            points.push({ x: px, y: py });
     
             if (i === 0) g.moveTo(px, py);
             else g.lineTo(px, py);
@@ -289,10 +331,14 @@ export default class SelectCharacterScene extends Phaser.Scene {
         g.closePath();
         g.fillPath();
         g.strokePath();
-    
-        // === ラベル ===
-        for (let i = 0; i < labels.length; i++) {
+
+        // === 中心から外円までの線 + ラベル ===
+        g.lineStyle(1, 0xffffff, 0.5);
+        for (let i = 0; i < relativeValues.length; i++) {
             const angle = angleStep * i - Phaser.Math.PI2 / 4;
+            const outerX = x + Math.cos(angle) * radius;
+            const outerY = y + Math.sin(angle) * radius;
+
             const labelX = x + Math.cos(angle) * (radius + 50);
             const labelY = y + Math.sin(angle) * (radius + 50);
     
@@ -301,23 +347,14 @@ export default class SelectCharacterScene extends Phaser.Scene {
                 fontSize: '24px',
                 color: '#ffffff',
             }).setOrigin(0.5).setDepth(2);
-        }
-    
-        // === 中心から外円までの線 ===
-        g.lineStyle(1, 0xffffff, 0.5);
-        for (let i = 0; i < points.length; i++) {
-            const px = points[i].x;
-            const py = points[i].y;
-            const angle = Phaser.Math.Angle.Between(x, y, px, py);
-            const outerX = x + Math.cos(angle) * radius;
-            const outerY = y + Math.sin(angle) * radius;
+        
+            g.beginPath();
             g.moveTo(x, y);
-            g.lineTo(px, py);
             g.lineTo(outerX, outerY);
+            g.strokePath();
         }
-        g.strokePath();
     }    
-    updateStatusHex(newValuesArray) {
+    updateStatusGraph(newValuesArray) {
         // Lockの場合
         const allNull = newValuesArray.every(value => value === null);
         if (allNull) {
@@ -327,12 +364,12 @@ export default class SelectCharacterScene extends Phaser.Scene {
                 this.statusHexLength,
                 null
             );
-            this.currentValues = [0, 0, 0, 0, 0];
+            this.currentValues = [0, 0, 0,];
             return;
         }
 
-        const startValues = this.currentValues?.slice?.() ?? [0, 0, 0, 0, 0];
-        const tempValues = this.currentValues?.slice?.() ?? [0, 0, 0, 0, 0];
+        const startValues = this.currentValues?.slice?.() ?? [0, 0, 0,];
+        const tempValues = this.currentValues?.slice?.() ?? [0, 0, 0,];
         const duration = this.animsDuration;
     
         this.tweens.addCounter({
@@ -363,4 +400,3 @@ export default class SelectCharacterScene extends Phaser.Scene {
     }    
         
 }
-
