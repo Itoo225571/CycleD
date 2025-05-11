@@ -38,13 +38,6 @@ export default class StartScene extends Phaser.Scene {
                 });
             }
         });
-        
-
-        // var msgs = [
-        //     'NAME: ponny',
-        //     '3日に1度はパンツの前後ろを間違え、5日に1度はパンツの表裏を間違える。'
-        // ]
-        // createMsgWindow(this,msgs,0)
 
         var option = { centerX: true, fontFamily: '"Press Start 2P"' };
         var btnList = [
@@ -75,7 +68,6 @@ export default class StartScene extends Phaser.Scene {
             });
         });
         
-
         // background
         this.add.image(0, 0, 'sky')
             .setOrigin(0, 0)
@@ -83,7 +75,7 @@ export default class StartScene extends Phaser.Scene {
             .setDepth(-7);
 
         // rankingSceneが起動中だったら停止する
-        if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene');
+        if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene');        
     }
 
     goPlayScene() {
@@ -109,29 +101,25 @@ export default class StartScene extends Phaser.Scene {
     }
 }
 
-function createFrame(scene, container, widthInTiles, heightInTiles, imgKey, color=null, alpha=1) {
-    for (let ty = 0; ty < heightInTiles; ty++) {
-        for (let tx = 0; tx < widthInTiles; tx++) {
-            let frame = 4; // デフォルト背景
+function createFrame(scene, container, widthInTiles, heightInTiles, imgKey, color = null, alpha = 1) {
+    const tileSize = 16;
+    const width = widthInTiles * tileSize;
+    const height = heightInTiles * tileSize;
 
-            // 角
-            if (tx === 0 && ty === 0) frame = 0; // 左上
-            else if (tx === widthInTiles - 1 && ty === 0) frame = 2; // 右上
-            else if (tx === 0 && ty === heightInTiles - 1) frame = 6; // 左下
-            else if (tx === widthInTiles - 1 && ty === heightInTiles - 1) frame = 8; // 右下
+    const frame = scene.rexUI.add.ninePatch2({
+        x: 0,
+        y: 0,
+        width: width,
+        height: height,
+        key: imgKey,
+        columns: [tileSize, undefined, tileSize],
+        rows: [tileSize, undefined, tileSize],
+    }).setOrigin(0);
 
-            // 縁
-            else if (ty === 0) frame = 1; // 上
-            else if (ty === heightInTiles - 1) frame = 7; // 下
-            else if (tx === 0) frame = 3; // 左
-            else if (tx === widthInTiles - 1) frame = 5; // 右
+    if (color) frame.setTint(color);
+    frame.setAlpha(alpha);
 
-            const tile = scene.add.image(tx * 16, ty * 16, imgKey, frame).setOrigin(0);
-            if (color) tile.setTint(color);
-            tile.setAlpha(alpha);        // 半透明
-            container.add(tile);
-        }
-    }
+    container.add(frame);
     return container;
 }
 
@@ -208,7 +196,6 @@ export function createMsgWindow(scene, message = '', delay = 0, config={}) {
     }
 }
 
-
 export function createBtn(x, y, scene, content, option = {}) {
     const per_length = 16;
     const info = {
@@ -273,3 +260,119 @@ export function createBtn(x, y, scene, content, option = {}) {
 
     return { container, hitArea };
 }
+
+export function createPopupWindow(scene, config) {
+    const {
+        x = 400,
+        y = 300,
+        width = 300,
+        height = 150,
+        header = '',  // ヘッダー部分
+        message = '',
+        showCancel = false,
+        onOK = () => {},
+        onCancel = () => {}
+    } = config;
+    const container = scene.add.container(x, y);
+
+    // 背景 NinePatch2
+    const bg = scene.rexUI.add.ninePatch2({
+        x: 0,
+        y: 0,
+        width,
+        height,
+        key: 'msgWindowTile',
+        columns: [16, undefined, 16],
+        rows: [16, undefined, 16]
+    }).setOrigin(0.5);
+    container.add(bg);
+
+    // ヘッダー
+    const headerText = scene.rexUI.add.BBCodeText(0, -height / 2 + 48, header, {
+        fontSize: '48px',
+        fontFamily: 'DotGothic16',
+        color: '#000000',
+        wordWrap: { width: width - 40 },
+        align: 'center',
+    }).setOrigin(0.5);
+    container.add(headerText);
+    // メッセージテキスト
+    const messageText = scene.rexUI.add.BBCodeText(0, -height / 2 + 48*2 + 16, message, {
+        fontFamily: 'DotGothic16',
+        fontSize: '32px',
+        color: '#000000',
+        wordWrap: { width: width - 40 },
+        align: 'left',
+        lineSpacing: 16
+    }).setOrigin(0,0);
+    container.add(messageText);
+    messageText.setX(-width / 2 + 32);  // テキストがコンテナの左端に揃うように調整
+
+    // OKボタン
+    const okButton = createButton(scene, 'OK', () => {
+        onOK();           // ユーザー定義のOK処理
+        container.destroy();
+        blocker.destroy();
+    }, showCancel ? -130 : 0, height / 2 - 48,'white'); // 位置も直接指定
+    container.add(okButton);
+
+    // CANCELボタン（オプション）
+    let cancelButton = null;
+    if (showCancel) {
+        cancelButton = createButton(scene, 'Cancel', () => {
+            onCancel();     // ユーザー定義のCancel処理
+            container.destroy();
+            blocker.destroy();
+        }, 130, height / 2 - 48,'white'); // 位置も直接指定
+        container.add(cancelButton);
+    }
+
+    // コンテナの位置調整（中央基準）
+    container.setSize(width, height);
+    container.setDepth(1000);
+
+    // blocker
+    const screenWidth = scene.sys.game.config.width;
+    const screenHeight = scene.sys.game.config.height;
+    const blocker = scene.add.rectangle(0, 0, screenWidth, screenHeight, 0x000000, 0.3)
+    .setOrigin(0)
+    .setInteractive()
+    .setDepth(999); // ウィンドウより一段低い深度にする
+
+    return {
+        container,
+        okButton,
+        cancelButton
+    };
+
+    function createButton(scene, label, callback, posX, posY, color) {
+        const buttonWidth = 200;
+        const buttonHeight = 70;
+    
+        const bg = scene.rexUI.add.ninePatch2({
+            width: buttonWidth,
+            height: buttonHeight,
+            key: 'btnTile',
+            columns: [16, undefined, 16],
+            rows: [16, undefined, 16]
+        }).setOrigin(0.5).setTint(0x808080);
+    
+        const text = scene.add.text(0, 0, label, {
+            fontSize: '24px',
+            color: color,
+            fontFamily: '"Press Start 2P"',
+        }).setOrigin(0.5);
+    
+        const container = scene.add.container(0, 0, [bg, text]);
+        container.setSize(buttonWidth, buttonHeight);
+        container.setPosition(posX, posY); // 位置をここで直接設定
+    
+        container.setInteractive({ useHandCursor: true }) 
+            .on('pointerdown', () => {
+                callback();
+            });
+    
+        return container;
+    }
+}
+

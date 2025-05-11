@@ -18,6 +18,7 @@ export default class PreloadScene extends Phaser.Scene {
             `${imgDir}Panel/panel-000.png`, 
             { frameWidth: 16, frameHeight: 16 }
         );
+        
         // 入力用
         this.load.spritesheet(
             'inputPrompts', 
@@ -296,30 +297,4 @@ export default class PreloadScene extends Phaser.Scene {
             }
         });        
     }
-}
-
-function createFrame(scene, container, widthInTiles, heightInTiles, imgKey, color=null, alpha=1) {
-    for (let ty = 0; ty < heightInTiles; ty++) {
-        for (let tx = 0; tx < widthInTiles; tx++) {
-            let frame = 4; // デフォルト背景
-
-            // 角
-            if (tx === 0 && ty === 0) frame = 0; // 左上
-            else if (tx === widthInTiles - 1 && ty === 0) frame = 2; // 右上
-            else if (tx === 0 && ty === heightInTiles - 1) frame = 6; // 左下
-            else if (tx === widthInTiles - 1 && ty === heightInTiles - 1) frame = 8; // 右下
-
-            // 縁
-            else if (ty === 0) frame = 1; // 上
-            else if (ty === heightInTiles - 1) frame = 7; // 下
-            else if (tx === 0) frame = 3; // 左
-            else if (tx === widthInTiles - 1) frame = 5; // 右
-
-            const tile = scene.add.image(tx * 16, ty * 16, imgKey, frame).setOrigin(0);
-            if (color) tile.setTint(color);
-            tile.setAlpha(alpha);        // 半透明
-            container.add(tile);
-        }
-    }
-    return container;
 }
