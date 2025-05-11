@@ -1,4 +1,4 @@
-import { createMsgWindow } from './start.js';
+import { createMsgWindow,createPopupWindow } from './start.js';
 
 export default class SelectCharacterScene extends Phaser.Scene {
     constructor() {
@@ -221,9 +221,18 @@ export default class SelectCharacterScene extends Phaser.Scene {
                 }
             });
         } else {
-            // console.log(selectedChara)
-            const msg = `このキャラをアンロックするには金コインが [color=#ffd700]${selectedChara.price}コ[/color] 必要です`;
-            createMsgWindow(this,msg,30);
+            const popup = createPopupWindow(this, {
+                x: this.game.config.width / 2,  // 画面の中央X座標
+                y: this.game.config.height / 2, // 画面の中央Y座標
+                width: this.game.config.height * 2/3 * 1.618,
+                height: this.game.config.height * 2/3,
+                header: '購入しますか？',
+                message: `このキャラをアンロックするには金コインが [color=#ffd700]${selectedChara.price}コ[/color] 必要です`,
+                showCancel: true,
+                onOK: () => this.purchaseProcessing(),
+                // onCancel: () => console.log('キャンセル押された')
+            });
+            this.add.existing(popup.container);
             
         }
     }
@@ -397,6 +406,10 @@ export default class SelectCharacterScene extends Phaser.Scene {
                 this.currentValues = newValuesArray.slice();  // 終了時に値を更新
             }
         });
-    }    
+    }
+
+    purchaseProcessing() {
+        console.log('ここに購入処理')
+    }
         
 }
