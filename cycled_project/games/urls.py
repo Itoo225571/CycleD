@@ -14,6 +14,7 @@ urlpatterns = [
 
     path('run/',views.NIKIRunView.as_view(),name='run'),
     path('run/get_data/',views.NIKIRunDataAPIView.as_view(),name='run_data'),
+    path('run/buy_chara/',views.BuyCharacterAPIView.as_view(),name='buy_chara'),
 
     path('roulette/',views.RouletteView.as_view(),name='roulette'),
 

@@ -12,7 +12,7 @@ from django.contrib import messages
 from django.utils.safestring import mark_safe
 from django.contrib.staticfiles import finders
 
-from rest_framework import views, viewsets, permissions, mixins, throttling
+from rest_framework import views, viewsets, permissions, mixins, throttling, status
 from rest_framework.response import Response
 
 from .models import NIKIRunScore,NIKIRunUserInfo
@@ -107,11 +107,78 @@ class NIKIRunDataAPIView(views.APIView):
             if player_key in owned_characters:
                 players_with_info[player_key] = player
             else:
-                players_with_info[player_key] = {'price': player.get('price')}
+                players_with_info[player_key] = {
+                    'key': player.get('key'),
+                    'price': player.get('price'),
+                }
 
         return Response({
             'players': players_with_info,
             'user_info': user_info_serialized,
             'score': score_serialized,
         })
+    
+class BuyCharacterAPIView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    throttle_classes = [
+        throttling.UserRateThrottle, 
+        throttling.AnonRateThrottle,
+    ]
 
+    def post(self, request):
+        character = request.data.get('character')
+        character_key = character.get('key')
+        price = character.get('price')
+
+        # json内にあるキャラだけを選択できる
+        base_dir = os.path.dirname(__file__)
+        json_path = os.path.join(base_dir, 'data', 'players.json')
+        with open(json_path, 'r', encoding='utf-8') as f:
+            players_data = json.load(f)
+            valid_character_keys = {player['key'] for player in players_data}
+
+        if not character_key in valid_character_keys:
+            return Response({'error': '指定されたキャラクターが存在しません'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = request.user
+            user_info = NIKIRunUserInfo.objects.get(user=user)
+
+            if character_key in user_info.owned_characters:
+                return Response({'message': 'すでに購入済みです'}, status=status.HTTP_200_OK)
+
+            # 購入処理
+            if not user.coin.sub(price):
+                return Response({'error': 'コインが足りません'}, status=status.HTTP_402_PAYMENT_REQUIRED)
+            user_info.owned_characters.append(character_key)
+            user_info.save()    # 更新
+            
+            # NIKIRunUserInfoを取得または作成
+            user_info_serialized = NIKIRunUserInfoSerializer(user_info).data
+            # 使えるキャラクターだけ情報を乗せる
+            owned_characters = user_info.owned_characters
+            players_with_info = {}
+            for player in players_data:
+                player_key = player['key']
+                if player_key in owned_characters:
+                    players_with_info[player_key] = player
+                else:
+                    players_with_info[player_key] = {
+                        'key': player.get('key'),
+                        'price': player.get('price'),
+                    }
+
+            return Response({
+                'message': '購入成功',
+                # 更新用のデータを添える
+                'players': players_with_info,
+                'user_info': user_info_serialized,
+                # 使用できるようになったキャラ情報
+                'character': players_with_info[character_key],
+            }, status=status.HTTP_200_OK)
+
+        except NIKIRunUserInfo.DoesNotExist:
+            return Response({'error': 'ユーザー情報が見つかりません'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -208,7 +208,7 @@ export default class RankingScene extends Phaser.Scene {
             //     .setDisplaySize(48, 48);
 
             // 名前
-            const username = this.add.text(0, 0, scoreData.user.username, {
+            const username = this.add.text(0, 0, scoreData.user, {
                 fontFamily: 'DotGothic16',
                 fontSize: '24px',
                 color: '#ffffcc'

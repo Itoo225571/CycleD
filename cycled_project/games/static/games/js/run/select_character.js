@@ -229,7 +229,7 @@ export default class SelectCharacterScene extends Phaser.Scene {
                 header: '購入しますか？',
                 message: `このキャラをアンロックするには金コインが [color=#ffd700]${selectedChara.price}コ[/color] 必要です`,
                 showCancel: true,
-                onOK: () => this.purchaseProcessing(),
+                onOK: () => this.purchaseProcessing(selectedChara),  // 購入処理
                 // onCancel: () => console.log('キャンセル押された')
             });
             this.add.existing(popup.container);
@@ -408,8 +408,73 @@ export default class SelectCharacterScene extends Phaser.Scene {
         });
     }
 
-    purchaseProcessing() {
-        console.log('ここに購入処理')
+    purchaseProcessing(selectedChara) {
+        var coin = this.userInfo.user.coin;
+        if (coin.num < selectedChara.price) {
+            const popup = createPopupWindow(this, {
+                x: this.game.config.width / 2,  // 画面の中央X座標
+                y: this.game.config.height / 2, // 画面の中央Y座標
+                width: this.game.config.height * 2/3 * 1.618,
+                height: this.game.config.height * 2/3,
+                header: 'お金が足りないヨ！',
+                message: `ちゃりニキで日記を書いてコインを貯めよう！`,
+            });
+            this.add.existing(popup.container);
+            return;
+        }
+        var owned_characters = this.userInfo.owned_characters;
+        if (owned_characters.includes(selectedChara.key)) {
+            const popup = createPopupWindow(this, {
+                x: this.game.config.width / 2,  // 画面の中央X座標
+                y: this.game.config.height / 2, // 画面の中央Y座標
+                width: this.game.config.height * 2/3 * 1.618,
+                height: this.game.config.height * 2/3,
+                header: 'Error',
+                message: `すでに所有しているキャラです`,
+            });
+            this.add.existing(popup.container);
+            return;
+        }
+
+        $.ajax({
+            url: '/games/run/buy_chara/',
+            type: 'POST',
+            headers: {
+                "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンをヘッダーに設定
+            },
+            contentType: 'application/json',  // これが重要！
+            data: JSON.stringify({
+                character: selectedChara  // オブジェクト全体を JSON として送る
+            }),
+            success: (data) => {
+                // データを更新
+                const popup = createPopupWindow(this, {
+                    x: this.game.config.width / 2,  // 画面の中央X座標
+                    y: this.game.config.height / 2, // 画面の中央Y座標
+                    width: this.game.config.height * 2/3 * 1.618,
+                    height: this.game.config.height * 2/3,
+                    header: '購入成功',
+                    message: `早速${data.character.key}を使用しますか？`,
+                    showCancel: true,
+                    cancelText: 'NO',
+                    onOK: () => {
+                        this.registry.set('selectedCharacter', data.character);
+                        this.registry.set('playersData', data.players);
+                        this.registry.set('userInfo', data.user_info);
+                        this.goStart();
+                    },   // キャラを切り替える
+                    onCancel: () => {
+                        this.registry.set('playersData', data.players);
+                        this.registry.set('userInfo', data.user_info);
+                        this.scene.restart();
+                    }
+                });
+                this.add.existing(popup.container);
+            },
+            error: function(xhr, status, error) {
+                console.error('エラー:', error);
+            }
+        });     
     }
         
 }
