@@ -271,7 +271,9 @@ export function createPopupWindow(scene, config) {
         message = '',
         showCancel = false,
         onOK = () => {},
-        onCancel = () => {}
+        onCancel = () => {},
+        okText = 'OK',
+        cancelText = 'Cancel',
     } = config;
     const container = scene.add.container(x, y);
 
@@ -309,7 +311,7 @@ export function createPopupWindow(scene, config) {
     messageText.setX(-width / 2 + 32);  // テキストがコンテナの左端に揃うように調整
 
     // OKボタン
-    const okButton = createButton(scene, 'OK', () => {
+    const okButton = createButton(scene, okText, () => {
         onOK();           // ユーザー定義のOK処理
         container.destroy();
         blocker.destroy();
@@ -319,7 +321,7 @@ export function createPopupWindow(scene, config) {
     // CANCELボタン（オプション）
     let cancelButton = null;
     if (showCancel) {
-        cancelButton = createButton(scene, 'Cancel', () => {
+        cancelButton = createButton(scene, cancelText, () => {
             onCancel();     // ユーザー定義のCancel処理
             container.destroy();
             blocker.destroy();
@@ -375,4 +377,3 @@ export function createPopupWindow(scene, config) {
         return container;
     }
 }
-

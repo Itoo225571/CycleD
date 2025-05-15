@@ -19,7 +19,7 @@
         "jumps": 1,
         "lives": 2,
         "jumpForce": 25,
-        "price": 300,
+        "price": 5,
         "msg": "頭が良くなると思って、毎日30分の逆立ちをしている。",
         "chargeSkill": "GainLife",
         "skillName": "+ライフ",
