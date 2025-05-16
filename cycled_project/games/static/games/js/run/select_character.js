@@ -232,7 +232,6 @@ export default class SelectCharacterScene extends Phaser.Scene {
                 onOK: () => this.purchaseProcessing(selectedChara),  // 購入処理
                 // onCancel: () => console.log('キャンセル押された')
             });
-            this.add.existing(popup.container);
             
         }
     }
@@ -419,7 +418,6 @@ export default class SelectCharacterScene extends Phaser.Scene {
                 header: 'お金が足りないヨ！',
                 message: `ちゃりニキで日記を書いてコインを貯めよう！`,
             });
-            this.add.existing(popup.container);
             return;
         }
         var owned_characters = this.userInfo.owned_characters;
@@ -432,10 +430,11 @@ export default class SelectCharacterScene extends Phaser.Scene {
                 header: 'Error',
                 message: `すでに所有しているキャラです`,
             });
-            this.add.existing(popup.container);
             return;
         }
+        
 
+        const scene = this;  // PhaserのScene内で this を保持しておく
         $.ajax({
             url: '/games/run/buy_chara/',
             type: 'POST',
@@ -446,33 +445,63 @@ export default class SelectCharacterScene extends Phaser.Scene {
             data: JSON.stringify({
                 character: selectedChara  // オブジェクト全体を JSON として送る
             }),
-            success: (data) => {
+            success: function(data) {
                 // データを更新
-                const popup = createPopupWindow(this, {
-                    x: this.game.config.width / 2,  // 画面の中央X座標
-                    y: this.game.config.height / 2, // 画面の中央Y座標
-                    width: this.game.config.height * 2/3 * 1.618,
-                    height: this.game.config.height * 2/3,
-                    header: '購入成功',
+                const popup = createPopupWindow(scene, {
+                    x: scene.game.config.width / 2,  // 画面の中央X座標
+                    y: scene.game.config.height / 2, // 画面の中央Y座標
+                    width: scene.game.config.height * 2/3 * 1.618,
+                    height: scene.game.config.height * 2/3,
+                    header: data.message,
                     message: `早速${data.character.key}を使用しますか？`,
                     showCancel: true,
                     cancelText: 'NO',
                     onOK: () => {
-                        this.registry.set('selectedCharacter', data.character);
-                        this.registry.set('playersData', data.players);
-                        this.registry.set('userInfo', data.user_info);
-                        this.goStart();
+                        scene.registry.set('selectedCharacter', data.character);
+                        scene.registry.set('playersData', data.players);
+                        scene.registry.set('userInfo', data.user_info);
+                        scene.goStart();
                     },   // キャラを切り替える
                     onCancel: () => {
-                        this.registry.set('playersData', data.players);
-                        this.registry.set('userInfo', data.user_info);
-                        this.scene.restart();
+                        scene.registry.set('playersData', data.players);
+                        scene.registry.set('userInfo', data.user_info);
+                        scene.scene.restart();
                     }
                 });
-                this.add.existing(popup.container);
+                scene.add.existing(popup.container);
             },
             error: function(xhr, status, error) {
-                console.error('エラー:', error);
+                let response = xhr.responseJSON || {};
+                let msg = '';
+
+                switch (xhr.status) {
+                    case 400:
+                        msg = response.error || 'リクエストに問題があります。';
+                        break;
+                    case 402:
+                        msg = response.error || 'コインが足りません。';
+                        break;
+                    case 404:
+                        msg = response.error || 'ユーザー情報が見つかりません。';
+                        break;
+                    case 409:
+                        msg = response.error || 'このキャラクターはすでに購入済みです。';
+                        break;
+                    case 500:
+                        console.error('サーバーエラー:', response.error || error);
+                        msg = 'サーバーエラーが発生しました。もう一度お試しください。';
+                        break;
+                    default:
+                        msg = '予期しないエラーが発生しました。';
+                }
+                const popup = createPopupWindow(scene, {
+                    x: scene.game.config.width / 2,  // 画面の中央X座標
+                    y: scene.game.config.height / 2, // 画面の中央Y座標
+                    width: scene.game.config.height * 2/3 * 1.618,
+                    height: scene.game.config.height * 2/3,
+                    header: 'Error',
+                    message: msg ,
+                });
             }
         });     
     }
