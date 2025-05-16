@@ -262,12 +262,31 @@ export function createBtn(x, y, scene, content, option = {}) {
 }
 
 export function createPopupWindow(scene, config) {
+    // キューと状態の初期化（初回だけ）
+    if (!scene.__popupState) {
+        scene.__popupState = {
+            active: false,
+            queue: []
+        };
+    }
+
+    const state = scene.__popupState;
+
+    // すでにポップアップが表示中なら、キューに追加してリターン
+    if (state.active) {
+        state.queue.push(config);
+        return;
+    }
+
+    // 今回のポップアップを「アクティブ」として表示
+    state.active = true;
+
     const {
         x = 400,
         y = 300,
         width = 300,
         height = 150,
-        header = '',  // ヘッダー部分
+        header = '',
         message = '',
         showCancel = false,
         onOK = () => {},
@@ -275,9 +294,9 @@ export function createPopupWindow(scene, config) {
         okText = 'OK',
         cancelText = 'Cancel',
     } = config;
+
     const container = scene.add.container(x, y);
 
-    // 背景 NinePatch2
     const bg = scene.rexUI.add.ninePatch2({
         x: 0,
         y: 0,
@@ -289,7 +308,6 @@ export function createPopupWindow(scene, config) {
     }).setOrigin(0.5);
     container.add(bg);
 
-    // ヘッダー
     const headerText = scene.rexUI.add.BBCodeText(0, -height / 2 + 48, header, {
         fontSize: '48px',
         fontFamily: 'DotGothic16',
@@ -298,48 +316,50 @@ export function createPopupWindow(scene, config) {
         align: 'center',
     }).setOrigin(0.5);
     container.add(headerText);
-    // メッセージテキスト
-    const messageText = scene.rexUI.add.BBCodeText(0, -height / 2 + 48*2 + 16, message, {
+
+    const messageText = scene.rexUI.add.BBCodeText(0, -height / 2 + 48 * 2 + 16, message, {
         fontFamily: 'DotGothic16',
         fontSize: '32px',
         color: '#000000',
         wordWrap: { width: width - 40 },
         align: 'left',
         lineSpacing: 16
-    }).setOrigin(0,0);
+    }).setOrigin(0, 0);
     container.add(messageText);
-    messageText.setX(-width / 2 + 32);  // テキストがコンテナの左端に揃うように調整
+    messageText.setX(-width / 2 + 32);
 
-    // OKボタン
     const okButton = createButton(scene, okText, () => {
-        onOK();           // ユーザー定義のOK処理
-        container.destroy();
-        blocker.destroy();
-    }, showCancel ? -130 : 0, height / 2 - 48,'white'); // 位置も直接指定
+        onOK();
+        closePopup();
+    }, showCancel ? -130 : 0, height / 2 - 48, 'white');
     container.add(okButton);
 
-    // CANCELボタン（オプション）
     let cancelButton = null;
     if (showCancel) {
         cancelButton = createButton(scene, cancelText, () => {
-            onCancel();     // ユーザー定義のCancel処理
-            container.destroy();
-            blocker.destroy();
-        }, 130, height / 2 - 48,'white'); // 位置も直接指定
+            onCancel();
+            closePopup();
+        }, 130, height / 2 - 48, 'white');
         container.add(cancelButton);
     }
 
-    // コンテナの位置調整（中央基準）
     container.setSize(width, height);
     container.setDepth(1000);
+    container.setScale(0);
 
-    // blocker
+    scene.tweens.add({
+        targets: container,
+        scale: 1,
+        ease: 'Back.Out',
+        duration: 400
+    });
+
     const screenWidth = scene.sys.game.config.width;
     const screenHeight = scene.sys.game.config.height;
     const blocker = scene.add.rectangle(0, 0, screenWidth, screenHeight, 0x000000, 0.3)
-    .setOrigin(0)
-    .setInteractive()
-    .setDepth(999); // ウィンドウより一段低い深度にする
+        .setOrigin(0)
+        .setInteractive()
+        .setDepth(999);
 
     return {
         container,
@@ -350,7 +370,7 @@ export function createPopupWindow(scene, config) {
     function createButton(scene, label, callback, posX, posY, color) {
         const buttonWidth = 200;
         const buttonHeight = 70;
-    
+
         const bg = scene.rexUI.add.ninePatch2({
             width: buttonWidth,
             height: buttonHeight,
@@ -358,22 +378,39 @@ export function createPopupWindow(scene, config) {
             columns: [16, undefined, 16],
             rows: [16, undefined, 16]
         }).setOrigin(0.5).setTint(0x808080);
-    
+
         const text = scene.add.text(0, 0, label, {
             fontSize: '24px',
             color: color,
             fontFamily: '"Press Start 2P"',
         }).setOrigin(0.5);
-    
-        const container = scene.add.container(0, 0, [bg, text]);
+
+        const container = scene.add.container(posX, posY, [bg, text]);
         container.setSize(buttonWidth, buttonHeight);
-        container.setPosition(posX, posY); // 位置をここで直接設定
-    
-        container.setInteractive({ useHandCursor: true }) 
-            .on('pointerdown', () => {
-                callback();
-            });
-    
+        container.setInteractive({ useHandCursor: true })
+            .on('pointerdown', callback);
+
         return container;
+    }
+
+    function closePopup() {
+        scene.tweens.add({
+            targets: container,
+            scale: 0,
+            alpha: 0,
+            ease: 'Back.In',
+            duration: 300,
+            onComplete: () => {
+                container.destroy();
+                blocker.destroy();
+                state.active = false;
+
+                // 次のポップアップがあれば表示
+                if (state.queue.length > 0) {
+                    const nextConfig = state.queue.shift();
+                    createPopupWindow(scene, nextConfig);
+                }
+            }
+        });
     }
 }

@@ -145,7 +145,7 @@ class BuyCharacterAPIView(views.APIView):
             user_info = NIKIRunUserInfo.objects.get(user=user)
 
             if character_key in user_info.owned_characters:
-                return Response({'message': 'すでに購入済みです'}, status=status.HTTP_200_OK)
+                return Response({'error': 'すでに購入済みです'}, status=status.HTTP_409_CONFLICT)
 
             # 購入処理
             if not user.coin.sub(price):
@@ -169,7 +169,7 @@ class BuyCharacterAPIView(views.APIView):
                     }
 
             return Response({
-                'message': '購入成功',
+                'message': '購入に成功しました！',
                 # 更新用のデータを添える
                 'players': players_with_info,
                 'user_info': user_info_serialized,
