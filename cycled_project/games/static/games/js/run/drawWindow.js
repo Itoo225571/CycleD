@@ -54,7 +54,7 @@ export function createMsgWindow(scene, message = '', delay = 0, config={}) {
         per_length * 2,
         '',
         {
-            fontFamily: 'DotGothic16',
+            fontFamily: 'JF-Dot-K14',
             fontSize: '32px',
             wrap: { mode: 'word', width: maxWidth },
             lineSpacing: 16
@@ -136,7 +136,7 @@ export function createBtn(x, y, scene, content, option = {}) {
             (info.btnHeight * per_length) / 2,
             content,
             {
-                fontFamily: option.fontFamily || 'DotGothic16',
+                fontFamily: option.fontFamily || 'JF-Dot-K14',
                 fontSize: `${info.contentWidth}px`,
                 color: cssColor,
             }
@@ -207,7 +207,7 @@ export function createPopupWindow(scene, config) {
 
     const headerText = scene.rexUI.add.BBCodeText(0, -height / 2 + 48, header, {
         fontSize: '48px',
-        fontFamily: 'DotGothic16',
+        fontFamily: 'JF-Dot-K14',
         color: '#000000',
         wordWrap: { width: width - 40 },
         align: 'center',
@@ -215,7 +215,7 @@ export function createPopupWindow(scene, config) {
     container.add(headerText);
 
     const messageText = scene.rexUI.add.BBCodeText(0, -height / 2 + 48 * 2 + 16, message, {
-        fontFamily: 'DotGothic16',
+        fontFamily: 'JF-Dot-K14',
         fontSize: '32px',
         color: '#000000',
         wordWrap: { width: width - 40 },
@@ -279,7 +279,7 @@ export function createPopupWindow(scene, config) {
         const text = scene.add.text(0, 0, label, {
             fontSize: '24px',
             color: color,
-            fontFamily: '"Press Start 2P"',
+            fontFamily: 'JF-Dot-K14',
         }).setOrigin(0.5);
 
         const container = scene.add.container(posX, posY, [bg, text]);

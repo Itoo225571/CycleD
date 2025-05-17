@@ -32,7 +32,7 @@ export default class SelectCharacterScene extends Phaser.Scene {
         this.currentValues = [0, 0, 0];
         this.statusNote = this.add.text(
             this.game.config.width - this.statusHexLength, this.statusHexLength * 2 +20 , '', {
-            fontFamily: 'DotGothic16',
+            fontFamily: 'JF-Dot-K14',
             fontSize: '32px',       // フォントサイズ
             color: '#ffffff',       // 文字色（白）
             lineSpacing: 10,        // ← この値を大きくすると行間が広がる
