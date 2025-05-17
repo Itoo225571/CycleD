@@ -10,7 +10,7 @@ window.onload = function() {
           families: ['JF-Dot-K14','Press Start 2P']
         },
         custom: {
-            families: ['JF-Dot-K14'],
+            families: ['JF-Dot-K14','DTM-Sans'],
             urls: ['/static/games/css/run.css']  // ← CSSファイルのパスを指定する
         },
         active: function () {

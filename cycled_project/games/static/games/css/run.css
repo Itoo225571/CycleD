@@ -2,3 +2,7 @@
     font-family: 'JF-Dot-K14';
     src: url('/static/games/fonts/JF-Dot-K14.ttf') format('truetype');
 }
+@font-face {
+    font-family: 'DTM-Sans';
+    src: url('/static/games/fonts/DTM-Sans.otf') format('truetype');
+}
