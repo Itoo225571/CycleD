@@ -352,7 +352,7 @@ export default class SelectCharacterScene extends Phaser.Scene {
     
             this.add.text(labelX, labelY, labels[i], {
                 fontFamily: 'DTM-Sans',
-                fontSize: '24px',
+                fontSize: '36px',
                 color: '#ffffff',
             }).setOrigin(0.5).setDepth(2);
         

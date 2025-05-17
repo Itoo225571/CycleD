@@ -44,7 +44,15 @@ export default class StartScene extends Phaser.Scene {
             }
         });
 
-        var option = { centerX: true, fontFamily: 'DTM-Sans', fontSize: 64 };
+        var option = { 
+            centerX: true, 
+            fontFamily: 'DTM-Sans', 
+            fontSize: 64,
+            color: 0xFFF3E0,
+            button: {
+                color: 0x4E342E
+            } 
+        };
         var btnList = [
             { y: 300, label: 'Start', callBack: this.goPlayScene.bind(this) },
             { y: 430, label: 'Select Character', callBack: this.goCharaSelectScene.bind(this) },

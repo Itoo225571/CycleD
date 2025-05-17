@@ -9,13 +9,19 @@ export default class PreloadScene extends Phaser.Scene {
         // msgウィンドウ
         this.load.spritesheet(
             'msgWindowTile', 
-            `${imgDir}Panel/panel-021.png`, 
+            `${imgDir}PanelTransparent/panel-008.png`, 
             { frameWidth: 16, frameHeight: 16 }
         );
         // btn
         this.load.spritesheet(
             'btnTile', 
-            `${imgDir}Panel/panel-000.png`, 
+            `${imgDir}Panel/panel-022.png`, 
+            { frameWidth: 16, frameHeight: 16 }
+        );
+        // ranking window
+        this.load.spritesheet(
+            'rankingWindowTile', 
+            `${imgDir}PanelTransparent/panel-015.png`, 
             { frameWidth: 16, frameHeight: 16 }
         );
         

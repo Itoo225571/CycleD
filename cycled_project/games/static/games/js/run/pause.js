@@ -17,7 +17,11 @@ export default class PauseScene extends Phaser.Scene {
 
         // ポーズ時のボタンに関するもの
         this.resumeBtns = [];  
-        const option = { centerX: true, fontFamily: 'DTM-Sans', fontSize: 64 };
+        const option = { 
+            centerX: true, 
+            fontFamily: 'DTM-Sans', 
+            fontSize: 64,
+        };
         // ボタンラベルとアクションの配列
         var buttons = [
             { label: 'Continue', callback: () => this.resumeGame() },
@@ -45,7 +49,7 @@ export default class PauseScene extends Phaser.Scene {
         // カウントダウン(非表示)
         this.countdownText = this.add.text(this.game.config.width / 2, this.game.config.height / 2, '', {
             fontFamily: 'DTM-Sans',
-            fontSize: '64px',
+            fontSize: '128px',
             fill: '#ffffff'
         }).setOrigin(0.5).setVisible(false);
     }
@@ -71,7 +75,7 @@ export default class PauseScene extends Phaser.Scene {
                 count--;
                 if (count < 0) {
                     // 0以下になったら「スタート！」表示
-                    this.countdownText.setText("GO!");
+                    this.countdownText.setText("G O !");
                     // 1秒後にゲームを再開
                     this.time.delayedCall(1000, () => {
                         this.countdownText.setVisible(false);
