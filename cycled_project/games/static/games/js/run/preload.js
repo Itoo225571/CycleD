@@ -292,6 +292,7 @@ export default class PreloadScene extends Phaser.Scene {
 
                 this.events.emit('gameDataLoaded', data);
             },
+            // preload時点でのエラーならalertでいいんじゃないかな
             error: function(xhr, status, error) {
                 let detailMessage = '';
                 try {

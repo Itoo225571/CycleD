@@ -7,7 +7,11 @@ let game;
 window.onload = function() {
     WebFont.load({
         google: {
-          families: ['DotGothic16','Press Start 2P']
+          families: ['JF-Dot-K14','Press Start 2P']
+        },
+        custom: {
+            families: ['JF-Dot-K14'],
+            urls: ['/static/games/css/run.css']  // ← CSSファイルのパスを指定する
         },
         active: function () {
             game = new Phaser.Game(gameConfig);      // ゲームインスタンス作成

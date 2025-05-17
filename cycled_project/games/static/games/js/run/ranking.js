@@ -238,7 +238,7 @@ export default class RankingScene extends Phaser.Scene {
 
             // 名前
             const username = this.add.text(0, 0, scoreData.user, {
-                fontFamily: 'DotGothic16',
+                fontFamily: 'JF-Dot-K14',
                 fontSize: '24px',
                 color: '#ffffcc'
             }).setOrigin(0.5);
