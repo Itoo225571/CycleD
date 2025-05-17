@@ -36,7 +36,7 @@ export default class PreloadScene extends Phaser.Scene {
         // ranking window
         this.load.spritesheet(
             'rankingWindowTile', 
-            `${imgDir}Panel/panel-015.png`, 
+            `${imgDir}PanelBorder/panel-014.png`, 
             { frameWidth: 16, frameHeight: 16 }
         );
         

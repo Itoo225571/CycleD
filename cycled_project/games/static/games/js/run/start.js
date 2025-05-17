@@ -8,7 +8,7 @@ export default class StartScene extends Phaser.Scene {
     create() {
         this.titleReady = false;  // ← アニメーション完了フラグ
 
-        var TITLE_NAME = 'NIKI RUN';
+        var TITLE_NAME = 'NIKI  RUN';
         // フェードインしつつ、ゆっくり上下に浮かぶ
         this.title = this.add.text(
             -200, 150, // 画面の左外側から開始
@@ -55,7 +55,7 @@ export default class StartScene extends Phaser.Scene {
         };
         var btnList = [
             { y: 300, label: 'Start', callBack: this.goPlayScene.bind(this) },
-            { y: 430, label: 'Select Character', callBack: this.goCharaSelectScene.bind(this) },
+            { y: 430, label: 'Select  Character', callBack: this.goCharaSelectScene.bind(this) },
             { y: 560, label: 'Ranking', callBack: this.goRankingScene.bind(this) }
         ];        
         
