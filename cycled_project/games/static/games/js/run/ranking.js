@@ -67,10 +67,6 @@ export default class RankingScene extends Phaser.Scene {
         // this.notyetText.setVisible(true); 
         this.backButton.setVisible(true);
     }
-
-    goScore() {
-        
-    }
     
     getScores() {
         var scene = this;
@@ -155,27 +151,37 @@ export default class RankingScene extends Phaser.Scene {
             y: centerY + 50,
             width: this.scale.width - 200,
             height: centerY + 100,
-    
-            scrollMode: 0, // 0=vertical, 1=horizontal
-    
-            background: this.add.rectangle(0, 0, 600, 400, 0x222222).setStrokeStyle(2, 0xffffff),
-    
+        
+            scrollMode: 0, // 0=vertical
+        
+            background: this.rexUI.add.ninePatch2({
+                width: this.scale.width - 200,
+                height: centerY + 100,
+                key: 'rankingWindowTile',
+                columns: [16, undefined, 16],
+                rows: [16, undefined, 16],
+                stretchMode: {
+                    edge: 'repeat',  // ← 好みに応じて 'scale' でもOK
+                    internal: 'scale'
+                }
+            }).setTint(0x222222),  // ← ここで枠の色変更
+        
             panel: {
                 child: this.rexUI.add.fixWidthSizer({
                     space: { top: 10, bottom: 10, left: 10, right: 10, item: 10 },
                 }),
             },
-    
+        
             slider: {
                 track: this.add.rectangle(0, 0, 20, 10, 0x555555),
                 thumb: this.add.rectangle(0, 0, 20, 40, 0xffffff),
             },
-    
+        
             mouseWheelScroller: {
                 focus: false,
                 speed: 0.1
             },
-    
+        
             space: {
                 left: 10,
                 right: 10,
@@ -183,7 +189,7 @@ export default class RankingScene extends Phaser.Scene {
                 bottom: 10,
                 panel: 10,
             }
-        })
+        })        
         .layout();
 
         if (!this.isReady)  this.getScores();   //displayがちゃんと完成してから実行

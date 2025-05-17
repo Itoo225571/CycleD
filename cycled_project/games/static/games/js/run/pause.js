@@ -50,8 +50,10 @@ export default class PauseScene extends Phaser.Scene {
         this.countdownText = this.add.text(this.game.config.width / 2, this.game.config.height / 2, '', {
             fontFamily: 'DTM-Sans',
             fontSize: '128px',
-            fill: '#ffffff'
-        }).setOrigin(0.5).setVisible(false);
+            fill: '#ffffff',             // 文字の色（白）
+            stroke: '#000000',           // アウトラインの色（黒）
+            strokeThickness: 8           // アウトラインの太さ（お好みで調整）
+        }).setOrigin(0.5).setVisible(false);        
     }
     
     resumeGame() {
