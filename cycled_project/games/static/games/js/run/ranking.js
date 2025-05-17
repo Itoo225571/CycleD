@@ -154,17 +154,20 @@ export default class RankingScene extends Phaser.Scene {
         
             scrollMode: 0, // 0=vertical
         
-            background: this.rexUI.add.ninePatch2({
-                width: this.scale.width - 200,
-                height: centerY + 100,
-                key: 'rankingWindowTile',
-                columns: [16, undefined, 16],
-                rows: [16, undefined, 16],
-                stretchMode: {
-                    edge: 'repeat',  // ← 好みに応じて 'scale' でもOK
-                    internal: 'scale'
-                }
-            }).setTint(0x222222),  // ← ここで枠の色変更
+            background: this.add.container(0, 0, [
+                this.add.rectangle(0, 0, this.scale.width - 200, centerY + 100, 0x000000),  // 黒背景追加
+                this.rexUI.add.ninePatch2({
+                    width: this.scale.width - 200,
+                    height: centerY + 100,
+                    key: 'rankingWindowTile',
+                    columns: [16, undefined, 16],
+                    rows: [16, undefined, 16],
+                    stretchMode: {
+                        edge: 'repeat',
+                        internal: 'scale'
+                    }
+                })
+            ]),            
         
             panel: {
                 child: this.rexUI.add.fixWidthSizer({

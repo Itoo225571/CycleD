@@ -48,30 +48,33 @@ export default class PlayScene extends Phaser.Scene {
             fontFamily: 'DTM-Sans',
             fontSize: '32px',
             fill: '#ffffff'
-        }).setScrollFactor(0);
+        }).setScrollFactor(0).setDepth(100);
         // チャージバー
         var barX = 30, barY = 80, barWidth = 200, barHeight = 20;
         var bgBar = this.add.rectangle(barX, barY, barWidth, barHeight, 0x444444)
                     .setOrigin(0, 0.5)
                     .setScrollFactor(0)
-                    .setAlpha(0.7);
+                    .setAlpha(0.7)
+                    .setDepth(99);;
         var chargeBar = this.add.rectangle(barX, barY, 0, barHeight, 0x00ff00)
                     .setOrigin(0, 0.5)
-                    .setScrollFactor(0);
+                    .setScrollFactor(0)
+                    .setDepth(100);
         this.player.createChargeBar(bgBar,chargeBar);
         // life
         this.lifeText = this.add.text(30, 120, `0`, {
             fontFamily: 'DTM-Sans',
             fontSize: '32px',
             fill: '#ffffff'
-        }).setScrollFactor(0);
+        }).setScrollFactor(0).setDepth(100);
 
         // ポーズボタン
         this.pauseButton = this.add.sprite(this.cameras.main.width - 50, 50, 'inputPrompts', 538)
                             .setOrigin(0.5)
                             .setScrollFactor(0)
                             .setDisplaySize(64,64)
-                            .setInteractive({ useHandCursor: true });
+                            .setInteractive({ useHandCursor: true })
+                            .setDepth(100);
         this.pauseButton.on('pointerdown', this.pauseGame, this);
         window.addEventListener('blur', () => {
             this.pauseGame();
