@@ -17,11 +17,11 @@ export default class PauseScene extends Phaser.Scene {
 
         // ポーズ時のボタンに関するもの
         this.resumeBtns = [];  
-        const option = { centerX: true, fontFamily: '"Press Start 2P"' };
+        const option = { centerX: true, fontFamily: 'DTM-Sans', fontSize: 64 };
         // ボタンラベルとアクションの配列
         var buttons = [
             { label: 'Continue', callback: () => this.resumeGame() },
-            { label: 'Re:start', callback: () => this.rePlayGame() },
+            { label: 'Re: start', callback: () => this.rePlayGame() },
             { label: 'Exit', callback: () => this.goStartScreen() }
         ];
         // ボタン作成
@@ -44,7 +44,7 @@ export default class PauseScene extends Phaser.Scene {
 
         // カウントダウン(非表示)
         this.countdownText = this.add.text(this.game.config.width / 2, this.game.config.height / 2, '', {
-            fontFamily: '"Press Start 2P"',
+            fontFamily: 'DTM-Sans',
             fontSize: '64px',
             fill: '#ffffff'
         }).setOrigin(0.5).setVisible(false);

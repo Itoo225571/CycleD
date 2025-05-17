@@ -292,7 +292,7 @@ export default class SelectCharacterScene extends Phaser.Scene {
         // 中心に「？」を作成
         if (!this.graphQ) {
             this.graphQ = this.add.text(x + 5, y + 5, '?', {
-                fontFamily: '"Press Start 2P"',
+                fontFamily: 'DTM-Sans',
                 fontSize: '96px',
                 color: '#ffffff',
             }).setOrigin(0.5).setDepth(2);
@@ -351,7 +351,7 @@ export default class SelectCharacterScene extends Phaser.Scene {
             const labelY = y + Math.sin(angle) * (radius + 50);
     
             this.add.text(labelX, labelY, labels[i], {
-                fontFamily: '"Press Start 2P"',
+                fontFamily: 'DTM-Sans',
                 fontSize: '24px',
                 color: '#ffffff',
             }).setOrigin(0.5).setDepth(2);

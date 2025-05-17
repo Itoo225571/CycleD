@@ -133,8 +133,8 @@ export default class RankingScene extends Phaser.Scene {
         this.scoreTitle = this.add.text(
             centerX, 90, 
             'Ranking', {
-            fontFamily: '"Press Start 2P"',
-            fontSize: '64px',
+            fontFamily: 'DTM-Sans',
+            fontSize: '96px',
             color: '#ffffff',
             align: 'center'
         }).setOrigin(0.5);
@@ -143,7 +143,7 @@ export default class RankingScene extends Phaser.Scene {
         this.notyetText = this.add.text(
             centerX, centerY, 
             'No scores yet!', {
-            fontFamily: '"Press Start 2P"',
+            fontFamily: 'DTM-Sans',
             fontSize: '32px',
             color: '#ffcccc',
             align: 'center'
@@ -227,7 +227,7 @@ export default class RankingScene extends Phaser.Scene {
 
             // 順位
             const rankText = this.add.text(0, 0, `${index + 1}.`, {
-                fontFamily: '"Press Start 2P"',
+                fontFamily: 'DTM-Sans',
                 fontSize: '24px',
                 color: '#ffffff'
             }).setOrigin(0.5);
@@ -245,14 +245,14 @@ export default class RankingScene extends Phaser.Scene {
             
             // 更新日時
             const updatedAt = this.add.text(0, 0, scoreData.updated_at || 'N/A', {
-                fontFamily: '"Press Start 2P"',
+                fontFamily: 'DTM-Sans',
                 fontSize: '24px',
                 color: '#cccccc'
             }).setOrigin(0.5);
 
             // スコア
             const scoreLabel = this.add.text(0, 0, scoreDisplay, {
-                fontFamily: '"Press Start 2P"',
+                fontFamily: 'DTM-Sans',
                 fontSize: '24px',
                 color: '#ffcc99',
                 align: 'right'

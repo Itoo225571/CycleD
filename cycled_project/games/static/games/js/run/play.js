@@ -45,7 +45,7 @@ export default class PlayScene extends Phaser.Scene {
 
         // スコアの表示
         this.distText = this.add.text(30, 20, `0.0`, {
-            fontFamily: '"Press Start 2P"',
+            fontFamily: 'DTM-Sans',
             fontSize: '32px',
             fill: '#ffffff'
         }).setScrollFactor(0);
@@ -61,7 +61,7 @@ export default class PlayScene extends Phaser.Scene {
         this.player.createChargeBar(bgBar,chargeBar);
         // life
         this.lifeText = this.add.text(30, 120, `0`, {
-            fontFamily: '"Press Start 2P"',
+            fontFamily: 'DTM-Sans',
             fontSize: '32px',
             fill: '#ffffff'
         }).setScrollFactor(0);

@@ -15,9 +15,9 @@ export default class GameoverScene extends Phaser.Scene {
 
         // this.postScore();
         this.gameoverBtns = [];  
-        const option = { centerX: true, fontFamily: '"Press Start 2P"' };
+        const option = { centerX: true, fontFamily: 'DTM-Sans', fontSize: 64 };
         var buttons = [
-            { label: 'Re:start', callback: () => this.rePlayGame() },
+            { label: 'Re: start', callback: () => this.rePlayGame() },
             { label: 'Ranking', callback: () => this.goRankingScene() },
             { label: 'Exit', callback: () => this.goStartScreen() }
         ];
@@ -35,24 +35,24 @@ export default class GameoverScene extends Phaser.Scene {
         });
 
         // text
-        this.stHeight = 100;
+        this.stHeight = 80;
         this.gameOverText = this.add.text(
             this.cameras.main.centerX,
             -100,  // 画面の上外からスタート
             'Game Over',
             {
-                fontFamily: '"Press Start 2P"',
-                fontSize: '64px',
+                fontFamily: 'DTM-Sans',
+                fontSize: '96px',
                 color: '#ffffff'
             }
         ).setOrigin(0.5);
         this.newRecordText = this.add.text(
-            -200,
-            this.stHeight + this.gameOverText.height,       //左端から
+            -200,   //左端から
+            this.stHeight + this.gameOverText.height,
             'NEW RECORD!',
             {
-                fontFamily: '"Press Start 2P"',
-                fontSize: '24px',
+                fontFamily: 'DTM-Sans',
+                fontSize: '48px',
                 color: '#FFD700',   // 金色っぽい
                 stroke: '#FF0000',  // 赤い縁取り
                 strokeThickness: 8, // 縁取りの太さ
@@ -70,8 +70,8 @@ export default class GameoverScene extends Phaser.Scene {
             -100,  // "Game Over" の下に配置
             '',  // とりあえず空
             {
-                fontFamily: '"Press Start 2P"',
-                fontSize: '32px',
+                fontFamily: 'DTM-Sans',
+                fontSize: '48px',
                 color: '#ffffff'
             }
         ).setOrigin(0.5);

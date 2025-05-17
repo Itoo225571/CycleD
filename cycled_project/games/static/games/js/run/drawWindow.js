@@ -131,13 +131,14 @@ export function createBtn(x, y, scene, content, option = {}) {
         container.add(image);
     } else {
         var cssColor = `#${hexColor.toString(16).padStart(6, '0')}`;  // 変換
+        var fontSize = option.fontSize || info.contentWidth;
         const text = scene.add.text(
             (info.btnWidth * per_length) / 2,
             (info.btnHeight * per_length) / 2,
             content,
             {
                 fontFamily: option.fontFamily || 'JF-Dot-K14',
-                fontSize: `${info.contentWidth}px`,
+                fontSize: `${fontSize}px`,
                 color: cssColor,
             }
         ).setOrigin(0.5);

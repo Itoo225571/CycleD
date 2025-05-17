@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from .models import User
 from diary.models import Diary,Coin,TempImage  # ← 他アプリ（diary）からのインポート
-from games.models import NIKIRunUserInfo
+from games.models import NIKIRunUserInfo,NIKIRunScore
 
 class DiaryInline(admin.TabularInline):
     model=Diary
@@ -19,6 +19,8 @@ class CoinInline(admin.TabularInline):
 
 class NIKIRunUserInfoInline(admin.TabularInline):
     model = NIKIRunUserInfo
+class NIKIRuScoreInline(admin.TabularInline):
+    model = NIKIRunScore
 
 class UserAdmin(BaseUserAdmin):
     add_fieldsets=[
@@ -42,7 +44,7 @@ class UserAdmin(BaseUserAdmin):
         ('重要な日付', {'fields': ('last_login', 'date_joined')}),
     )
     # fields = "__all__"
-    inlines=[DiaryInline,CoinInline,TempImageInline,NIKIRunUserInfoInline]
+    inlines=[DiaryInline,CoinInline,TempImageInline,NIKIRunUserInfoInline,NIKIRuScoreInline]
     list_display=["username",]
     search_fields = ["username", "email"]
     list_filter = ["is_staff", "is_superuser", "is_active"]

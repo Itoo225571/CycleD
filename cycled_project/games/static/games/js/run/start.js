@@ -12,13 +12,16 @@ export default class StartScene extends Phaser.Scene {
         // フェードインしつつ、ゆっくり上下に浮かぶ
         this.title = this.add.text(
             -200, 150, // 画面の左外側から開始
-            TITLE_NAME, {
-                fontFamily: '"Press Start 2P"',
-                fontSize: '60px',
-                color: '#ffffff',
+            TITLE_NAME,
+            {
+                fontFamily: 'DTM-Sans',
+                fontSize: '96px',
+                color: '#ffffff',           // 文字の色
+                stroke: '#444444',          // 縁の色（黒）
+                strokeThickness: 8,         // 縁の太さ
                 resolution: 2
-            }).setOrigin(0.5).setAlpha(0).setScale(0.9)
-            .setShadow(10, 10, '#660066', 0, true, true);  // ← 影を追加！;
+            }
+        ).setOrigin(0.5).setAlpha(0);        
         // アニメーション
         this.tweens.add({
             targets: this.title,
@@ -41,7 +44,7 @@ export default class StartScene extends Phaser.Scene {
             }
         });
 
-        var option = { centerX: true, fontFamily: '"Press Start 2P"' };
+        var option = { centerX: true, fontFamily: 'DTM-Sans', fontSize: 64 };
         var btnList = [
             { y: 300, label: 'Start', callBack: this.goPlayScene.bind(this) },
             { y: 430, label: 'Select Character', callBack: this.goCharaSelectScene.bind(this) },
