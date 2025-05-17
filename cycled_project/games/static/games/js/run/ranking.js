@@ -1,3 +1,5 @@
+import { createPopupWindow } from './drawWindow.js';
+
 export default class RankingScene extends Phaser.Scene {
     constructor() {
         super({ key: 'RankingScene' });
@@ -71,6 +73,7 @@ export default class RankingScene extends Phaser.Scene {
     }
     
     getScores() {
+        var scene = this;
         $.ajax({
             url: '/games/api/nikirun_score/',
             method: 'GET',
@@ -84,13 +87,39 @@ export default class RankingScene extends Phaser.Scene {
                 this.showDisplayScores(scores);
             },
             error: function(xhr, status, error) {
-                var response = xhr.responseJSON;
-                var errors = response.form.fields;
-                $.each(errors,function(_,error) {
-                    // 手動でエラーを出力
-                    append_error_ajax(error.label,error.errors);
-                })
-                goBackScene();  //戻す
+                let msg;
+                switch (xhr.status) {
+                    case 400:
+                        const res = xhr.responseJSON;
+                        if (res && res.score) {
+                            msg = 'スコアに関するエラー: ' + res.score.join(', ');
+                        } else {
+                            msg = 'リクエストに問題があります: ' + JSON.stringify(res);
+                        }
+                        break;
+                    case 401:
+                        msg = '認証が必要です。ログインしてください。';
+                        break;
+                    case 403:
+                        msg = 'アクセスが拒否されました。権限がありません。';
+                        break;
+                    case 404:
+                        msg = 'スコアデータが見つかりませんでした。';
+                        break;
+                    case 500:
+                        msg = 'サーバー内部でエラーが発生しました。';
+                        break;
+                    default:
+                        msg = `不明なエラーが発生しました\n（ステータスコード: ${xhr.status} ）`;
+                }
+                const popup = createPopupWindow(scene, {
+                    x: scene.game.config.width / 2,  // 画面の中央X座標
+                    y: scene.game.config.height / 2, // 画面の中央Y座標
+                    width: scene.game.config.height * 2/3 * 1.618,
+                    height: scene.game.config.height * 2/3,
+                    header: 'Error',
+                    message: msg ,
+                });
             },
         });
     }

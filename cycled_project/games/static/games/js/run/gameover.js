@@ -1,4 +1,4 @@
-import { createBtn } from './start.js';
+import { createBtn, createPopupWindow } from './drawWindow.js';
 
 export default class GameoverScene extends Phaser.Scene {
     constructor() {
@@ -134,6 +134,7 @@ export default class GameoverScene extends Phaser.Scene {
         // 新記録か，そもそも存在しない場合
         if (scoreData.score || scoreData.score < score_new) {
             var is_newrecord = false;
+            var scene = this;
             $.ajax({
                 url: `/games/api/nikirun_score/${id}/`,
                 method: 'PATCH',
@@ -148,20 +149,40 @@ export default class GameoverScene extends Phaser.Scene {
                     this.registry.set('scoreData', response);   // 新しい情報をセット
                 },
                 error: function(xhr, status, error) {
-                    var response = xhr.responseJSON;
-                
-                    // response.formが存在するか確認
-                    if (response && response.form && response.form.fields) {
-                        var errors = response.form.fields;
-                        $.each(errors, function(_, error) {
-                            // 手動でエラーを出力
-                            append_error_ajax(error.label, error.errors);
-                        });
-                    } else {
-                        // response.formが存在しない場合のエラーハンドリング（必要に応じて）
-                        console.error("Error response structure is invalid or missing fields.");
+                    let msg;
+                    switch (xhr.status) {
+                        case 400:
+                            const res = xhr.responseJSON;
+                            if (res && res.score) {
+                                msg = 'スコアに関するエラー: ' + res.score.join(', ');
+                            } else {
+                                msg = 'リクエストに問題があります: ' + JSON.stringify(res);
+                            }
+                            break;
+                        case 401:
+                            msg = '認証が必要です。ログインしてください。';
+                            break;
+                        case 403:
+                            msg = 'アクセスが拒否されました。権限がありません。';
+                            break;
+                        case 404:
+                            msg = 'スコアデータが見つかりませんでした。';
+                            break;
+                        case 500:
+                            msg = 'サーバー内部でエラーが発生しました。';
+                            break;
+                        default:
+                            msg = `不明なエラーが発生しました\n（ステータスコード: ${xhr.status} ）`;
                     }
-                },            
+                    const popup = createPopupWindow(scene, {
+                        x: scene.game.config.width / 2,  // 画面の中央X座標
+                        y: scene.game.config.height / 2, // 画面の中央Y座標
+                        width: scene.game.config.height * 2/3 * 1.618,
+                        height: scene.game.config.height * 2/3,
+                        header: 'Error',
+                        message: msg ,
+                    });
+                },           
                 complete: () => {
                     this.startAnim(score_new,is_newrecord);  // 成功・失敗に関わらず呼び出す
                 },

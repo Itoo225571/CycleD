@@ -1,4 +1,4 @@
-import { createMsgWindow,createPopupWindow } from './start.js';
+import { createMsgWindow,createPopupWindow } from './drawWindow.js';
 
 export default class SelectCharacterScene extends Phaser.Scene {
     constructor() {
@@ -476,19 +476,19 @@ export default class SelectCharacterScene extends Phaser.Scene {
 
                 switch (xhr.status) {
                     case 400:
-                        msg = response.error || 'リクエストに問題があります。';
+                        msg = response.detail || 'リクエストに問題があります。';
                         break;
                     case 402:
-                        msg = response.error || 'コインが足りません。';
+                        msg = response.detail || 'コインが足りません。';
                         break;
                     case 404:
-                        msg = response.error || 'ユーザー情報が見つかりません。';
+                        msg = response.detail || 'ユーザー情報が見つかりません。';
                         break;
                     case 409:
-                        msg = response.error || 'このキャラクターはすでに購入済みです。';
+                        msg = response.detail || 'このキャラクターはすでに購入済みです。';
                         break;
                     case 500:
-                        console.error('サーバーエラー:', response.error || error);
+                        console.error('サーバーエラー:', response.detail || error);
                         msg = 'サーバーエラーが発生しました。もう一度お試しください。';
                         break;
                     default:

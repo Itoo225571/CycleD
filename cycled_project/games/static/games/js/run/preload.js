@@ -293,8 +293,33 @@ export default class PreloadScene extends Phaser.Scene {
                 this.events.emit('gameDataLoaded', data);
             },
             error: function(xhr, status, error) {
-                console.error('エラー:', error);
-            }
+                let detailMessage = '';
+                try {
+                    detailMessage = xhr.responseJSON?.detail || '不明なエラー';
+                } catch (e) {
+                    detailMessage = 'エラーレスポンスの解析に失敗しました';
+                }
+        
+                switch (xhr.status) {
+                    case 400:
+                        alert('不正なリクエストです: ' + detailMessage);
+                        break;
+                    case 401:
+                        alert('認証されていません。ログインしてください。');
+                        break;
+                    case 403:
+                        alert('アクセスが拒否されました。');
+                        break;
+                    case 404:
+                        alert('データが見つかりません: ' + detailMessage);
+                        break;
+                    case 500:
+                        alert('サーバーエラー: ' + detailMessage);
+                        break;
+                    default:
+                        alert('予期しないエラーが発生しました: ' + detailMessage + '（コード: ' + xhr.status + '）');
+                }
+            },
         });        
     }
 }
