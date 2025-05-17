@@ -114,7 +114,7 @@ export function createBtn(x, y, scene, content, option = {}) {
 
     const container = scene.add.container(posX, posY);
 
-    createFrame(scene, container, info.btnWidth, info.btnHeight, 'btnTile', 0xffffff);
+    createFrame(scene, container, info.btnWidth, info.btnHeight, 'btnTile', info.btnColor);
 
     // テキスト作成
     const hexColor = info.contentColor;
@@ -141,7 +141,8 @@ export function createBtn(x, y, scene, content, option = {}) {
                 fontSize: `${fontSize}px`,
                 color: cssColor,
             }
-        ).setOrigin(0.5);
+        ).setOrigin(0.5)
+        .setShadow(2, 2, '#555555', 0, true, true);  // ← ここで影を追加;
         container.add(text);
     }
 
