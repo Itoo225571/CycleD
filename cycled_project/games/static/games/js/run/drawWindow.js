@@ -1,4 +1,4 @@
-function createFrame(scene, container, widthInTiles, heightInTiles, imgKey, color = null, alpha = 1) {
+function createFrame(scene, container, widthInTiles, heightInTiles, imgKey, borderColor = 0xffffff, alpha = 1) {
     const tileSize = 16;
     const width = widthInTiles * tileSize;
     const height = heightInTiles * tileSize;
@@ -13,19 +13,21 @@ function createFrame(scene, container, widthInTiles, heightInTiles, imgKey, colo
         rows: [tileSize, undefined, tileSize],
     }).setOrigin(0);
 
-    if (color) frame.setTint(color);
+    frame.setTint(borderColor);
     frame.setAlpha(alpha);
 
     container.add(frame);
+
     return container;
 }
 
-export function createMsgWindow(scene, message = '', delay = 0, config={}) {
+
+export function createMsgWindow(scene, message = '', delay = 0, option={}) {
     const info = {
-        x: config.x || 0,
-        y: config.y || 500,
-        width: config.width || 75,
-        height: config.height || 15,
+        x: option.x || 0,
+        y: option.y || 500,
+        width: option.width || 75,
+        height: option.height || 15,
     };
     const per_length = 16;
     const widthInTiles = info.width;
@@ -45,7 +47,8 @@ export function createMsgWindow(scene, message = '', delay = 0, config={}) {
     const container = scene.add.container((scene.scale.width - windowWidth) / 2, info.y);
     scene._msgWindowContainer = container;
 
-    createFrame(scene, container, widthInTiles, heightInTiles, 'msgWindowTile', 0x000000, 0.5);
+    var tileName = option.transparent? 'msgWindowTileTransparent': 'msgWindowTile';
+    createFrame(scene, container, widthInTiles, heightInTiles, tileName, 0x000000, 0.5);
 
     const maxWidth = info.width * per_length - 16 * 5;
 
@@ -114,7 +117,8 @@ export function createBtn(x, y, scene, content, option = {}) {
 
     const container = scene.add.container(posX, posY);
 
-    createFrame(scene, container, info.btnWidth, info.btnHeight, 'btnTile', info.btnColor);
+    const tileName = option.button && option.button.transparent ? 'btnTileTransparent' : 'btnTile';
+    createFrame(scene, container, info.btnWidth, info.btnHeight, tileName, info.btnColor);
 
     // テキスト作成
     const hexColor = info.contentColor;
@@ -152,7 +156,7 @@ export function createBtn(x, y, scene, content, option = {}) {
     hitArea.setOrigin(0);
     hitArea.setInteractive({ useHandCursor: true });
 
-    hitArea.on('pointerover', () => container.setAlpha(0.8));
+    hitArea.on('pointerover', () => container.setAlpha(0.3));
     hitArea.on('pointerout', () => container.setAlpha(1));
 
     container.add(hitArea);
@@ -160,7 +164,7 @@ export function createBtn(x, y, scene, content, option = {}) {
     return { container, hitArea };
 }
 
-export function createPopupWindow(scene, config) {
+export function createPopupWindow(scene, option) {
     // キューと状態の初期化（初回だけ）
     if (!scene.__popupState) {
         scene.__popupState = {
@@ -173,7 +177,7 @@ export function createPopupWindow(scene, config) {
 
     // すでにポップアップが表示中なら、キューに追加してリターン
     if (state.active) {
-        state.queue.push(config);
+        state.queue.push(option);
         return;
     }
 
@@ -192,25 +196,32 @@ export function createPopupWindow(scene, config) {
         onCancel = () => {},
         okText = 'OK',
         cancelText = 'Cancel',
-    } = config;
+        transparent = false,
+    } = option;
 
     const container = scene.add.container(x, y);
 
-    const bg = scene.rexUI.add.ninePatch2({
+    // const tileName = transparent? 'msgWindowTileTransparent': 'msgWindowTile';
+    const tileName = 'msgWindowTileBorder';
+    // 黒い背景をまず描く
+    const bgRect = scene.add.rectangle(0, 0, width, height, 0x000000, 1).setOrigin(0.5);
+    container.add(bgRect);
+    // 白いボーダーのみを持つ ninePatch を重ねる
+    const frame = scene.rexUI.add.ninePatch2({
         x: 0,
         y: 0,
         width,
         height,
-        key: 'msgWindowTile',
+        key: tileName,
         columns: [16, undefined, 16],
         rows: [16, undefined, 16]
     }).setOrigin(0.5);
-    container.add(bg);
+    container.add(frame);
 
     const headerText = scene.rexUI.add.BBCodeText(0, -height / 2 + 48, header, {
         fontSize: '48px',
         fontFamily: 'JF-Dot-K14',
-        color: '#000000',
+        color: '#FFFFFF',  // ← 白
         wordWrap: { width: width - 40 },
         align: 'center',
     }).setOrigin(0.5);
@@ -219,7 +230,7 @@ export function createPopupWindow(scene, config) {
     const messageText = scene.rexUI.add.BBCodeText(0, -height / 2 + 48 * 2 + 16, message, {
         fontFamily: 'JF-Dot-K14',
         fontSize: '32px',
-        color: '#000000',
+        color: '#FFFFFF',  // ← 白
         wordWrap: { width: width - 40 },
         align: 'left',
         lineSpacing: 16
@@ -227,10 +238,11 @@ export function createPopupWindow(scene, config) {
     container.add(messageText);
     messageText.setX(-width / 2 + 32);
 
+    var btnHeight = height / 2 - 64 - 16;
     const okButton = createButton(scene, okText, () => {
         onOK();
         closePopup();
-    }, showCancel ? -130 : 0, height / 2 - 48, 'white');
+    }, showCancel ? -130 : 0, btnHeight, 'white');
     container.add(okButton);
 
     let cancelButton = null;
@@ -238,7 +250,7 @@ export function createPopupWindow(scene, config) {
         cancelButton = createButton(scene, cancelText, () => {
             onCancel();
             closePopup();
-        }, 130, height / 2 - 48, 'white');
+        }, 130, btnHeight, 'white');
         container.add(cancelButton);
     }
 
@@ -270,24 +282,27 @@ export function createPopupWindow(scene, config) {
         const buttonWidth = 200;
         const buttonHeight = 70;
 
-        const bg = scene.rexUI.add.ninePatch2({
-            width: buttonWidth,
-            height: buttonHeight,
-            key: 'btnTile',
-            columns: [16, undefined, 16],
-            rows: [16, undefined, 16]
-        }).setOrigin(0.5).setTint(0x808080);
+        // const bg = scene.rexUI.add.ninePatch2({
+        //     width: buttonWidth,
+        //     height: buttonHeight,
+        //     key: 'btnTile',
+        //     columns: [16, undefined, 16],
+        //     rows: [16, undefined, 16]
+        // }).setOrigin(0.5).setTint(0x808080);
 
         const text = scene.add.text(0, 0, label, {
-            fontSize: '24px',
+            fontSize: '64px',
             color: color,
-            fontFamily: 'JF-Dot-K14',
+            fontFamily: 'DTM-Sans',
         }).setOrigin(0.5);
 
-        const container = scene.add.container(posX, posY, [bg, text]);
+        // const container = scene.add.container(posX, posY, [bg, text]);
+        const container = scene.add.container(posX, posY, [text]);
         container.setSize(buttonWidth, buttonHeight);
         container.setInteractive({ useHandCursor: true })
             .on('pointerdown', callback);
+        container.on('pointerover', () => container.setAlpha(0.3));
+        container.on('pointerout', () => container.setAlpha(1));
 
         return container;
     }

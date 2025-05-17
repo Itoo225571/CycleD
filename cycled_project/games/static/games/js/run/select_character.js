@@ -160,7 +160,10 @@ export default class SelectCharacterScene extends Phaser.Scene {
                     var skillName = charaInfo.skillName || '???';
                     var skillDescription = charaInfo.skillDescription || '?????';
                     const msg = `NAME: ${formatKey(key)}\n${charaMsg}\n[color=#ffff00]SKILL: ${skillName}\n${skillDescription}[/color]`;
-                    createMsgWindow(this,msg,10);
+                    var option = {
+                        // transparent: true,
+                    };
+                    createMsgWindow(this,msg,10,option);
                 }
             }
         }
@@ -176,6 +179,21 @@ export default class SelectCharacterScene extends Phaser.Scene {
         const isOwned = this.userInfo.owned_characters.includes(key);
 
         if (isOwned) {
+            // ちゃんとステータスがあるキャラか
+            const requiredKeys = ['speed', 'accel', 'jumpForce'];
+            const isMissing = requiredKeys.some(key => selectedChara[key] === undefined);
+            if (isMissing) {
+                const popup = createPopupWindow(scene, {
+                    x: scene.game.config.width / 2,  // 画面の中央X座標
+                    y: scene.game.config.height / 2, // 画面の中央Y座標
+                    width: scene.game.config.height * 2/3 * 1.618,
+                    height: scene.game.config.height * 2/3,
+                    header: 'Error',
+                    message: '選択したキャラが存在しません' ,
+                });
+                return;
+            }
+
             this.registry.set('selectedCharacter', selectedChara);
             const selectedSprite = this.characterSprites[charaIndex];
             selectedSprite.anims.stop();
@@ -361,7 +379,7 @@ export default class SelectCharacterScene extends Phaser.Scene {
             g.lineTo(outerX, outerY);
             g.strokePath();
         }
-    }    
+    }
     updateStatusGraph(newValuesArray) {
         // Lockの場合
         const allNull = newValuesArray.every(value => value === null);

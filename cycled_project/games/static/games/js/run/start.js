@@ -50,7 +50,7 @@ export default class StartScene extends Phaser.Scene {
             fontSize: 64,
             color: 0xFFF3E0,
             button: {
-                color: 0x4E342E
+                color: 0x4E342E,
             } 
         };
         var btnList = [
