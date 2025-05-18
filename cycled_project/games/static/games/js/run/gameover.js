@@ -130,6 +130,7 @@ export default class GameoverScene extends Phaser.Scene {
         // var id = score_id;
         const scoreData = this.registry.get('scoreData');
         const id = scoreData.id;
+        // const player = this.scene.get('PlayScene').player;
         
         // 新記録か，そもそも存在しない場合
         if (scoreData.score || scoreData.score < score_new) {

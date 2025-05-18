@@ -39,6 +39,17 @@ export default class PreloadScene extends Phaser.Scene {
             `${imgDir}PanelBorder/panel-014.png`, 
             { frameWidth: 16, frameHeight: 16 }
         );
+        // heart
+        this.load.spritesheet(
+            'heartIcon', 
+            `${imgDir}heart.png`, 
+            { frameWidth: 20, frameHeight: 18 }
+        );
+        this.load.spritesheet(
+            'heartHalfIcon', 
+            `${imgDir}heartHalf.png`, 
+            { frameWidth: 20, frameHeight: 18 }
+        );
         
         // 入力用
         this.load.spritesheet(
@@ -157,7 +168,19 @@ export default class PreloadScene extends Phaser.Scene {
             frames: this.anims.generateFrameNumbers('SelectEffect', { start: 2, end: 6 }),
             frameRate: 10,
             repeat: 0
-        });        
+        });
+        this.anims.create({
+            key: 'heartAnim',
+            frames: this.anims.generateFrameNumbers('heartIcon', { start: 0, end: 20 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'heartHalfAnim',
+            frames: this.anims.generateFrameNumbers('heartHalfIcon', { start: 0, end: 20 }),
+            frameRate: 10,
+            repeat: -1
+        });
 
         // ユーザー情報取得
         this.getGameData();

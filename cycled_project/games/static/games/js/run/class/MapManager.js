@@ -501,6 +501,7 @@ export default class MapManager {
         switch (itemName) {
             case 'coin_bronze':
                 player.chargeBar.chargeUp(0.01);
+                player.coin_bronze += 1;    // bronzeコイン加算
                 break;
         }
         item.setActive(false);

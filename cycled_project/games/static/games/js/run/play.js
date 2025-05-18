@@ -46,11 +46,11 @@ export default class PlayScene extends Phaser.Scene {
         // スコアの表示
         this.distText = this.add.text(30, 20, `0.0`, {
             fontFamily: 'DTM-Sans',
-            fontSize: '32px',
+            fontSize: '48px',
             fill: '#ffffff'
         }).setScrollFactor(0).setDepth(100);
         // チャージバー
-        var barX = 30, barY = 80, barWidth = 200, barHeight = 20;
+        var barX = 30, barY = 96, barWidth = 240, barHeight = 32;
         var bgBar = this.add.rectangle(barX, barY, barWidth, barHeight, 0x444444)
                     .setOrigin(0, 0.5)
                     .setScrollFactor(0)
@@ -62,11 +62,8 @@ export default class PlayScene extends Phaser.Scene {
                     .setDepth(100);
         this.player.createChargeBar(bgBar,chargeBar);
         // life
-        this.lifeText = this.add.text(30, 120, `0`, {
-            fontFamily: 'DTM-Sans',
-            fontSize: '32px',
-            fill: '#ffffff'
-        }).setScrollFactor(0).setDepth(100);
+        this.heartIcons = [];
+        this.updateHearts();
 
         // ポーズボタン
         this.pauseButton = this.add.sprite(this.cameras.main.width - 50, 50, 'inputPrompts', 538)
@@ -101,7 +98,6 @@ export default class PlayScene extends Phaser.Scene {
         // スコア更新表示
         this.score = this.player.dist + this.player.distPre;
         this.distText.setText(`${strScore(this.score)}`);
-        this.lifeText.setText(`${this.player.onSkill}`);
 
         const leftBound = cam.scrollX - (cam.width / 6);
         const bottomBound = cam.scrollY + cam.height * 7 / 6;
@@ -109,10 +105,41 @@ export default class PlayScene extends Phaser.Scene {
         if (outOfBounds) {
             this.loseLife(false);
         }
+    }
+
+    updateHearts() {
+        const baseX = 48;
+        const baseY = 140;
+
+        // 既存のハートを全部破棄して配列もクリア
+        this.heartIcons.forEach(heart => heart.destroy());
+        this.heartIcons = [];
+    
+        const fullHearts = Math.floor(this.player.lives);
+        const hasHalfHeart = (this.player.lives % 1) >= 0.5;
+    
+        for (let i = 0; i < fullHearts; i++) {
+            const heart = this.add.sprite(baseX + i * 48, baseY, 'heart')
+                .setScrollFactor(0)
+                .setDepth(100)
+                .setScale(2);
+            heart.play('heartAnim');
+            this.heartIcons.push(heart);
+        }
+    
+        if (hasHalfHeart) {
+            const halfHeart = this.add.sprite(baseX + fullHearts * 48, baseY, 'heartHalfIcon')
+                .setScrollFactor(0)
+                .setDepth(100)
+                .setScale(2);
+            halfHeart.play('heartHalfAnim');
+            this.heartIcons.push(halfHeart);
+        }
     }    
 
     loseLifeAfetr() {
         const is_alive = this.player.loseLifePlayer();
+        this.updateHearts();
 
         if (is_alive) {
             this.respawnPlayer();

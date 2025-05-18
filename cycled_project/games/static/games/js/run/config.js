@@ -76,11 +76,11 @@ export const CATEGORY = {
 };
 
 export const chargeSkillTable = {
-    GainLife: (player) => {
-        player.lives++;
-        var skillTime = 10;
-        createSkillEndEvent(player, skillTime, false,() => {
-            player.lives = Math.max(0, player.lives - 1);
+    DefenceBoost: (player) => {
+        var skillTime = 20;
+        player.defence = 0.5;
+        createSkillEndEvent(player, skillTime, true,() => {
+            player.defence = 0;
         });
     },
     // 無敵化

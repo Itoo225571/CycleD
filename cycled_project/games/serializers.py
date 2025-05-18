@@ -42,4 +42,4 @@ class NIKIRunUserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = NIKIRunUserInfo
         fields = ['id','user','owned_characters','bronze_coin','character_last']
-        read_only_fields = ['user','id']
+        read_only_fields = ['id','user','owned_characters','bronze_coin']
