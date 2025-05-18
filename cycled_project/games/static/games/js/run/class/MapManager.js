@@ -48,8 +48,21 @@ export default class MapManager {
     }
 
     addNextChunk() {
-        const randomIndex = Math.floor(Math.random() * this.chunks.length);
-        const chunkKey = this.nextChunkX === 0 ? gameOptions.startChunk : this.chunks[randomIndex];
+        let availableChunks = this.chunks;
+        if (this.nextChunkX === 0) {
+            var chunkKey = gameOptions.startChunk;  // 最初のチャンクは startChunk を使用
+        } else {
+            // 前回と同じインデックスを除外
+            if (this.lastChunkIndex >= 0 && this.chunks.length > 1) {
+                availableChunks = this.chunks.filter((_, index) => index !== this.lastChunkIndex);
+            }
+    
+            const randomIndex = Math.floor(Math.random() * availableChunks.length);
+            chunkKey = availableChunks[randomIndex];
+    
+            // 選んだチャンクのインデックスを元の配列で探して保存
+            this.lastChunkIndex = this.chunks.indexOf(chunkKey);
+        }
         const chunkMap = this.scene.make.tilemap({ key: chunkKey });
 
         const tilesets = this.tilesetKeyArray.map(key => {
