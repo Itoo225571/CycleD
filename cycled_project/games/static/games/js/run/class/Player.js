@@ -18,10 +18,12 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         this.jumpForce = config.jumpForce;
         this.jumps = config.jumps;
         this.lives = config.lives;
+        // skill関係
         this.chargeSkill = config.chargeSkill || (() => {});
         this.skillEndEvent = null;
         this.onSkill = false;
         this.invincible = false;
+        this.defence = 0;
 
         if (gameConfig.physics.matter.debug)    this.jumps=1000;
         if (gameConfig.physics.matter.debug)    this.lives=1000;
@@ -33,6 +35,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         this.distPre = 0;
         this.dist = 0;
         this.prevBlockX = 0;
+        this.coin_bronze = 0;
 
         // サイズ・物理設定
         this.setDisplaySize(gameOptions.oneBlockSize, gameOptions.oneBlockSize);
@@ -150,7 +153,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
     }
     
     loseLifePlayer() {
-        this.lives--;
+        this.lives -= (1 - this.defence);   // defence分だけ軽減
         this.distPre += this.dist;
         this.initPlayer();
         return this.lives > 0;
@@ -198,7 +201,7 @@ class ChargeBar {
 
         this.maxWidth = bgBar.width;
         this.charge = 0;     // 現在のチャージ量（0〜1）
-        this.speed = 0.01;   // チャージ速度（任意）
+        this.speed = 0.01;   // チャージ速度
     }
 
     chargeUp(amount = this.speed) {
@@ -214,7 +217,7 @@ class ChargeBar {
 
     onChargeFull() {
         this.reset();
-        if (this.player.onSkill)   return;
+        // if (this.player.onSkill)   return;
         
         this.player.onSkill = true;
         if (this.player.chargeSkill) this.player.chargeSkill(this.player);
