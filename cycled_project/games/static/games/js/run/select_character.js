@@ -177,6 +177,8 @@ export default class SelectCharacterScene extends Phaser.Scene {
         const key = this.characterKeys[charaIndex];
         const selectedChara = this.charaData[key];
         const isOwned = this.userInfo.owned_characters.includes(key);
+        const userInfo = this.registry.get('userInfo');
+        const id = userInfo.id;
 
         if (isOwned) {
             // ちゃんとステータスがあるキャラか
@@ -193,7 +195,49 @@ export default class SelectCharacterScene extends Phaser.Scene {
                 });
                 return;
             }
+            var scene = this;
+            $.ajax({
+                url: `/games/api/nikirun_userinfo/${id}/`,
+                type: 'PATCH',
+                contentType: 'application/json',
+                headers: {
+                    "X-CSRFToken": getCookie('csrftoken')  // CSRFトークンをヘッダーに設定
+                },
+                data: JSON.stringify({ 
+                    character_last: key,
+                }),
+                success: () => {
+                    successCallback();  // ここで呼び出す
+                },
+                error: () => {
+                    const popup = createPopupWindow(scene, {
+                        x: scene.game.config.width / 2,  // 画面の中央X座標
+                        y: scene.game.config.height / 2, // 画面の中央Y座標
+                        width: scene.game.config.height * 2/3 * 1.618,
+                        height: scene.game.config.height * 2/3,
+                        header: 'Error',
+                        message: '通信エラーが発生しました' ,
+                    });
+                    return;
+                },
+            });
+            
+        } else {
+            const popup = createPopupWindow(this, {
+                x: this.game.config.width / 2,  // 画面の中央X座標
+                y: this.game.config.height / 2, // 画面の中央Y座標
+                width: this.game.config.height * 2/3 * 1.618,
+                height: this.game.config.height * 2/3,
+                header: '購入しますか？',
+                message: `このキャラをアンロックするには金コインが [color=#ffd700]${selectedChara.price}コ[/color] 必要です`,
+                showCancel: true,
+                onOK: () => this.purchaseProcessing(selectedChara),  // 購入処理
+                // onCancel: () => console.log('キャンセル押された')
+            });
+            
+        }
 
+        const successCallback = () => {
             this.registry.set('selectedCharacter', selectedChara);
             const selectedSprite = this.characterSprites[charaIndex];
             selectedSprite.anims.stop();
@@ -217,7 +261,6 @@ export default class SelectCharacterScene extends Phaser.Scene {
                 appearingEffect.destroy();
             });
 
-        
             // 少し上がって戻るアニメーションを追加
             this.tweens.add({
                 targets: selectedSprite,
@@ -238,19 +281,6 @@ export default class SelectCharacterScene extends Phaser.Scene {
                     });
                 }
             });
-        } else {
-            const popup = createPopupWindow(this, {
-                x: this.game.config.width / 2,  // 画面の中央X座標
-                y: this.game.config.height / 2, // 画面の中央Y座標
-                width: this.game.config.height * 2/3 * 1.618,
-                height: this.game.config.height * 2/3,
-                header: '購入しますか？',
-                message: `このキャラをアンロックするには金コインが [color=#ffd700]${selectedChara.price}コ[/color] 必要です`,
-                showCancel: true,
-                onOK: () => this.purchaseProcessing(selectedChara),  // 購入処理
-                // onCancel: () => console.log('キャンセル押された')
-            });
-            
         }
     }
 
