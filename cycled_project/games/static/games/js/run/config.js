@@ -11,8 +11,8 @@ export const gameOptions = {
     playerStartPosition: 200,
     oneBlockSize: 64,
     startChunk: 'startMap',
-    chunks: ['Map1','Map2','Map3','Map4','Map5'],
-    // chunks: ['Map1'],
+    // chunks: ['Map1','Map2','Map3','Map4','Map5'],
+    chunks: ['Map6'],
     maxSpeed: 10,   // 暫定最大速度
     tilesets: [
         { nameInTiled: 'Tiles1', textureKey: 'Tiles1' },

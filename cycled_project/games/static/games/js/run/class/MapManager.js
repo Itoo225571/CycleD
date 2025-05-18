@@ -39,9 +39,9 @@ export default class MapManager {
                 }
 
                 if ((this.isTrap(spriteA) && bodyB.label === 'player') || (this.isTrap(spriteB) && bodyA.label === 'player')) {
-                    const item = this.isTrap(spriteA) ? spriteA : spriteB;
+                    const trap = this.isTrap(spriteA) ? spriteA : spriteB;
                     const player = bodyA.label === 'player' ? spriteA : spriteB;
-                    this.onTrap(player, item);
+                    this.onTrap(player, trap);
                 }
             });
         });
@@ -60,31 +60,35 @@ export default class MapManager {
             .setDepth(-2)
             .setAlpha(0.75); // 透明度を設定
 
-        this.decoLayer = this.getLayerFromPool(chunkMap, 'Deco', tilesets).setDepth(-1);
         // this.itemLayer = this.getLayerFromPool(chunkMap, 'Item', tilesets).setDepth(0);
 
         this.groundLayer = safeCreateLayer(chunkMap, 'Ground', tilesets, this.nextChunkX, 0).setDepth(2);
         this.blockLayer = safeCreateLayer(chunkMap, 'Block', tilesets, this.nextChunkX, 0).setDepth(3);
 
-        this.convertLayerToMatterBodies(this.groundLayer, 'ground');
-        this.groundLayer.setCollisionCategory(CATEGORY.WALL);
+        this.decoLayer = this.getLayerFromPool(chunkMap, 'Deco', tilesets).setDepth(4);
+
+        this.convertLayerToMatterBodies(this.groundLayer);  // ここで衝突するオブジェクトを設定
         if (this.blockLayer) {
-            this.convertLayerToMatterBodies(this.blockLayer, 'block');
-            this.blockLayer.setCollisionCategory(CATEGORY.WALL); // ブロックカテゴリを設定
+            this.convertLayerToMatterBodies(this.blockLayer);
         }
 
         this.setEnemies(chunkMap);
         this.setItems(chunkMap);
         this.setTraps(chunkMap);
 
+        this.enemies.forEach(enemy => {
+            if (enemy.chunkIndex + 1 < this.currentChunkIndex) {
+                this.addObjToPool(enemy);
+            }
+        });
         this.items.forEach(item => {
             if (item.chunkIndex + 1 < this.currentChunkIndex) {
                 this.addObjToPool(item);
             }
         });
-        this.enemies.forEach(enemy => {
-            if (enemy.chunkIndex + 1 < this.currentChunkIndex) {
-                this.addObjToPool(enemy);
+        this.traps.forEach(trap => {
+            if (trap.chunkIndex + 1 < this.currentChunkIndex) {
+                this.addObjToPool(trap);
             }
         });
 
@@ -405,7 +409,7 @@ export default class MapManager {
                 item.chunkIndex = this.currentChunkIndex;
 
                 item.setCollisionCategory(CATEGORY.ITEM);
-                item.setCollidesWith(CATEGORY.PLAYER); // 敵とは衝突させない
+                item.setCollidesWith(CATEGORY.PLAYER | CATEGORY.WALL); // 敵とは衝突させない
 
                 this.items.push(item);
             });
@@ -449,14 +453,20 @@ export default class MapManager {
                     obj.x + this.nextChunkX,
                     obj.y,
                     [ellipseVertices],
-                    { label: 'item' },
+                    { label: 'trap' },
                     true
                 );
-
                 trap.setExistingBody(newBody);
                 trap.setPosition(obj.x + this.nextChunkX + width/2, obj.y +height/2);
-                trap.setStatic(true); // プレイヤーが乗れるように固定
+
+                const isStatic = getProp(obj, 'static', true);  // 静的か
+                trap.setStatic(isStatic); // プレイヤーが乗れるように固定
                 // trap.setMass(1); // 静的だけど衝突判定は有効
+
+                trap.body.friction = 0;
+                trap.body.frictionStatic = 0;
+                trap.body.frictionAir = 0;
+                trap.body.gravityScale = 1;
 
                 // const gravityIgnore = getProp(obj, 'gravityIgnore', false);
                 // trap.setIgnoreGravity(gravityIgnore);
@@ -466,7 +476,7 @@ export default class MapManager {
                 trap.chunkIndex = this.currentChunkIndex;
 
                 trap.setCollisionCategory(CATEGORY.TRAP);
-                trap.setCollidesWith(CATEGORY.PLAYER);
+                trap.setCollidesWith(CATEGORY.PLAYER | CATEGORY.WALL | CATEGORY.ENEMY); // enemyにも当たるように
 
                 this.traps.push(trap);
             });
@@ -511,12 +521,12 @@ export default class MapManager {
         })
     }
 
-    convertLayerToMatterBodies = (layer, label) => {
-        if (!layer) return;
-    
+    convertLayerToMatterBodies = (layer) => {
+        if (!layer) return;        
+
         layer.setCollisionByProperty({ collides: true });
         this.scene.matter.world.convertTilemapLayer(layer);
-    
+        
         layer.forEachTile(tile => {
             if (tile.properties.collides) {
                 const matterBody = tile.physics.matterBody?.body;
@@ -525,7 +535,7 @@ export default class MapManager {
                     // collisionCategory と collisionMask を設定
                     matterBody.collisionFilter = {
                         category: CATEGORY.WALL,  // 壁カテゴリを設定
-                        mask: CATEGORY.PLAYER | CATEGORY.ITEM | CATEGORY.ENEMY,  // 衝突する相手カテゴリ
+                        mask: CATEGORY.PLAYER | CATEGORY.ITEM | CATEGORY.ENEMY | CATEGORY.TRAP,  // 衝突する相手カテゴリ
                     };
     
                     // 衝突する物体をリストに追加
