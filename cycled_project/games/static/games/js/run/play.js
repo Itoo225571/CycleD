@@ -1,5 +1,5 @@
-import { gameOptions, CATEGORY, chargeSkillTable } from './config.js';
-import Player from './class/Player.js';
+import { gameOptions, CATEGORY } from './config.js';
+import { Player,chargeSkillTable } from './class/Player.js';
 import MapManager from './class/MapManager.js';
 
 export default class PlayScene extends Phaser.Scene {

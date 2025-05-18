@@ -74,37 +74,3 @@ export const CATEGORY = {
     WALL:   0x0008,
     TRAP:   0x0010, // 追加
 };
-
-export const chargeSkillTable = {
-    DefenceBoost: (player) => {
-        var skillTime = 20;
-        player.defence = 0.5;
-        createSkillEndEvent(player, skillTime, true,() => {
-            player.defence = 0;
-        });
-    },
-    // 無敵化
-    Invincibled: (player) => {
-        player.invincible = true;
-        var skillTime = 10;
-        createSkillEndEvent(player, skillTime, true,() => {
-            player.invincible = false;
-        });
-    },
-};
-
-function createSkillEndEvent(player, skillTime,isDeadTriggered=true, func) {
-    if (player.skillEndEvent) return;
-
-    player.onSkill = true;
-
-    player._onSkillEnd = (timer=false) => {
-        if (isDeadTriggered || timer) func();    //死語発動するタイプだったら || 時間発動だったら
-        player.skillEndEvent = null;
-        player.onSkill = false;
-    };
-
-    player.skillEndEvent = setTimeout(() => {
-        player._onSkillEnd(true); // ← 外側の player をそのまま使う
-    }, skillTime * 1000);
-}

@@ -1,6 +1,6 @@
 import { gameOptions,gameConfig,CATEGORY } from '../config.js';
 
-export default class Player extends Phaser.Physics.Matter.Sprite {
+export class Player extends Phaser.Physics.Matter.Sprite {
     constructor(scene, config) {
         // Matterでは座標指定が必須（this.scene.game.config などにアクセス不可なため scene.scale.height を使用）
         const startX = gameOptions.playerStartPosition;
@@ -85,6 +85,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
         if (currentBlockX > this.prevBlockX) {
             for (let i = this.prevBlockX + 1; i <= currentBlockX; i++) {
                 this.chargeBar.chargeUp(0.001);
+                // this.chargeBar.chargeUp(0.1);
             }
             this.prevBlockX = currentBlockX;
         }
@@ -194,6 +195,7 @@ export default class Player extends Phaser.Physics.Matter.Sprite {
 class ChargeBar {
     constructor(player, bgBar, chargeBar) {
         this.player = player;
+        this.scene = player.scene;
         // 背景バー
         this.bgBar = bgBar;
         // チャージバー（前面）
@@ -220,8 +222,96 @@ class ChargeBar {
         // if (this.player.onSkill)   return;
         
         this.player.onSkill = true;
-        if (this.player.chargeSkill) this.player.chargeSkill(this.player);
+        if (this.player.chargeSkill) this.player.chargeSkill(this.player,this.scene);
         this.player.emit('chargeFull'); // 外部でも監視可能
     }
     
+}
+
+export const chargeSkillTable = {
+    DefenceBoost: (player, scene) => {
+        var skillTime = 20;
+        player.defence = 0.5;
+        skillStartDefenceBoost(player, scene);
+        createSkillEndEvent(player, skillTime, true, () => {
+            player.defence = 0;
+            skillEnd(player, scene);
+        });
+    },
+    Invincibled: (player, scene) => {
+        var skillTime = 10;
+        player.invincible = true;
+        skillStartInvincibled(player, scene);
+        createSkillEndEvent(player, skillTime, true, () => {
+            player.invincible = false;
+            skillEnd(player, scene);
+        });
+    },
+};
+
+function createSkillEndEvent(player, skillTime, isDeadTriggered=true, func) {
+    if (player.skillEndEvent) return;
+
+    player.onSkill = true;
+
+    player._onSkillEnd = (timer=false) => {
+        if (isDeadTriggered || timer) func();
+        player.skillEndEvent = null;
+        player.onSkill = false;
+    };
+
+    player.skillEndEvent = setTimeout(() => {
+        player._onSkillEnd(true);
+    }, skillTime * 1000);
+}
+
+function skillStartDefenceBoost(player, scene) {
+    player.setTintFill(0x4c4c4c);
+}
+
+function skillStartInvincibled(player, scene) {
+    const colors = [
+        0xff0000, // 赤
+        0xff7f00, // オレンジ
+        0xffff00, // 黄
+        0x00ff00, // 緑
+        0x0000ff, // 青
+        0x4b0082, // インディゴ
+        0x8b00ff  // バイオレット
+    ];
+    
+    let colorIndex = 0;
+
+    // 既存イベントあれば削除＆tintクリア
+    if (player.skillTintEvent) {
+        scene.time.removeEvent(player.skillTintEvent);
+        player.clearTint();
+        player.setBlendMode(Phaser.BlendModes.NORMAL);
+        player.setAlpha(1);
+    }
+
+    player.setBlendMode(Phaser.BlendModes.ADD);  // 発光っぽく
+
+    player.skillTintEvent = scene.time.addEvent({
+        delay: 100,
+        loop: true,
+        callback: () => {
+            player.setTint(colors[colorIndex]);
+            // alphaもゆらゆらさせる例（0.8〜1.0の間を行き来）
+            let alpha = 0.8 + 0.2 * Math.sin(colorIndex * Math.PI / colors.length);
+            player.setAlpha(alpha);
+            colorIndex = (colorIndex + 1) % colors.length;
+        }
+    });
+}
+
+function skillEnd(player, scene) {
+    // タイマー消去
+    if (player.skillTintEvent) {
+        scene.time.removeEvent(player.skillTintEvent);
+        player.skillTintEvent = null;
+    }
+    // 元の色に戻す（tint解除）
+    player.clearTint();
+    player.setAlpha(1);
 }
