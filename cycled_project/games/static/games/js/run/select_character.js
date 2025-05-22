@@ -516,7 +516,6 @@ export default class SelectCharacterScene extends Phaser.Scene {
                         scene.scene.restart();
                     }
                 });
-                scene.add.existing(popup.container);
             },
             error: function(xhr, status, error) {
                 let response = xhr.responseJSON || {};
