@@ -8,8 +8,8 @@ class NIKIRunScoreSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()     # strのみ
     class Meta:
         model = NIKIRunScore
-        fields = ['id', 'user', 'score', 'updated_at']  # 必要なフィールドを指定
-        read_only_fields = ['id','updated_at','user']
+        fields = ['id', 'user', 'score', 'updated_at', 'character']  # 必要なフィールドを指定
+        read_only_fields = ['id','updated_at','user',]
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)

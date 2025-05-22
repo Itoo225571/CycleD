@@ -28,7 +28,6 @@ export default class PlayScene extends Phaser.Scene {
         // プレイヤーオブジェクトを作成
         this.player = new Player(this, characterConfig);
 
-
         this.input.on("pointerdown", () => this.player.jump(false), this);
         this.input.keyboard.on("keydown-SPACE", () => this.player.jump(false), this);        
 

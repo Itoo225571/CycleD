@@ -140,7 +140,7 @@ export default class RankingScene extends Phaser.Scene {
             centerX, centerY, 
             'No scores yet!', {
             fontFamily: 'DTM-Sans',
-            fontSize: '32px',
+            fontSize: '48px',
             color: '#ffcccc',
             align: 'center'
         }).setOrigin(0.5).setDepth(1).setVisible(false);
@@ -218,65 +218,95 @@ export default class RankingScene extends Phaser.Scene {
 
         // スコアリストを作成
         scores.forEach((scoreData, index) => {
-            // スコア表示を km と m に分ける
-            let scoreDisplay = strScore(scoreData.score);
+            let rankColor;
+            switch (index) {
+                case 0: rankColor = '#ffd700'; break;   // 金
+                case 1: rankColor = '#c0c0c0'; break;   // 銀
+                case 2: rankColor = '#cd7f32'; break;   // 銅
+                default: rankColor = '#ffffff'; break;  // 白
+            }            
+            const rowHeight = 64;
+            const rowWidth = this.panel.width - 80;
 
-            // sizerの周りを囲う
-            // const background = this.add.rectangle(0, 0, 600, 60, 0x333333)
-            // 1列分のSizerを作る
+            // 1行分のSizerを作る
             const row = this.rexUI.add.sizer({
-                orientation: 'horizontal', // 横並び（x方向）
-                space: {
-                    top: 10,
-                    bottom: 10,
-                    item: 100 
-                },
-                // background: background
+                orientation: 'horizontal',
+                space: { top: 10, bottom: 10, left: 20, item: 30 },
+                width: rowWidth,   // ちょっと余裕を持たせる
+                height: rowHeight + 20,  // spaceで上下10ずつ取っているので行の高さより少し大きめに
             });
 
             // 順位
-            const rankText = this.add.text(0, 0, `${index + 1}.`, {
+            let rankDisplay = ordinalSuffix(index + 1);
+            const rankText = this.add.text(0, 0, rankDisplay, {
                 fontFamily: 'DTM-Sans',
-                fontSize: '24px',
-                color: '#ffffff'
+                fontSize: '48px',
+                color: rankColor,
             }).setOrigin(0.5);
 
-            // // アイコン
-            // const avatar = this.add.image(0, 0, 'tilemap', 264)
-            //     .setDisplaySize(48, 48);
+            // アイコン
+            const chara = scoreData.character;
+            const avatar = this.add.sprite(0, 0, chara + 'Run', 0)
+                .setDisplaySize(64, 64)
+                .play(chara + 'Run')
+                .setOrigin(0.5);
 
             // 名前
             const username = this.add.text(0, 0, scoreData.user, {
                 fontFamily: 'JF-Dot-K14',
-                fontSize: '24px',
+                fontSize: '48px',
                 color: '#ffffcc'
+            }).setOrigin(0.5);
+
+            // スコア
+            let scoreDisplay = strScore(scoreData.score);
+            const scoreLabel = this.add.text(0, 0, scoreDisplay, {
+                fontFamily: 'DTM-Sans',
+                fontSize: '48px',
+                color: '#ffcc99',
+                align: 'right'
             }).setOrigin(0.5);
             
             // 更新日時
             const updatedAt = this.add.text(0, 0, scoreData.updated_at || 'N/A', {
                 fontFamily: 'DTM-Sans',
-                fontSize: '24px',
+                fontSize: '48px',
                 color: '#cccccc'
             }).setOrigin(0.5);
 
-            // スコア
-            const scoreLabel = this.add.text(0, 0, scoreDisplay, {
-                fontFamily: 'DTM-Sans',
-                fontSize: '24px',
-                color: '#ffcc99',
-                align: 'right'
-            }).setOrigin(0.5);
-
-
             // rowにパーツを追加
-            row.add(rankText, 1, 'center');
-            // row.add(avatar, 0, 'center');  // avatarにのみx軸マージンを追加
-            row.add(username, 1, 'center');
-            row.add(updatedAt, 1, 'center');
-            row.add(scoreLabel, 1, 'right');  // ← scoreLabelだけ伸びる (proportion:1)
+            row.add(rankText, 0, 'center');
+            row.add(avatar, 0, 'center');  // avatarにのみx軸マージンを追加
+            row.add(username, 0, 'center');
+            row.add(this.rexUI.add.space(), 1);
+            row.add(scoreLabel, 0, 'center');  // ← scoreLabelだけ伸びる (proportion:1)
+            // ★ スペーサーを追加（右側に押し出す）
+            row.add(this.rexUI.add.space(), 1);  // proportion: 1
+            row.add(updatedAt, 0, 'right');
 
             // 全体のsizerに追加
             this.sizer.add(row, 0, 'left', 0, true);
+
+            // ボーダーの幅と高さ
+            const borderWidth = rowWidth;
+            const borderHeight = 2;
+
+            // Rectangleを使ってボーダーを作成
+            const borderLine = this.add.rectangle(0, 0, borderWidth, borderHeight, 0xffffff)
+                .setOrigin(0);  // 左上を基準に
+
+            // borderLine をラップする Sizer を作成（オプション、安定性のため）
+            const borderSizer = this.rexUI.add.sizer({
+                orientation: 'vertical',
+                width: borderWidth,
+                height: borderHeight,
+            });
+
+            borderSizer.add(borderLine, 0, 'center');
+
+            // rowの下に追加
+            this.sizer.add(borderSizer, 0, 'left', 0, true);
+
         });
 
         // スライダー調整
@@ -309,4 +339,11 @@ function strScore(score) {
         scoreDisplay = score.toPrecision(3) + ' m';
     }
     return scoreDisplay;
+}
+function ordinalSuffix(i) {
+    const j = i % 10, k = i % 100;
+    if (j == 1 && k != 11) return i + "st.";
+    if (j == 2 && k != 12) return i + "nd.";
+    if (j == 3 && k != 13) return i + "rd.";
+    return i + "th.";
 }

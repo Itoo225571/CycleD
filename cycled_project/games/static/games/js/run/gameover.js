@@ -76,8 +76,8 @@ export default class GameoverScene extends Phaser.Scene {
             }
         ).setOrigin(0.5);
 
-        var score = this.scene.get('PlayScene').score;
-        this.postScore(score);      // score投稿
+        var scene = this.scene.get('PlayScene');
+        this.postScore(scene);      // score投稿
 
         this.isReady = true;    // 準備完了
     }
@@ -126,11 +126,12 @@ export default class GameoverScene extends Phaser.Scene {
     
     }
 
-    postScore(score_new) {
+    postScore(playScene) {
         // var id = score_id;
-        const scoreData = this.registry.get('scoreData');
+        const scoreData = this.registry.get('scoreData');   //前のデータ
         const id = scoreData.id;
-        // const player = this.scene.get('PlayScene').player;
+        const chara_name = playScene.player.playerName;
+        const score_new = playScene.score;
         
         // 新記録か，そもそも存在しない場合
         if (scoreData.score || scoreData.score < score_new) {
@@ -144,6 +145,7 @@ export default class GameoverScene extends Phaser.Scene {
                 },
                 data: {
                     score: score_new,  // 更新したいデータ
+                    character: chara_name,
                 },
                 success: (response) => {
                     is_newrecord = Boolean(response.is_newrecord)   // サーバー側でも確認
@@ -228,8 +230,8 @@ export default class GameoverScene extends Phaser.Scene {
         this.overlay?.setVisible(true);
         this.gameOverText?.setVisible(true);
         if (post_score) {
-            var score = this.scene.get('PlayScene').score;
-            this.postScore(score);
+            var scene = this.scene.get('PlayScene');
+            this.postScore(scene);
         }
     }
     
