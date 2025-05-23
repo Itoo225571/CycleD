@@ -223,16 +223,19 @@ export default class SelectCharacterScene extends Phaser.Scene {
             });
             
         } else {
+            var coinNum = userInfo.user.coin.num;
             const popup = createPopupWindow(this, {
                 x: this.game.config.width / 2,  // 画面の中央X座標
                 y: this.game.config.height / 2, // 画面の中央Y座標
                 width: this.game.config.height * 2/3 * 1.618,
                 height: this.game.config.height * 2/3,
                 header: '購入しますか？',
-                message: `このキャラをアンロックするには金コインが [color=#ffd700]${selectedChara.price}コ[/color] 必要です`,
+                message: `このキャラをアンロックするには金コインが [color=#ffd700]${selectedChara.price}[/color] 必要です`,
                 showCancel: true,
                 onOK: () => this.purchaseProcessing(selectedChara),  // 購入処理
                 // onCancel: () => console.log('キャンセル押された')
+                showCoin: true,
+                coinCount: coinNum,
             });
             
         }

@@ -196,7 +196,9 @@ export function createPopupWindow(scene, option) {
         onCancel = () => {},
         okText = 'OK',
         cancelText = 'Cancel',
-        transparent = false,
+        // transparent = false,
+        showCoin = false,
+        coinCount = 0,
     } = option;
 
     const container = scene.add.container(x, y);
@@ -271,6 +273,42 @@ export function createPopupWindow(scene, option) {
         .setOrigin(0)
         .setInteractive()
         .setDepth(999);
+
+    // Coin 追加
+    if (showCoin) {
+        const animKey = 'coin_gold';
+    
+        // テキスト一時作成して幅取得（正確な中央揃えのため）
+        const tmpText = scene.add.text(0, 0, `${coinCount}`, {
+            fontSize: '48px',
+            fontFamily: 'DTM-Sans'
+        }).setVisible(false);
+    
+        const textWidth = tmpText.width;
+        tmpText.destroy(); // 不要になったので破棄
+    
+        const spacing = 10; // アイコンとテキストの間隔
+        const iconWidth = 64;
+        const totalWidth = iconWidth + spacing + textWidth;
+    
+        // アニメーションスプライト（左寄せに配置）
+        const animSprite = scene.add.sprite(-totalWidth / 2 + iconWidth / 2, 0, animKey)
+            .play(animKey)
+            .setOrigin(0.5)
+            .setDisplaySize(iconWidth, iconWidth);
+    
+        // テキスト（アニメの右横に）
+        const coinText = scene.add.text(animSprite.x + iconWidth / 2 + spacing, 0, `${coinCount}`, {
+            fontSize: '48px',
+            color: '#FFFFFF',
+            fontFamily: 'DTM-Sans'
+        }).setOrigin(0, 0.5); // 左寄せ・中央垂直
+    
+        // 中央配置のコンテナ（ポップアップ中央に置く）
+        const coinDisplay = scene.add.container(0, 0, [animSprite, coinText]);
+        container.add(coinDisplay);
+    }
+    
 
     return {
         container,
