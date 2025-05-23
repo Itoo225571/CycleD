@@ -94,7 +94,7 @@ class NIKIRunDataAPIView(views.APIView):
             if not os.path.exists(json_path):
                 raise Http404("キャラクターデータが見つかりません。")
 
-            with open(json_path, 'r') as f:
+            with open(json_path, 'r', encoding='utf-8') as f:
                 players_data = json.load(f)
 
             # NIKIRunUserInfoを取得または作成
@@ -129,6 +129,7 @@ class NIKIRunDataAPIView(views.APIView):
         except json.JSONDecodeError:
             return Response({'detail': 'キャラクターデータが壊れています。'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
+            print(str(e))
             return Response({'detail': f'予期しないエラーが発生しました: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 class BuyCharacterAPIView(views.APIView):
