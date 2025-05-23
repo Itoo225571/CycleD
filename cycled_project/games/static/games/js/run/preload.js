@@ -66,7 +66,8 @@ export default class PreloadScene extends Phaser.Scene {
 
         // item
         this.items = [
-            { name : 'coin_bronze', size: 32, start:0, end:5 }
+            { name : 'coin_bronze', size: 32, start:0, end:5 },
+            { name : 'coin_gold', size: 32, start:0, end:5, frameRate: 10 }
         ];
         this.items.forEach(({ name, size}) => {
             this.load.spritesheet(
@@ -276,11 +277,11 @@ export default class PreloadScene extends Phaser.Scene {
     }
     
     createItemAnims() {
-        this.items.forEach(({ name, size, start, end }) => {
+        this.items.forEach(({ name, size, start, end, frameRate }) => {
             this.anims.create({
                 key: name,
                 frames: this.anims.generateFrameNumbers(name, { start: start, end: end }),
-                frameRate: 15,
+                frameRate: frameRate || 15,
                 repeat: -1
             }); 
         });
