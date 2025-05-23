@@ -25,7 +25,7 @@ class WeatherView(LoginRequiredMixin, generic.TemplateView):
         context = super().get_context_data(**kwargs)
         # JSONファイルの読み込み
         json_file_path = os.path.join(settings.BASE_DIR, 'diary', 'resources', 'openweather_mapping.json')
-        with open(json_file_path, 'r') as file:
+        with open(json_file_path, 'r', encoding='utf-8') as file:
             openweather_data = json.load(file)
             context['openweather'] = openweather_data
         location = getattr(self.request.user, 'location', None)
