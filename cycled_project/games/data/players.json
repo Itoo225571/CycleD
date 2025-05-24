@@ -10,7 +10,7 @@
         "msg": "3日に1度はパンツの前後ろを間違え、5日に1度はパンツの表裏を間違える。",
         "chargeSkill": "Invincibled",
         "skillName": "無敵化",
-        "skillDescription": "一定時間無敵になる。敵の上をジャンプできるが、落ちると死ぬ。"
+        "skillDescription": "一定時間無敵になる。"
     },
     {
         "key": "NinjaFrog",
@@ -18,12 +18,12 @@
         "accel": 1,
         "jumps": 1,
         "lives": 2,
-        "jumpForce": 25,
+        "jumpForce": 23,
         "price": 5,
         "msg": "頭が良くなると思って、毎日30分の逆立ちをしている。",
         "chargeSkill": "DefenceBoost",
         "skillName": "硬くなるぅ",
-        "skillDescription": "一定時間、死ぬ時のライフが半分になる。"
+        "skillDescription": "一定時間、受けるダメージが半分になる。"
     },
     {
         "key": "MaskMen",
@@ -36,7 +36,7 @@
         "msg": "トイレにいる時以外は、マスクをつけているらしい。",
         "chargeSkill": "DefenceBoost",
         "skillName": "+ライフ",
-        "skillDescription": "一定時間、死ぬ時のライフが半分になる。"
+        "skillDescription": "一定時間、受けるダメージが半分になる。"
     },
     {
         "key": "Diver",
@@ -49,6 +49,6 @@
         "msg": "ゴーグルのサイズを間違えたので、口までゴーグルで覆われている。",
         "chargeSkill": "DefenceBoost",
         "skillName": "+ライフ",
-        "skillDescription": "一定時間、死ぬ時のライフが半分になる。"
+        "skillDescription": "一定時間、受けるダメージが半分になる。"
     }
 ]
