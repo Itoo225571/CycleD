@@ -1,4 +1,4 @@
-import { createBtn } from "./drawWindow.js";
+import { createBtn,createPopupWindow } from "./drawWindow.js";
 
 export default class StartScene extends Phaser.Scene {
     constructor() {
@@ -87,8 +87,22 @@ export default class StartScene extends Phaser.Scene {
             .setDisplaySize(this.game.config.width, this.game.config.height)
             .setDepth(-7);
 
+        // 戻るボタン
+        this.backButton = this.add.sprite(100, 80, 'inputPrompts', 608)  // (x, y, key, frame)
+            .setDisplaySize(48 *3/2, 48)
+            .setInteractive({ useHandCursor: true })
+            .setFlipX(true)
+            .on('pointerdown', this.goBackCycleD.bind(this));
+        // ホバー時の色変更（マウスオーバー）
+        this.backButton.on('pointerover', () => {
+            this.backButton.setTint(0x44ff44);  // ホバー時に緑色に変更
+        });
+        this.backButton.on('pointerout', () => {
+            this.backButton.clearTint();  // 色を元に戻す
+        });
+
         // rankingSceneが起動中だったら停止する
-        if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene');        
+        if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene');
     }
 
     goPlayScene() {
@@ -112,4 +126,31 @@ export default class StartScene extends Phaser.Scene {
     onBringToTop() {
         this.title.setVisible(true);  //titleを見せる
     }
+
+    goBackCycleD() {
+        const popup = createPopupWindow(this, {
+            x: this.game.config.width / 2,  // 画面の中央X座標
+            y: this.game.config.height / 2, // 画面の中央Y座標
+            width: this.game.config.height * 2/3 * 1.618,
+            height: this.game.config.height * 2/3,
+            header: 'Exit',
+            message: `ゲームを終了しますか？`,
+            showCancel: true,
+            onOK: () => goCycleD(),
+        });
+        const goCycleD = () => {
+            if (this._isExiting) return;
+            this._isExiting = true;
+        
+            this.cameras.main.fadeOut(100, 0, 0, 0); // 暗転
+        
+            this.cameras.main.once('camerafadeoutcomplete', () => {
+                setTimeout(() => {
+                    this.game.destroy(true);
+                    window.location.replace(url_CycleD);
+                }, 100)}
+            );
+        };
+    }    
+    
 }

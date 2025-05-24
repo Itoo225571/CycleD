@@ -120,8 +120,8 @@
 						</div>
 					</a>
 					<div class="fab-space nav-item"></div>
-					<a class="navbar-brand nav-item" href="{% url 'diary:calendar' %}">
-						<div class="icon-text">
+					{% comment %} <a class="navbar-brand nav-item" href="{% url 'diary:calendar' %}">
+					<div class="icon-text">
 							<span class="material-icons-outlined {% if request.resolver_match.url_name == 'calendar' %}selected{% endif %}">
 								calendar_month
 							</span>
@@ -133,7 +133,45 @@
 							<span class="material-icons-outlined {% if request.resolver_match.url_name == 'map' %}selected{% endif %}">
 								map
 							</span>
-							<span class="icon-label">マップ</span>
+							<span class="icon-label">地図</span>
+						</div>
+					</a> {% endcomment %}
+					<!-- ドロップダウン：カレンダーと地図 -->
+					<div class="nav-item dropdown">
+						<a class="navbar-brand" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<div class="icon-text">
+								<span class="material-icons-outlined {% if request.resolver_match.url_name == 'calendar' or request.resolver_match.url_name == 'map' %} selected {% endif %}">
+									auto_stories
+								</span>
+								<span class="icon-label">記録帳</span>
+							</div>
+						</a>
+						<ul class="dropdown-menu">
+							<li class="pb-2">
+								<a class="dropdown-item d-flex align-items-center" href="{% url 'diary:calendar' %}">
+									<span class="material-icons-outlined {% if request.resolver_match.url_name == 'calendar' %}selected{% endif %}">
+										calendar_month
+									</span>
+									<span class="px-2">カレンダー</span>
+								</a>
+							</li>
+							<li class="pb-2">
+								<a class="dropdown-item d-flex align-items-center" href="{% url 'diary:map' %}">
+									<span class="material-icons-outlined {% if request.resolver_match.url_name == 'map' %}selected{% endif %}">
+										map
+									</span>
+									<span class="px-2">地図</span>
+								</a>
+							</li>
+						</ul>						
+					</div>
+
+					<a class="navbar-brand nav-item" href="{% url 'games:run' %}">
+						<div class="icon-text">
+							<span class="material-icons-outlined {% if request.resolver_match.url_name == 'run' %}selected{% endif %}">
+								sports_esports
+							</span>
+							<span class="icon-label">ゲーム</span>
 						</div>
 					</a>
 				</div>
@@ -178,7 +216,10 @@
 										</li>
 										<li class="nav-item ms-2">
 											<a class="nav-link button-map with-icon ps-2" href="{% url 'diary:map' %}">地図</a>
-										</li>										
+										</li>
+										<li class="nav-item ms-2">
+											<a class="nav-link button-game with-icon ps-2" href="{% url 'games:run' %}">ゲーム</a>
+										</li>
 										
 										<li class="bd-links-span-all my-2 border-top"></li>
 										<li class="nav-item ms-2">
