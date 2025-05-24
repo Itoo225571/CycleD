@@ -105,6 +105,10 @@ body {
     font-family: 'Material Icons';
     content: '\e55b';
 }
+.button-game::before {
+    font-family: 'Material Icons';
+    content: '\ea28';
+}
 
 /* スマホ用のナビゲーションバー */
 .navbar-mobile {

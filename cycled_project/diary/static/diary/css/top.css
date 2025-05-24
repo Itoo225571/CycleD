@@ -53,20 +53,20 @@
     pointer-events: none;
 }
 
-#entry .btn-entry {
+header .btn-entry {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* 通常時の影 */
     transition: box-shadow 0.3s ease; /* 影の変化を滑らかに */
     margin: .5rem 1rem;
 }
 @media (min-width: 992px) {
-    #entry .btn-entry {
+    header .btn-entry {
         padding: 0.5rem 1.25rem;   /* 上下の余白: 0.75rem、左右の余白: 1.25rem */
         font-size: 1.25rem;         /* フォントサイズ: 1.25rem */
         line-height: 1.5;           /* 行の高さ: 1.5 */
         border-radius: 0.375rem;    /* 角の丸み: 0.375rem */
     }
 }
-#entry .btn-entry:hover {
+header .btn-entry:hover {
     box-shadow: none !important; /* 影を消す */
 }
 

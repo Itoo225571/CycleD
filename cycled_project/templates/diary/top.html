@@ -31,10 +31,15 @@
                         </a>
                     </section>
                     <section class="pt-2 d-flex justify-content-center">
-                        <a href="{% url 'games:run' %}" class="btn btn-light shadow">
-                            <span class="px-2 py-1 fw-semibold">今すぐ始めない</span>
-                        </a>                        
-                    </section>
+                        <a href="{% url 'games:run' %}" class="btn btn-light btn-entry">
+                            <div class="p-2 d-flex align-items-center">
+                                <span class="material-icons me-2 text-danger">
+                                    sports_esports
+                                </span>
+                                <span class="fw-semibold">今すぐ始めない</span>
+                            </div>
+                        </a>
+                    </section>                    
                 </div>
             </div>
             <div class="col-lg-7 pt-lg-0 pt-4 d-flex align-items-center">
