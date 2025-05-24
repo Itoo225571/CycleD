@@ -101,6 +101,19 @@ export default class StartScene extends Phaser.Scene {
             this.backButton.clearTint();  // 色を元に戻す
         });
 
+        // helpボタン
+        this.helpButton = this.add.sprite(this.cameras.main.width - 100, 80, 'inputPrompts', 436)
+            .setDisplaySize(72, 72)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', this.showHelpText.bind(this));
+        // ホバー時の色変更（マウスオーバー）
+        this.helpButton.on('pointerover', () => {
+            this.helpButton.setTint(0xFFFF00);  // ホバー時に緑色に変更
+        });
+        this.helpButton.on('pointerout', () => {
+            this.helpButton.clearTint();  // 色を元に戻す
+        });
+
         // rankingSceneが起動中だったら停止する
         if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene');
     }
@@ -151,6 +164,18 @@ export default class StartScene extends Phaser.Scene {
                 }, 100)}
             );
         };
-    }    
+    }
+
+    showHelpText() {
+        var msg = `・障害物にぶつからないように走ろう！\n・タップか Enter キーでジャンプ！\n・銅コインを100枚集めると特別な力が使える！\n・[color=#ffd700]ちゃりニキで日記を書くと、\n　キャラ交換に使える金コインがもらえるよ！[/color]`;
+        const popup = createPopupWindow(this, {
+            x: this.game.config.width / 2,  // 画面の中央X座標
+            y: this.game.config.height / 2, // 画面の中央Y座標
+            width: this.game.config.height * 2/3 * 1.618,
+            height: this.game.config.height * 2/3,
+            header: 'ゲ〜ム説明',
+            message: msg,
+        });
+    }
     
 }

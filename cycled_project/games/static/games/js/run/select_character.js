@@ -153,7 +153,7 @@ export default class SelectCharacterScene extends Phaser.Scene {
                     ];
                     const isOwned = this.userInfo.owned_characters.includes(key);
                     this.updateStatusGraph(newValues,isOwned);
-                    this.statusNote.setText(`残機: ${charaInfo.lives}\nジャンプ回数: ${charaInfo.jumps+1}`).setVisible(isOwned);
+                    this.statusNote.setText(`ライフ: ${charaInfo.lives}\nジャンプ回数: ${charaInfo.jumps+1}`).setVisible(isOwned);
 
 
                     var charaMsg = charaInfo.msg || '???';

@@ -489,7 +489,11 @@ export default class MapManager {
                 trap.chunkIndex = this.currentChunkIndex;
 
                 trap.setCollisionCategory(CATEGORY.TRAP);
-                trap.setCollidesWith(CATEGORY.PLAYER | CATEGORY.WALL | CATEGORY.ENEMY); // enemyにも当たるように
+                if (!isStatic) {
+                    trap.setCollidesWith(CATEGORY.PLAYER | CATEGORY.WALL | CATEGORY.ENEMY); // enemyにも当たるように
+                } else {
+                    trap.setCollidesWith(CATEGORY.PLAYER);
+                }
 
                 this.traps.push(trap);
             });
