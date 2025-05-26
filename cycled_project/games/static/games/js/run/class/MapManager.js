@@ -709,12 +709,13 @@ function getProp(obj, name, defaultValue) {
 
 function judgeDirection(angle) {
     let collisionDirection = '';
-    var angular_width = Math.PI / 6;
+    var angle_range = 12;
+    var angular_width = Math.PI / angle_range;
     if (angle >= - angular_width && angle < angular_width) {
         collisionDirection = 'right';
-    } else if (angle >=  angular_width && angle < angular_width * 5) {
+    } else if (angle >=  angular_width && angle < angular_width * (angle_range-1)) {
         collisionDirection = 'down';
-    } else if (angle >= - angular_width * 5 && angle < -angular_width) {
+    } else if (angle >= - angular_width * (angle_range-1) && angle < -angular_width) {
         collisionDirection = 'up';
     } else {
         collisionDirection = 'left';

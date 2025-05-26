@@ -101,7 +101,7 @@
          "objects":[
                 {
                  "ellipse":true,
-                 "height":64,
+                 "height":96,
                  "id":61,
                  "name":"SpikeBall",
                  "properties":[
@@ -113,9 +113,9 @@
                  "rotation":0,
                  "type":"trap",
                  "visible":true,
-                 "width":64,
-                 "x":4032,
-                 "y":0
+                 "width":96,
+                 "x":4021.71193415638,
+                 "y":-39.0946502057613
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -340,8 +340,8 @@
                  "type":"enemy",
                  "visible":true,
                  "width":96,
-                 "x":4122.76472823448,
-                 "y":-34.8112123568447
+                 "x":4122.76,
+                 "y":-34.8112
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -379,7 +379,7 @@
          "y":0
         }],
  "nextlayerid":11,
- "nextobjectid":66,
+ "nextobjectid":96,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

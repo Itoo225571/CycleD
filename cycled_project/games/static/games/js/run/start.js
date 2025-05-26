@@ -114,6 +114,21 @@ export default class StartScene extends Phaser.Scene {
             this.helpButton.clearTint();  // 色を元に戻す
         });
 
+        // クレジット表示（画面右下に小さく）
+        this.creditText = this.add.text(
+            this.scale.width - 10, 
+            this.scale.height - 10, 
+            '効果音：OtoLogic', 
+            {
+                fontSize: '14px',
+                color: '#cccccc'
+            }
+        ).setOrigin(1, 1).setAlpha(0.6);
+        this.creditText.setInteractive({ useHandCursor: true });
+        this.creditText.on('pointerdown', () => {
+            window.open('https://otologic.jp', '_blank');
+        });
+
         // rankingSceneが起動中だったら停止する
         if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene');
     }
