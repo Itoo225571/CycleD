@@ -74,7 +74,15 @@ export default class PlayScene extends Phaser.Scene {
         this.pauseButton.on('pointerdown', this.pauseGame, this);
         window.addEventListener('blur', () => {
             this.pauseGame();
-        });        
+        });
+
+        // 暗転用のオーバーレイ
+        this.darkOverlay = this.add.rectangle(0, 0, this.cameras.main.width, this.cameras.main.height, 0x000000)
+                            .setOrigin(0)
+                            .setScrollFactor(0)
+                            .setAlpha(0)        // 初期状態は透明
+                            .setDepth(200);     // UI より手前
+
 
         if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene'); 
     }
@@ -134,14 +142,123 @@ export default class PlayScene extends Phaser.Scene {
             halfHeart.play('heartHalfAnim');
             this.heartIcons.push(halfHeart);
         }
-    }    
 
+    }
+
+    losingLife(preHearts, currentHearts) {
+        const diff = preHearts - currentHearts;  // 減った数
+        const centerX = this.cameras.main.midPoint.x;
+        const centerY = this.cameras.main.midPoint.y;
+        const heartSpacing = 64;
+        const hearts = [];
+
+        const fullHearts = Math.floor(preHearts);
+        const hasHalfHeart = (preHearts % 1) >= 0.5;
+        const totalHearts = fullHearts + (hasHalfHeart ? 1 : 0);
+    
+        // 暗転
+        this.tweens.add({
+            targets: this.darkOverlay,
+            alpha: 0.8,
+            duration: 200,
+            onComplete: () => {
+                // ハートを中央に配置（減る前の数）
+                for (let i = 0; i < fullHearts; i++) {
+                    const offsetX = (i - (totalHearts - 1) / 2) * heartSpacing;
+                    const heart = this.add.sprite(centerX + offsetX, centerY, 'heart')
+                        .setDepth(201)
+                        .setScale(4)
+                        .setAlpha(1);
+                    heart.play?.('heartAnim');
+                    hearts.push(heart);
+                }
+                // 0.5ハートを追加（右端）
+                if (hasHalfHeart) {
+                    const offsetX = (fullHearts - (totalHearts - 1) / 2) * heartSpacing; // 右隣に配置
+                    const halfHeart = this.add.sprite(centerX + offsetX, centerY, 'heartHalfIcon')
+                        .setScrollFactor(0)
+                        .setDepth(201)
+                        .setScale(4)
+                        .setAlpha(1);
+                    halfHeart.play?.('heartHalfAnim');
+                    hearts.push(halfHeart);
+                }
+    
+                this.time.delayedCall(800, () => {
+                    const integerPart = Math.floor(diff);
+                    const fractionalPart = diff - integerPart;
+    
+                    // 1個分のハートをフェードアウト＆スケールダウンで消去
+                    const targetIndex = fullHearts - 1;
+                    const heartToRemove = hearts[targetIndex];
+                    this.tweens.add({
+                        targets: heartToRemove,
+                        alpha: 0,
+                        scale: 0,
+                        duration: 300,
+                        onComplete: () => {
+                            heartToRemove.destroy();
+
+                            // 0.5減った場合、最後のハートを halfHeart を生やす
+                            if ((fractionalPart >= 0.45 && !hasHalfHeart)|| (fractionalPart <= 0.45 && hasHalfHeart)) {
+                                const targetIndex = fullHearts - 1 - integerPart;
+                                const oldHeart = hearts[targetIndex];
+                                const x = oldHeart?.x || centerX;  // 右隣に配置
+                                const y = oldHeart?.y || centerY;
+                            
+                                const halfHeart = this.add.sprite(x, y, 'heartHalfIcon')
+                                    .setDepth(201)
+                                    .setAlpha(1)
+                                    .setScale(0);  // 最初は縮小状態
+                            
+                                halfHeart.play?.('heartHalfAnim');
+                                hearts.push(halfHeart);
+                            
+                                this.tweens.add({
+                                    targets: halfHeart,
+                                    scale: 4,  // 最終的な大きさ
+                                    duration: 500,
+                                    ease: 'Power2'
+                                });
+                            }
+                            
+                        }
+                    });
+    
+                    // 残りのハートも時間差で削除（表示残したいならスキップ）
+                    this.time.delayedCall(800, () => {
+                        // for (let i = 0; i < hearts.length; i++) {
+                        //     if (i < fullHearts - diff) continue; // 生存分は残す
+                        //     if (hearts[i] && hearts[i].active) hearts[i].destroy();
+                        // }
+    
+                        // 暗転解除
+                        this.time.delayedCall(300, () => {
+                            hearts.forEach(h => h?.destroy());  // すべて非表示
+                            this.tweens.add({
+                                targets: this.darkOverlay,
+                                alpha: 0,
+                                duration: 300,
+                                onComplete: () => {
+                                    this.respawnPlayer();
+                                }
+                            });
+                        });
+                    });
+                });
+            }
+        });
+    }
+    
     loseLifeAfetr() {
+        const preHearts = this.player.lives;
         const is_alive = this.player.loseLifePlayer();
+        const currentHearts = this.player.lives;
+
         this.updateHearts();
 
         if (is_alive) {
-            this.respawnPlayer();
+            this.losingLife(preHearts,currentHearts)
         } else {
             // this.scene.start('StartScene');
             this.GameOver();

@@ -83,8 +83,8 @@ class CustomResetPasswordForm(ResetPasswordForm):
         set_email(self.fields["email"])
 
     """カスタムパスワードリセットフォーム（存在しないメールにエラーを出す）"""
-    def clean_email(self):
-        email = super().clean_email()
-        if not EmailAddress.objects.filter(email=email, verified=True).exists():
-            self.add_error("email","このメールアドレスは登録されていません。")
-        return email
+    # def clean_email(self):
+    #     email = super().clean_email()
+    #     if not EmailAddress.objects.filter(email=email, verified=True).exists():
+    #         self.add_error("email","このメールアドレスは登録されていません。")
+    #     return email

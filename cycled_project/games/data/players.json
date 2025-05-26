@@ -19,7 +19,7 @@
         "jumps": 1,
         "lives": 2,
         "jumpForce": 23,
-        "price": 5,
+        "price": 0,
         "msg": "頭が良くなると思って、毎日30分の逆立ちをしている。",
         "chargeSkill": "DefenceBoost",
         "skillName": "硬くなるぅ",
