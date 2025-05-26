@@ -6,17 +6,7 @@ export default class SelectCharacterScene extends Phaser.Scene {
     }
 
     create() {
-        this.charaData = this.registry.get('playersData');
-
-        this.userInfo = this.registry.get('userInfo');
-        this.characterConfigs = {};
-        // `this.charaData` をループし、`null` でないキャラクターのみ処理
-        for (const key in this.charaData) {
-            const chara = this.charaData[key];
-            this.characterConfigs[key] = { ...chara };
-        }
-
-        this.characterKeys = Object.keys(this.characterConfigs);
+        this.updateData();
 
         this.centerX = this.cameras.main.width / 2;
         this.centerY = this.cameras.main.height / 2;
@@ -48,13 +38,10 @@ export default class SelectCharacterScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-LEFT', () => {
             this.updateCarousel((this.selectedIndex - 1 + this.characterKeys.length) % this.characterKeys.length);
         });
-
         this.input.keyboard.on('keydown-RIGHT', () => {
             this.updateCarousel((this.selectedIndex + 1) % this.characterKeys.length);
         });
-
         this.input.keyboard.on('keydown-ENTER', () => {
-            // console.log("Selected character:", this.characterKeys[this.selectedIndex]);
             this.selectCharacter(this.selectedIndex);
         });
 
@@ -73,6 +60,18 @@ export default class SelectCharacterScene extends Phaser.Scene {
         this.backButton.on('pointerout', () => {
             this.backButton.clearTint();  // 色を元に戻す
         });
+    }
+
+    updateData() {
+        this.charaData = this.registry.get('playersData');
+        this.userInfo = this.registry.get('userInfo');
+        this.characterConfigs = {};
+        // `this.charaData` をループし、`null` でないキャラクターのみ処理
+        for (const key in this.charaData) {
+            const chara = this.charaData[key];
+            this.characterConfigs[key] = { ...chara };
+        }
+        this.characterKeys = Object.keys(this.characterConfigs);
     }
 
     updateCarousel(newIndex, withAnimation = true) {
@@ -243,6 +242,7 @@ export default class SelectCharacterScene extends Phaser.Scene {
         const successCallback = () => {
             this.registry.set('selectedCharacter', selectedChara);
             const selectedSprite = this.characterSprites[charaIndex];
+            console.log(selectedChara,selectedSprite)
             selectedSprite.anims.stop();
 
             // ランダムにモーションを選ぶ
@@ -323,7 +323,6 @@ export default class SelectCharacterScene extends Phaser.Scene {
                 // タップしたキャラが中央かどうかをチェック
                 const tappedIndex = i;
                 if (tappedIndex === this.selectedIndex) {
-                    // console.log("Selected character:", this.characterKeys[tappedIndex]);
                     // ここで選択したキャラクターの処理を行う
                     this.selectCharacter(tappedIndex);
                 } else {
@@ -506,11 +505,13 @@ export default class SelectCharacterScene extends Phaser.Scene {
                     header: data.message,
                     message: `早速${data.character.key}を使用しますか？`,
                     showCancel: true,
+                    okText: 'YES',
                     cancelText: 'NO',
                     onOK: () => {
                         scene.registry.set('selectedCharacter', data.character);
                         scene.registry.set('playersData', data.players);
                         scene.registry.set('userInfo', data.user_info);
+                        scene.updateData();
                         scene.goStart();
                     },   // キャラを切り替える
                     onCancel: () => {
