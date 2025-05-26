@@ -150,6 +150,9 @@ export default class PreloadScene extends Phaser.Scene {
             { frameWidth: 96, frameHeight: 96 }
         );
 
+        // 効果音
+        // this.load.audio('jumpSound', `${soundDir}/01(Jump).mp3`);
+
         // map読み込み
         this.loadMap();
     }
