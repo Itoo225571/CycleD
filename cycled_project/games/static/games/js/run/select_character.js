@@ -242,7 +242,6 @@ export default class SelectCharacterScene extends Phaser.Scene {
         const successCallback = () => {
             this.registry.set('selectedCharacter', selectedChara);
             const selectedSprite = this.characterSprites[charaIndex];
-            console.log(selectedChara,selectedSprite)
             selectedSprite.anims.stop();
 
             // ランダムにモーションを選ぶ
