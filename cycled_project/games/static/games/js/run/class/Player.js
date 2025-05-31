@@ -88,7 +88,6 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         if (currentBlockX > this.prevBlockX) {
             for (let i = this.prevBlockX + 1; i <= currentBlockX; i++) {
                 this.chargeBar.chargeUp(0.001);
-                // this.chargeBar.chargeUp(0.1);
             }
             this.prevBlockX = currentBlockX;
         }
@@ -183,7 +182,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         this.setStatic(false);       // 動的に戻す
         this.setCollisionCategory(CATEGORY.PLAYER); // 元のカテゴリに再設定
         this.setCollidesWith(CATEGORY.ENEMY | CATEGORY.WALL | CATEGORY.ITEM | CATEGORY.TRAP);
-        this.setDepth(0);  
+        this.setDepth(0);
 
         // 位置と速度を初期化するならここ
         this.setVelocity(0, 0);
@@ -318,4 +317,5 @@ function skillEnd(player, scene) {
     // 元の色に戻す（tint解除）
     player.clearTint();
     player.setAlpha(1);
+    player.setBlendMode(Phaser.BlendModes.NORMAL);
 }

@@ -436,6 +436,9 @@ export default class MapManager {
                 const width = obj.width;
                 const height = obj.height;
 
+                const isStatic = getProp(obj, 'static', true);  // 静的か
+                const weight = getProp(obj, 'weight', 1);  // 重さ
+
                 const trap = this.getObjFromPool(this.trapPool, name, obj.x + this.nextChunkX, obj.y);
                 trap.chunkX = this.nextChunkX;
 
@@ -472,12 +475,11 @@ export default class MapManager {
                 trap.setExistingBody(newBody);
                 trap.setPosition(obj.x + this.nextChunkX + width/2, obj.y +height/2);
 
-                const isStatic = getProp(obj, 'static', true);  // 静的か
                 trap.setStatic(isStatic); // プレイヤーが乗れるように固定
                 // trap.setMass(1); // 静的だけど衝突判定は有効
 
-                trap.body.friction = 0;
-                trap.body.frictionStatic = 0;
+                trap.body.friction = 0.1;
+                trap.body.frictionStatic = 0.1;
                 trap.body.frictionAir = 0;
                 trap.body.gravityScale = 1;
 
@@ -491,6 +493,7 @@ export default class MapManager {
                 trap.setCollisionCategory(CATEGORY.TRAP);
                 if (!isStatic) {
                     trap.setCollidesWith(CATEGORY.PLAYER | CATEGORY.WALL | CATEGORY.ENEMY); // enemyにも当たるように
+                    trap.setMass(weight); // 動的なトラップに重さを設定
                 } else {
                     trap.setCollidesWith(CATEGORY.PLAYER);
                 }
@@ -504,8 +507,7 @@ export default class MapManager {
         const itemName = item.texture.key;
         switch (itemName) {
             case 'coin_bronze':
-                player.chargeBar.chargeUp(0.01);
-                player.chargeBar.chargeUp(0.5);
+                player.chargeBar.chargeUp(0.05);
                 player.coin_bronze += 1;    // bronzeコイン加算
                 break;
         }
@@ -523,8 +525,20 @@ export default class MapManager {
         const trapName = trap.texture.key;
         switch (trapName) {
             case 'SpikeBall':
-                if(!player.invincible)   this.scene.loseLife(true);
+                if (player.invincible) {
+                    if(!trap.body.isStatic)  trapDead();
+                } else {
+                    this.scene.loseLife(true);
+                }
                 break;
+        }
+        function trapDead() {
+            // 敵を消すまたは反応させる場合
+            trap.setAlpha(0.7);
+            trap.setVelocityY(-10); // 少し跳ねる（オプション）
+            trap.setCollisionCategory(null);
+            trap.setDepth(10);   //この時だけ最前線で表示
+            trap.setIgnoreGravity(false);      //重力適用
         }
     }
 
