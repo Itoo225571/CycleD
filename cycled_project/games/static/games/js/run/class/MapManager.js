@@ -45,6 +45,11 @@ export default class MapManager {
                 }
             });
         });
+
+        // 音
+        this.blockSound = scene.sound.add('blockSound');
+        this.stompSound = scene.sound.add('stompSound');
+        this.coinSound = scene.sound.add('coinSound');
     }
 
     addNextChunk() {
@@ -349,15 +354,17 @@ export default class MapManager {
             // player.setVelocityY(-player.jumpForce); // 上に弾む（速度を調整）
             player.jump_count = 0;
             player.jump(true);
-            enemyDead(enemy);
+            enemyDead(this);
         } else if (player.invincible) {
-            enemyDead(enemy);   // playerが無敵状態
+            enemyDead(this);   // playerが無敵状態
         } else {
+            this.blockSound.play();
             this.scene.loseLife(true);     //ジャンプしながら消滅
         }
 
-        function enemyDead(enemy) {
+        function enemyDead(scene) {
             enemy.is_alive = false;
+            scene.stompSound.play();    // 音声
             // 敵を消すまたは反応させる場合
             enemy.setAlpha(0.7);
             enemy.play(enemy.name + 'Dead');
@@ -509,6 +516,7 @@ export default class MapManager {
             case 'coin_bronze':
                 player.chargeBar.chargeUp(0.05);
                 player.coin_bronze += 1;    // bronzeコイン加算
+                this.coinSound.play();  // 音声再生
                 break;
         }
         item.setActive(false);
