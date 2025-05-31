@@ -365,19 +365,23 @@
 		{% comment %} messages表示(error以外) {% endcomment %}
 		{% if messages %}
 			<script>
-				$(document).ready(function() {
-					{% for message in messages %}
-						{% if message.level_tag != 'danger' %}  {# error 以外を対象にする #}
-							Swal.fire({
-								icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}",
-								title: "{{ message | escapejs }}",
-								confirmButtonText: 'OK'
-							});
+			$(document).ready(function() {
+				{% for message in messages %}
+					{% if message.level_tag != 'danger' %}
+						Swal.fire({
+						icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}",
+						{% if 'html' in message.tags %}
+							html: `{{ message|safe }}`,
+						{% else %}
+							title: "{{ message|escapejs }}",
 						{% endif %}
-					{% endfor %}
-				});
+						confirmButtonText: 'OK'
+						});
+					{% endif %}
+				{% endfor %}
+			});
 			</script>
-		{% endif %}
+	  	{% endif %}
 
 		{% comment %} 全体でのエラー表示用 {% endcomment %}
 		<script src="{% static 'js/error_lib.js' %}"></script>
