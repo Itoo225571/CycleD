@@ -86,6 +86,9 @@ export default class PlayScene extends Phaser.Scene {
             .setAlpha(0.8);
         this.overlayContainer.add(darkOverlay);
 
+        // 音
+        this.blockSound = this.sound.add('blockSound');
+
         if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene'); 
     }
 
@@ -195,7 +198,10 @@ export default class PlayScene extends Phaser.Scene {
                 scene.heartsOverlay.push(halfHeart);
             }
             overlay.add(scene.heartsOverlay);
-            if(vibration)   camera.shake(300, 0.05);    // ハート消滅に合わせて振動
+            if(vibration) {
+                scene.blockSound.play();  // 音声再生
+                camera.shake(300, 0.05);    // ハート消滅に合わせて振動
+            }
         }
     }
     

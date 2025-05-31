@@ -59,7 +59,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         this.just_jumped = false;
 
         // サウンド追加
-        // this.jumpSound = this.scene.sound.add('jumpSound');
+        this.jumpSound = this.scene.sound.add('jumpSound');
 
         this.body.label = 'player';
     }
@@ -116,7 +116,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         if (this.jump_count < this.jumps) {
             // Matterでは setVelocityY はないので force を使う方が自然
             this.setVelocityY(-Math.abs(this.jumpForce)); // jumpForce を適度に調整
-            // if(!onObject)   this.jumpSound.play();  // 音声再生
+            if(!onObject)   this.jumpSound.play();  // 音声再生
 
             if (isGrounded) {
                 this.anims.play(this.playerName + 'Jump', true);
