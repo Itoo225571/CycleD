@@ -163,11 +163,12 @@ class Coin(models.Model):
     #     ・rateに応じたCoinが手に入る
     def add(self, diary):
         if self._can_increment(diary):
-            self.num += self._rate_convert(diary)
+            coin_num = self._rate_convert(diary)
+            self.num += coin_num
             self._date_process(diary)
             self.save()
-            return True
-        return False
+            return coin_num
+        return 0
     
     def sub(self, num):
         if self._can_decrement(num):
