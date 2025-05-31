@@ -13,6 +13,8 @@ from django.core.exceptions import ValidationError,ObjectDoesNotExist
 from django.contrib import messages
 from django.core.cache import cache
 from django.utils import timezone
+from django.utils.safestring import mark_safe
+from django.templatetags.static import static
 
 from ..forms import AddressSearchForm,AddressForm,LocationFormSet,DiaryFormSet,PhotosForm
 from ..models import Diary,Location,TempImage,Good
@@ -144,8 +146,19 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
 
                 # キャッシュ更新
                 update_diaries(self.request)
-                coin_msg = f'\nコインが{coin_num}枚増えました' if coin_num else ''
-                messages.success(self.request, "写真の投稿に成功しました！" + coin_msg)
+                img_url = static('diary/img/coin_icon.gif')
+                coin_msg = mark_safe(f'''
+                <div style="font-size: 1rem; font-weight: bold; display: flex; align-items: center; justify-content: center; padding-bottom: 0.5em;">
+                    <img src="{img_url}" alt="coin" style="height: 3.5em; vertical-align: middle; margin-right: 0.3em;">
+                    <div style="display: inline-block; vertical-align: bottom;">
+                        + <span style="font-size: 1.25rem; padding-right: 0.3em;">{coin_num}</span>
+                    </div>
+                </div>
+                ''') if coin_num else ''
+
+                msg = f'<h3 class="swal2-title fw-bold">写真の投稿に成功しました！</h3>' + coin_msg
+                # HTML形式のメッセージ（スタイル付き）
+                messages.success(self.request, mark_safe(msg), extra_tags='html')
                 return redirect(self.get_success_url())
         except Exception as e:
             print(f"Error occurred: {e}")
