@@ -78,10 +78,12 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
         
     def form_valid(self, diary_formset, location_formset):
         try:
+            user = self.request.user
+            coin_num = 0
             with transaction.atomic():
                 for form_diary in diary_formset.forms:
                     diary = form_diary.instance
-                    diary.user = self.request.user  # 現在のユーザーを設定
+                    diary.user = user  # 現在のユーザーを設定
                     to_delete = form_diary.cleaned_data.get('DELETE', False)
                     if to_delete:
                         if diary.pk:  # 既存なら削除
@@ -109,7 +111,7 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
 
                     # tempImageの場合
                     if id:
-                        temp_image = get_object_or_404(TempImage, id=id, user=self.request.user)
+                        temp_image = get_object_or_404(TempImage, id=id, user=user)
                         image = temp_image.image
                         if image:
                             image_file = ContentFile(image.read(), name=image.name)
@@ -128,13 +130,13 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
                     #         location.delete()   # 元のDiaryを削除
                     #         continue
 
-                    location.diary = get_object_or_404(Diary, user=self.request.user, date=date)
+                    location.diary = get_object_or_404(Diary, user=user, date=date)
                     # 今日中に作成されたものかどうか(0がGOLD)
                     if id:
                         if datetime.now().date() == temp_image.date_photographed.date() == temp_image.date_lastModified.date():
                             location.diary.rank = 0
 
-                    self.request.user.coin.add(location.diary)    # ここでコイン計算
+                    coin_num += user.coin.add(location.diary)    # ここでコイン計算
                     location.diary.save()
                     
                     location.full_clean()  # バリデーションを実行
@@ -142,7 +144,9 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
 
                 # キャッシュ更新
                 update_diaries(self.request)
-                return super().form_valid(diary_formset)
+                coin_msg = f'\nコインが{coin_num}枚増えました' if coin_num else ''
+                messages.success(self.request, "写真の投稿に成功しました！" + coin_msg)
+                return redirect(self.get_success_url())
         except Exception as e:
             print(f"Error occurred: {e}")
             traceback.print_exc()  # ここでエラー箇所とスタックトレースを表示

@@ -209,10 +209,10 @@
 											<a class="nav-link button-diary with-icon ps-2" href="{% url 'diary:diary_photo' %}">日記作成</a>
 										</li>
 										<li class="nav-item ms-2">
-											<a class="nav-link button-calendar with-icon ps-2" href="{% url 'diary:calendar' %}">カレンダー</a>
+											<a class="nav-link button-weather with-icon ps-2" href="{% url 'diary:weather_report' %}">天気予報</a>
 										</li>
 										<li class="nav-item ms-2">
-											<a class="nav-link button-weather with-icon ps-2" href="{% url 'diary:weather_report' %}">天気予報</a>
+											<a class="nav-link button-calendar with-icon ps-2" href="{% url 'diary:calendar' %}">カレンダー</a>
 										</li>
 										<li class="nav-item ms-2">
 											<a class="nav-link button-map with-icon ps-2" href="{% url 'diary:map' %}">地図</a>
@@ -370,7 +370,7 @@
 						{% if message.level_tag != 'danger' %}  {# error 以外を対象にする #}
 							Swal.fire({
 								icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}",
-								title: "{{ message }}",
+								title: "{{ message | escapejs }}",
 								confirmButtonText: 'OK'
 							});
 						{% endif %}
