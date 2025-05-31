@@ -151,12 +151,12 @@ class DiaryPhotoView(LoginRequiredMixin, generic.FormView):
                 <div style="font-size: 1rem; font-weight: bold; display: flex; align-items: center; justify-content: center; padding-bottom: 0.5em;">
                     <img src="{img_url}" alt="coin" style="height: 3.5em; vertical-align: middle; margin-right: 0.3em;">
                     <div style="display: inline-block; vertical-align: bottom;">
-                        + <span style="font-size: 1.25rem; padding-right: 0.3em;">{coin_num}</span>
+                        <span style="font-size: 1.5rem; padding-right: 0.3em;">+ {coin_num}</span>
                     </div>
                 </div>
                 ''') if coin_num else ''
 
-                msg = f'<h3 class="swal2-title fw-bold">写真の投稿に成功しました！</h3>' + coin_msg
+                msg = f'<h3 style="font-size: 1.75em; font-weight: bold; margin: 0.5em 0;">写真の投稿に成功しました！</h3>' + coin_msg
                 # HTML形式のメッセージ（スタイル付き）
                 messages.success(self.request, mark_safe(msg), extra_tags='html')
                 return redirect(self.get_success_url())
