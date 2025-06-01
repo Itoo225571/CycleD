@@ -47,7 +47,7 @@ export default class MapManager {
         });
 
         // 音
-        this.blockSound = scene.sound.add('blockSound');
+        this.damageSound = scene.sound.add('damageSound');
         this.stompSound = scene.sound.add('stompSound');
         this.coinSound = scene.sound.add('coinSound');
     }
@@ -358,7 +358,7 @@ export default class MapManager {
         } else if (player.invincible) {
             enemyDead(this);   // playerが無敵状態
         } else {
-            this.blockSound.play();
+            this.damageSound.play();
             this.scene.loseLife(true);     //ジャンプしながら消滅
         }
 
@@ -536,6 +536,7 @@ export default class MapManager {
                 if (player.invincible) {
                     if(!trap.body.isStatic)  trapDead();
                 } else {
+                    this.damageSound.play();
                     this.scene.loseLife(true);
                 }
                 break;
