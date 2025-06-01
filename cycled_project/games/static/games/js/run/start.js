@@ -48,9 +48,9 @@ export default class StartScene extends Phaser.Scene {
             centerX: true, 
             fontFamily: 'DTM-Sans', 
             fontSize: 64,
-            color: 0xFFF3E0,
+            color: 0x4E342E, // 濃い茶色文字
             button: {
-                color: 0x4E342E,
+                color: 0xD7CCC8, // 薄いベージュ（例: #D7CCC8）
             } 
         };
         var btnList = [
@@ -82,10 +82,23 @@ export default class StartScene extends Phaser.Scene {
         });
         
         // background
-        this.add.image(0, 0, 'sky')
+        this.add.image(0, 0, 'background')
             .setOrigin(0, 0)
             .setDisplaySize(this.game.config.width, this.game.config.height)
             .setDepth(-7);
+        const layerConfigs = [
+            { key: 'layer1', depth: -6, },
+            { key: 'layer2', depth: -5, },
+            { key: 'layer3', depth: -4, },
+            { key: 'layer4', depth: -3, }
+        ];    
+        for (const config of layerConfigs) {
+            if (!this.textures.exists(config.key)) continue;    //存在しなかったらスキップ
+            this.add.image(0, 0, config.key)
+                .setOrigin(0, 0)
+                .setDisplaySize(this.game.config.width, this.game.config.height)
+                .setDepth(config.depth);
+        }
 
         // 戻るボタン
         this.backButton = this.add.sprite(100, 80, 'inputPrompts', 608)  // (x, y, key, frame)

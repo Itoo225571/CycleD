@@ -59,7 +59,9 @@ export default class PlayScene extends Phaser.Scene {
         this.distText = this.add.text(30, 20, `0.0`, {
             fontFamily: 'DTM-Sans',
             fontSize: '48px',
-            fill: '#ffffff'
+            fill: '#ffffff',
+            stroke: '#000000',        // 黒い縁
+            strokeThickness: 3        // 縁の太さ（適宜調整）
         }).setScrollFactor(0).setDepth(100);
         // チャージバー
         var barX = 30, barY = 96, barWidth = 240, barHeight = 32;
