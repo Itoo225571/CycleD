@@ -54,12 +54,12 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         this.setFrictionStatic(0);    // 静止摩擦
         this.setFrictionAir(0);       // 空気抵抗
         this.setCollisionCategory(CATEGORY.PLAYER);
-        this.setCollidesWith(CATEGORY.ENEMY | CATEGORY.WALL | CATEGORY.ITEM | CATEGORY.TRAP);
+        this.setCollidesWith(CATEGORY.ENEMY | CATEGORY.WALL | CATEGORY.ITEM | CATEGORY.TRAP | CATEGORY.CEILING);
 
         this.just_jumped = false;
 
         // サウンド追加
-        this.jumpSound = this.scene.sound.add('jumpSound');
+        this.jumpSound = this.scene.sound.add('jumpSound',{ volume: 0.3,});
 
         this.body.label = 'player';
     }
@@ -181,7 +181,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         this.setRotation(0);             // 角度リセット
         this.setStatic(false);       // 動的に戻す
         this.setCollisionCategory(CATEGORY.PLAYER); // 元のカテゴリに再設定
-        this.setCollidesWith(CATEGORY.ENEMY | CATEGORY.WALL | CATEGORY.ITEM | CATEGORY.TRAP);
+        this.setCollidesWith(CATEGORY.ENEMY | CATEGORY.WALL | CATEGORY.ITEM | CATEGORY.TRAP | CATEGORY.CEILING);
         this.setDepth(0);
 
         // 位置と速度を初期化するならここ

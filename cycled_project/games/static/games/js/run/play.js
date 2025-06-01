@@ -41,6 +41,19 @@ export default class PlayScene extends Phaser.Scene {
         this.centerPoint.setIgnoreGravity(true);
         this.cameras.main.startFollow(this.centerPoint, false, 1, 0);
         this.centerPoint.body.isSensor = true;
+        
+        // 天井
+        this.ceiling = this.add.rectangle(
+            0, 0,
+            this.scale.width * 2,     // width
+            100,                    // height
+            0x000000,              // 色（任意）
+            0                      // alpha = 0（見えない）
+        );
+        this.matter.add.gameObject(this.ceiling, { isStatic: true });
+        this.ceiling.setCollisionCategory(CATEGORY.CEILING)
+                    .setCollidesWith(CATEGORY.PLAYER)
+                    .setIgnoreGravity(true);
 
         // スコアの表示
         this.distText = this.add.text(30, 20, `0.0`, {
@@ -87,7 +100,8 @@ export default class PlayScene extends Phaser.Scene {
         this.overlayContainer.add(darkOverlay);
 
         // 音
-        this.blockSound = this.sound.add('blockSound');
+        this.impactSound = this.sound.add('impactSound');
+        this.fallingSound = this.sound.add('fallingSound');
 
         if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene'); 
     }
@@ -95,11 +109,20 @@ export default class PlayScene extends Phaser.Scene {
     update(time, delta) {
         if (this.isPaused) return;
 
+        const Matter = Phaser.Physics.Matter.Matter;
+
         let cam = this.cameras.main;
         this.elapsedTime += delta;
 
         this.player.update(this.elapsedTime, cam);
+        // カメラと天井を移動
         this.centerPoint.setVelocityX(this.player.speed);
+        // Matterボディを直接移動させる
+        this.matter.body.setPosition(this.ceiling.body, {
+            x: cam.scrollX,
+            y: cam.scrollY - this.ceiling.hight/2
+        });
+        // this.ceiling.setPosition(cam.scrollX, cam.scrollY - this.ceiling.hight/2); // 表示移動用(なくていい)
 
         const guideX = this.mapManager.nextChunkX - this.mapManager.chunkWidth / 2;
         if (this.player.x > guideX) {
@@ -115,6 +138,7 @@ export default class PlayScene extends Phaser.Scene {
         const bottomBound = cam.scrollY + cam.height * 7 / 6;
         const outOfBounds = this.player.x < leftBound || this.player.y > bottomBound;
         if (outOfBounds) {
+            this.fallingSound.play();
             this.loseLife(false);
         }
     }
@@ -199,7 +223,7 @@ export default class PlayScene extends Phaser.Scene {
             }
             overlay.add(scene.heartsOverlay);
             if(vibration) {
-                scene.blockSound.play();  // 音声再生
+                scene.impactSound.play();  // 音声再生
                 camera.shake(300, 0.05);    // ハート消滅に合わせて振動
             }
         }
