@@ -655,7 +655,7 @@ export default class MapManager {
     
     createBackgrounds() {
         this.backgroundLayers = {
-            sky: this.scene.add.image(0, 0, 'sky')
+            sky: this.scene.add.image(0, 0, 'background')
                 .setOrigin(0, 0)
                 .setDisplaySize(this.scene.game.config.width, this.scene.game.config.height)
                 .setDepth(-7)
@@ -666,17 +666,18 @@ export default class MapManager {
         const height = this.scene.game.config.height;
     
         const layerConfigs = [
-            { key: 'mountain', depth: -6, parallaxFactor: 0.2 },
-            { key: 'mountains', depth: -5, parallaxFactor: 0.4 },
-            { key: 'mountain-trees', depth: -4, parallaxFactor: 0.6 },
-            { key: 'trees', depth: -3, parallaxFactor: 0.8 }
+            { key: 'layer1', depth: -6, parallaxFactor: 0.01 },
+            { key: 'layer2', depth: -5, parallaxFactor: 0.05 },
+            { key: 'layer3', depth: -4, parallaxFactor: 0.1 },
+            { key: 'layer4', depth: -3, parallaxFactor: 0.2 }
         ];
-    
         this.parallaxLayers = [];
     
         for (const config of layerConfigs) {
             const layerPair = [];
-    
+            if (!this.scene.textures.exists(config.key)) continue;    //存在しなかったらスキップ
+
+            // 4つの画像を連結して使う
             for (let i = 0; i < 4; i++) {
                 const image = this.scene.add.image(i * width, 0, config.key)
                     .setOrigin(0, 0)

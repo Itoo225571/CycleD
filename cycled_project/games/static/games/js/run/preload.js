@@ -58,11 +58,18 @@ export default class PreloadScene extends Phaser.Scene {
             { frameWidth: 16, frameHeight: 16 }
         );
         // 背景画像
-        this.load.image('sky', `${imgDir}background/sky.png`);
-        this.load.image('mountain', `${imgDir}background/mountain.png`);
-        this.load.image('mountains', `${imgDir}background/mountains.png`);
-        this.load.image('mountain-trees', `${imgDir}background/mountain-trees.png`);
-        this.load.image('trees', `${imgDir}background/trees.png`);
+        const bgFolders = [
+            { name: 'background1/', num: 4},
+            { name: 'background2/', num: 3},
+        ];
+        // 昼夜で切り替え
+        const selected = Phaser.Math.RND.pick(bgFolders);
+        const folder = imgDir + selected.name;
+        this.load.image('background', `${folder}/background.png`);  // 背景（共通）読み込み
+        // 選ばれたディレクトリ内のlayer画像を読み込む
+        for (let i = 1; i <= selected.num; i++) {
+            this.load.image(`layer${i}`, `${folder}/layer${i}.png`);
+        }
 
         // item
         this.items = [
