@@ -1,12 +1,11 @@
 ## Third-Party Licenses
 
-This project includes the following open-source libraries:
-
+### オープンソースライブラリ:
 - **MDBootstrap** (MIT License) - [MIT License](https://opensource.org/licenses/MIT)  
 - **Bas Milius OSS** (MIT License) - [MIT License](https://opensource.org/licenses/MIT)  
 - **Mage Icons** (Apache License 2.0) - [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)  
 
-See the `LICENSE` file for details.
+## 使用ライブラリ一覧
 
 ### aiofiles
 
@@ -62,3 +61,10 @@ See the `LICENSE` file for details.
 - 総務省「全国地方公共団体コード」
 
 本プロジェクトは、上記データを利用しています。各データの利用規約に従い、出典の表記を行っています。
+
+### 著作権および商標
+本ウェブサイトおよびそのコンテンツの著作権はOpenweather Ltd.（登録番号 11047846）に帰属します。
+所在地：30 St. Mary Axe, The City Of London, London, Greater London, United Kingdom, EC3A 8BF
+
+「Openweather®」はOpenweather Ltd.の登録商標です。
+その他の商標および商号の無断使用を禁止します。
