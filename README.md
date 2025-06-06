@@ -55,3 +55,10 @@ See the `LICENSE` file for details.
 - バージョン: 3.8.1
 - ライセンス: BSD 3-Clause License
 - リンク: https://pypi.org/project/asgiref/
+
+### 使用データおよびAPI
+- Yahoo!ジオコーダ API（© Yahoo Japan）
+- 国土地理院「住所検索API」
+- 総務省「全国地方公共団体コード」
+
+本プロジェクトは、上記データを利用しています。各データの利用規約に従い、出典の表記を行っています。
