@@ -7,3 +7,51 @@ This project includes the following open-source libraries:
 - **Mage Icons** (Apache License 2.0) - [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)  
 
 See the `LICENSE` file for details.
+
+### aiofiles
+
+- バージョン: 24.1.0
+- ライセンス: Apache License 2.0
+- リンク: https://pypi.org/project/aiofiles/
+
+### aiohappyeyeballs
+
+- バージョン: 2.4.3
+- ライセンス: Python Software Foundation License
+- リンク: https://pypi.org/project/aiohappyeyeballs/
+
+### aiosignal
+
+- バージョン: 1.3.1
+- ライセンス: Apache License 2.0
+- リンク: https://pypi.org/project/aiosignal/
+
+### annotated-types
+
+- バージョン: 0.7.0
+- ライセンス: MIT License
+- リンク: https://pypi.org/project/annotated-types/
+
+### anyio
+
+- バージョン: 4.6.0
+- ライセンス: MIT License
+- リンク: https://pypi.org/project/anyio/
+
+### appnope
+
+- バージョン: 0.1.4
+- ライセンス: BSD 3-Clause License
+- リンク: https://pypi.org/project/appnope/
+
+### APScheduler
+
+- バージョン: 3.10.4
+- ライセンス: MIT License
+- リンク: https://pypi.org/project/APScheduler/
+
+### asgiref
+
+- バージョン: 3.8.1
+- ライセンス: BSD 3-Clause License
+- リンク: https://pypi.org/project/asgiref/
