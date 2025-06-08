@@ -24,7 +24,7 @@
 
 ゲームの様子は以下のリンクからご覧いただけます。
 
-[ゲームプレイ動画をダウンロード](https://youtu.be/ChiuTB7LyqE)
+[ゲームプレイ動画](https://youtu.be/ChiuTB7LyqE)
 
 
 ## 工夫した点
