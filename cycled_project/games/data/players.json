@@ -7,7 +7,7 @@
         "lives": 3,
         "jumpForce": 18,
         "price": 0,
-        "msg": "3日に1度はパンツの前後ろを間違え、5日に1度はパンツの表裏を間違える。",
+        "msg": "上京して東京特許許可局に行くことが夢",
         "chargeSkill": "Invincibled",
         "skillName": "無敵化",
         "skillDescription": "一定時間無敵になる。"
@@ -19,10 +19,10 @@
         "jumps": 1,
         "lives": 2,
         "jumpForce": 23,
-        "price": 0,
+        "price": 5,
         "msg": "頭が良くなると思って、毎日30分の逆立ちをしている。",
         "chargeSkill": "DefenceBoost",
-        "skillName": "硬くなるぅ",
+        "skillName": "硬くなる",
         "skillDescription": "一定時間、受けるダメージが半分になる。"
     },
     {

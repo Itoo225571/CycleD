@@ -24,7 +24,6 @@ def robots_txt(request):
     return HttpResponse(content, content_type="text/plain")
 
 urlpatterns = [
-    # path("admin/", admin.site.urls),#admin(管理)画面用のURL
     path("",include("diary.urls")),
     path("__debug__/",include("debug_toolbar.urls")),#Debug-toolbar追加
     path("accounts/", include("accounts.urls")),  # 追加
