@@ -4,6 +4,8 @@
 - **MDBootstrap** (MIT License) - [MIT License](https://opensource.org/licenses/MIT)  
 - **Bas Milius OSS** (MIT License) - [MIT License](https://opensource.org/licenses/MIT)  
 - **Mage Icons** (Apache License 2.0) - [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)  
+- **pagination.js** (MIT License) - [MIT License](https://opensource.org/licenses/MIT)  
+  - Copyright © 2014–2100, [superRaytin](https://github.com/superRaytin) 
 
 ### 使用ライブラリ一覧
 
