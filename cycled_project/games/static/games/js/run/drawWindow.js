@@ -106,6 +106,7 @@ export function createBtn(x, y, scene, content, option = {}) {
         btnWidth: option.button ? option.button.width || 40 : 40,  // option.button が undefined の場合、デフォルトで40
         btnHeight: option.button ? option.button.height || 6 : 6,  // option.button が undefined の場合、デフォルトで6
         btnColor: option.button ? option.button.color || 0xffffff : 0xffffff,  // option.button が undefined の場合、デフォルトで白
+        btnSound: option.button ? option.button.sound || 'buttonHardSound' : 'buttonHardSound',
     };
 
     // 中央配置処理
@@ -154,7 +155,11 @@ export function createBtn(x, y, scene, content, option = {}) {
     const buttonColor = info.btnColor;
     const hitArea = scene.add.rectangle(0, 0, info.btnWidth * per_length, info.btnHeight * per_length, buttonColor, 0);
     hitArea.setOrigin(0);
-    hitArea.setInteractive({ useHandCursor: true });
+    hitArea.setInteractive({ useHandCursor: true })
+        .on('pointerdown', () => {
+            const sound = scene.sound.add(info.btnSound,{volume: 1.0});
+            sound.play();
+        });
 
     hitArea.on('pointerover', () => container.setAlpha(0.3));
     hitArea.on('pointerout', () => container.setAlpha(1));
@@ -242,6 +247,8 @@ export function createPopupWindow(scene, option) {
 
     var btnHeight = height / 2 - 64 - 16;
     const okButton = createButton(scene, okText, () => {
+        const sound = scene.sound.add('buttonSoftSound',{volume: 1.1});
+        sound.play();
         onOK();
         closePopup();
     }, showCancel ? -130 : 0, btnHeight, 'white');
@@ -250,6 +257,8 @@ export function createPopupWindow(scene, option) {
     let cancelButton = null;
     if (showCancel) {
         cancelButton = createButton(scene, cancelText, () => {
+            const sound = scene.sound.add('buttonHardSound',{volume: 1.0});
+            sound.play();
             onCancel();
             closePopup();
         }, 130, btnHeight, 'white');

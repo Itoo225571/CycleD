@@ -70,8 +70,9 @@ export default class PauseScene extends Phaser.Scene {
         this.input.enabled = false;
     
         // 1秒ごとにカウントダウン
+        const delay = 500;
         this.countdownEvent = this.time.addEvent({
-            delay: 1000,
+            delay: delay,
             callback: () => {
                 this.countdownText.setText(count);
                 count--;
@@ -79,7 +80,7 @@ export default class PauseScene extends Phaser.Scene {
                     // 0以下になったら「スタート！」表示
                     this.countdownText.setText("G O !");
                     // 1秒後にゲームを再開
-                    this.time.delayedCall(1000, () => {
+                    this.time.delayedCall(delay, () => {
                         this.countdownText.setVisible(false);
                         this.scene.bringToTop('PlayScene');
                         this.PlayScene.resumeGame();

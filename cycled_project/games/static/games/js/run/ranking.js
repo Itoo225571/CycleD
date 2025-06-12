@@ -10,18 +10,23 @@ export default class RankingScene extends Phaser.Scene {
         // 戻るボタン
         this.backButton = this.add.sprite(100, 80, 'inputPrompts', 608);  // (x, y, key, frame)
         // ボタンにインタラクションを追加（クリックイベント）
-        this.backButton.setDisplaySize(48 *3/2, 48);
-        this.backButton.setInteractive({ useHandCursor: true });
-        this.backButton.setFlipX(true);  // 水平方向に反転
-        this.backButton.on('pointerdown', this.goBackScene.bind(this));
-        // ホバー時の色変更（マウスオーバー）
-        this.backButton.on('pointerover', () => {
-            this.backButton.setTint(0x44ff44);  // ホバー時に緑色に変更
-        });
-        // ホバーを外した時の色を戻す（マウスアウト）
-        this.backButton.on('pointerout', () => {
-            this.backButton.clearTint();  // 色を元に戻す
-        });
+        this.backButton
+            .setDisplaySize(48 *3/2, 48)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => {
+                const sound = this.sound.add('buttonSoftSound',{volume: 1.2});
+                sound.play();
+            })
+            .setFlipX(true)  // 水平方向に反転
+            .on('pointerdown', this.goBackScene.bind(this))
+            // ホバー時の色変更（マウスオーバー）
+            .on('pointerover', () => {
+                this.backButton.setTint(0x44ff44);  // ホバー時に緑色に変更
+            })
+            // ホバーを外した時の色を戻す（マウスアウト）
+            .on('pointerout', () => {
+                this.backButton.clearTint();  // 色を元に戻す
+            });
 
         const { width, height } = this.scale;
         this.overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.5)
@@ -53,19 +58,22 @@ export default class RankingScene extends Phaser.Scene {
     onBringToTop() {
         if (!this.isReady)  return;
 
-        const now = Date.now();
-        const THRESHOLD_MS = 30 * 1000;  // 30秒以内なら再取得しない
-        if ((now - this.lastGetScoresTime) < THRESHOLD_MS && this.preScores) {
-            this.showDisplayScores(this.preScores);
-        } else {
-            this.getScores();
-        }
-        
         this.overlay.setVisible(true);
         this.panel.setVisible(true);
         this.scoreTitle.setVisible(true);
         // this.notyetText.setVisible(true); 
         this.backButton.setVisible(true);
+
+        // 一瞬まつ(panelを取得できるように)
+        this.time.delayedCall(10, () => {
+            const now = Date.now();
+            const THRESHOLD_MS = 30 * 1000;  // 30秒以内なら再取得しない
+            if ((now - this.lastGetScoresTime) < THRESHOLD_MS && this.preScores) {
+                this.showDisplayScores(this.preScores);
+            } else {
+                this.getScores();
+            }
+        });
     }
     
     getScores() {

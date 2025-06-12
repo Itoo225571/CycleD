@@ -118,6 +118,9 @@ export default class StartScene extends Phaser.Scene {
         this.helpButton = this.add.sprite(this.cameras.main.width - 100, 80, 'inputPrompts', 436)
             .setDisplaySize(72, 72)
             .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => {
+                this.sound.add('buttonSoftSound',{volume: 1.2}).play();
+            })
             .on('pointerdown', this.showHelpText.bind(this));
         // ホバー時の色変更（マウスオーバー）
         this.helpButton.on('pointerover', () => {

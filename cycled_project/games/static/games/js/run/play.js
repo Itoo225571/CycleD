@@ -85,6 +85,10 @@ export default class PlayScene extends Phaser.Scene {
                             .setScrollFactor(0)
                             .setDisplaySize(64,64)
                             .setInteractive({ useHandCursor: true })
+                            .on('pointerdown', () => {
+                                const sound = this.sound.add('pauseSound');
+                                sound.play();
+                            })
                             .setDepth(100);
         this.pauseButton.on('pointerdown', this.pauseGame, this);
         window.addEventListener('blur', () => {
@@ -104,6 +108,51 @@ export default class PlayScene extends Phaser.Scene {
         // 音
         this.impactSound = this.sound.add('impactSound');
         this.fallingSound = this.sound.add('fallingSound');
+
+        // 説明
+        const centerX = this.scale.width / 2;
+        const centerY = this.scale.height / 2;
+        const spriteSize = 64;
+        const spacing = 16;
+
+        if (isMobile()) {
+            this.add.sprite(centerX, centerY, 'inputPrompts', 578)
+                .setDepth(10)
+                .setDisplaySize(spriteSize,spriteSize);
+            this.add.text(centerX + spriteSize * 1 + spacing, centerY, 'Jump', {
+                fontFamily: 'DTM-Sans',
+                fontSize: '48px',
+                fill: '#ffffff',
+                stroke: '#000000',
+                strokeThickness: 3
+            })
+            .setOrigin(0, 0.5) // 左寄せ + 縦中央揃え
+            .setDepth(10);
+        } else {
+            this.add.sprite(centerX, centerY, 'inputPrompts', 111)
+                .setDepth(10)
+                .setDisplaySize(spriteSize,spriteSize);
+            
+            const startX = centerX + spriteSize + spacing;
+            [507, 508, 509].forEach((frameIndex, i) => {
+                this.add.sprite(startX + i * spriteSize, centerY, 'inputPrompts', frameIndex)
+                    .setDisplaySize(spriteSize,spriteSize)
+                    .setDepth(10);
+            });
+            this.add.text(centerX + spriteSize * 4 + spacing, centerY, 'Jump', {
+                fontFamily: 'DTM-Sans',
+                fontSize: '48px',
+                fill: '#ffffff',
+                stroke: '#000000',
+                strokeThickness: 3
+            })
+            .setOrigin(0, 0.5) // 左寄せ + 縦中央揃え
+            .setDepth(10);
+        }
+        // モバイル判定関数
+        function isMobile() {
+            return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        }
 
         if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene'); 
     }

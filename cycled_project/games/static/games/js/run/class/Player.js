@@ -59,7 +59,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         this.just_jumped = false;
 
         // サウンド追加
-        this.jumpSound = this.scene.sound.add('jumpSound',{ volume: 0.3,});
+        this.jumpSound = this.scene.sound.add('jumpSound',{ volume: 0.4,});
 
         this.body.label = 'player';
     }

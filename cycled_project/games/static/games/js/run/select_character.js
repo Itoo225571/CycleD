@@ -48,18 +48,21 @@ export default class SelectCharacterScene extends Phaser.Scene {
         // 戻るボタン
         this.backButton = this.add.sprite(100, 80, 'inputPrompts', 608);  // (x, y, key, frame)
         // ボタンにインタラクションを追加（クリックイベント）
-        this.backButton.setDisplaySize(48 *3/2, 48);
-        this.backButton.setInteractive({ useHandCursor: true });
-        this.backButton.setFlipX(true);  // 水平方向に反転
-        this.backButton.on('pointerdown', this.goStart.bind(this));
-        // ホバー時の色変更（マウスオーバー）
-        this.backButton.on('pointerover', () => {
-            this.backButton.setTint(0x44ff44);  // ホバー時に緑色に変更
-        });
-        // ホバーを外した時の色を戻す（マウスアウト）
-        this.backButton.on('pointerout', () => {
-            this.backButton.clearTint();  // 色を元に戻す
-        });
+        this.backButton
+            .setDisplaySize(48 *3/2, 48)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => {
+                const sound = this.sound.add('buttonSoftSound',{volume: 1.2});
+                sound.play();
+            })
+            .setFlipX(true)  // 水平方向に反転
+            .on('pointerdown', this.goStart.bind(this))
+            .on('pointerover', () => {
+                this.backButton.setTint(0x44ff44);  // ホバー時に緑色に変更
+            })
+            .on('pointerout', () => {
+                this.backButton.clearTint();  // 色を元に戻す
+            });
     }
 
     updateData() {
@@ -258,6 +261,9 @@ export default class SelectCharacterScene extends Phaser.Scene {
                 .setScale(6)
                 .setDepth(selectedSprite.depth - 1)
                 .play('SelectAnim');
+
+            // 効果音
+            this.sound.add('selectedSound',{volume: 0.8}).play();
 
             appearingEffect.on('animationcomplete', () => {
                 appearingEffect.destroy();
