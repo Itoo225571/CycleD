@@ -41,6 +41,11 @@ MEDIA_URL="/media/"
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+    "https://localhost:8000",
+    "https://*.github.dev",
+]
 
 RATELIMIT_ENABLE = True
 RATELIMIT_USE_CACHE = "default"
