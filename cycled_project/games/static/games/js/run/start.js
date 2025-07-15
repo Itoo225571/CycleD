@@ -145,11 +145,27 @@ export default class StartScene extends Phaser.Scene {
             window.open('https://otologic.jp', '_blank');
         });
 
+        // bgm再生
+        // すでにBGMが再生中の場合は停止する
+        if (this.bgm && this.bgm.isPlaying) {
+            this.bgm.stop();
+        }
+        this.bgm = this.sound.add('bgmDrops', {
+                        loop: true,    // ループ再生する場合はtrue
+                        volume: 1.0,   // 音量（0.0〜1.0）
+                    });
+        // 1000ms (1秒) 待ってから BGM を再生
+        this.time.delayedCall(1000, () => {
+            this.bgm.play();
+        }, [], this);
+        this.sound.pauseOnBlur = false;
+
         // rankingSceneが起動中だったら停止する
         if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene');
     }
 
     goPlayScene() {
+        this.bgm.stop();    //bgmストップ
         this.scene.start('PlayScene');
     }
     goCharaSelectScene() {

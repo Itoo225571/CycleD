@@ -160,6 +160,19 @@ export default class PlayScene extends Phaser.Scene {
     update(time, delta) {
         if (this.isPaused) return;
 
+        // bgm再生
+        // すでにBGMが再生中の場合はそのまま
+        if (!(this.bgm && this.bgm.isPlaying)) {
+            this.bgm = this.sound.add('bgmRunning', {
+                            loop: true,    // ループ再生する場合はtrue
+                            volume: 0.5,   // 音量（0.0〜1.0）
+                        });
+            // 1000ms (1秒) 待ってから BGM を再生
+            this.time.delayedCall(500, () => {
+                this.bgm.play();
+            }, [], this);
+        }
+
         const Matter = Phaser.Physics.Matter.Matter;
 
         let cam = this.cameras.main;
@@ -306,6 +319,7 @@ export default class PlayScene extends Phaser.Scene {
         this.player.setVisible(true);
         this.player.setActive(false);
 
+        this.bgm.stop();
         this.player.anims.stop(); // アニメーション停止
         // フレーム指定でテクスチャを一時的に切り替え
         this.player.setTexture(this.player.playerName + 'Hit', 6); // 第2引数にフレーム番号（または名前）

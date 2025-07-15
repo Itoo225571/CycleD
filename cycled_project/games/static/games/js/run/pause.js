@@ -102,12 +102,16 @@ export default class PauseScene extends Phaser.Scene {
         this.scene.stop('PlayScene');
         // 自身（PauseScene）も停止
         this.scene.stop();
+        // bgm停止
+        this.PlayScene.bgm.stop();
         // PlayScene を最初から再スタート
         this.scene.start('PlayScene');
     }
     
     // 「Start画面」に戻る処理
     goStartScreen() {
+        // bgm停止
+        this.PlayScene.bgm.stop();
         this.scene.stop('PlayScene');
         this.scene.start('StartScene');
         this.scene.stop();  // 現在のシーンを停止

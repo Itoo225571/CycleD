@@ -7,6 +7,11 @@ export default class GameoverScene extends Phaser.Scene {
     }
 
     create() {
+        // PlayScene
+        this.PlayScene = this.scene.get('PlayScene');
+        // bgmストップ
+        this.PlayScene.bgm.stop();
+
         // 半透明の黒背景を作成（画面全体を覆う）
         const { width, height } = this.scale;
         this.overlay = this.add.rectangle(0, 0, width, height, 0x000000, 0.6)
