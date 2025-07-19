@@ -1,4 +1,5 @@
 import { gameOptions } from './config.js';
+import BgmManager from './BgmManager.js';
 
 export default class PreloadScene extends Phaser.Scene {
     constructor() {
@@ -171,7 +172,13 @@ export default class PreloadScene extends Phaser.Scene {
 
         // bgm読み込み
         this.load.audio('bgmDrops', `${soundDir}/bgm/drops.mp3`);
-        this.load.audio('bgmRunning', `${soundDir}/bgm/running.wav`);
+        this.load.audio('bgmRunning', `${soundDir}/bgm/running.mp3`);
+        this.load.audio('bgmGameOver', `${soundDir}/bgm/game_over.mp3`);
+        // 一度だけグローバルにBGMマネージャを登録
+        if (!this.registry.get('bgmManager')) {
+            const bgmManager = new BgmManager(this);
+            this.registry.set('bgmManager', bgmManager);
+        }
 
         // map読み込み
         this.loadMap();
@@ -214,7 +221,7 @@ export default class PreloadScene extends Phaser.Scene {
             var players = data.players;
             var key = data.user_info.character_last;
             this.registry.set('selectedCharacter', players[key]);   // 前回使用したキャラをセット
-            this.scene.start('StartScene');
+            this.scene.start('PreStartScene');
         });   
     }
 

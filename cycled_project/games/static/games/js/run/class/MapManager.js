@@ -514,7 +514,7 @@ export default class MapManager {
         const itemName = item.texture.key;
         switch (itemName) {
             case 'coin_bronze':
-                player.chargeBar.chargeUp(0.05);
+                player.chargeBar.chargeUp(0.03);
                 player.coin_bronze += 1;    // bronzeコイン加算
                 this.coinSound.play();  // 音声再生
                 break;

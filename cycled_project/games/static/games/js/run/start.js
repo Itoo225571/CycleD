@@ -7,6 +7,7 @@ export default class StartScene extends Phaser.Scene {
 
     create() {
         this.titleReady = false;  // ← アニメーション完了フラグ
+        this.input.setDefaultCursor('default');     // カーソルを戻す
 
         var TITLE_NAME = 'NIKI  RUN';
         // フェードインしつつ、ゆっくり上下に浮かぶ
@@ -146,17 +147,10 @@ export default class StartScene extends Phaser.Scene {
         });
 
         // bgm再生
-        // すでにBGMが再生中の場合は停止する
-        if (this.bgm && this.bgm.isPlaying) {
-            this.bgm.stop();
-        }
-        this.bgm = this.sound.add('bgmDrops', {
-                        loop: true,    // ループ再生する場合はtrue
-                        volume: 1.0,   // 音量（0.0〜1.0）
-                    });
+        this.bgmManager = this.registry.get('bgmManager');
         // 1000ms (1秒) 待ってから BGM を再生
-        this.time.delayedCall(1000, () => {
-            this.bgm.play();
+        this.time.delayedCall(500, () => {
+            this.bgmManager.play('bgmDrops');
         }, [], this);
         this.sound.pauseOnBlur = false;
 
@@ -165,7 +159,7 @@ export default class StartScene extends Phaser.Scene {
     }
 
     goPlayScene() {
-        this.bgm.stop();    //bgmストップ
+        this.bgmManager.stop();
         this.scene.start('PlayScene');
     }
     goCharaSelectScene() {

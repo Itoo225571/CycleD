@@ -5,6 +5,7 @@ import RankingScene from './ranking.js';
 import PauseScene from './pause.js'
 import GameoverScene from './gameover.js';
 import SelectCharacterScene from './select_character.js';
+import PreStartScene from './prestart.js';
 
 export const gameOptions = {
     garavityForce: 3,
@@ -26,7 +27,7 @@ export const gameConfig = {
     pixelArt: true,
     scene: [
         PreloadScene, 
-        StartScene, PlayScene, RankingScene, SelectCharacterScene,
+        PreStartScene, StartScene, PlayScene, RankingScene, SelectCharacterScene,
         PauseScene , GameoverScene, 
     ], // シーンの順番
     backgroundColor: 0x444444,

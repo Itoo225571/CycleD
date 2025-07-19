@@ -9,8 +9,11 @@ export default class GameoverScene extends Phaser.Scene {
     create() {
         // PlayScene
         this.PlayScene = this.scene.get('PlayScene');
-        // bgmストップ
-        this.PlayScene.bgm.stop();
+        // bgm
+        this.bgmManager = this.registry.get('bgmManager');
+        this.time.delayedCall(500, () => {
+            this.bgmManager.play('bgmGameOver');
+        }, [], this);
 
         // 半透明の黒背景を作成（画面全体を覆う）
         const { width, height } = this.scale;
@@ -201,6 +204,8 @@ export default class GameoverScene extends Phaser.Scene {
     }
 
     rePlayGame() {
+        // bgm停止
+        this.bgmManager.stop();
         // 現在のプレイシーンを完全に停止して初期化
         this.scene.stop('PlayScene');
         // 自身も停止
@@ -211,6 +216,8 @@ export default class GameoverScene extends Phaser.Scene {
     
     // 「Start画面」に戻る処理
     goStartScreen() {
+        // bgm停止
+        this.bgmManager.stop();
         this.scene.stop('PlayScene');
         this.scene.start('StartScene');
         this.scene.stop();  // 現在のシーンを停止
@@ -230,6 +237,11 @@ export default class GameoverScene extends Phaser.Scene {
 
     onBringToTop(post_score = false) {
         if (!this.isReady)  return;
+
+        // bgm
+        this.time.delayedCall(500, () => {
+            this.bgmManager.play('bgmGameOver');
+        }, [], this);
 
         this.gameoverBtns?.forEach(btn => btn.container.setVisible(true));
         this.overlay?.setVisible(true);

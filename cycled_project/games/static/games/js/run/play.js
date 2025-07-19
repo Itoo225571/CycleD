@@ -154,24 +154,17 @@ export default class PlayScene extends Phaser.Scene {
             return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         }
 
+        // bgm
+        this.bgmManager = this.registry.get('bgmManager');
+        this.time.delayedCall(500, () => {
+            this.bgmManager.play('bgmRunning');
+        }, [], this);
+
         if (this.scene.isActive('RankingScene')) this.scene.stop('RankingScene'); 
     }
 
     update(time, delta) {
         if (this.isPaused) return;
-
-        // bgm再生
-        // すでにBGMが再生中の場合はそのまま
-        if (!(this.bgm && this.bgm.isPlaying)) {
-            this.bgm = this.sound.add('bgmRunning', {
-                            loop: true,    // ループ再生する場合はtrue
-                            volume: 0.5,   // 音量（0.0〜1.0）
-                        });
-            // 1000ms (1秒) 待ってから BGM を再生
-            this.time.delayedCall(500, () => {
-                this.bgm.play();
-            }, [], this);
-        }
 
         const Matter = Phaser.Physics.Matter.Matter;
 
@@ -235,7 +228,6 @@ export default class PlayScene extends Phaser.Scene {
             halfHeart.play('heartHalfAnim');
             this.heartIcons.push(halfHeart);
         }
-
     }
 
     losingLife(preHearts, currentHearts) {
@@ -288,7 +280,7 @@ export default class PlayScene extends Phaser.Scene {
             overlay.add(scene.heartsOverlay);
             if(vibration) {
                 scene.impactSound.play();  // 音声再生
-                camera.shake(300, 0.05);    // ハート消滅に合わせて振動
+                camera.shake(300, 0.1);    // ハート消滅に合わせて振動
             }
         }
     }
@@ -319,8 +311,8 @@ export default class PlayScene extends Phaser.Scene {
         this.player.setVisible(true);
         this.player.setActive(false);
 
-        this.bgm.stop();
-        this.player.anims.stop(); // アニメーション停止
+        this.bgmManager.stop();     // bgm停止
+        this.player.anims.stop();   // アニメーション停止
         // フレーム指定でテクスチャを一時的に切り替え
         this.player.setTexture(this.player.playerName + 'Hit', 6); // 第2引数にフレーム番号（または名前）
         this.player.setDepth(10);   //この時だけ最前線で表示
@@ -386,6 +378,10 @@ export default class PlayScene extends Phaser.Scene {
         this.isPaused = false;
         this.input.enabled = true;
         this.matter.world.resume();
+
+        this.time.delayedCall(500, () => {
+            this.bgmManager.play('bgmRunning');
+        }, [], this);
     }
     rePlayGame() {
         this.scene.restart();
