@@ -31,6 +31,7 @@ export default class PreStartScene extends Phaser.Scene {
         // 画面のどこでもクリックで遷移
         this.input.once('pointerdown', () => {
             this.sound.play('buttonHardSound',{volume: 1.2});
+            if (!this.scale.isFullscreen)   this.scale.startFullscreen();
             this.scene.start('StartScene');
         });
     }

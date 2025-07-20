@@ -24,6 +24,10 @@ export const gameConfig = {
     type: Phaser.AUTO,
     width: 1334,
     height: 750,
+        scale: {
+        mode: Phaser.Scale.FIT,               // 画面にフィットさせる
+        autoCenter: Phaser.Scale.CENTER_BOTH  // 中央に配置
+    },
     pixelArt: true,
     scene: [
         PreloadScene, 

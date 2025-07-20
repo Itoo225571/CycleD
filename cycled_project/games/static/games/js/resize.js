@@ -1,43 +1,61 @@
-export function checkGameSize(game) {
+function isFullscreen() {
+    return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+}
+
+function isMobile() {
+    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+}
+
+export function resize(game) {
     const $game_container = $('#game-container');
-    // const $lock = $('#orientation-lock');
-    const $canvas = $("canvas");
+    const $canvas = $('canvas');
 
-    // モバイル判定関数
-    function isMobile() {
-        return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    $game_container.removeClass('full-screen-container');
+    if (isMobile()) {
+        $game_container.addClass('full-screen-container');
     }
 
-    function resize() {
-        $game_container.removeClass('full-screen-container');  //一旦取り外す
-        if (isMobile()) {
-            $game_container.addClass('full-screen-container');     //フルスクリーン表示用のクラス
-        }
+    const containerWidth = $game_container.width();
+    const containerHeight = $game_container.height();
+    const containerRatio = containerWidth / containerHeight;
+    const gameRatio = game.config.width / game.config.height;
 
-        let containerWidth = $game_container.width();
-        let containerHeight = $game_container.height();
-        let containerRatio = containerWidth / containerHeight;
-        let gameRatio = game.config.width / game.config.height;
-        // サイズ調整: コンテナから溢れないように
+    let newWidth, newHeight;
+
+    if (isFullscreen()) {
         if (containerRatio < gameRatio) {
-            $canvas.css({
-                width: containerWidth + "px",
-                height: (containerWidth / gameRatio) + "px"
-            });
+            newWidth = containerWidth;
+            newHeight = containerWidth / gameRatio;
         } else {
-            $canvas.css({
-                width: (containerHeight * gameRatio) + "px",
-                height: containerHeight + "px"
-            });
+            newHeight = containerHeight;
+            newWidth = containerHeight * gameRatio;
         }
+    } else {
+        const maxWidth = 800;
+        const maxHeight = 450;
 
-        // $lock.hide();
-        $game_container.show();
-        
-        if (game && game.scene && game.scene.isPaused()) {
-            game.scene.resume();
+        if (containerRatio < gameRatio) {
+            newWidth = Math.min(containerWidth, maxWidth);
+            newHeight = newWidth / gameRatio;
+        } else {
+            newHeight = Math.min(containerHeight, maxHeight);
+            newWidth = newHeight * gameRatio;
         }
     }
-    resize();
-    $(window).on('resize',resize);
+
+    const marginLeft = (containerWidth - newWidth) / 2;
+    const marginTop = (containerHeight - newHeight) / 2;
+
+    $canvas.css({
+        width: newWidth + "px",
+        height: newHeight + "px",
+        marginLeft: marginLeft + "px",
+        marginTop: marginTop + "px"
+    });
+
+    $game_container.show();
+
+    if (game && game.scene && game.scene.isPaused()) {
+        game.scene.resume();
+    }
 }
