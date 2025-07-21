@@ -205,11 +205,13 @@ class ChargeBar {
         this.chargeBar = chargeBar;
 
         this.maxWidth = bgBar.width;
-        this.charge = 0;     // 現在のチャージ量（0〜1）
-        this.speed = 0.01;   // チャージ速度
+        this.charge = 0;        // 現在のチャージ量（0〜1）
+        this.speed = 0.01;      // チャージ速度
     }
 
     chargeUp(amount = this.speed) {
+        if (this.player.onSkill)   return;
+        
         this.charge = Phaser.Math.Clamp(this.charge + amount, 0, 1);
         this.chargeBar.width = this.maxWidth * this.charge;
         if (this.charge >= 1)   this.onChargeFull();
