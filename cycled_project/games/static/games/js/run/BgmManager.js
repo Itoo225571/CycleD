@@ -52,4 +52,11 @@ export default class BgmManager {
             this.currentBgm.setVolume(volume);
         }
     }
+
+    // 速度変更
+    setRate(rate) {
+        if (this.currentBgm) {
+            this.currentBgm.setRate(rate);
+        }
+    }    
 }

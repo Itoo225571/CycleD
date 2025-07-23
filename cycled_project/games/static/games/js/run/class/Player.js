@@ -225,6 +225,11 @@ class ChargeBar {
         // if (this.player.onSkill)   return;
         
         this.player.onSkill = true;
+
+        // bgm加速
+        const bgmManager = this.scene.registry.get('bgmManager');
+        bgmManager.setRate(1.2);
+
         if (this.player.chargeSkill) this.player.chargeSkill(this.player,this.scene);
         this.player.emit('chargeFull'); // 外部でも監視可能
     }
@@ -253,6 +258,7 @@ export const chargeSkillTable = {
 };
 
 function createSkillEndEvent(player, skillTime, isDeadTriggered=true, func) {
+    const bgmManager = player.scene.registry.get('bgmManager');
     if (player.skillEndEvent) return;
 
     player.onSkill = true;
@@ -261,11 +267,55 @@ function createSkillEndEvent(player, skillTime, isDeadTriggered=true, func) {
         if (isDeadTriggered || timer) func();
         player.skillEndEvent = null;
         player.onSkill = false;
+        bgmManager.setRate(1.0);
     };
 
+    // ⏱️ スキル終了3秒前に点滅開始
+    const blinkStartTime = Math.max(0, skillTime - 3) * 1000;
+    player.skillBlinkEvent = player.scene.time.delayedCall(blinkStartTime, () => {
+        startBlinking(player);
+    });
+
+    // ⏲️ スキル終了タイマー
     player.skillEndEvent = setTimeout(() => {
+        stopBlinking(player);  // 点滅終了
         player._onSkillEnd(true);
     }, skillTime * 1000);
+
+    // 点滅関数
+    function startBlinking(player) {
+        if (player.skillBlinkTween) return;
+    
+        player.skillBlinkTween = player.scene.tweens.add({
+            targets: player,
+            alpha: { from: 1, to: 0 },
+            duration: 250,
+            ease: 'Linear',
+            yoyo: true,
+            repeat: -1
+        });
+
+        // 🔔 アラームループ再生（点滅中ずっと）
+        if (!player.alarmSound) {
+            player.alarmSound = player.scene.sound.add('alarmSound', { loop: true });
+            player.alarmSound.play();
+        }
+    }
+    // 点滅STOP関数
+    function stopBlinking(player) {
+        if (player.skillBlinkTween) {
+            player.skillBlinkTween.stop();
+            player.skillBlinkTween = null;
+            player.setAlpha(1);  // アルファ値を戻す
+        }
+        // アラーム
+        if (player.alarmSound) {
+            player.alarmSound.stop();
+            player.alarmSound.destroy();  // メモリ解放（任意）
+            player.alarmSound = null;
+        }
+    }
+    
 }
 
 function skillStartDefenceBoost(player, scene) {
