@@ -103,28 +103,41 @@ export default class StartScene extends Phaser.Scene {
 
         // 戻るボタン
         // 影
-        this.backButtonShadow = this.add.sprite(100 + 4, 80 + 4, 'inputPrompts', 608)
-            .setDisplaySize(48 * 3 / 2, 48)
+        this.backButtonShadow = this.add.sprite(100 + 4, 80 + 4, 'inputPrompts', 729)
+            .setDisplaySize(72,72)
             .setFlipX(true)
             .setTint(0x000000)
             .setAlpha(0.75);
         // 本体
-        this.backButton = this.add.sprite(100, 80, 'inputPrompts', 608)
-            .setDisplaySize(48 * 3 / 2, 48)
+        this.backButton = this.add.sprite(100, 80, 'inputPrompts', 729)
+            .setDisplaySize(72,72)
             .setInteractive({ useHandCursor: true })
             .setFlipX(true)
             .on('pointerdown', this.goBackCycleD.bind(this));
 
         // ホバー時の色変更（マウスオーバー）
         this.backButton.on('pointerover', () => {
-            this.backButton.setTint(0x44ff44);  // ホバー時に緑色に変更
+            this.backButton.setTint(0x888888);  // ホバー時に変更
         });
         this.backButton.on('pointerout', () => {
             this.backButton.clearTint();  // 色を元に戻す
         });
 
+        // 設定ボタン
+        this.settingsButton = this.add.sprite(this.cameras.main.width - 100, 80, 'settings')
+            .setDisplaySize(72, 72)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => {
+                this.sound.add('buttonSoftSound',{volume: 1.2}).play();
+            })
+
         // helpボタン
-        this.helpButton = this.add.sprite(this.cameras.main.width - 100, 80, 'inputPrompts', 436)
+        this.helpButtonShadow = this.add.sprite(this.cameras.main.width - 200, 80, 'inputPrompts', 436)
+            .setDisplaySize(72,72)
+            .setFlipX(true)
+            .setTint(0x000000)
+            .setAlpha(0.75);
+        this.helpButton = this.add.sprite(this.cameras.main.width - 200, 80, 'inputPrompts', 436)
             .setDisplaySize(72, 72)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
