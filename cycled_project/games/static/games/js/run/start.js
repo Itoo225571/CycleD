@@ -102,11 +102,19 @@ export default class StartScene extends Phaser.Scene {
         }
 
         // 戻るボタン
-        this.backButton = this.add.sprite(100, 80, 'inputPrompts', 608)  // (x, y, key, frame)
-            .setDisplaySize(48 *3/2, 48)
+        // 影
+        this.backButtonShadow = this.add.sprite(100 + 4, 80 + 4, 'inputPrompts', 608)
+            .setDisplaySize(48 * 3 / 2, 48)
+            .setFlipX(true)
+            .setTint(0x000000)
+            .setAlpha(0.75);
+        // 本体
+        this.backButton = this.add.sprite(100, 80, 'inputPrompts', 608)
+            .setDisplaySize(48 * 3 / 2, 48)
             .setInteractive({ useHandCursor: true })
             .setFlipX(true)
             .on('pointerdown', this.goBackCycleD.bind(this));
+
         // ホバー時の色変更（マウスオーバー）
         this.backButton.on('pointerover', () => {
             this.backButton.setTint(0x44ff44);  // ホバー時に緑色に変更

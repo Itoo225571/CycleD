@@ -204,6 +204,9 @@ export function createPopupWindow(scene, option) {
         // transparent = false,
         showCoin = false,
         coinCount = 0,
+        closeOnOutsideClick= true,  // デフォルト true
+        outsideClickAsCancel= true, // デフォルト true
+
     } = option;
 
     const container = scene.add.container(x, y);
@@ -282,6 +285,19 @@ export function createPopupWindow(scene, option) {
         .setOrigin(0)
         .setInteractive()
         .setDepth(999);
+    if (closeOnOutsideClick !== false) {
+        blocker.on('pointerdown', () => {
+            const sound = scene.sound.add('buttonHardSound', { volume: 1.0 });
+            sound.play();
+            if (outsideClickAsCancel !== false && showCancel) {
+                onCancel();
+            } else {
+                onOK();
+            }
+            closePopup();
+        });
+    }
+    
 
     // Coin 追加
     if (showCoin) {

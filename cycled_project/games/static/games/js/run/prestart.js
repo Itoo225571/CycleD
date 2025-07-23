@@ -30,9 +30,28 @@ export default class PreStartScene extends Phaser.Scene {
 
         // 画面のどこでもクリックで遷移
         this.input.once('pointerdown', () => {
+            if (isMobile()) {
+                // タップで全画面化・アドレスバー非表示誘導
+                this.input.once('pointerdown', () => {
+                    if (!this.scale.isFullscreen) {
+                        this.scale.startFullscreen();
+                    }
+                    // スクロールでアドレスバー隠す
+                    window.scrollTo(0, 1);
+                });
+                // リサイズ時にもスクロールしてアドレスバー非表示誘導
+                window.addEventListener('resize', () => {
+                    window.scrollTo(0, 1);
+                });
+            }
+
             this.sound.play('buttonHardSound',{volume: 1.2});
             this.scene.start('StartScene');
         });
     }
 }
-  
+
+// モバイル判定関数
+function isMobile() {
+    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+}
