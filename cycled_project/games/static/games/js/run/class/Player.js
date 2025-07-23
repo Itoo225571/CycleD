@@ -263,13 +263,12 @@ function createSkillEndEvent(player, skillTime, isDeadTriggered=true, func) {
     const bgmManager = player.scene.registry.get('bgmManager');
     if (player.skillEndEvent) return;
 
-    player.onSkill = true;
-
     player._onSkillEnd = (timer=false) => {
         if (isDeadTriggered || timer) func();
         player.skillEndEvent = null;
         player.onSkill = false;
         bgmManager.setRate(1.0);
+        stopBlinking(player);  // 点滅終了
     };
 
     // ⏱️ スキル終了3秒前に点滅開始
@@ -280,7 +279,6 @@ function createSkillEndEvent(player, skillTime, isDeadTriggered=true, func) {
 
     // ⏲️ スキル終了タイマー
     player.skillEndEvent = setTimeout(() => {
-        stopBlinking(player);  // 点滅終了
         player._onSkillEnd(true);
     }, skillTime * 1000);
 
