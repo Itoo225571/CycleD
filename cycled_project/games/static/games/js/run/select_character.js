@@ -6,6 +6,10 @@ export default class SelectCharacterScene extends Phaser.Scene {
     }
 
     create() {
+        // 音
+        this.bgmManager = this.registry.get('bgmManager');
+        this.sfxManager = this.registry.get('sfxManager');
+
         this.updateData();
 
         this.centerX = this.cameras.main.width / 2;
@@ -52,8 +56,7 @@ export default class SelectCharacterScene extends Phaser.Scene {
             .setDisplaySize(48 *3/2, 48)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                const sound = this.sound.add('buttonSoftSound',{volume: 1.2});
-                sound.play();
+                this.sfxManager.play('buttonSoftSound');
             })
             .setFlipX(true)  // 水平方向に反転
             .on('pointerdown', this.goStart.bind(this))
@@ -263,7 +266,7 @@ export default class SelectCharacterScene extends Phaser.Scene {
                 .play('SelectAnim');
 
             // 効果音
-            this.sound.add('selectedSound',{volume: 0.8}).play();
+            this.sfxManager.play('selectedSound')
 
             appearingEffect.on('animationcomplete', () => {
                 appearingEffect.destroy();

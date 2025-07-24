@@ -21,7 +21,6 @@ function createFrame(scene, container, widthInTiles, heightInTiles, imgKey, bord
     return container;
 }
 
-
 export function createMsgWindow(scene, message = '', delay = 0, option={}) {
     const info = {
         x: option.x || 0,
@@ -151,14 +150,16 @@ export function createBtn(x, y, scene, content, option = {}) {
         container.add(text);
     }
 
+    // 効果音
+    const sfxManager = scene.sfxManager;
+
     // ヒットエリア（透明）
     const buttonColor = info.btnColor;
     const hitArea = scene.add.rectangle(0, 0, info.btnWidth * per_length, info.btnHeight * per_length, buttonColor, 0);
     hitArea.setOrigin(0);
     hitArea.setInteractive({ useHandCursor: true })
         .on('pointerdown', () => {
-            const sound = scene.sound.add(info.btnSound,{volume: 1.0});
-            sound.play();
+            sfxManager.play(info.btnSound)
         });
 
     hitArea.on('pointerover', () => container.setAlpha(0.3));
@@ -170,6 +171,9 @@ export function createBtn(x, y, scene, content, option = {}) {
 }
 
 export function createPopupWindow(scene, option) {
+    // 効果音
+    const sfxManager = scene.sfxManager;
+
     // キューと状態の初期化（初回だけ）
     if (!scene.__popupState) {
         scene.__popupState = {
@@ -214,7 +218,9 @@ export function createPopupWindow(scene, option) {
     // const tileName = transparent? 'msgWindowTileTransparent': 'msgWindowTile';
     const tileName = 'msgWindowTileBorder';
     // 黒い背景をまず描く
-    const bgRect = scene.add.rectangle(0, 0, width, height, 0x000000, 1).setOrigin(0.5);
+    const bgRect = scene.add.rectangle(0, 0, width, height, 0x000000, 1)
+        .setOrigin(0.5)
+        .setInteractive();  //クリック無効
     container.add(bgRect);
     // 白いボーダーのみを持つ ninePatch を重ねる
     const frame = scene.rexUI.add.ninePatch2({
@@ -225,7 +231,9 @@ export function createPopupWindow(scene, option) {
         key: tileName,
         columns: [16, undefined, 16],
         rows: [16, undefined, 16]
-    }).setOrigin(0.5);
+    })
+        .setOrigin(0.5)
+        .setInteractive();  // クリック無効
     container.add(frame);
 
     const headerText = scene.rexUI.add.BBCodeText(0, -height / 2 + 48, header, {
@@ -250,8 +258,7 @@ export function createPopupWindow(scene, option) {
 
     var btnHeight = height / 2 - 64 - 16;
     const okButton = createButton(scene, okText, () => {
-        const sound = scene.sound.add('buttonSoftSound',{volume: 1.1});
-        sound.play();
+        sfxManager.play('buttonSoftSound')
         onOK();
         closePopup();
     }, showCancel ? -130 : 0, btnHeight, 'white');
@@ -260,8 +267,7 @@ export function createPopupWindow(scene, option) {
     let cancelButton = null;
     if (showCancel) {
         cancelButton = createButton(scene, cancelText, () => {
-            const sound = scene.sound.add('buttonHardSound',{volume: 1.0});
-            sound.play();
+            sfxManager.play('buttonHardSound');
             onCancel();
             closePopup();
         }, 130, btnHeight, 'white');
@@ -287,8 +293,7 @@ export function createPopupWindow(scene, option) {
         .setDepth(999);
     if (closeOnOutsideClick !== false) {
         blocker.on('pointerdown', () => {
-            const sound = scene.sound.add('buttonHardSound', { volume: 1.0 });
-            sound.play();
+            sfxManager.play('buttonHardSound');
             if (outsideClickAsCancel !== false && showCancel) {
                 onCancel();
             } else {

@@ -9,8 +9,9 @@ export default class GameoverScene extends Phaser.Scene {
     create() {
         // PlayScene
         this.PlayScene = this.scene.get('PlayScene');
-        // bgm
+        // 音
         this.bgmManager = this.registry.get('bgmManager');
+        this.sfxManager = this.registry.get('sfxManager');
         this.time.delayedCall(500, () => {
             this.bgmManager.play('bgmGameOver');
         }, [], this);

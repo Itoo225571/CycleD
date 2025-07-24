@@ -40,6 +40,13 @@ class NIKIRunScore(ScoreBase):
                 'character': f"'{self.character}' は無効なキャラクターです"
             })
         
+def default_game_options():
+    return {
+        "masterVolume": 1.0,
+        "bgmVolume": 1.0,
+        "sfxVolume": 1.0,
+        "fullscreen": False,
+    }
 class NIKIRunUserInfo(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -47,6 +54,7 @@ class NIKIRunUserInfo(models.Model):
     owned_characters = models.JSONField(default=default_owned_characters)               # 許可されたキャラ
     bronze_coin = models.IntegerField(default=0, validators=[MinValueValidator(0)])     # 集められる銅コイン枚数
     character_last = models.CharField(max_length=16, default=DEFAULT_CHARACTER)         # 最後に選択したキャラ
+    options = models.JSONField(default=default_game_options)                            # オプション
 
     def clean(self):
         super().clean()

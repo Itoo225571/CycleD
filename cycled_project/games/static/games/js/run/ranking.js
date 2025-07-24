@@ -7,6 +7,10 @@ export default class RankingScene extends Phaser.Scene {
     }
 
     create() {
+        // 音
+        this.bgmManager = this.registry.get('bgmManager');
+        this.sfxManager = this.registry.get('sfxManager');
+
         // 戻るボタン
         this.backButton = this.add.sprite(100, 80, 'inputPrompts', 608);  // (x, y, key, frame)
         // ボタンにインタラクションを追加（クリックイベント）
@@ -14,8 +18,7 @@ export default class RankingScene extends Phaser.Scene {
             .setDisplaySize(48 *3/2, 48)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                const sound = this.sound.add('buttonSoftSound',{volume: 1.2});
-                sound.play();
+                this.sfxManager.play('buttonSoftSound')
             })
             .setFlipX(true)  // 水平方向に反転
             .on('pointerdown', this.goBackScene.bind(this))

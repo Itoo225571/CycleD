@@ -6,6 +6,10 @@ export default class StartScene extends Phaser.Scene {
     }
 
     create() {
+        // 音
+        this.bgmManager = this.registry.get('bgmManager');
+        this.sfxManager = this.registry.get('sfxManager');
+
         this.titleReady = false;  // ← アニメーション完了フラグ
         this.input.setDefaultCursor('default');     // カーソルを戻す
 
@@ -128,7 +132,7 @@ export default class StartScene extends Phaser.Scene {
             .setDisplaySize(72, 72)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                this.sound.add('buttonSoftSound',{volume: 1.2}).play();
+                this.sfxManager.play('buttonSoftSound');
             })
 
         // helpボタン
@@ -141,7 +145,7 @@ export default class StartScene extends Phaser.Scene {
             .setDisplaySize(72, 72)
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
-                this.sound.add('buttonSoftSound',{volume: 1.2}).play();
+                this.sfxManager.play('buttonSoftSound');
             })
             .on('pointerdown', this.showHelpText.bind(this));
         // ホバー時の色変更（マウスオーバー）

@@ -1,5 +1,7 @@
 import { gameOptions } from './config.js';
-import BgmManager from './BgmManager.js';
+import BgmManager from './class/BgmManager.js';
+import SfxManager from './class/SfxManager.js';
+import { PlayerOptions } from './class/PlayerOptions.js';
 
 export default class PreloadScene extends Phaser.Scene {
     constructor() {
@@ -176,11 +178,6 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.audio('bgmDrops', `${soundDir}/bgm/drops.mp3`);
         this.load.audio('bgmRunning', `${soundDir}/bgm/running.mp3`);
         this.load.audio('bgmGameOver', `${soundDir}/bgm/game_over.mp3`);
-        // 一度だけグローバルにBGMマネージャを登録
-        if (!this.registry.get('bgmManager')) {
-            const bgmManager = new BgmManager(this);
-            this.registry.set('bgmManager', bgmManager);
-        }
 
         // map読み込み
         this.loadMap();
@@ -367,7 +364,21 @@ export default class PreloadScene extends Phaser.Scene {
                 this.registry.set('userInfo', data.user_info);
                 this.registry.set('scoreData', data.score);
 
-                this.events.emit('gameDataLoaded', data);
+                // optionをレジストリに保存
+                const options = new PlayerOptions(data.user_info.options);
+                this.registry.set('playerOptions', options);
+                // 一度だけグローバルにBGMマネージャを登録
+                if (!this.registry.get('bgmManager')) {
+                    const bgmManager = new BgmManager(this,options);
+                    this.registry.set('bgmManager', bgmManager);
+                }
+                // 一度だけグローバルに効果音マネージャを登録
+                if (!this.registry.get('sfxManager')) {
+                    const sfxManager = new SfxManager(this,options);
+                    this.registry.set('sfxManager', sfxManager);
+                }
+
+                this.events.emit('gameDataLoaded', data);   // 合図
             },
             // preload時点でのエラーならalertでいいんじゃないかな
             error: function(xhr, status, error) {

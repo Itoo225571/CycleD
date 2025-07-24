@@ -17,7 +17,7 @@ export const gameOptions = {
     maxSpeed: 10,   // 暫定最大速度
     tilesets: [
         { nameInTiled: 'Tiles1', textureKey: 'Tiles1' },
-    ]
+    ],
 };
 
 export const gameConfig = {

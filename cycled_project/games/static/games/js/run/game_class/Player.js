@@ -59,7 +59,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         this.just_jumped = false;
 
         // サウンド追加
-        this.jumpSound = this.scene.sound.add('jumpSound',{ volume: 0.4,});
+        this.sfxManager = this.scene.registry.get('sfxManager');  // 効果音
 
         this.body.label = 'player';
     }
@@ -116,7 +116,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         if (this.jump_count < this.jumps) {
             // Matterでは setVelocityY はないので force を使う方が自然
             this.setVelocityY(-Math.abs(this.jumpForce)); // jumpForce を適度に調整
-            if(!onObject)   this.jumpSound.play();  // 音声再生
+            if(!onObject)   this.sfxManager.play('jumpSound');
 
             if (isGrounded) {
                 this.anims.play(this.playerName + 'Jump', true);
@@ -261,6 +261,7 @@ export const chargeSkillTable = {
 
 function createSkillEndEvent(player, skillTime, isDeadTriggered=true, func) {
     const bgmManager = player.scene.registry.get('bgmManager');
+    const sfxManager = player.scene.registry.get('sfxManager');
     if (player.skillEndEvent) return;
 
     player._onSkillEnd = (timer=false) => {
@@ -296,10 +297,7 @@ function createSkillEndEvent(player, skillTime, isDeadTriggered=true, func) {
         });
 
         // 🔔 アラームループ再生（点滅中ずっと）
-        if (!player.alarmSound) {
-            player.alarmSound = player.scene.sound.add('alarmSound', { loop: true });
-            player.alarmSound.play();
-        }
+        sfxManager.play('alarmSound', { loop: true })
     }
     // 点滅STOP関数
     function stopBlinking(player) {
@@ -309,11 +307,7 @@ function createSkillEndEvent(player, skillTime, isDeadTriggered=true, func) {
             player.setAlpha(1);  // アルファ値を戻す
         }
         // アラーム
-        if (player.alarmSound) {
-            player.alarmSound.stop();
-            player.alarmSound.destroy();  // メモリ解放（任意）
-            player.alarmSound = null;
-        }
+        sfxManager.stop('alarmSound');
     }
     
 }

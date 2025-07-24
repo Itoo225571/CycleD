@@ -6,6 +6,10 @@ export default class PauseScene extends Phaser.Scene {
     }
 
     create() {
+        // 音
+        this.bgmManager = this.registry.get('bgmManager');
+        this.sfxManager = this.registry.get('sfxManager');
+        
         // 半透明の黒背景を作成（画面全体を覆う）
         const { width, height } = this.scale;
         this.overlay = this.add.rectangle(0, 0, width, height, 0x000000, 0.6)

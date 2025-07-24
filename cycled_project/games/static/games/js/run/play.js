@@ -1,6 +1,6 @@
 import { gameOptions, CATEGORY } from './config.js';
-import { Player,chargeSkillTable } from './class/Player.js';
-import MapManager from './class/MapManager.js';
+import { Player,chargeSkillTable } from './game_class/Player.js';
+import MapManager from './game_class/MapManager.js';
 
 export default class PlayScene extends Phaser.Scene {
     constructor() {
@@ -8,6 +8,10 @@ export default class PlayScene extends Phaser.Scene {
     }
 
     create() {
+        // 音
+        this.bgmManager = this.registry.get('bgmManager');
+        this.sfxManager = this.registry.get('sfxManager');
+
         this.elapsedTime = 0;
         this.isPaused = false;
         this.score = 0;
@@ -86,8 +90,7 @@ export default class PlayScene extends Phaser.Scene {
                             .setDisplaySize(64,64)
                             .setInteractive({ useHandCursor: true })
                             .on('pointerdown', () => {
-                                const sound = this.sound.add('pauseSound');
-                                sound.play();
+                                this.sfxManager.play('pauseSound')
                             })
                             .setDepth(100);
         this.pauseButton.on('pointerdown', this.pauseGame, this);
@@ -155,7 +158,6 @@ export default class PlayScene extends Phaser.Scene {
         }
 
         // bgm
-        this.bgmManager = this.registry.get('bgmManager');
         this.time.delayedCall(500, () => {
             this.bgmManager.play('bgmRunning');
         }, [], this);
@@ -195,7 +197,7 @@ export default class PlayScene extends Phaser.Scene {
         const bottomBound = cam.scrollY + cam.height * 7 / 6;
         const outOfBounds = this.player.x < leftBound || this.player.y > bottomBound;
         if (outOfBounds) {
-            this.fallingSound.play();
+            this.sfxManager.play('fallingSound');
             this.loseLife(false);
         }
     }
@@ -279,8 +281,8 @@ export default class PlayScene extends Phaser.Scene {
             }
             overlay.add(scene.heartsOverlay);
             if(vibration) {
-                scene.impactSound.play();  // 音声再生
-                camera.shake(300, 0.1);    // ハート消滅に合わせて振動
+                scene.sfxManager.play('impactSound')    // 音声再生
+                camera.shake(300, 0.1);                 // ハート消滅に合わせて振動
             }
         }
     }

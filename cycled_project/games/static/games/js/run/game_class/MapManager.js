@@ -354,17 +354,17 @@ export default class MapManager {
             // player.setVelocityY(-player.jumpForce); // 上に弾む（速度を調整）
             player.jump_count = 0;
             player.jump(true);
-            enemyDead(this);
+            enemyDead(this.scene);
         } else if (player.invincible) {
-            enemyDead(this);   // playerが無敵状態
+            enemyDead(this.scene);   // playerが無敵状態
         } else {
-            this.damageSound.play();
+            this.scene.sfxManager.play('damageSound');
             this.scene.loseLife(true);     //ジャンプしながら消滅
         }
 
         function enemyDead(scene) {
             enemy.is_alive = false;
-            scene.stompSound.play();    // 音声
+            scene.sfxManager.play('stompSound'); // 音声
             // 敵を消すまたは反応させる場合
             enemy.setAlpha(0.7);
             enemy.play(enemy.name + 'Dead');
@@ -516,7 +516,7 @@ export default class MapManager {
             case 'coin_bronze':
                 player.chargeBar.chargeUp(0.03);
                 player.coin_bronze += 1;    // bronzeコイン加算
-                this.coinSound.play();  // 音声再生
+                this.scene.sfxManager.play('coinSound') // 音声再生
                 break;
         }
         item.setActive(false);
@@ -536,7 +536,7 @@ export default class MapManager {
                 if (player.invincible) {
                     if(!trap.body.isStatic)  trapDead();
                 } else {
-                    this.damageSound.play();
+                    this.scene.sfxManager.play('damageSound') // 音声再生
                     this.scene.loseLife(true);
                 }
                 break;

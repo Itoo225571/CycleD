@@ -4,6 +4,10 @@ export default class PreStartScene extends Phaser.Scene {
     }
   
     create() {
+        // 音
+        this.bgmManager = this.registry.get('bgmManager');
+        this.sfxManager = this.registry.get('sfxManager');
+
         const { width, height } = this.scale;
 
         this.input.setDefaultCursor('pointer');
@@ -45,7 +49,7 @@ export default class PreStartScene extends Phaser.Scene {
                 });
             }
 
-            this.sound.play('buttonHardSound',{volume: 1.2});
+            this.sfxManager.play('buttonHardSound')
             this.scene.start('StartScene');
         });
     }
