@@ -68,6 +68,15 @@ export default class BgmManager {
         }
     }
 
+    updateVolume() {
+        const baseVolume = this.volumeTable[this.currentKey] ?? 1.0;
+        const playerOptions = this.scene.registry.get('playerOptions');
+
+        if (this.currentBgm?.isPlaying) {
+            this.currentBgm.setVolume(playerOptions.get(baseVolume,'BGM'));
+        }
+    }   
+
     // 速度変更
     setRate(rate) {
         if (this.currentBgm) {

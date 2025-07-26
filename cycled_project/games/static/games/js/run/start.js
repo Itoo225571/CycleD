@@ -133,6 +133,7 @@ export default class StartScene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
                 this.sfxManager.play('buttonSoftSound');
+                this.goOptionsScene.bind(this)();
             })
 
         // helpボタン
@@ -202,6 +203,21 @@ export default class StartScene extends Phaser.Scene {
         RankingScene.onBringToTop?.();
         this.scene.bringToTop('RankingScene');
     }
+    goOptionsScene() {
+        if (!this.titleReady) return;
+    
+        this.title.setVisible(false);
+    
+        if (!this.scene.isActive('OptionsScene')) {
+            // 起動時に前シーン名を渡す（init で受け取る）
+            this.scene.launch('OptionsScene', { previousScene: 'StartScene' });
+        }
+    
+        const optionsScene = this.scene.get('OptionsScene');
+        optionsScene?.onBringToTop?.();  // オプション表示を更新
+        this.scene.bringToTop('OptionsScene');
+    }
+        
     onBringToTop() {
         this.title.setVisible(true);  //titleを見せる
     }

@@ -6,6 +6,7 @@ import PauseScene from './pause.js'
 import GameoverScene from './gameover.js';
 import SelectCharacterScene from './select_character.js';
 import PreStartScene from './prestart.js';
+import OptionsScene from './options.js';
 
 export const gameOptions = {
     garavityForce: 3,
@@ -26,7 +27,7 @@ export const gameConfig = {
     height: 750,
     pixelArt: true,
     scene: [
-        PreloadScene, 
+        PreloadScene, OptionsScene,
         PreStartScene, StartScene, PlayScene, RankingScene, SelectCharacterScene,
         PauseScene , GameoverScene, 
     ], // シーンの順番
