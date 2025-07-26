@@ -1,10 +1,9 @@
 // BgmManager.js
 export default class BgmManager {
-    constructor(scene, options) {
+    constructor(scene) {
         this.scene = scene;
         this.currentBgm = null;
         this.currentKey = null;
-        this.options = options;
 
         // 🔽 BGMごとの基準音量を定義（必要に応じて調整）
         this.volumeTable = {
@@ -17,6 +16,7 @@ export default class BgmManager {
     play(key, overrideVolume = null, config = { loop: true }) {
         const baseVolume = this.volumeTable[key] ?? 1.0;
         const rawVolume = overrideVolume ?? baseVolume;
+        const playerOptions = this.scene.registry.get('playerOptions');
 
         // すでに同じBGMが再生中ならスキップ
         if (this.currentKey === key && this.currentBgm?.isPlaying) {
@@ -31,7 +31,7 @@ export default class BgmManager {
         // BGMを新しく再生
         this.currentBgm = this.scene.sound.add(key, {
             ...config,
-            volume: this.options.get(rawVolume,'BGM'),    // 音量調節
+            volume: playerOptions.get(rawVolume,'BGM'),    // 音量調節
         });
     
         this.currentBgm.play();

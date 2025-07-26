@@ -369,12 +369,12 @@ export default class PreloadScene extends Phaser.Scene {
                 this.registry.set('playerOptions', options);
                 // 一度だけグローバルにBGMマネージャを登録
                 if (!this.registry.get('bgmManager')) {
-                    const bgmManager = new BgmManager(this,options);
+                    const bgmManager = new BgmManager(this);
                     this.registry.set('bgmManager', bgmManager);
                 }
                 // 一度だけグローバルに効果音マネージャを登録
                 if (!this.registry.get('sfxManager')) {
-                    const sfxManager = new SfxManager(this,options);
+                    const sfxManager = new SfxManager(this);
                     this.registry.set('sfxManager', sfxManager);
                 }
 

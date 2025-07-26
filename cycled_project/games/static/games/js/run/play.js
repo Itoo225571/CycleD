@@ -314,6 +314,8 @@ export default class PlayScene extends Phaser.Scene {
         this.player.setActive(false);
 
         this.bgmManager.stop();     // bgm停止
+        this.sfxManager.stopAll();     // 効果音停止
+        
         this.player.anims.stop();   // アニメーション停止
         // フレーム指定でテクスチャを一時的に切り替え
         this.player.setTexture(this.player.playerName + 'Hit', 6); // 第2引数にフレーム番号（または名前）

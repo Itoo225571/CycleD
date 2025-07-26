@@ -1,8 +1,7 @@
 export default class SfxManager {
-    constructor(scene, options) {
+    constructor(scene) {
         this.scene = scene;
         this.activeSFX = [];
-        this.options = options;
 
         // 🔽 SFXごとの基準音量を定義（必要に応じて調整）
         this.volumeTable = {
@@ -23,8 +22,9 @@ export default class SfxManager {
     play(key, options = {}) {
         const baseVolume = this.volumeTable[key] ?? 1.0;
         const rawVolume = options.volume ?? baseVolume;
+        const playerOptions = this.scene.registry.get('playerOptions');
     
-        const sfxVolume = this.options.get(rawVolume, 'SFX');
+        const sfxVolume = playerOptions.get(rawVolume, 'SFX');
     
         const sound = this.scene.sound.add(key);
         sound.play({
