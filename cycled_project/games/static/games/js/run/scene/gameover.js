@@ -1,4 +1,4 @@
-import { createBtn, createPopupWindow } from './drawWindow.js';
+import { createBtn, createPopupWindow } from '../drawWindow.js';
 
 export default class GameoverScene extends Phaser.Scene {
     constructor() {

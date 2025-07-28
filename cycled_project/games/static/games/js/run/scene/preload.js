@@ -1,7 +1,7 @@
-import { gameOptions } from './config.js';
-import BgmManager from './class/BgmManager.js';
-import SfxManager from './class/SfxManager.js';
-import { PlayerOptions } from './class/PlayerOptions.js';
+import { gameOptions } from '../config.js';
+import BgmManager from '../class/BgmManager.js';
+import SfxManager from '../class/SfxManager.js';
+import { PlayerOptions } from '../class/PlayerOptions.js';
 
 export default class PreloadScene extends Phaser.Scene {
     constructor() {

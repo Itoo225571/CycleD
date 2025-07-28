@@ -1,4 +1,4 @@
-import { createPopupWindow } from './drawWindow.js';
+import { createPopupWindow } from '../drawWindow.js';
 
 export default class OptionsScene extends Phaser.Scene {
     constructor() {
@@ -38,13 +38,14 @@ export default class OptionsScene extends Phaser.Scene {
         const { width, height } = this.scale;
         this.overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.5)
             .setScrollFactor(0)
-            .setDepth(-1);
+            .setDepth(-1)
+            .setInteractive();
 
         // インタラクションブロック用の透明なレイヤー
-        this.hitBlocker = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0)
-            .setScrollFactor(0)
-            .setDepth(-2)              // オーバーレイよりさらに後ろに置く場合はこれより小さい値に
-            .setInteractive();
+        // this.hitBlocker = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0)
+        //     .setScrollFactor(0)
+        //     .setDepth(-2)              // オーバーレイよりさらに後ろに置く場合はこれより小さい値に
+        //     .setInteractive();
 
         this.createDisplay();
         this.isReady = true;
@@ -54,6 +55,7 @@ export default class OptionsScene extends Phaser.Scene {
         // 非表示にする
         this.overlay.setVisible(false);  // オーバーレイを非表示にする
         this.panel.setVisible(false);
+        this.panelBackground.setVisible(false);
         this.optionsTitle.setVisible(false);
         this.backButton.setVisible(false);
     }
@@ -71,6 +73,7 @@ export default class OptionsScene extends Phaser.Scene {
 
         this.overlay.setVisible(true);
         this.panel.setVisible(true);
+        this.panelBackground.setVisible(true);
         this.optionsTitle.setVisible(true);
         this.backButton.setVisible(true);
 
@@ -103,7 +106,7 @@ export default class OptionsScene extends Phaser.Scene {
         const panelWidth = this.scale.width - 200;
         const panelHeight = centerY + 100;
     
-        const panelBackground = this.add.container(centerX, centerY + 50, [
+        this.panelBackground = this.add.container(centerX, centerY + 50, [
             this.add.rectangle(0, 0, panelWidth, panelHeight, 0x000000).setOrigin(0.5),
             this.rexUI.add.ninePatch2({
                 width: panelWidth,

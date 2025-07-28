@@ -1,6 +1,6 @@
-import { gameOptions, CATEGORY } from './config.js';
-import { Player,chargeSkillTable } from './game_class/Player.js';
-import MapManager from './game_class/MapManager.js';
+import { gameOptions, CATEGORY } from '../config.js';
+import { Player,chargeSkillTable } from '../game_class/Player.js';
+import MapManager from '../game_class/MapManager.js';
 
 export default class PlayScene extends Phaser.Scene {
     constructor() {
@@ -314,7 +314,7 @@ export default class PlayScene extends Phaser.Scene {
         this.player.setActive(false);
 
         this.bgmManager.stop();     // bgm停止
-        this.sfxManager.stopAll();     // 効果音停止
+        // this.sfxManager.stopAll();     // 効果音停止
         
         this.player.anims.stop();   // アニメーション停止
         // フレーム指定でテクスチャを一時的に切り替え

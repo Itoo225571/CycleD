@@ -1,12 +1,12 @@
-import PreloadScene from './preload.js';
-import PlayScene from './play.js';
-import StartScene from './start.js';
-import RankingScene from './ranking.js';
-import PauseScene from './pause.js'
-import GameoverScene from './gameover.js';
-import SelectCharacterScene from './select_character.js';
-import PreStartScene from './prestart.js';
-import OptionsScene from './options.js';
+import PreloadScene from './scene/preload.js';
+import PlayScene from './scene/play.js';
+import StartScene from './scene/start.js';
+import RankingScene from './scene/ranking.js';
+import PauseScene from './scene/pause.js'
+import GameoverScene from './scene/gameover.js';
+import SelectCharacterScene from './scene/select_character.js';
+import PreStartScene from './scene/prestart.js';
+import OptionsScene from './scene/options.js';
 
 export const gameOptions = {
     garavityForce: 3,

@@ -7,7 +7,7 @@ export default class BgmManager {
 
         // 🔽 BGMごとの基準音量を定義（必要に応じて調整）
         this.volumeTable = {
-            bgmDrops: 0.5,
+            bgmDrops: 0.8,
             bgmRunning: 0.5,
             bgmGameOver: 0.5,
         };

@@ -1,4 +1,4 @@
-import { createBtn } from './drawWindow.js';
+import { createBtn } from '../drawWindow.js';
 
 export default class PauseScene extends Phaser.Scene {
     constructor() {

@@ -1,4 +1,4 @@
-import { createMsgWindow,createPopupWindow } from './drawWindow.js';
+import { createMsgWindow,createPopupWindow } from '../drawWindow.js';
 
 export default class SelectCharacterScene extends Phaser.Scene {
     constructor() {

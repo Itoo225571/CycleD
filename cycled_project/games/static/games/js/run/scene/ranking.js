@@ -1,4 +1,4 @@
-import { createPopupWindow } from './drawWindow.js';
+import { createPopupWindow } from '../drawWindow.js';
 
 export default class RankingScene extends Phaser.Scene {
     constructor() {
