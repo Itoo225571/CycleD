@@ -118,15 +118,13 @@ export default class StartScene extends Phaser.Scene {
             .setDisplaySize(72,72)
             .setInteractive({ useHandCursor: true })
             .setFlipX(true)
-            .on('pointerdown', this.goBackCycleD.bind(this));
-
-        // ホバー時の色変更（マウスオーバー）
-        this.backButton.on('pointerover', () => {
-            this.backButton.setTint(0x888888);  // ホバー時に変更
-        });
-        this.backButton.on('pointerout', () => {
-            this.backButton.clearTint();  // 色を元に戻す
-        });
+            .on('pointerdown', this.goBackCycleD.bind(this))
+            .on('pointerover', function(){
+                this.setTint(0x888888);  // ホバー時に変更
+            })
+            .on('pointerout', function(){
+                this.clearTint();  // 色を元に戻す
+            });
 
         // 設定ボタン
         this.optionsButton = this.add.sprite(this.cameras.main.width - 100, 80, 'settings')
@@ -135,7 +133,7 @@ export default class StartScene extends Phaser.Scene {
             .on('pointerdown', () => {
                 this.sfxManager.play('buttonSoftSound');
                 showOptions(this);
-            })
+            });
 
         // helpボタン
         this.helpButtonShadow = this.add.sprite(this.cameras.main.width - 200, 80, 'inputPrompts', 436)
@@ -149,14 +147,28 @@ export default class StartScene extends Phaser.Scene {
             .on('pointerdown', () => {
                 this.sfxManager.play('buttonSoftSound');
             })
-            .on('pointerdown', this.showHelpText.bind(this));
-        // ホバー時の色変更（マウスオーバー）
-        this.helpButton.on('pointerover', () => {
-            this.helpButton.setTint(0xFFFF00);  // ホバー時に緑色に変更
-        });
-        this.helpButton.on('pointerout', () => {
-            this.helpButton.clearTint();  // 色を元に戻す
-        });
+            .on('pointerdown', this.showHelpText.bind(this))
+            .on('pointerover', function(){
+                this.setTint(0x0000FF);
+            })
+            .on('pointerout', function(){
+                this.clearTint();  // 色を元に戻す
+            });
+
+        // ガチャボタン
+        this.gachaButton = this.add.sprite(this.cameras.main.width - 100,this.cameras.main.height - 80, '1bit-icons1',409)
+            .setDisplaySize(64, 64)
+            .setInteractive({ useHandCursor: true })
+            .on('pointerdown', () => {
+                this.sfxManager.play('buttonSoftSound');
+                this.goGachaScene()
+            })
+            .on('pointerover', function(){
+                this.setTint(0xFFFF00);  // ホバー時に変更
+            })
+            .on('pointerout', function(){
+                this.clearTint();  // 色を元に戻す
+            });
 
         // クレジット表示（画面右下に小さく）
         this.creditText = this.add.text(
@@ -203,6 +215,9 @@ export default class StartScene extends Phaser.Scene {
         const RankingScene = this.scene.get('RankingScene');
         RankingScene.onBringToTop?.();
         this.scene.bringToTop('RankingScene');
+    }
+    goGachaScene() {
+        this.scene.start('GachaScene');
     }
         
     onBringToTop() {

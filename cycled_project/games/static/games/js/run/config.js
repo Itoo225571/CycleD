@@ -6,7 +6,7 @@ import PauseScene from './scene/pause.js'
 import GameoverScene from './scene/gameover.js';
 import SelectCharacterScene from './scene/select_character.js';
 import PreStartScene from './scene/prestart.js';
-import OptionsScene from './scene/options.js';
+import GachaScene from './scene/gacha.js';
 
 export const gameOptions = {
     garavityForce: 3,
@@ -27,7 +27,8 @@ export const gameConfig = {
     height: 750,
     pixelArt: true,
     scene: [
-        PreloadScene, OptionsScene,
+        PreloadScene,
+        GachaScene,
         PreStartScene, StartScene, PlayScene, RankingScene, SelectCharacterScene,
         PauseScene , GameoverScene, 
     ], // シーンの順番
@@ -80,7 +81,7 @@ export const CATEGORY = {
 
 const STORAGE_KEY_OPTIONS = 'gameNIKIRunOptions';
 const defaultOptions = {
-    masterVolume: 1.0,
+    masterVolume: 0.5,
     bgmVolume: 1.0,
     sfxVolume: 1.0,
     // fullscreen: false,

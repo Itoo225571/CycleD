@@ -105,3 +105,18 @@
 
 「Openweather®」はOpenweather Ltd.の登録商標です。  
 その他の商標および商号の無断使用を禁止します。
+
+---
+
+### ゲーム上で使用
+
+**1-Bit Icons Part-I**  
+- Author: PiiiXL
+- Source: https://piiixl.itch.io/
+- License: CC BY-ND 4.0  
+  https://creativecommons.org/licenses/by-nd/4.0/
+
+**1-Bit Icons Part-II**  
+- Author: PiiiXL  
+- Source: https://piiixl.itch.io/1bit-icons-part2  
+- License: [CC BY-ND 4.0](https://creativecommons.org/licenses/by-nd/4.0/)

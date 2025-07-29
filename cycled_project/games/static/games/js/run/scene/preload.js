@@ -152,6 +152,18 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.image('lock', `${imgDir}lock.png`);
         this.load.image('unlock', `${imgDir}unlock.png`);
         this.load.image('settings', `${imgDir}Settings.png`);
+        this.load.spritesheet('1bit-icons1', `${imgDir}1bit-icons1.png`, {
+            frameWidth: 16,
+            frameHeight: 16,
+            margin: 8,     // ← スプライトシートの最初のマージン（左上の余白）
+            spacing: 8     // ← 各スプライト間のスペース
+        });
+        this.load.spritesheet('1bit-icons2', `${imgDir}1bit-icons2.png`, {
+            frameWidth: 16,
+            frameHeight: 16,
+            margin: 8,     // ← スプライトシートの最初のマージン（左上の余白）
+            spacing: 8     // ← 各スプライト間のスペース
+        });
 
         // エフェクト
         this.load.spritesheet(
