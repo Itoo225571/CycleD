@@ -1,3 +1,5 @@
+import { get_options } from "../config.js";
+
 export default class SfxManager {
     constructor(scene) {
         this.scene = scene;
@@ -6,14 +8,14 @@ export default class SfxManager {
         // 🔽 SFXごとの基準音量を定義（必要に応じて調整）
         this.volumeTable = {
             jumpSound: 0.4,
-            stompSound: 1.0,
+            stompSound: 1.2,
             damageSound: 1.0,
             fallingSound: 1.0,
             alarmSound: 1.0,
-            coinSound: 0.8,
+            coinSound: 0.6,
             impactSound: 1.0,
             buttonSoftSound: 1.1,
-            buttonHardSound: 1.0,
+            buttonHardSound: 0.8,
             pauseSound: 1.0,
             selectedSound: 0.8,
         };
@@ -22,14 +24,18 @@ export default class SfxManager {
     play(key, options = {}) {
         const baseVolume = this.volumeTable[key] ?? 1.0;
         const rawVolume = options.volume ?? baseVolume;
-        const playerOptions = this.scene.registry.get('playerOptions');
-    
-        const sfxVolume = playerOptions.get(rawVolume, 'SFX');
+
+        const playerOptions = get_options();
+        // 基準音量 x 主音量 x 効果音音量
+        const finalVolume = Phaser.Math.Clamp(
+            rawVolume * playerOptions.masterVolume * playerOptions.sfxVolume,
+            0, 1
+        );
     
         const sound = this.scene.sound.add(key);
         sound.play({
             ...options,
-            volume: sfxVolume,  // masterVolume × sfxVolume × baseVolume
+            volume: finalVolume,
         });
     
         this.activeSFX.push(sound);

@@ -54,7 +54,7 @@ class NIKIRunUserInfo(models.Model):
     owned_characters = models.JSONField(default=default_owned_characters)               # 許可されたキャラ
     bronze_coin = models.IntegerField(default=0, validators=[MinValueValidator(0)])     # 集められる銅コイン枚数
     character_last = models.CharField(max_length=16, default=DEFAULT_CHARACTER)         # 最後に選択したキャラ
-    options = models.JSONField(default=default_game_options)                            # オプション
+    # options = models.JSONField(default=default_game_options)                            # オプション
 
     def clean(self):
         super().clean()

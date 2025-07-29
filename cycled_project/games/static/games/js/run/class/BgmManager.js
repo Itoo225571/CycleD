@@ -1,4 +1,5 @@
-// BgmManager.js
+import { get_options } from "../config.js";
+
 export default class BgmManager {
     constructor(scene) {
         this.scene = scene;
@@ -16,7 +17,12 @@ export default class BgmManager {
     play(key, overrideVolume = null, config = { loop: true }) {
         const baseVolume = this.volumeTable[key] ?? 1.0;
         const rawVolume = overrideVolume ?? baseVolume;
-        const playerOptions = this.scene.registry.get('playerOptions');
+        const playerOptions = get_options();
+        // 基準音量 x 主音量 x 効果音音量
+        const finalVolume = Phaser.Math.Clamp(
+            rawVolume * playerOptions.masterVolume * playerOptions.bgmVolume,
+            0, 1
+        );
 
         // すでに同じBGMが再生中ならスキップ
         if (this.currentKey === key && this.currentBgm?.isPlaying) {
@@ -31,7 +37,7 @@ export default class BgmManager {
         // BGMを新しく再生
         this.currentBgm = this.scene.sound.add(key, {
             ...config,
-            volume: playerOptions.get(rawVolume,'BGM'),    // 音量調節
+            volume: finalVolume,    // 音量調節
         });
     
         this.currentBgm.play();
@@ -70,10 +76,15 @@ export default class BgmManager {
 
     updateVolume() {
         const baseVolume = this.volumeTable[this.currentKey] ?? 1.0;
-        const playerOptions = this.scene.registry.get('playerOptions');
+        const playerOptions = get_options();
+        // 基準音量 x 主音量 x 効果音音量
+        const finalVolume = Phaser.Math.Clamp(
+            baseVolume * playerOptions.masterVolume * playerOptions.bgmVolume,
+            0, 1
+        );
 
         if (this.currentBgm?.isPlaying) {
-            this.currentBgm.setVolume(playerOptions.get(baseVolume,'BGM'));
+            this.currentBgm.setVolume(finalVolume);
         }
     }   
 

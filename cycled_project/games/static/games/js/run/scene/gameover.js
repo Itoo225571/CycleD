@@ -1,4 +1,5 @@
 import { createBtn, createPopupWindow } from '../drawWindow.js';
+import { showOptions } from "../showOptions.js";
 
 export default class GameoverScene extends Phaser.Scene {
     constructor() {
@@ -84,6 +85,15 @@ export default class GameoverScene extends Phaser.Scene {
                 color: '#ffffff'
             }
         ).setOrigin(0.5);
+
+        // 設定ボタン
+        this.optionsButton = this.add.sprite(this.cameras.main.width - 100, 80, 'settings')
+        .setDisplaySize(72, 72)
+        .setInteractive({ useHandCursor: true })
+        .on('pointerdown', () => {
+            this.sfxManager.play('buttonSoftSound');
+            showOptions(this);
+        })
 
         var scene = this.scene.get('PlayScene');
         this.postScore(scene);      // score投稿
@@ -227,6 +237,7 @@ export default class GameoverScene extends Phaser.Scene {
     goRankingScene() {
         this.scene.get('RankingScene').data.set('previousScene', 'GameoverScene');
         this.gameOverText.setVisible(false);  //titleを隠す
+        this.optionsButton?.setVisible(false);
         if (!this.scene.isActive('RankingScene')) {
             // 起動していなければ、RankingSceneをオーバーレイとして開始
             this.scene.launch('RankingScene');
@@ -251,6 +262,7 @@ export default class GameoverScene extends Phaser.Scene {
             var scene = this.scene.get('PlayScene');
             this.postScore(scene);
         }
+        this.optionsButton?.setVisible(true);
     }
     
 }

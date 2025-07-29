@@ -1,8 +1,10 @@
 import { createBtn } from '../drawWindow.js';
+import { showOptions } from "../showOptions.js";
 
 export default class PauseScene extends Phaser.Scene {
     constructor() {
         super({ key: 'PauseScene' });
+        this.isReady = false;
     }
 
     create() {
@@ -50,6 +52,15 @@ export default class PauseScene extends Phaser.Scene {
             // btn.hitArea.disableInteractive();
         });
 
+        // 設定ボタン
+        this.optionsButton = this.add.sprite(this.cameras.main.width - 100, 80, 'settings')
+        .setDisplaySize(72, 72)
+        .setInteractive({ useHandCursor: true })
+        .on('pointerdown', () => {
+            this.sfxManager.play('buttonSoftSound');
+            showOptions(this);
+        })
+
         // カウントダウン(非表示)
         this.countdownText = this.add.text(this.game.config.width / 2, this.game.config.height / 2, '', {
             fontFamily: 'DTM-Sans',
@@ -57,7 +68,9 @@ export default class PauseScene extends Phaser.Scene {
             fill: '#ffffff',             // 文字の色（白）
             stroke: '#000000',           // アウトラインの色（黒）
             strokeThickness: 8           // アウトラインの太さ（お好みで調整）
-        }).setOrigin(0.5).setVisible(false);        
+        }).setOrigin(0.5).setVisible(false);  
+        
+        this.isReady = true;
     }
     
     resumeGame() {
@@ -66,6 +79,7 @@ export default class PauseScene extends Phaser.Scene {
             btn.container.setVisible(false);  // ボタンを非表示
             btn.hitArea.disableInteractive();  // インタラクションを無効化
         });
+        this.optionsButton.setVisible(false);
         this.overlay.setVisible(false);  // オーバーレイを非表示にする
         this.countdownText.setVisible(true);
     
@@ -125,16 +139,15 @@ export default class PauseScene extends Phaser.Scene {
     }
 
     onBringToTop() {
-        if (this.resumeBtns) {
-            this.resumeBtns.forEach(btn => {
-                btn.container.setVisible(true);
-                // btn.hitArea.setInteractive();
-            });
-        }
-        if(this.overlay) {
-            this.overlay.setVisible(true);
-        }
-        if(this.countdownEvent) this.countdownEvent.destroy();
-        if(this.countdownText) this.countdownText.setVisible(false);
+        if (!this.isReady)  return;
+
+        this.resumeBtns.forEach(btn => {
+            btn.container.setVisible(true);
+            // btn.hitArea.setInteractive();
+        });
+        this.overlay.setVisible(true);
+        this.countdownEvent.destroy();
+        this.countdownText.setVisible(false);
+        this.optionsButton.setVisible(false);
     }
 }

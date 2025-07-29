@@ -41,5 +41,5 @@ class NIKIRunUserInfoSerializer(serializers.ModelSerializer):
     user = UserSerializer()  # userフィールドをUserSerializerでシリアライズ
     class Meta:
         model = NIKIRunUserInfo
-        fields = ['id','user','owned_characters','bronze_coin','character_last','options']
+        fields = ['id','user','owned_characters','bronze_coin','character_last']
         read_only_fields = ['id','user','owned_characters','bronze_coin']

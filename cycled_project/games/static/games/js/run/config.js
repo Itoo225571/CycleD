@@ -77,3 +77,58 @@ export const CATEGORY = {
     TRAP:       0x0010, // 追加
     CEILING:    0x0012, // 天井
 };
+
+const STORAGE_KEY_OPTIONS = 'gameNIKIRunOptions';
+const defaultOptions = {
+    masterVolume: 1.0,
+    bgmVolume: 1.0,
+    sfxVolume: 1.0,
+    // fullscreen: false,
+};
+export const optionsMeta = {
+    masterVolume: { type: 'slider', label: '主音量', min: 0, max: 1, steps: 10 },
+    bgmVolume: { type: 'slider', label: 'ＢＧＭ', min: 0, max: 1, steps: 10 },
+    sfxVolume: { type: 'slider', label: '効果音', min: 0, max: 1, steps: 10 },
+    // fullscreen: { type: 'toggle', label: 'フルスクリーン' },
+};
+
+export function get_options() {
+    const stored = localStorage.getItem(STORAGE_KEY_OPTIONS);
+
+    if (stored) {
+        try {
+            return JSON.parse(stored);
+        } catch (e) {
+            console.warn('設定の読み込みに失敗しました。デフォルト値を使用します。', e);
+        }
+    }
+
+    // 保存されていなかった or パース失敗時 → デフォルト値を保存して返す
+    localStorage.setItem(STORAGE_KEY_OPTIONS, JSON.stringify(defaultOptions));
+    return defaultOptions;
+}
+export function update_options(scene, newValues) {
+    const validKeys = Object.keys(defaultOptions);
+
+    // 不正なキーを除外
+    const filtered = Object.fromEntries(
+        Object.entries(newValues).filter(([key]) => validKeys.includes(key))
+    );
+
+    const stored = localStorage.getItem(STORAGE_KEY_OPTIONS);
+    let currentOptions;
+
+    try {
+        currentOptions = stored ? JSON.parse(stored) : defaultOptions;
+    } catch (e) {
+        console.warn('オプションの読み込みに失敗したため、初期値を使用します。', e);
+        currentOptions = defaultOptions;
+    }
+
+    const updatedOptions = { ...currentOptions, ...filtered };
+    localStorage.setItem(STORAGE_KEY_OPTIONS, JSON.stringify(updatedOptions));
+
+    scene.bgmManager.updateVolume();
+
+    return updatedOptions;
+}

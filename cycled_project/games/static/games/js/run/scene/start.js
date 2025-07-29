@@ -1,4 +1,5 @@
 import { createBtn,createPopupWindow } from "../drawWindow.js";
+import { showOptions } from "../showOptions.js";
 
 export default class StartScene extends Phaser.Scene {
     constructor() {
@@ -133,7 +134,7 @@ export default class StartScene extends Phaser.Scene {
             .setInteractive({ useHandCursor: true })
             .on('pointerdown', () => {
                 this.sfxManager.play('buttonSoftSound');
-                this.showOptipns.bind(this)();
+                showOptions(this);
             })
 
         // helpボタン
@@ -245,72 +246,4 @@ export default class StartScene extends Phaser.Scene {
             message: msg,
         });
     }
-    
-    showOptipns() {
-        const scene = this;
-        const popup = createPopupWindow(scene, {
-            x: scene.game.config.width / 2,  // 画面の中央X座標
-            y: scene.game.config.height / 2, // 画面の中央Y座標
-            width: scene.game.config.height * 4/5 * 1.618,
-            height: scene.game.config.height * 4/5,
-            header: 'おぷしょん',
-            message: '',
-            onOK: () => console.log('OK'),
-        });
-        const sliderWidth = popup.container.width *3/4;  // 好きな横幅に変更
-        const sliderHeight = 20;
-        const steps = 10;
-        const track = this.add.rectangle(0, 0, sliderWidth, sliderHeight, 0xaaaaaa);
-        // const background = this.add.rectangle(0, 0, sliderWidth, sliderHeight, 0xaaaaaa);
-
-        // Graphicsで模様を作成(メモリ)
-        const graphics = this.add.graphics();
-        graphics.fillStyle(0x888888, 1);
-        graphics.fillRect(0, 0, sliderWidth, sliderHeight);
-        // 縦線を描く
-        graphics.lineStyle(2, 0xffffff, 1);  // 線の太さ2px、白色
-        for (let i = 0; i <= steps; i++) {
-            const x = sliderHeight + ((sliderWidth-sliderHeight*2) / steps) * i;
-            graphics.beginPath();
-            graphics.moveTo(x, 0);
-            graphics.lineTo(x, sliderHeight);
-            graphics.strokePath();
-        }
-        // 背景として使うための画像化
-        const textureKey = 'sliderBackgroundPattern';
-        graphics.generateTexture(textureKey, sliderWidth, sliderHeight);
-        graphics.destroy();  // もうGraphicsは不要なので破棄
-        // 画像として追加
-        const bgImage = this.add.image(0, 0, textureKey).setOrigin(0, 0);
-        
-        const slider = this.rexUI.add.slider({
-            x: 0,
-            y: 0,
-            width: sliderWidth,
-            height: sliderHeight,
-            orientation: 'x',
-            background: bgImage,
-            track: track,
-            thumb: this.add.circle(0, 0, sliderHeight, 0xffffff),
-            value: 1,
-            valuechangeCallback: (value) => {
-                // console.log('value:', value);
-            }
-        })
-        .layout()
-        .setGap(1 / steps);  // ✅ steps段階に制限;
-        
-        // track にクリックイベントを追加
-        track.setInteractive().on('pointerdown', (pointer) => {
-            const worldLeft = slider.getTopLeft().x;
-            const worldX = pointer.x - popup.container.x;
-            const localX = worldX - worldLeft;
-            const newValue = Math.round((localX / sliderWidth) * steps) / steps;
-            slider.setValue(newValue);
-        });
-
-        popup.container.add(slider);
-            
-    }
-
 }
