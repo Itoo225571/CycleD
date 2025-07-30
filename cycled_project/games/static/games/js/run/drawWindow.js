@@ -1,4 +1,4 @@
-function createFrame(scene, container, widthInTiles, heightInTiles, imgKey, borderColor = 0xffffff, alpha = 1) {
+export function createFrame(scene, widthInTiles, heightInTiles, imgKey, borderColor = 0xffffff, alpha = 1) {
     const tileSize = 16;
     const width = widthInTiles * tileSize;
     const height = heightInTiles * tileSize;
@@ -16,9 +16,7 @@ function createFrame(scene, container, widthInTiles, heightInTiles, imgKey, bord
     frame.setTint(borderColor);
     frame.setAlpha(alpha);
 
-    container.add(frame);
-
-    return container;
+    return frame;
 }
 
 export function createMsgWindow(scene, message = '', delay = 0, option={}) {
@@ -47,7 +45,8 @@ export function createMsgWindow(scene, message = '', delay = 0, option={}) {
     scene._msgWindowContainer = container;
 
     var tileName = option.transparent? 'msgWindowTileTransparent': 'msgWindowTile';
-    createFrame(scene, container, widthInTiles, heightInTiles, tileName, 0x000000, 0.5);
+    const frame = createFrame(scene, widthInTiles, heightInTiles, tileName, 0x000000, 0.5);
+    container.add(frame);  // コンテナに追加
 
     const maxWidth = info.width * per_length - 16 * 5;
 
@@ -93,6 +92,8 @@ export function createMsgWindow(scene, message = '', delay = 0, option={}) {
             }
         });
     }
+
+    return container
 }
 
 export function createBtn(x, y, scene, content, option = {}) {
@@ -118,7 +119,8 @@ export function createBtn(x, y, scene, content, option = {}) {
     const container = scene.add.container(posX, posY);
 
     const tileName = option.button && option.button.transparent ? 'btnTileTransparent' : 'btnTile';
-    createFrame(scene, container, info.btnWidth, info.btnHeight, tileName, info.btnColor);
+    const frame = createFrame(scene, info.btnWidth, info.btnHeight, tileName, info.btnColor);
+    container.add(frame);  // コンテナに追加
 
     // テキスト作成
     const hexColor = info.contentColor;
