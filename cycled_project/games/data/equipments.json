@@ -1,0 +1,51 @@
+[
+    {
+        "id": "1",
+        "name": "にやけ顔",
+        "rarity": "R",
+        "imgKey": "1bit-icons1",
+        "frame": 0
+    },
+    {
+        "id": "2",
+        "name": "困り顔",
+        "rarity": "R",
+        "imgKey": "1bit-icons1",
+        "frame": 1
+    },
+    {
+        "id": "3",
+        "name": "ガキ",
+        "rarity": "R",
+        "imgKey": "1bit-icons1",
+        "frame": 2
+    },
+    {
+        "id": "101",
+        "name": "異形うさぎ",
+        "rarity": "SR",
+        "imgKey": "1bit-icons1",
+        "frame": 3
+    },
+    {
+        "id": "102",
+        "name": "コーン好きの馬",
+        "rarity": "SR",
+        "imgKey": "1bit-icons1",
+        "frame": 4
+    },
+    {
+        "id": "103",
+        "name": "ゆにコーン",
+        "rarity": "SR",
+        "imgKey": "1bit-icons1",
+        "frame": 5
+    },
+    {
+        "id": "201",
+        "name": "ちょろびっと星人",
+        "rarity": "SSR",
+        "imgKey": "1bit-icons1",
+        "frame": 8
+    }
+]

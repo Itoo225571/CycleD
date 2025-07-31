@@ -21,6 +21,7 @@ from .serializers import NIKIRunScoreSerializer,NIKIRunUserInfoSerializer
 
 import json
 import os
+import random
 
 class TopView(LoginRequiredMixin,generic.TemplateView):
     template_name="games/top.html"
@@ -196,3 +197,68 @@ class BuyCharacterAPIView(views.APIView):
 
         except Exception as e:
             return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class PullGachaAPIView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    throttle_classes = [
+        throttling.UserRateThrottle, 
+        throttling.AnonRateThrottle,
+    ]
+
+    def post(self, request):
+        num = int(request.data.get('num', 1))  # 'num' をint型に変換、未指定時は1
+
+        base_dir = os.path.dirname(__file__)
+        json_path = os.path.join(base_dir, 'data', 'equipments.json')
+        with open(json_path, 'r', encoding='utf-8') as f:
+            equipments_data = json.load(f)
+
+        price = 0  #とりあえずpriceは固定
+        # レアリティごとの出現確率
+        rarity_weights = {
+            "R": 80,     # 80%
+            "SR": 15,    # 15%
+            "SSR": 5     # 5%
+        }
+
+        try:
+            user = request.user
+            user_info = NIKIRunUserInfo.objects.get(user=user)
+
+            # 購入処理
+            if not user.coin.sub(price*num):
+                return Response({'detail': 'コインが足りません'}, status=status.HTTP_402_PAYMENT_REQUIRED)
+            
+            results = []
+            for i in range(num):
+                result = draw_equipment(rarity_weights,equipments_data)
+
+                user_info.add_equipment(result['id'])
+                user_info.save()    # 更新
+                results.append(result)
+
+            return Response({
+                # 更新用のデータを添える
+                'user_info': NIKIRunUserInfoSerializer(user_info).data,
+                # ガチャ結果
+                'results': results,
+            }, status=status.HTTP_200_OK)
+            
+        except NIKIRunUserInfo.DoesNotExist:
+            return Response({'detail': 'ユーザー情報が見つかりません'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# 抽選処理
+def draw_equipment(rarity_weights,equipment_list):
+    # レアリティを重み付きで抽選
+    rarities = list(rarity_weights.keys())
+    weights = list(rarity_weights.values())
+    selected_rarity = random.choices(rarities, weights=weights, k=1)[0]
+
+    # 該当するレアリティの装備リストからランダムに選ぶ
+    candidates = [eq for eq in equipment_list if eq["rarity"] == selected_rarity]
+    selected_equipment = random.choice(candidates)
+
+    return selected_equipment

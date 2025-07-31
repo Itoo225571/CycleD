@@ -54,7 +54,20 @@ class NIKIRunUserInfo(models.Model):
     owned_characters = models.JSONField(default=default_owned_characters)               # 許可されたキャラ
     bronze_coin = models.IntegerField(default=0, validators=[MinValueValidator(0)])     # 集められる銅コイン枚数
     character_last = models.CharField(max_length=16, default=DEFAULT_CHARACTER)         # 最後に選択したキャラ
+    equipments = models.JSONField(default=dict, blank=True)                             # 装備
     # options = models.JSONField(default=default_game_options)                            # オプション
+
+    def add_equipment(self, eq_id, count=1):
+        # equipmentsがNoneの場合は空辞書に初期化
+        if self.equipments is None:
+            self.equipments = {}
+        # 持っていれば加算、なければ新規でcountをセット
+        if eq_id in self.equipments:
+            self.equipments[eq_id] += count
+        else:
+            self.equipments[eq_id] = count
+
+        self.save()
 
     def clean(self):
         super().clean()
