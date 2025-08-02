@@ -109,10 +109,21 @@ export default class GachaScene extends Phaser.Scene {
 
         // ガチャ
         this.boxes = [];
+        this.equipments = [];
         this.gachaArea = this.makeGachaArea();
         this.isPulling = false;                 // ガチャを引くとき
         this.isSelecting = false;               // 箱を選ぶとき
     }
+
+    // 毎フレーム表示切り替えチェック（update内で）
+    update() {
+        if (!this.isSelecting && this.isPulling) {
+            this.selectText.setVisible(true);
+        } else {
+            this.selectText.setVisible(false);
+        }
+    }
+    
     // 「Start画面」に戻る処理
     goStartScreen() {
         // bgm停止
@@ -137,19 +148,32 @@ export default class GachaScene extends Phaser.Scene {
         gachaArea.setMask(mask);
 
         // 箱を横に並べて追加（中央揃え）
-        const spacing = areaWidth / 4;  // スプライトの幅に合わせた間隔（必要に応じて調整）
-        const startX = areaWidth / 4;
+        const num = 5;
+
+        const spacing = areaWidth / (num+1);  // スプライトの幅に合わせた間隔（必要に応じて調整）
+        const startX = areaWidth / (num+1);
         const startY = areaHeight / 2;
-        const num = 3;
         const size = 72
 
         for (let i = 0; i < num; i++) {
             const x = startX + i * spacing;
+            const equipment = this.add.sprite(x, startY, 'monochroTiles', 7)
+                .setDisplaySize(size, size)
+                .setInteractive()
+                .setAlpha(0)
+                .on('pointerover', function(){
+                    this.setTint(0xffff00);
+                    this.scene.input.setDefaultCursor('pointer');  // 手のカーソルにする
+                })
+                .on('pointerout', function(){
+                    this.clearTint();  // 色を元に戻す
+                    this.scene.input.setDefaultCursor('default');  // 通常カーソルに戻す
+                });
+                
             const box = this.add.sprite(x, startY, 'monochroTiles', 7)
                 .setDisplaySize(size, size)
                 .setInteractive()
                 .on('pointerover', function(){
-                    if (!box.isActive)  return;
                     this.setTint(0xffff00);
                     this.scene.input.setDefaultCursor('pointer');  // 手のカーソルにする
                 })
@@ -159,11 +183,13 @@ export default class GachaScene extends Phaser.Scene {
                 })
                 .on('pointerdown', ()=>{
                     this.sfxManager.play('buttonSoftSound');
-                    this.selectBox(box);
+                    this.selectBox(box,equipment);
                 });
-            box.isActive = true;
+
             gachaArea.add(box);  // コンテナに追加
+            gachaArea.add(equipment);  // コンテナに追加
             this.boxes.push(box);
+            this.equipments.push(equipment);
         }
 
         // 文字を作る（例）
@@ -186,15 +212,6 @@ export default class GachaScene extends Phaser.Scene {
         return gachaArea;
     }
 
-    // 毎フレーム表示切り替えチェック（update内で）
-    update() {
-        if (!this.isSelecting && this.isPulling) {
-            this.selectText.setVisible(true);
-        } else {
-            this.selectText.setVisible(false);
-        }
-    }
-
     // ガチャを引く
     showGacha(){
         if (this.isPulling) return;  // 回転中は無視
@@ -204,7 +221,7 @@ export default class GachaScene extends Phaser.Scene {
         return;
     }
     // boxの上に抽選されたアイテムを表示する
-    selectBox(box){
+    selectBox(box,equipment){
         if (this.pullNum <= 0 )   return;
 
         this.isSelecting = true;
@@ -215,47 +232,63 @@ export default class GachaScene extends Phaser.Scene {
             'SR': 0xffd700,   // ゴールド
             'SSR': 0xaa00ff   // 紫
         };
+        equipment.setTexture(result.imgKey, result.frame)       //eqを変更
+            .on('pointerdown', ()=>{
+                this.sfxManager.play('buttonSoftSound');
+                this.selectEq(result);
+            });
 
         this.tweens.add({
             targets: box,
             alpha: 0,
-            duration: 500, // ミリ秒
+            duration: 300, // ミリ秒
             onComplete: () => {
-                const color = rarityColors[result.rarity] || 0xffffff;  // 無ければ白
-
-                box.setTexture(result.imgKey, result.frame)
-                    .setAlpha(1)                                    // 必要なら再度フェードインやそのまま表示
-                    .setTint(color);
-                box.isActive = false;                               // boxフラグをfalseに
-
-                if (result.rarity === 'SSR') {
-                    this.time.delayedCall(100, () => {
-                        // まず一気にドアップ
-                        this.tweens.add({
-                            targets: box,
-                            scale: 10,
-                            duration: 500,
-                            yoyo: true,    // 拡大後に元に戻す
-                            ease: 'Power1',
-                            onComplete: () => {
-                                // box.setScale(1);  // 念のため元サイズをセット
-                            }
-                        });
-                    });
-                }
+                this.tweens.add({
+                    targets: equipment,
+                    alpha: 1,
+                    duration: 300,      // フェードインの時間（ミリ秒）
+                    ease: 'Linear',     // イージング（お好みで 'Power1', 'Cubic', etc. に変更可）
+                    onComplete: () => {
+                        if (result.rarity === 'SSR') {
+                            this.time.delayedCall(200, () => {
+                                // まず一気にドアップ
+                                this.tweens.add({
+                                    targets: equipment,
+                                    scale: 15,
+                                    duration: 500,
+                                    yoyo: true,    // 拡大後に元に戻す
+                                    ease: 'Power1',
+                                    onComplete: () => {
+                                        // box.setScale(1);  // 念のため元サイズをセット
+                                    }
+                                });
+                            });
+                        }
+                    }
+                });
 
                 this.pullNum = results.length;
                 if (this.pullNum <= 0) {
                     this.okButton.setVisible(true);
-                    // すべてのboxを選択不可に
-                    this.boxes.forEach(box => {
-                        box.isActive = false;
-                    });
                 }
             }
         });
         return;
     }
+
+    // 装備の内容を表示する
+    selectEq(result){
+        var scene = this;
+        createPopupWindow(scene, {
+            x: scene.game.config.width / 2,  // 画面の中央X座標
+            y: scene.game.config.height / 2, // 画面の中央Y座標
+            width: scene.game.config.height * 2/3 * 1.618,
+            height: scene.game.config.height * 2/3,
+            header: result.name,
+            message: result.msg ,
+        });
+    }
+
     preSelectBox(){
         this.backButton.setVisible(false);
         this.pullButton.setVisible(false);
@@ -272,9 +305,12 @@ export default class GachaScene extends Phaser.Scene {
 
         // 見た目を戻す
         this.boxes.forEach(box => {
-            box.setTexture('monochroTiles', 7);
             box.clearTint();
-            box.isActive = true;
+            box.setAlpha(1);
+        });
+        this.equipments.forEach(eq => {
+            eq.clearTint();
+            eq.setAlpha(0);
         });
     }
     // 抽選本体

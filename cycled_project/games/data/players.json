@@ -10,7 +10,8 @@
         "msg": "上京して東京特許許可局に行くことが夢",
         "chargeSkill": "Invincibled",
         "skillName": "無敵化",
-        "skillDescription": "一定時間無敵になる。"
+        "skillDescription": "一定時間無敵になる。",
+        "skillTime": 20
     },
     {
         "key": "NinjaFrog",
@@ -23,7 +24,8 @@
         "msg": "頭が良くなると思って、毎日30分の逆立ちをしている。",
         "chargeSkill": "Invincibled",
         "skillName": "無敵化",
-        "skillDescription": "一定時間無敵になる。"
+        "skillDescription": "一定時間無敵になる。",
+        "skillTime": 30
     },
     {
         "key": "MaskMen",
@@ -36,7 +38,8 @@
         "msg": "トイレにいる時以外は、マスクをつけているらしい。",
         "chargeSkill": "DefenceBoost",
         "skillName": "硬くなる",
-        "skillDescription": "一定時間、受けるダメージが半分になる。"
+        "skillDescription": "一定時間、受けるダメージが半分になる。",
+        "skillTime": 20
     },
     {
         "key": "Diver",
@@ -49,6 +52,7 @@
         "msg": "ゴーグルのサイズを間違えたので、口までゴーグルで覆われている。",
         "chargeSkill": "DefenceBoost",
         "skillName": "硬くなる",
-        "skillDescription": "一定時間、受けるダメージが半分になる。"
+        "skillDescription": "一定時間、受けるダメージが半分になる。",
+        "skillTime": 20
     }
 ]

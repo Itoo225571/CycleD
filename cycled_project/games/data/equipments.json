@@ -1,51 +1,311 @@
 [
     {
         "id": "1",
-        "name": "にやけ顔",
+        "name": "俊足",
         "rarity": "R",
-        "imgKey": "1bit-icons1",
-        "frame": 0
-    },
+        "imgKey": "1bit-icons2",
+        "frame": 138,
+        "msg": "コーナーで差をつけろ",
+        "eqDescription1": "足が少し早くなる",
+        "eqDescription2": "足が早くなる",
+        "effects1": [
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "initSpeed",
+                "operation": "mul",
+                "value": 1.1
+            }
+        ],
+        "effects2": [
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "initSpeed",
+                "operation": "mul",
+                "value": 1.2
+            }
+        ]
+      },
     {
         "id": "2",
-        "name": "困り顔",
+        "name": "鈍足",
         "rarity": "R",
-        "imgKey": "1bit-icons1",
-        "frame": 1
+        "imgKey": "1bit-icons2",
+        "frame": 159,
+        "msg": "直線で差をつけろ",
+        "eqDescription1": "足が少し遅くなる",
+        "eqDescription2": "足が遅くなる",
+        "effects1": [
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "initSpeed",
+                "operation": "mul",
+                "value": 0.9
+            }
+        ],
+        "effects2": [
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "initSpeed",
+                "operation": "mul",
+                "value": 0.8
+            }
+        ]
     },
     {
         "id": "3",
-        "name": "ガキ",
+        "name": "ピヨピヨちゃん",
         "rarity": "R",
         "imgKey": "1bit-icons1",
-        "frame": 2
+        "frame": 68,
+        "msg": "外来種",
+        "eqDescription1": "ジャンプ力が少し上がる",
+        "eqDescription2": "ジャンプ力が上がる",
+        "effects1": [
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "jumpForce",
+                "operation": "mul",
+                "value": 1.1
+            }
+        ],
+        "effects2": [
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "jumpForce",
+                "operation": "mul",
+                "value": 1.2
+            }
+        ]
     },
     {
-        "id": "101",
-        "name": "異形うさぎ",
-        "rarity": "SR",
+        "id": "4",
+        "name": "スキル電池",
+        "rarity": "R",
+        "imgKey": "1bit-icons2",
+        "frame": 24,
+        "msg": "",
+        "eqDescription1": "ゲーム開始時に一度だけスキルチャージバーを少し増やす",
+        "eqDescription2": "ゲーム開始時に一度だけスキルチャージバーを増やす",
+        "effects1": [
+            {
+                "timing": "triggered",
+                "targetObject": "player",
+                "targetField": "skillChargeInit",
+                "operation": "add",
+                "value": 0.2
+            }
+        ],
+        "effects2": [
+            {
+                "timing": "triggered",
+                "targetObject": "player",
+                "targetField": "skillChargeInit",
+                "operation": "add",
+                "value": 0.4
+            }
+        ]
+    },
+    {
+        "id": "5",
+        "name": "アドレナリン",
+        "rarity": "R",
         "imgKey": "1bit-icons1",
-        "frame": 3
+        "frame": 398,
+        "msg": "駐車するタイプのヤバいやつ",
+        "eqDescription1": "残機を1つ減らす代わりに、ジャンプ力がすごく上がる",
+        "eqDescription2": "ゲーム開始時の残機を1にする代わりに、ジャンプ力がめっちゃ上がる",
+        "effects1": [
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "lives",
+                "operation": "add",
+                "value": -1
+            },
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "jumpForce",
+                "operation": "mul",
+                "value": 1.5
+            }
+        ],
+        "effects2": [
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "lives",
+                "operation": "set",
+                "value": 1
+            },
+
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "jumpForce",
+                "operation": "mul",
+                "value": 2
+            }
+        ]
     },
     {
         "id": "102",
-        "name": "コーン好きの馬",
+        "name": "イカサマタイマー",
         "rarity": "SR",
         "imgKey": "1bit-icons1",
-        "frame": 4
+        "frame": 163,
+        "msg": "時間を伸ばしたければ時計をイジればいいじゃない",
+        "eqDescription1": "スキル時間をほんの少し伸ばす",
+        "eqDescription2": "スキル時間を少し伸ばす",
+        "effects1": [
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "skillTime",
+                "operation": "add",
+                "value": 2
+            }
+        ],
+        "effects2": [
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "skillTime",
+                "operation": "add",
+                "value": 5
+            }
+        ]
     },
     {
         "id": "103",
-        "name": "ゆにコーン",
+        "name": "充電装置",
         "rarity": "SR",
-        "imgKey": "1bit-icons1",
-        "frame": 5
+        "imgKey": "1bit-icons2",
+        "frame": 24,
+        "msg": "（充電コード別売）",
+        "eqDescription1": "コインを集めたときのスキルチャージ量が少し増える",
+        "eqDescription2": "コインを集めたときのスキルチャージ量が増える",
+        "effects1": [
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "skillChargeSpeed",
+                "operation": "mul",
+                "value": 1.1
+            }
+        ],
+        "effects2": [
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "skillChargeSpeed",
+                "operation": "mul",
+                "value": 1.2
+            }
+        ]
+    },
+    {
+        "id": "104",
+        "name": "発電装置",
+        "rarity": "SR",
+        "imgKey": "1bit-icons2",
+        "frame": 23,
+        "msg": "走ることで発生するエネルギーを回収している。すごくエコ",
+        "eqDescription1": "時間経過でごくわずかにスキルゲージが溜まる",
+        "eqDescription2": "時間経過でわずかにスキルゲージが溜まる",
+        "effects1": [
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "skillAutoChargeSpeed",
+                "operation": "add",
+                "value": 0.001
+            }
+        ],
+        "effects2": [
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "skillAutoChargeSpeed",
+                "operation": "add",
+                "value": 0.002
+            }
+        ]
     },
     {
         "id": "201",
-        "name": "ちょろびっと星人",
+        "name": "ハートの器",
         "rarity": "SSR",
-        "imgKey": "1bit-icons1",
-        "frame": 8
+        "imgKey": "1bit-icons2",
+        "frame": 45,
+        "msg": "某伝説に出てくるアイテムとは関係ない",
+        "eqDescription1": "残機を1つ増やす",
+        "eqDescription2": "残機を2つ増やす",
+        "effects1": [
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "lives",
+                "operation": "add",
+                "value": 1
+            }
+        ],
+        "effects2": [
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "lives",
+                "operation": "add",
+                "value": 2
+            }
+        ]
+    },
+    {
+        "id": "202",
+        "name": "ポッポちゃん",
+        "rarity": "SSR",
+        "imgKey": "1bit-icons2",
+        "frame": 59,
+        "msg": "在来種。ピヨピヨちゃんに捕食され、現在絶滅危惧種に指定されている",
+        "eqDescription1": "ジャンプ回数が1回増えるが、ジャンプ力が下がる",
+        "eqDescription2": "ジャンプ回数が2回増えるが、ジャンプ力がすごく下がる",
+        "effects1": [
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "jumps",
+                "operation": "add",
+                "value": 1
+            },
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "jumpForce",
+                "operation": "mul",
+                "value": 0.8
+            }
+        ],
+        "effects2": [
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "jumps",
+                "operation": "add",
+                "value": 2
+            },
+            {
+                "timing": "passive",
+                "targetObject": "player",
+                "targetField": "jumpForce",
+                "operation": "mul",
+                "value": 0.5
+            }
+        ]
     }
 ]

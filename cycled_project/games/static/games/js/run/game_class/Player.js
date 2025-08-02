@@ -21,13 +21,20 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         // skill関係
         this.chargeSkill = config.chargeSkill || (() => {});
         this.skillEndEvent = null;
+        this.skillTime = config.skillTime;
+        this.skillChargeInit = 0;               // 初期からチャージされている量
+        this.skillChargeSpeed = 0.01;           // スキルチャージ速度
+        this.skillAutoChargeSpeed = 0;          // 自動回復
         this.onSkill = false;
+
         this.invincible = false;
         this.defence = 0;
 
         if (gameConfig.physics.matter.debug)    this.jumps=1000;
         if (gameConfig.physics.matter.debug)    this.lives=1000;
         // if (gameConfig.physics.matter.debug)    this.invincible=true;
+
+        this.applyEquipment();
 
         this.speed = this.initSpeed;
         this.jump_count = 0;
@@ -87,7 +94,8 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         const currentBlockX = Math.floor(this.dist);
         if (currentBlockX > this.prevBlockX) {
             for (let i = this.prevBlockX + 1; i <= currentBlockX; i++) {
-                this.chargeBar.chargeUp(0.001);
+                var speed = this.chargeBar.autoChargeSpeed;
+                this.chargeBar.chargeUp(speed);
             }
             this.prevBlockX = currentBlockX;
         }
@@ -191,8 +199,13 @@ export class Player extends Phaser.Physics.Matter.Sprite {
 
     createChargeBar(bgBar, chargeBar) {
         this.chargeBar = new ChargeBar(this, bgBar, chargeBar);
-        this.chargeBar.reset();
+        // this.chargeBar.reset();
     }
+
+    applyEquipment() {
+        const equipmentData = this.scene.cache.json.get('equipments');  // Phaserで事前にロードされている前提
+    }
+    
 }
 
 class ChargeBar {
@@ -206,7 +219,10 @@ class ChargeBar {
 
         this.maxWidth = bgBar.width;
         this.charge = 0;        // 現在のチャージ量（0〜1）
-        this.speed = 0.01;      // チャージ速度
+        this.speed = player.skillChargeSpeed;      // チャージ速度
+        this.autoChargeSpeed = player.skillAutoChargeSpeed;    //自動チャージ量
+
+        this.chargeUp(player.skillChargeInit);  //初期チャージ
     }
 
     chargeUp(amount = this.speed) {
@@ -240,7 +256,7 @@ class ChargeBar {
 
 export const chargeSkillTable = {
     DefenceBoost: (player, scene) => {
-        var skillTime = 20;
+        var skillTime = player.skillTime;
         player.defence = 0.5;
         skillStartDefenceBoost(player, scene);
         createSkillEndEvent(player, skillTime, true, () => {
@@ -249,7 +265,7 @@ export const chargeSkillTable = {
         });
     },
     Invincibled: (player, scene) => {
-        var skillTime = 10;
+        var skillTime = player.skillTime;
         player.invincible = true;
         skillStartInvincibled(player, scene);
         createSkillEndEvent(player, skillTime, true, () => {
