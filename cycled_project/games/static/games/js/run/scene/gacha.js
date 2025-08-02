@@ -311,6 +311,7 @@ export default class GachaScene extends Phaser.Scene {
         this.equipments.forEach(eq => {
             eq.clearTint();
             eq.setAlpha(0);
+            eq.removeAllListeners('pointerdown');
         });
     }
     // 抽選本体
