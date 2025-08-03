@@ -148,12 +148,12 @@ export default class GachaScene extends Phaser.Scene {
         gachaArea.setMask(mask);
 
         // 箱を横に並べて追加（中央揃え）
-        const num = 5;
+        const num = 3;
 
         const spacing = areaWidth / (num+1);  // スプライトの幅に合わせた間隔（必要に応じて調整）
         const startX = areaWidth / (num+1);
         const startY = areaHeight / 2;
-        const size = 72
+        const size = 72;
 
         for (let i = 0; i < num; i++) {
             const x = startX + i * spacing;

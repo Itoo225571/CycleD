@@ -173,7 +173,7 @@ export default class PreloadScene extends Phaser.Scene {
         );
 
         // そのほかで使うタイル
-        this.load.spritesheet('monochroTiles', `${imgDir}monochrome_tilemap.png`, { 
+        this.load.spritesheet('monochroTiles', `${imgDir}monochrome_tilemap_transparent.png`, { 
             frameWidth: 16, 
             frameHeight: 16,
             spacing: 1     // ← 各スプライト間のスペース
