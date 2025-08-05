@@ -41,12 +41,14 @@ export default class GachaScene extends Phaser.Scene {
         // 引く
         var width = 12;
         var height = 6;
-        this.pullButton = this.add.container(
-            (this.scale.width - width*16) / 2, 
+
+        // x1ガチャ
+        this.pullButton1 = this.add.container(
+            (this.scale.width - width*16) / 3, 
             this.scale.height * 4/5 - height*16/2,
         );
         // テキストを追加
-        this.pullText = this.add.text(
+        this.pullText1 = this.add.text(
             width*16 / 2,     // コンテナ内部の中心に表示
             height*16 / 2,
             'x 1',       // 表示する文字列
@@ -57,21 +59,54 @@ export default class GachaScene extends Phaser.Scene {
                 align: 'center',
             }
         ).setOrigin(0.5);  // 中央揃え
-        this.pullFrame = createFrame(this,width,height,'msgWindowTile')
+        this.pullFrame1 = createFrame(this,width,height,'msgWindowTile')
             .setInteractive({ useHandCursor: true })
             .on('pointerover', () => {
-                this.pullText.setColor('#ffff00');  // 色コードで直接指定
-                this.pullFrame.setTint(0x888888);
+                this.pullText1.setColor('#ffff00');  // 色コードで直接指定
+                this.pullFrame1.setTint(0x888888);
             })
             .on('pointerout', ()=>{
-                this.pullText.setColor('#000000');  // 元の色に戻す
-                this.pullFrame.clearTint();  // 色を元に戻す
+                this.pullText1.setColor('#000000');  // 元の色に戻す
+                this.pullFrame1.clearTint();  // 色を元に戻す
             })
             .on('pointerdown', ()=>{
                 this.showGacha();
             });
-        this.pullButton.add(this.pullFrame);  // コンテナに追加
-        this.pullButton.add(this.pullText);  // コンテナに追加
+        this.pullButton1.add(this.pullFrame1);  // コンテナに追加
+        this.pullButton1.add(this.pullText1);  // コンテナに追加
+
+        // x5ガチャ
+        this.pullButton5 = this.add.container(
+            (this.scale.width - width*16) *2/3, 
+            this.scale.height * 4/5 - height*16/2,
+        );
+        // テキストを追加
+        this.pullText5 = this.add.text(
+            width*16  / 2,
+            height*16 / 2,
+            'x 5',       // 表示する文字列
+            {
+                fontFamily: 'DTM-Sans',
+                fontSize: '64px',
+                color: '#000000',
+                align: 'center',
+            }
+        ).setOrigin(0.5);  // 中央揃え
+        this.pullFrame5 = createFrame(this,width,height,'msgWindowTile')
+            .setInteractive({ useHandCursor: true })
+            .on('pointerover', () => {
+                this.pullText5.setColor('#ffff00');  // 色コードで直接指定
+                this.pullFrame5.setTint(0x888888);
+            })
+            .on('pointerout', ()=>{
+                this.pullText5.setColor('#000000');  // 元の色に戻す
+                this.pullFrame5.clearTint();  // 色を元に戻す
+            })
+            .on('pointerdown', ()=>{
+                this.showGacha(5);
+            });
+        this.pullButton5.add(this.pullFrame5);  // コンテナに追加
+        this.pullButton5.add(this.pullText5);  // コンテナに追加
 
         // ガチャ結果確認ボタン
         this.okButton = this.add.container(
@@ -108,11 +143,11 @@ export default class GachaScene extends Phaser.Scene {
             .setVisible(false);
 
         // ガチャ
-        this.boxes = [];
-        this.equipments = [];
+        this.itemContainers = []
         this.gachaArea = this.makeGachaArea();
         this.isPulling = false;                 // ガチャを引くとき
         this.isSelecting = false;               // 箱を選ぶとき
+        this.isResult = false;                  // 結果画面
     }
 
     // 毎フレーム表示切り替えチェック（update内で）
@@ -148,48 +183,59 @@ export default class GachaScene extends Phaser.Scene {
         gachaArea.setMask(mask);
 
         // 箱を横に並べて追加（中央揃え）
-        const num = 3;
+        const num = 5;
 
         const spacing = areaWidth / (num+1);  // スプライトの幅に合わせた間隔（必要に応じて調整）
         const startX = areaWidth / (num+1);
         const startY = areaHeight / 2;
-        const size = 72;
+        const size = 96;
 
         for (let i = 0; i < num; i++) {
-            const x = startX + i * spacing;
-            const equipment = this.add.sprite(x, startY, 'monochroTiles', 7)
-                .setDisplaySize(size, size)
-                .setInteractive()
+            const x = i * spacing;
+            const eqRect = this.add.sprite(x, 0, 'monochroTilesBrack', 0)
+                .setAlpha(0)
+                .setDisplaySize(size*2/3, size*2/3)
+
+            const equipment = this.add.sprite(x, 0, 'monochroTiles', 7)
+                .setDisplaySize(size/2, size/2)
                 .setAlpha(0)
                 .on('pointerover', function(){
-                    this.setTint(0xffff00);
+                    // this.setTint(0xffff00);
                     this.scene.input.setDefaultCursor('pointer');  // 手のカーソルにする
                 })
                 .on('pointerout', function(){
-                    this.clearTint();  // 色を元に戻す
+                    // this.clearTint();  // 色を元に戻す
                     this.scene.input.setDefaultCursor('default');  // 通常カーソルに戻す
                 });
                 
-            const box = this.add.sprite(x, startY, 'monochroTiles', 7)
+            const box = this.add.sprite(x, 0, 'monochroTiles', 7)
                 .setDisplaySize(size, size)
                 .setInteractive()
                 .on('pointerover', function(){
-                    this.setTint(0xffff00);
+                    // if (this.scene.isResult) return;    // 結果表示画面ならば無視
+                    // this.setTint(0xffff00);
                     this.scene.input.setDefaultCursor('pointer');  // 手のカーソルにする
                 })
                 .on('pointerout', function(){
-                    this.clearTint();  // 色を元に戻す
+                    // if (this.scene.isResult) return;    // 結果表示画面ならば無視
+                    // this.clearTint();  // 色を元に戻す
                     this.scene.input.setDefaultCursor('default');  // 通常カーソルに戻す
-                })
-                .on('pointerdown', ()=>{
-                    this.sfxManager.play('buttonSoftSound');
-                    this.selectBox(box,equipment);
                 });
 
-            gachaArea.add(box);  // コンテナに追加
-            gachaArea.add(equipment);  // コンテナに追加
-            this.boxes.push(box);
-            this.equipments.push(equipment);
+            // 順番に格納
+            const itemContainer = this.add.container(startX, startY, [eqRect, box, equipment])
+                .setSize(size, size);
+            box.on('pointerdown', ()=>{
+                // if (this.scene.isResult) return;    // 結果表示画面ならば無視
+                this.sfxManager.play('buttonSoftSound');
+                this.selectBox(itemContainer);
+            });
+            gachaArea.add(itemContainer); // container を gachaArea に追加
+
+            // this.rects.push(eqRect);
+            // this.boxes.push(box);
+            // this.equipments.push(equipment);
+            this.itemContainers.push(itemContainer);
         }
 
         // 文字を作る（例）
@@ -213,16 +259,24 @@ export default class GachaScene extends Phaser.Scene {
     }
 
     // ガチャを引く
-    showGacha(){
+    showGacha(num=1){
         if (this.isPulling) return;  // 回転中は無視
+        if (num === 1 || num === 5) {
+            this.selectText.setText(num === 1 ? 'SELECT ONE BOX' : 'SELECT ALL BOX');
+        } else {
+            return;
+        }
         this.sfxManager.play('buttonSoftSound');
-        var num = 1;
         this.pullGacha(num);
         return;
     }
     // boxの上に抽選されたアイテムを表示する
-    selectBox(box,equipment){
+    selectBox(container){
         if (this.pullNum <= 0 )   return;
+
+        const rect = container.getAt(0);
+        const box = container.getAt(1);
+        const equipment = container.getAt(2);
 
         this.isSelecting = true;
         let results = this.pullResults;
@@ -230,49 +284,71 @@ export default class GachaScene extends Phaser.Scene {
         const rarityColors = {
             'R': 0xffffff,
             'SR': 0xffd700,   // ゴールド
-            'SSR': 0xaa00ff   // 紫
+            'SSR': 0xffffff   // 仮設定
         };
         equipment.setTexture(result.imgKey, result.frame)       //eqを変更
             .on('pointerdown', ()=>{
                 this.sfxManager.play('buttonSoftSound');
                 this.selectEq(result);
             });
+        box.on('pointerdown', ()=>{
+            this.sfxManager.play('buttonSoftSound');
+            this.selectEq(result);
+        });        
 
         this.tweens.add({
-            targets: box,
-            alpha: 0,
-            duration: 300, // ミリ秒
+            targets: [rect,box,equipment],
+            scaleX: 0,
+            scaleY: 10,
+            duration: 200,
+            yoyo: true,
+            onYoyo: () => {
+                box.setFrame(90);
+                box.setTint(rarityColors[result.rarity]);
+            },
             onComplete: () => {
-                this.tweens.add({
-                    targets: equipment,
-                    alpha: 1,
-                    duration: 300,      // フェードインの時間（ミリ秒）
-                    ease: 'Linear',     // イージング（お好みで 'Power1', 'Cubic', etc. に変更可）
-                    onComplete: () => {
-                        if (result.rarity === 'SSR') {
-                            this.time.delayedCall(200, () => {
-                                // まず一気にドアップ
-                                this.tweens.add({
-                                    targets: equipment,
-                                    scale: 15,
-                                    duration: 500,
-                                    yoyo: true,    // 拡大後に元に戻す
-                                    ease: 'Power1',
-                                    onComplete: () => {
-                                        // box.setScale(1);  // 念のため元サイズをセット
+                rect.setAlpha(1);
+                equipment.setAlpha(1);
+                if (result.rarity === 'SSR') {
+                    rect.setAlpha(0);
+                    box.setAlpha(0);
+                    this.time.delayedCall(200, () => {
+                        // まず一気にドアップ
+                        this.tweens.add({
+                            targets: [rect,box,equipment],
+                            scale: 10,
+                            duration: 500,
+                            yoyo: true,    // 拡大後に元に戻す
+                            ease: 'Power1',
+                            onComplete: () => {
+                                // 戻す
+                                rect.setAlpha(1);
+                                box.setAlpha(1);
+                                // ゲーミングさせる
+                                let hue = 0;
+                                this.rainbowEvent = this.time.addEvent({
+                                    delay: 10, // 約33fps
+                                    loop: true,
+                                    callback: () => {
+                                        hue += 1;
+                                        if (hue > 360) hue = 0;
+                                
+                                        const rgb = Phaser.Display.Color.HSVToRGB(hue / 360, 1, 1).color;
+                                        box.setTint(rgb);
                                     }
                                 });
-                            });
-                        }
-                    }
-                });
-
-                this.pullNum = results.length;
-                if (this.pullNum <= 0) {
-                    this.okButton.setVisible(true);
+                                // box.setScale(1);  // 念のため元サイズをセット
+                            }
+                        });
+                    })
                 }
             }
         });
+        this.pullNum = results.length;
+        if (this.pullNum <= 0) {
+            this.isResult = true;    // 結果表示画面
+            this.okButton.setVisible(true);
+        }
         return;
     }
 
@@ -291,27 +367,41 @@ export default class GachaScene extends Phaser.Scene {
 
     preSelectBox(){
         this.backButton.setVisible(false);
-        this.pullButton.setVisible(false);
+        this.pullButton1.setVisible(false);
+        this.pullButton5.setVisible(false);
         this.gachaArea.setVisible(true);
     }
     postPullGacha(){
         this.isPulling = false;
         this.backButton.setVisible(true);
-        this.pullButton.setVisible(true);
+        this.pullButton1.setVisible(true);
+        this.pullButton5.setVisible(true);
         this.gachaArea.setVisible(false);
         this.okButton.setVisible(false);
         this.pullResults = null;
         this.isSelecting = false;
+        this.isResult = false;    // 結果表示画面
+        this.rainbowEvent?.remove();  // 完全に削除
 
         // 見た目を戻す
-        this.boxes.forEach(box => {
+        this.itemContainers.forEach((container, index)=> {
+            const rect = container.getAt(0);
+            const box = container.getAt(1);
+            const equipment = container.getAt(2);
+
             box.clearTint();
-            box.setAlpha(1);
-        });
-        this.equipments.forEach(eq => {
-            eq.clearTint();
-            eq.setAlpha(0);
-            eq.removeAllListeners('pointerdown');
+            box.setFrame(7);
+            box.removeAllListeners('pointerdown');
+            box.on('pointerdown', ()=>{
+                this.sfxManager.play('buttonSoftSound');
+                this.selectBox(container);
+            });
+
+            equipment.clearTint();
+            equipment.setAlpha(0);
+            equipment.removeAllListeners('pointerdown');
+
+            rect.setAlpha(0);
         });
     }
     // 抽選本体

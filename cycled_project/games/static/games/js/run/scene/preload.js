@@ -178,6 +178,11 @@ export default class PreloadScene extends Phaser.Scene {
             frameHeight: 16,
             spacing: 1     // ← 各スプライト間のスペース
         });
+        this.load.spritesheet('monochroTilesBrack', `${imgDir}monochrome_tilemap.png`, { 
+            frameWidth: 16, 
+            frameHeight: 16,
+            spacing: 1     // ← 各スプライト間のスペース
+        });
 
         // 効果音
         this.load.audio('jumpSound', `${soundDir}/jump.wav`);
