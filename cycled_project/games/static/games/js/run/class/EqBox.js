@@ -6,8 +6,8 @@ export class EqBox extends Phaser.GameObjects.Container {
 
         this.scene = scene;
         this.size = size;
-        this.isFlipping = false;
-        this.isFlipped = false;
+        this.isOpening = false;
+        this.isOpened = false;
         this.gachaResult = gachaResult;           // 中身のデータ
 
         // !ボックス
@@ -36,19 +36,20 @@ export class EqBox extends Phaser.GameObjects.Container {
 
         // イベント設定
         this.hitArea.on('pointerover', () => {
-            // if (!this.isFlipped) return;
+            // if (!this.isOpened) return;
             scene.input.setDefaultCursor('pointer');
         });
         this.hitArea.on('pointerout', () => {
-            // if (!this.isFlipped) return;
+            // if (!this.isOpened) return;
             scene.input.setDefaultCursor('default');
         });
     }
 
     // ひっくり返す
-    flip() {
-        if (this.isFlipping) return;
-        const { equipment, eqRect, frontBox, backBox } = this;
+    open() {
+        if (this.isOpening) return;
+        this.scene.sfxManager.play('blockSound');
+        const { equipment, eqRect, frontBox, backBox, hitArea } = this;
         const rarityColors = {
             'R': 0xffffff,
             'SR': 0xffd700,
@@ -56,46 +57,71 @@ export class EqBox extends Phaser.GameObjects.Container {
         };
         equipment.setTexture(this.gachaResult.imgKey, this.gachaResult.frame);
 
-        this.isFlipping = true;
-        this.scene.tweens.add({
-            targets: [equipment, eqRect, frontBox, backBox],
-            scaleX: 0,
-            scaleY: 10,
-            duration: 200,
-            yoyo: true,
-            onYoyo: () => {
-                frontBox.setAlpha(0);
-                backBox.setAlpha(1);
-                backBox.setTint(rarityColors[this.gachaResult.rarity]);
-            },
-            onComplete: () => {
-                eqRect.setAlpha(1);
-                equipment.setAlpha(1);
-                if (this.gachaResult.rarity === 'SSR') {
-                    eqRect.setAlpha(0);
-                    backBox.setAlpha(0);
-                    this.scene.time.delayedCall(200, () => {
+        this.isOpening = true;
+        backBox.setTint(rarityColors[this.gachaResult.rarity]);
+        this.scene.tweens.chain({
+            targets: frontBox,
+            tweens: [
+                {
+                    y: -50, duration: 50, ease: 'Sine.easeInOut'
+                },
+                {
+                    y: 30, duration: 100, ease: 'Sine.easeInOut',
+                    onStart: () => {
+                        equipment.setAlpha(1);
                         this.scene.tweens.add({
-                            targets: [equipment, eqRect, backBox],
-                            scale: 10,
-                            duration: 500,
-                            yoyo: true,
-                            ease: 'Power1',
-                            onComplete: () => {
-                                eqRect.setAlpha(1);
-                                backBox.setAlpha(1);
-                                this.startRainbowEffect();
-                                this.isFlipping = false;
-                                this.isFlipped = true;
-                            }
-                        });
-                    });
-                } else {
-                    this.isFlipping = false;
-                    this.isFlipped = true;
-                }
-            }
+                            targets: [equipment, eqRect, backBox, hitArea],
+                            y: - 150,
+                            duration: 100,
+                            ease: 'Sine.easeInOut',
+                        });                          
+                    }
+                },
+                {
+                    y: 0, duration: 50, ease: 'Sine.easeInOut',
+                    onStart: () => {
+                        // ここで絵柄変更
+                        frontBox.setFrame(9);
+                    },
+                    onComplete: () => {
+                        if (this.gachaResult.rarity === 'SSR') {
+                            this.scene.time.delayedCall(200, () => {
+                                this.scene.tweens.add({
+                                    targets: [equipment],
+                                    scale: 10,
+                                    duration: 500,
+                                    yoyo: true,
+                                    ease: 'Power1',
+                                    onComplete: () => {
+                                        this.scene.tweens.add({
+                                            targets: [eqRect,backBox],
+                                            alpha: 1,
+                                            duration: 500,       // フェードイン時間（ミリ秒）
+                                            ease: 'Linear'       // イージング（好みで変えてOK）
+                                        });
+                                        this.startRainbowEffect();
+                                        this.isOpening = false;
+                                        this.isOpened = true;
+                                    }
+                                });
+                            });
+                        } else {
+                            this.scene.tweens.add({
+                                targets: [eqRect,backBox],
+                                alpha: 1,
+                                duration: 500,       // フェードイン時間（ミリ秒）
+                                ease: 'Linear'       // イージング（好みで変えてOK）
+                            });
+                            this.isOpening = false;
+                            this.isOpened = true;
+                        }
+                    }
+                },
+            ]
         });
+        
+        // chain.restart();
+        
     }
 
     startRainbowEffect() {
@@ -115,19 +141,20 @@ export class EqBox extends Phaser.GameObjects.Container {
 
     showResult() {
         var scene = this.scene;
+        var msg = `${this.gachaResult.eqDescription1}\n\n[color=#888888]${this.gachaResult.msg}[/color]`;
         createPopupWindow(scene, {
             x: scene.game.config.width / 2,  // 画面の中央X座標
             y: scene.game.config.height / 2, // 画面の中央Y座標
             width: scene.game.config.height * 2/3 * 1.618,
             height: scene.game.config.height * 2/3,
             header: this.gachaResult.name,
-            message: this.gachaResult.msg ,
+            message: msg,
         });
     }
 
     // リセットの際に、中身のgachaResultを渡す
     reset(gachaResult) {
-        this.isFlipped = false;
+        this.isOpened = false;
         this.gachaResult = gachaResult;
         this.eqRect.setAlpha(0);
         this.box.setAlpha(1);

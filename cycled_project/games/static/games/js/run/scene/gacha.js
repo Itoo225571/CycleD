@@ -242,14 +242,14 @@ export default class GachaScene extends Phaser.Scene {
             itemContainer.hitArea.on('pointerdown', () => {
                 // 終了していない場合、カードをめくる or その内容を見せる
                 this.isSelecting = true;
-                this.sfxManager.play('buttonSoftSound');
-                if (itemContainer.isFlipped) {
+                if (itemContainer.isOpened) {
+                    this.sfxManager.play('buttonSoftSound');
                     itemContainer.showResult();
                 } else {
-                    itemContainer.flip();
+                    itemContainer.open();
                 }
 
-                var flippedCount = this.eqBoxes.filter(box => box.isFlipped || box.isFlipping).length;
+                var flippedCount = this.eqBoxes.filter(box => box.isOpened || box.isOpening).length;
                 if (flippedCount >= num) {
                     postOpening();
                 }
@@ -267,13 +267,13 @@ export default class GachaScene extends Phaser.Scene {
                 this.isSelecting = true;
                 this.sfxManager.play('buttonSoftSound');
 
-                const targets = this.eqBoxes.filter(eqBox => !eqBox.isFlipped && !eqBox.isFlipping);
+                const targets = this.eqBoxes.filter(eqBox => !eqBox.isOpened && !eqBox.isOpening);
                 // 入力を無効化
                 this.input.enabled = false;
                 
                 targets.forEach((eqBox, i) => {
-                    this.time.delayedCall(500 * i, () => {
-                        eqBox.flip();
+                    this.time.delayedCall(400 * i, () => {
+                        eqBox.open();
                         if (i === targets.length - 1) {
                             // 最後のflipが終わるタイミングで入力を戻す＆end()実行
                             this.time.delayedCall(200, () => {
@@ -292,6 +292,7 @@ export default class GachaScene extends Phaser.Scene {
             this.isResult = true;
             this.okButton.setVisible(true);
             this.backButton.setVisible(true);
+            this.skipButton.setVisible(false);
         }
     }
     postPullGacha(){

@@ -90,8 +90,8 @@
         "imgKey": "1bit-icons2",
         "frame": 24,
         "msg": "Amazonレビュー星4.9",
-        "eqDescription1": "ゲーム開始時に一度だけスキルチャージバーを少し増やす",
-        "eqDescription2": "ゲーム開始時に一度だけスキルチャージバーを増やす",
+        "eqDescription1": "ゲーム開始時に一度だけ\nスキルチャージバーを少し増やす",
+        "eqDescription2": "ゲーム開始時に一度だけ\nスキルチャージバーを増やす",
         "effects1": [
             {
                 "timing": "triggered",
@@ -118,8 +118,8 @@
         "imgKey": "1bit-icons1",
         "frame": 417,
         "msg": "飲むタイプのヤバいやつ",
-        "eqDescription1": "残機を1つ減らす代わりに、ジャンプ力がすごく上がる",
-        "eqDescription2": "ゲーム開始時の残機を1にする代わりに、ジャンプ力がめっちゃ上がる",
+        "eqDescription1": "残機を1つ減らす代わりに、\nジャンプ力がすごく上がる",
+        "eqDescription2": "ゲーム開始時の残機を1にする代わりに、\nジャンプ力がめっちゃ上がる",
         "effects1": [
             {
                 "timing": "passive",
@@ -189,8 +189,8 @@
         "imgKey": "1bit-icons2",
         "frame": 345,
         "msg": "USB Type-C",
-        "eqDescription1": "コインを集めたときのスキルチャージ量が少し増える",
-        "eqDescription2": "コインを集めたときのスキルチャージ量が増える",
+        "eqDescription1": "コインを集めたときの\nスキルチャージ量が少し増える",
+        "eqDescription2": "コインを集めたときの\nスキルチャージ量が増える",
         "effects1": [
             {
                 "timing": "passive",
@@ -273,8 +273,8 @@
         "imgKey": "1bit-icons2",
         "frame": 59,
         "msg": "在来種\nピヨピヨちゃんに捕食され、\n現在絶滅危惧種に指定されている",
-        "eqDescription1": "ジャンプ回数が1回増えるが、ジャンプ力が下がる",
-        "eqDescription2": "ジャンプ回数が2回増えるが、ジャンプ力がすごく下がる",
+        "eqDescription1": "ジャンプ回数が1回増えるが、\nジャンプ力が下がる",
+        "eqDescription2": "ジャンプ回数が2回増えるが、\nジャンプ力がすごく下がる",
         "effects1": [
             {
                 "timing": "passive",

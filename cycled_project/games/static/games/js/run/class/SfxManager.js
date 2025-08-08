@@ -18,6 +18,7 @@ export default class SfxManager {
             buttonHardSound: 0.8,
             pauseSound: 1.0,
             selectedSound: 0.8,
+            blockSound: 2.0,
         };
     }
 

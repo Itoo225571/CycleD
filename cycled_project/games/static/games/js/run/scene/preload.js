@@ -196,6 +196,7 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.audio('buttonHardSound', `${soundDir}/buttonHard.wav`);
         this.load.audio('pauseSound', `${soundDir}/pause.wav`);
         this.load.audio('selectedSound', `${soundDir}/selected.wav`);
+        this.load.audio('blockSound', `${soundDir}/block.mp3`);
 
         // bgm読み込み
         this.load.audio('bgmDrops', `${soundDir}/bgm/drops.mp3`);
