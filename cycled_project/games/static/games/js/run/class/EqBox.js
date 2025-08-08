@@ -87,7 +87,7 @@ export class EqBox extends Phaser.GameObjects.Container {
         });
     }    
 
-    // ひっくり返す
+    // 開ける
     async open() {
         if (this.isOpening) return;
         await this._preopen();  // ここで待つ
@@ -115,7 +115,7 @@ export class EqBox extends Phaser.GameObjects.Container {
                         equipment.setAlpha(1);
                         this.scene.tweens.add({
                             targets: [equipment, eqRect, backBox, hitArea],
-                            y: - 150,
+                            y: - (this.size + 20),
                             duration: 100,
                             ease: 'Sine.easeInOut',
                         });                          
@@ -133,11 +133,18 @@ export class EqBox extends Phaser.GameObjects.Container {
                         }
                     },
                     onComplete: () => {
+                        this.scene.tweens.add({
+                            targets: frontBox,
+                            alpha: 0,
+                            duration: 500,       // フェードイン時間（ミリ秒）
+                            ease: 'Linear'       // イージング（好みで変えてOK）
+                        });
                         if (this.gachaResult.rarity === 'SSR') {
                             this.scene.time.delayedCall(200, () => {
                                 this.scene.tweens.add({
                                     targets: [equipment],
-                                    scale: 10,
+                                    displayWidth: this.size*1.5,
+                                    displayHeight: this.size*1.5,
                                     duration: 500,
                                     yoyo: true,
                                     ease: 'Power1',
@@ -168,6 +175,14 @@ export class EqBox extends Phaser.GameObjects.Container {
         });
         
         const openCompleted = () => {
+            this.scene.time.delayedCall(200, () => {
+                this.scene.tweens.add({
+                    targets: [equipment, eqRect, backBox, hitArea],
+                    y: 0,
+                    duration: 1000,
+                    ease: 'Sine.easeInOut',
+                });
+            });
             this.isOpening = false;
             this.isOpened = true;
             this.emit('opened');

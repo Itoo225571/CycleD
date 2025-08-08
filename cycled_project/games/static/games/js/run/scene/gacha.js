@@ -213,7 +213,7 @@ export default class GachaScene extends Phaser.Scene {
     showGacha(num=1){
         if (this.isPulling) return;  // 回転中は無視
         if (num === 1 || num === 10) {
-            this.selectText.setText(num === 1 ? 'SELECT ONE BOX' : 'SELECT ALL BOX');
+            this.selectText.setText(num === 1 ? 'TAP THE BOX' : 'TAP ALL BOXES');
         } else {
             return;
         }
@@ -233,7 +233,7 @@ export default class GachaScene extends Phaser.Scene {
         const spacing = this.areaWidth / (num+1);  // スプライトの幅に合わせた間隔（必要に応じて調整）
         const startX = this.areaWidth / (num+1);
         const startY = this.areaHeight / 2;
-        const size = 96;
+        const size = (num === 1) ? 96 * 2 : 96;
 
         for (let i = 0; i < num; i++) {
             const x = startX + i * spacing;
