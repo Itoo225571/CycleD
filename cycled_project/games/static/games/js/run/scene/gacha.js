@@ -248,11 +248,12 @@ export default class GachaScene extends Phaser.Scene {
                 } else {
                     itemContainer.open();
                 }
-
-                var flippedCount = this.eqBoxes.filter(box => box.isOpened || box.isOpening).length;
-                if (flippedCount >= num) {
-                    postOpening();
-                }
+                itemContainer.once('opened', () => {
+                    var flippedCount = this.eqBoxes.filter(box => box.isOpened || box.isOpening).length;
+                    if (flippedCount >= num) {
+                        postOpening();
+                    }
+                });
             });
 
             this.eqBoxes.push(itemContainer);
@@ -260,30 +261,31 @@ export default class GachaScene extends Phaser.Scene {
         }
 
         // skipボタン
-        this.skipButton = this.add.sprite(this.areaWidth -100, 80, 'inputPrompts', 269)
+        this.skipButton = this.add.sprite(this.areaWidth - 100, 80, 'inputPrompts', 269)
             .setDisplaySize(96, 96)
             .setInteractive({ useHandCursor: true })
-            .on('pointerdown', () => {
+            .on('pointerdown', async () => {
                 this.isSelecting = true;
                 this.sfxManager.play('buttonSoftSound');
-
+        
                 const targets = this.eqBoxes.filter(eqBox => !eqBox.isOpened && !eqBox.isOpening);
-                // 入力を無効化
+        
                 this.input.enabled = false;
-                
-                targets.forEach((eqBox, i) => {
-                    this.time.delayedCall(400 * i, () => {
+        
+                for (const eqBox of targets) {
+                    await new Promise(resolve => {
+                        eqBox.once('opened', () => resolve());
                         eqBox.open();
-                        if (i === targets.length - 1) {
-                            // 最後のflipが終わるタイミングで入力を戻す＆end()実行
-                            this.time.delayedCall(200, () => {
-                                this.input.enabled = true; // 入力有効化
-                                postOpening();
-                            });
-                        }
                     });
-                });                                   
+                    // open完了後待つ
+                    await new Promise(resolve => this.time.delayedCall(300, resolve));
+                }
+        
+                this.input.enabled = true;
+                postOpening();
             });
+    
+    
         this.gachaArea.add(this.skipButton);   
 
         this.gachaArea.setVisible(true);

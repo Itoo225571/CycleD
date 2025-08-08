@@ -9,10 +9,20 @@ export class EqBox extends Phaser.GameObjects.Container {
         this.isOpening = false;
         this.isOpened = false;
         this.gachaResult = gachaResult;           // 中身のデータ
+        this.appRarity = 'R';                   // 見た目のレアリティ
 
-        // !ボックス
+        // !ボックス        
         this.frontBox = scene.add.sprite(0, 0, 'monochroTiles', 7)
             .setDisplaySize(size, size);
+        // 条件: レアリティが R または SSR
+        if ((gachaResult.rarity === 'SR' || gachaResult.rarity === 'SSR') && Math.random() < 0.5) {
+            // 金色にする（16進カラーコード）
+            this.frontBox.setTint(0xFFD700); // 金色
+            this.appRarity = 'SR';
+        } else if (gachaResult.rarity === 'SSR' && Math.random() < 0.5) {
+            this.rainbowEvent = this.startRainbowEffect(this.frontBox);
+            this.appRarity = 'SSR';
+        }
 
         // 裏
         this.backBox = scene.add.sprite(0, 0, 'monochroTiles', 90)
@@ -45,9 +55,43 @@ export class EqBox extends Phaser.GameObjects.Container {
         });
     }
 
+    _preopen() {
+        return new Promise(resolve => {
+            this.hitArea.disableInteractive();
+            if (this.appRarity != this.gachaResult.rarity) {
+                this.frontBox.setAlpha(0);
+                if (this.gachaResult.rarity === 'SR') {
+                    this.frontBox.setTint(0xFFD700); // 金色
+                    this.appRarity = 'SR';
+                } else if (this.gachaResult.rarity === 'SSR') {
+                    this.rainbowEvent = this.startRainbowEffect(this.frontBox);
+                    this.appRarity = 'SSR';
+                }
+                this.scene.tweens.add({
+                    targets: this.frontBox,
+                    alpha: 1,
+                    duration: 500,
+                    onComplete: () => {
+                        this.frontBox.setAlpha(1);
+                        this.scene.time.delayedCall(1000, () => {
+                            this.hitArea.setInteractive();
+                            resolve();
+                        });
+                    }
+                });
+            } else {
+                // すでに同じレアリティなら即座にresolve
+                this.hitArea.setInteractive();
+                resolve();
+            }
+        });
+    }    
+
     // ひっくり返す
-    open() {
+    async open() {
         if (this.isOpening) return;
+        await this._preopen();  // ここで待つ
+
         this.scene.sfxManager.play('blockSound');
         const { equipment, eqRect, frontBox, backBox, hitArea } = this;
         const rarityColors = {
@@ -82,6 +126,11 @@ export class EqBox extends Phaser.GameObjects.Container {
                     onStart: () => {
                         // ここで絵柄変更
                         frontBox.setFrame(9);
+                        this.frontBox.clearTint();
+                        if (this.rainbowEvent) {
+                            this.rainbowEvent.remove();
+                            this.rainbowEvent = null;
+                        }
                     },
                     onComplete: () => {
                         if (this.gachaResult.rarity === 'SSR') {
@@ -99,9 +148,8 @@ export class EqBox extends Phaser.GameObjects.Container {
                                             duration: 500,       // フェードイン時間（ミリ秒）
                                             ease: 'Linear'       // イージング（好みで変えてOK）
                                         });
-                                        this.startRainbowEffect();
-                                        this.isOpening = false;
-                                        this.isOpened = true;
+                                        this.rainbowEvent = this.startRainbowEffect(this.backBox);
+                                        openCompleted();
                                     }
                                 });
                             });
@@ -112,19 +160,22 @@ export class EqBox extends Phaser.GameObjects.Container {
                                 duration: 500,       // フェードイン時間（ミリ秒）
                                 ease: 'Linear'       // イージング（好みで変えてOK）
                             });
-                            this.isOpening = false;
-                            this.isOpened = true;
+                            openCompleted();
                         }
                     }
                 },
             ]
         });
         
-        // chain.restart();
+        const openCompleted = () => {
+            this.isOpening = false;
+            this.isOpened = true;
+            this.emit('opened');
+        }
         
     }
 
-    startRainbowEffect() {
+    startRainbowEffect(target) {
         let hue = 0;
         const event = this.scene.time.addEvent({
             delay: 10,
@@ -133,10 +184,10 @@ export class EqBox extends Phaser.GameObjects.Container {
                 hue += 1;
                 if (hue > 360) hue = 0;
                 const rgb = Phaser.Display.Color.HSVToRGB(hue / 360, 1, 1).color;
-                this.backBox.setTint(rgb);
+                target.setTint(rgb);
             }
         });
-        this.rainbowEvent = event;
+        return event;
     }
 
     showResult() {
@@ -160,6 +211,7 @@ export class EqBox extends Phaser.GameObjects.Container {
         this.box.setAlpha(1);
         this.box.clearTint();
         this.equipment.setAlpha(0);
+        this.appRarity = 'R'
 
         if (this.rainbowEvent) {
             this.rainbowEvent.remove();
