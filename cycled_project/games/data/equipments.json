@@ -29,11 +29,11 @@
       },
     {
         "id": "2",
-        "name": "鈍足",
+        "name": "鉄球",
         "rarity": "R",
         "imgKey": "1bit-icons2",
-        "frame": 159,
-        "msg": "直線で差をつけろ",
+        "frame": 29,
+        "msg": "当然！「鉄球」だッ！",
         "eqDescription1": "足が少し遅くなる",
         "eqDescription2": "足が遅くなる",
         "effects1": [
@@ -61,7 +61,7 @@
         "rarity": "R",
         "imgKey": "1bit-icons1",
         "frame": 68,
-        "msg": "外来種",
+        "msg": "外来種\n28種類の在来種を絶滅させた\nジャンプをお手伝いしてくれるよ",
         "eqDescription1": "ジャンプ力が少し上がる",
         "eqDescription2": "ジャンプ力が上がる",
         "effects1": [
@@ -89,7 +89,7 @@
         "rarity": "R",
         "imgKey": "1bit-icons2",
         "frame": 24,
-        "msg": "今時、電池型のデバイスは流行らないかも",
+        "msg": "Amazonレビュー星4.9",
         "eqDescription1": "ゲーム開始時に一度だけスキルチャージバーを少し増やす",
         "eqDescription2": "ゲーム開始時に一度だけスキルチャージバーを増やす",
         "effects1": [
@@ -184,11 +184,11 @@
     },
     {
         "id": "103",
-        "name": "充電装置",
+        "name": "充電コード",
         "rarity": "SR",
         "imgKey": "1bit-icons2",
-        "frame": 24,
-        "msg": "（充電コード別売）",
+        "frame": 345,
+        "msg": "USB Type-C",
         "eqDescription1": "コインを集めたときのスキルチャージ量が少し増える",
         "eqDescription2": "コインを集めたときのスキルチャージ量が増える",
         "effects1": [

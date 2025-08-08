@@ -216,9 +216,9 @@ class PullGachaAPIView(views.APIView):
         price = 0  #とりあえずpriceは固定
         # レアリティごとの出現確率
         rarity_weights = {
-            "R": 80,     # 80%
-            "SR": 15,    # 15%
-            "SSR": 5     # 5%
+            "R": 82,
+            "SR": 15,
+            "SSR": 3
         }
 
         try:
