@@ -216,18 +216,6 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.audio('bgmGameOver', `${soundDir}/bgm/game_over.mp3`);
         this.load.audio('bgmGacha', `${soundDir}/bgm/gacha.mp3`);
 
-        // options
-        // 一度だけグローバルにBGMマネージャを登録
-        if (!this.registry.get('bgmManager')) {
-            const bgmManager = new BgmManager(this);
-            this.registry.set('bgmManager', bgmManager);
-        }
-        // 一度だけグローバルに効果音マネージャを登録
-        if (!this.registry.get('sfxManager')) {
-            const sfxManager = new SfxManager(this);
-            this.registry.set('sfxManager', sfxManager);
-        }
-
         // map読み込み
         this.loadMap();
     }
@@ -263,6 +251,18 @@ export default class PreloadScene extends Phaser.Scene {
 
         // ユーザー情報取得
         this.getGameData();
+
+        // options
+        // 一度だけグローバルにBGMマネージャを登録
+        if (!this.registry.get('bgmManager')) {
+            const bgmManager = new BgmManager(this);
+            this.registry.set('bgmManager', bgmManager);
+        }
+        // 一度だけグローバルに効果音マネージャを登録
+        if (!this.registry.get('sfxManager')) {
+            const sfxManager = new SfxManager(this);
+            this.registry.set('sfxManager', sfxManager);
+        }
 
         // ajaxで情報を取得してからスタート
         this.events.on('gameDataLoaded', (data) => {
