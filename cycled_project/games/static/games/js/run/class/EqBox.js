@@ -31,8 +31,8 @@ export class EqBox extends Phaser.GameObjects.Container {
 
         // 黒背景
         this.eqRect = scene.add.sprite(0, 0, 'monochroTilesBrack', 0)
-            .setAlpha(0)
-            .setDisplaySize(size * 2 / 3, size * 2 / 3);
+            .setAlpha(1)
+            .setDisplaySize(size * 5/6, size * 5/6);
 
         // 中身
         this.equipment = scene.add.sprite(0, 0, 'monochroTiles', 7)
@@ -42,7 +42,7 @@ export class EqBox extends Phaser.GameObjects.Container {
         this.hitArea = this.scene.add.zone(0, 0, size, size)
             .setInteractive();        
 
-        this.add([this.backBox, this.eqRect, this.equipment, this.frontBox, this.hitArea]);
+        this.add([this.eqRect, this.backBox, this.equipment, this.frontBox, this.hitArea]);
 
         // イベント設定
         this.hitArea.on('pointerover', () => {
@@ -103,6 +103,7 @@ export class EqBox extends Phaser.GameObjects.Container {
 
         this.isOpening = true;
         backBox.setTint(rarityColors[this.gachaResult.rarity]);
+        eqRect.setAlpha(0);
         this.scene.tweens.chain({
             targets: frontBox,
             tweens: [
@@ -175,6 +176,7 @@ export class EqBox extends Phaser.GameObjects.Container {
         });
         
         const openCompleted = () => {
+            eqRect.setAlpha(1);
             this.scene.time.delayedCall(200, () => {
                 this.scene.tweens.add({
                     targets: [equipment, eqRect, backBox, hitArea],
@@ -222,7 +224,6 @@ export class EqBox extends Phaser.GameObjects.Container {
     reset(gachaResult) {
         this.isOpened = false;
         this.gachaResult = gachaResult;
-        this.eqRect.setAlpha(0);
         this.box.setAlpha(1);
         this.box.clearTint();
         this.equipment.setAlpha(0);

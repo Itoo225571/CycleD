@@ -183,6 +183,15 @@ export default class PreloadScene extends Phaser.Scene {
             frameHeight: 16,
             spacing: 1     // ← 各スプライト間のスペース
         });
+        this.load.spritesheet('CannonFire', `${imgDir}CannonFire.png`, { 
+            frameWidth: 50, 
+            frameHeight: 36,
+            // spacing: 10,
+        });
+        // this.load.spritesheet('CannonFireEffect', `${imgDir}CannonFireEffect.png`, { 
+        //     frameWidth: 20, 
+        //     frameHeight: 28,
+        // });
 
         // 効果音
         this.load.audio('jumpSound', `${soundDir}/jump.wav`);
