@@ -74,7 +74,7 @@ export class EqBox extends Phaser.GameObjects.Container {
                     duration: 500,
                     onComplete: () => {
                         this.frontBox.setAlpha(1);
-                        this.scene.time.delayedCall(1000, () => {
+                        this.scene.time.delayedCall(500, () => {
                             this.hitArea.setInteractive();
                             resolve();
                         });

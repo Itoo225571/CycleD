@@ -34,27 +34,26 @@ export default class SfxManager {
     play(key, options = {}) {
         const baseVolume = this.volumeTable[key] ?? 1.0;
         const rawVolume = options.volume ?? baseVolume;
-    
+
         const playerOptions = get_options();
+        // 基準音量 x 主音量 x 効果音音量
         const finalVolume = Phaser.Math.Clamp(
             rawVolume * playerOptions.masterVolume * playerOptions.sfxVolume,
             0, 1
         );
     
-        const sound = this.sfxCache[key];
+        const sound = this.scene.sound.add(key);
+        sound.play({
+            ...options,
+            volume: finalVolume,
+        });
     
-        if (sound.isPlaying) {
-            // 同時再生したい場合はclone
-            const clone = this.scene.sound.add(key);
-            clone.play({ ...options, volume: finalVolume });
-            this.activeSFX.push(clone);
-            clone.once('complete', () => {
-                this.activeSFX = this.activeSFX.filter(s => s !== clone);
-                clone.destroy();
-            });
-        } else {
-            sound.play({ ...options, volume: finalVolume });
-        }
+        this.activeSFX.push(sound);
+    
+        sound.once('complete', () => {
+            this.activeSFX = this.activeSFX.filter(s => s !== sound);
+            sound.destroy();
+        });
     }
 
     stop(key) {

@@ -304,12 +304,13 @@ export default class GachaScene extends Phaser.Scene {
         var skipHeight = 96;
         var skipX = this.areaWidth - 100;
         var skipY = 80;
-        if (!this.skipButton) {
+        if (!this.skipButton || !this.skipButton.active) {
             // 初回作成
             this.skipButton = this.add.sprite(skipX, skipY, 'inputPrompts', 269)
                 .setDisplaySize(skipWidth, skipHeight)
                 .setInteractive({ useHandCursor: true })
                 .setVisible(false)
+                .setAlpha(1)
                 .on('pointerdown', async () => {
                     this.isSelecting = true;
                     this.cannon.setAlpha(0);
@@ -357,86 +358,96 @@ export default class GachaScene extends Phaser.Scene {
                 this.time.delayedCall(duration + 500, () => {
                     this.canClickCannon = true;
                     this.selectText.setVisible(true);
-                    this.cannon.setInteractive({ useHandCursor: true }).on('pointerdown', () => {
-                        if (!this.canClickCannon) return;  // クリック禁止なら無視
 
-                        this.canClickCannon = false;  // クリック禁止にする
+                    this.fullScreenHitArea = this.add.rectangle(
+                        this.cameras.main.width / 2,
+                        this.cameras.main.height / 2,
+                        this.cameras.main.width,
+                        this.cameras.main.height,
+                        0x000000,
+                        0
+                    )
+                    .setInteractive({ useHandCursor: true })
+                    .on('pointerdown', () => {
+                        if (!this.canClickCannon) return;
+                
+                        this.canClickCannon = false;
                         this.selectText
                             .setVisible(false)
                             .setText(this.resultsNum === 1 ? 'TAP THE BOX' : 'TAP ALL BOXES');
                         this.cannon.play(this.resultsNum === 1 ? 'cannonFire' : 'cannonFireSlow');
                     });
+                    
                 });
                 
             }
         });
 
-        if (!this.cannonAnimationUpdateHandler) {
-            this.cannonAnimationUpdateHandler = (anim, frame, gameObject) => {
-                if (frame.index < 4) {
-                    this.tweens.add({
-                        targets: this.cannon,
-                        x: this.areaWidth/2 + frame.index*15,
-                        duration: 100,
-                    });
-                }
-                if (frame.index === 4) {
-                    this.sfxManager.play('cannonFireSound');
-                    this.tweens.add({
-                        targets: this.cannon,
-                        x: this.areaWidth/2,
-                        duration: 100,
-                        ease: 'Bounce.easeOut'   // 弾むように落ち着く感じ
-                    });
-
-                    // box を右から左へ tween で移動
-                    this.eqBoxes.forEach((box,index) => {
-                        box.setVisible(true);
-                        this.tweens.chain({
-                            targets: box,
-                            tweens: [
-                                {
-                                    x: -this.areaWidth /2, duration: 500, ease: 'Power2',
-                                    onComplete: () => {
-                                        this.tweens.add({
-                                            targets: this.cannon,
-                                            x: this.areaWidth * 3/2,
-                                            duration: 1000,
-                                            ease: 'Power2',
-                                        });
-                                    }
-                                },
-                                {
-                                    x: this.areaWidth /2, 
-                                    duration: 1000, 
-                                    ease: 'Power2',
-                                },
-                                {
-                                    x: this.resultsNum === 1 ? box.postX : this.areaWidth /2 + (index-5)*10, 
-                                    y: this.resultsNum === 1 ? box.postY : this.areaHeight /2 + (index-5)*10,
-                                    duration: this.resultsNum === 1 ? 0 : 100, 
-                                    ease: 'Power2',
-                                },
-                                {
-                                    x: box.postX, 
-                                    y: box.postY, 
-                                    duration: this.resultsNum === 1 ? 0 : 1000, 
-                                    ease: 'Sine.easeInOut',
-                                    onComplete: () => {
-                                        this.isPulling = true;
-                                        this.skipButton.setVisible(true);
-                                        this.selectText.setVisible(true);
-                                        box.canOpen = true;                 // 開ける
-                                    }
-                                },
-                                
-                            ]
-                        });
-                    });
-                }
+        this.cannonAnimationUpdateHandler = (anim, frame, gameObject) => {
+            if (frame.index < 4) {
+                this.tweens.add({
+                    targets: this.cannon,
+                    x: this.areaWidth/2 + frame.index*15,
+                    duration: 100,
+                });
             }
-            this.cannon.on('animationupdate', this.cannonAnimationUpdateHandler);
+            if (frame.index === 4) {
+                this.sfxManager.play('cannonFireSound');
+                this.tweens.add({
+                    targets: this.cannon,
+                    x: this.areaWidth/2,
+                    duration: 100,
+                    ease: 'Bounce.easeOut'   // 弾むように落ち着く感じ
+                });
+
+                // box を右から左へ tween で移動
+                this.eqBoxes.forEach((box,index) => {
+                    box.setVisible(true);
+                    this.tweens.chain({
+                        targets: box,
+                        tweens: [
+                            {
+                                x: -this.areaWidth /2, duration: 500, ease: 'Power2',
+                                onComplete: () => {
+                                    this.tweens.add({
+                                        targets: this.cannon,
+                                        x: this.areaWidth * 3/2,
+                                        duration: 1000,
+                                        ease: 'Power2',
+                                    });
+                                }
+                            },
+                            {
+                                x: this.areaWidth /2, 
+                                duration: 1000, 
+                                ease: 'Power2',
+                            },
+                            {
+                                x: this.resultsNum === 1 ? box.postX : this.areaWidth /2 + (index-5)*10, 
+                                y: this.resultsNum === 1 ? box.postY : this.areaHeight /2 + (index-5)*10,
+                                duration: this.resultsNum === 1 ? 0 : 100, 
+                                ease: 'Power2',
+                            },
+                            {
+                                x: box.postX, 
+                                y: box.postY, 
+                                duration: this.resultsNum === 1 ? 0 : 1000, 
+                                ease: 'Sine.easeInOut',
+                                onComplete: () => {
+                                    this.isPulling = true;
+                                    this.skipButton.setVisible(true);
+                                    this.selectText.setVisible(true);
+                                    this.fullScreenHitArea.setVisible(false);
+                                    box.canOpen = true;                 // 開ける
+                                }
+                            },
+                            
+                        ]
+                    });
+                });
+            }
         }
+        this.cannon.on('animationupdate', this.cannonAnimationUpdateHandler);
 
         const postOpening = () => {
             this.isResult = true;
@@ -444,6 +455,10 @@ export default class GachaScene extends Phaser.Scene {
             this.backButton.setVisible(true);
             this.skipButton.setVisible(false);
             this.selectText.setVisible(false);
+            this.cannon.off('animationupdate', this.cannonAnimationUpdateHandler);
+
+            this.fullScreenHitArea.destroy();
+            this.fullScreenHitArea = null;
         }
     }
     postPullGacha(){
