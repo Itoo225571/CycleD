@@ -11,6 +11,7 @@ export default class BgmManager {
             bgmDrops: 0.8,
             bgmRunning: 0.5,
             bgmGameOver: 0.5,
+            bgmGacha: 0.5,
         };
     }
 

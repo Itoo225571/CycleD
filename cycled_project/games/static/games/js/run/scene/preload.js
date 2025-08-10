@@ -198,6 +198,8 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.audio('stompSound', `${soundDir}/stomp.mp3`);
         this.load.audio('damageSound', `${soundDir}/damage.wav`);
         this.load.audio('fallingSound', `${soundDir}/falling.wav`);
+        this.load.audio('falling2Sound', `${soundDir}/falling2.wav`);
+        this.load.audio('falling3Sound', `${soundDir}/falling3.wav`);
         this.load.audio('alarmSound', `${soundDir}/alarm.wav`);
         this.load.audio('coinSound', `${soundDir}/coin.wav`);
         this.load.audio('impactSound', `${soundDir}/impact.wav`);
@@ -206,11 +208,13 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.audio('pauseSound', `${soundDir}/pause.wav`);
         this.load.audio('selectedSound', `${soundDir}/selected.wav`);
         this.load.audio('blockSound', `${soundDir}/block.mp3`);
+        this.load.audio('cannonFireSound', `${soundDir}/cannonFire.wav`);
 
         // bgm読み込み
         this.load.audio('bgmDrops', `${soundDir}/bgm/drops.mp3`);
         this.load.audio('bgmRunning', `${soundDir}/bgm/running.mp3`);
         this.load.audio('bgmGameOver', `${soundDir}/bgm/game_over.mp3`);
+        this.load.audio('bgmGacha', `${soundDir}/bgm/gacha.mp3`);
 
         // options
         // 一度だけグローバルにBGMマネージャを登録

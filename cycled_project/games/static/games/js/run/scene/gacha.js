@@ -18,8 +18,12 @@ export default class GachaScene extends Phaser.Scene {
         // 音
         this.bgmManager = this.registry.get('bgmManager');
         this.sfxManager = this.registry.get('sfxManager');
+
         // bgm停止
         this.bgmManager.stop();
+        this.time.delayedCall(1000, () => {
+            this.bgmManager.play('bgmGacha');
+        });
 
         // 戻るボタン
         this.backButton = this.add.sprite(100, 80, 'inputPrompts', 608)
@@ -150,31 +154,36 @@ export default class GachaScene extends Phaser.Scene {
         this.isSelecting = false;               // 箱を選ぶとき
         this.isResult = false;                  // 結果画面
 
+        this.cannon = this.add.sprite(0,0, 'CannonFire', 5).setVisible(false);
         // キャノンアニメーション
-        this.anims.create({
-            key: 'cannonFireSlow',
-            frames: [
-                { key: 'CannonFire', frame: 0, duration: 125 },
-                { key: 'CannonFire', frame: 1, duration: 125 },
-                { key: 'CannonFire', frame: 2, duration: 800 },
-                { key: 'CannonFire', frame: 3, duration: 50 },
-                { key: 'CannonFire', frame: 4, duration: 50 },
-                { key: 'CannonFire', frame: 5, duration: 50 },
-            ],
-            repeat: 0
-        });
-        this.anims.create({
-            key: 'cannonFire',
-            frames: [
-                { key: 'CannonFire', frame: 0, duration: 125 },
-                { key: 'CannonFire', frame: 1, duration: 125 },
-                { key: 'CannonFire', frame: 2, duration: 125 },
-                { key: 'CannonFire', frame: 3, duration: 50 },
-                { key: 'CannonFire', frame: 4, duration: 50 },
-                { key: 'CannonFire', frame: 5, duration: 50 },
-            ],
-            repeat: 0
-        });
+        if (!this.anims.exists('cannonFireSlow')) {
+            this.anims.create({
+                key: 'cannonFireSlow',
+                frames: [
+                    { key: 'CannonFire', frame: 0, duration: 125 },
+                    { key: 'CannonFire', frame: 1, duration: 125 },
+                    { key: 'CannonFire', frame: 2, duration: 1000 },
+                    { key: 'CannonFire', frame: 3, duration: 50 },
+                    { key: 'CannonFire', frame: 4, duration: 50 },
+                    { key: 'CannonFire', frame: 5, duration: 50 },
+                ],
+                repeat: 0
+            });
+        }
+        if (!this.anims.exists('cannonFire')) {
+            this.anims.create({
+                key: 'cannonFire',
+                frames: [
+                    { key: 'CannonFire', frame: 0, duration: 125 },
+                    { key: 'CannonFire', frame: 1, duration: 125 },
+                    { key: 'CannonFire', frame: 2, duration: 100 },
+                    { key: 'CannonFire', frame: 3, duration: 50 },
+                    { key: 'CannonFire', frame: 4, duration: 50 },
+                    { key: 'CannonFire', frame: 5, duration: 50 },
+                ],
+                repeat: 0
+            });
+        }        
     }
     
     // 「Start画面」に戻る処理
@@ -254,18 +263,12 @@ export default class GachaScene extends Phaser.Scene {
         var height = canonSize * 4;
         var posX = this.areaWidth/2;
         var posY = startY;
-        if (!this.cannon) {
-            // 初回作成
-            this.cannon = this.add.sprite(posX, -this.areaHeight, 'CannonFire', 5)
-                .setDisplaySize(width, height);
-            this.gachaArea.add(this.cannon);
-        } else {
-            // 既存のキャノンを再利用
-            this.cannon.setVisible(true)
-                .setAlpha(1)
-                .setDisplaySize(width, height)
-                .setPosition(posX, -this.areaHeight);
-        }
+        // 既存のキャノンを再利用
+        this.gachaArea.add(this.cannon);
+        this.cannon.setVisible(true)
+            .setAlpha(1)
+            .setDisplaySize(width, height)
+            .setPosition(posX, -this.areaHeight);
 
         // box
         for (let i = 0; i < num; i++) {
@@ -273,6 +276,7 @@ export default class GachaScene extends Phaser.Scene {
             const itemContainer = new EqBox(this,posX-canonSize*2-10,posY,size,results[i]).setVisible(false);
             itemContainer.postX = x;
             itemContainer.postY = startY;
+            itemContainer.canOpen = false;
 
             itemContainer.hitArea.on('pointerdown', () => {
                 // 終了していない場合、カードをめくる or その内容を見せる
@@ -292,7 +296,7 @@ export default class GachaScene extends Phaser.Scene {
             });
 
             this.eqBoxes.push(itemContainer);
-            this.gachaArea.add(itemContainer);
+            this.gachaArea.addAt(itemContainer, 0); // インデックス0に追加（最前面ではなく一番奥）
         }
 
         // skipボタン
@@ -308,7 +312,6 @@ export default class GachaScene extends Phaser.Scene {
                 .setVisible(false)
                 .on('pointerdown', async () => {
                     this.isSelecting = true;
-                    this.sfxManager.play('buttonSoftSound');
                     this.cannon.setAlpha(0);
                     this.selectText.setVisible(false);
             
@@ -337,29 +340,37 @@ export default class GachaScene extends Phaser.Scene {
         this.gachaArea.setVisible(true);
 
         // キャノン砲を押したらガチャスタート
+        this.resultsNum = num;  // 非同期処理のためにthisに入れる
         this.tweens.add({
             targets: this.cannon,
             y: posY,
             duration: 1000,
             ease: 'Quart.easeIn',
             onComplete: () => {
-                const duration = Math.min(200 + (num * 100), 500);
-                const intensity = Math.min(0.01 + (num * 0.01), 0.1);
+                const duration = Math.min(200 + (this.resultsNum * 100), 500);
+                const intensity = Math.min(0.01 + (this.resultsNum * 0.01), 0.1);
                 this.cameras.main.shake(duration,intensity);
+                this.time.delayedCall(100, () => {
+                    // this.sfxManager.play('falling2Sound');
+                    this.sfxManager.play(this.resultsNum === 1 ? 'falling2Sound' : 'falling3Sound');
+                    this.canClickCannon = true;
+                });
                 this.time.delayedCall(duration + 500, () => {
                     this.selectText.setVisible(true);
+                    this.cannon.setInteractive({ useHandCursor: true }).on('pointerdown', () => {
+                        if (!this.canClickCannon) return;  // クリック禁止なら無視
+
+                        this.canClickCannon = false;  // クリック禁止にする
+                        this.selectText
+                            .setVisible(false)
+                            .setText(this.resultsNum === 1 ? 'TAP THE BOX' : 'TAP ALL BOXES');
+                        this.cannon.play(this.resultsNum === 1 ? 'cannonFire' : 'cannonFireSlow');
+                    });
                 });
                 
             }
-        });        
-        this.cannon.setInteractive({ useHandCursor: true }).on('pointerdown', () => {
-            this.selectText
-                .setVisible(false)
-                .setText(num === 1 ? 'TAP THE BOX' : 'TAP ALL BOXES');
-            this.cannon.play(num === 1 ? 'cannonFire' : 'cannonFireSlow');
         });
 
-        this.resultsNum = num;  // 非同期処理のためにthisに入れる
         this.cannon.on('animationupdate', (anim, frame, gameObject) => {
             if (frame.index < 4) {
                 this.tweens.add({
@@ -369,6 +380,7 @@ export default class GachaScene extends Phaser.Scene {
                 });
             }
             if (frame.index === 4) {
+                this.sfxManager.play('cannonFireSound');
                 this.tweens.add({
                     targets: this.cannon,
                     x: this.areaWidth/2,
@@ -399,19 +411,21 @@ export default class GachaScene extends Phaser.Scene {
                                 ease: 'Power2',
                             },
                             {
-                                y: box.postY - index*10, 
+                                x: this.areaWidth /2 + (index-5)*10, 
+                                y: this.areaHeight /2 + (index-5)*10,
                                 duration: this.resultsNum === 1 ? 0 : 100, 
                                 ease: 'Power2',
                             },
                             {
                                 x: box.postX, 
                                 y: box.postY, 
-                                duration: this.resultsNum === 1 ? 0 : 1000, 
+                                duration: this.resultsNum === 1 ? 10 : 1000, 
                                 ease: 'Sine.easeInOut',
                                 onComplete: () => {
                                     this.isPulling = true;
                                     this.skipButton.setVisible(true);
                                     this.selectText.setVisible(true);
+                                    box.canOpen = true;                 // 開ける
                                 }
                             },
                             

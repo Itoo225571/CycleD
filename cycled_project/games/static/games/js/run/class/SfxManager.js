@@ -11,14 +11,17 @@ export default class SfxManager {
             stompSound: 1.2,
             damageSound: 1.0,
             fallingSound: 1.0,
+            falling2Sound: 1.0,
+            falling3Sound: 1.0,
             alarmSound: 1.0,
             coinSound: 0.6,
             impactSound: 1.0,
-            buttonSoftSound: 1.1,
-            buttonHardSound: 0.8,
+            buttonSoftSound: 0.8,
+            buttonHardSound: 0.5,
             pauseSound: 1.0,
             selectedSound: 0.8,
-            blockSound: 2.0,
+            blockSound: 1.0,
+            cannonFireSound: 0.7,
         };
     }
 

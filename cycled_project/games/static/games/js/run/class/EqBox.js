@@ -8,6 +8,7 @@ export class EqBox extends Phaser.GameObjects.Container {
         this.size = size;
         this.isOpening = false;
         this.isOpened = false;
+        this.canOpen = true;                    // 外からopenを制御する
         this.gachaResult = gachaResult;           // 中身のデータ
         this.appRarity = 'R';                   // 見た目のレアリティ
 
@@ -90,6 +91,7 @@ export class EqBox extends Phaser.GameObjects.Container {
     // 開ける
     async open() {
         if (this.isOpening) return;
+        if (!this.canOpen) return;
         await this._preopen();  // ここで待つ
 
         this.scene.sfxManager.play('blockSound');
