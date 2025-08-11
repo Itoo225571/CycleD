@@ -533,7 +533,7 @@ export default class MapManager {
         const trapName = trap.texture.key;
         switch (trapName) {
             case 'SpikeBall':
-                if (player.invincible) {
+                if (player.invincible || player.TrapImmunity) {
                     if(!trap.body.isStatic)  trapDead();
                 } else {
                     this.scene.sfxManager.play('damageSound') // 音声再生

@@ -359,24 +359,29 @@ export default class GachaScene extends Phaser.Scene {
                     this.canClickCannon = true;
                     this.selectText.setVisible(true);
 
-                    this.fullScreenHitArea = this.add.rectangle(
-                        this.cameras.main.width / 2,
-                        this.cameras.main.height / 2,
-                        this.cameras.main.width,
-                        this.cameras.main.height,
-                        0x000000,
-                        0
-                    )
-                    .setInteractive({ useHandCursor: true })
-                    .on('pointerdown', () => {
-                        if (!this.canClickCannon) return;
-                
-                        this.canClickCannon = false;
-                        this.selectText
-                            .setVisible(false)
-                            .setText(this.resultsNum === 1 ? 'TAP THE BOX' : 'TAP ALL BOXES');
-                        this.cannon.play(this.resultsNum === 1 ? 'cannonFire' : 'cannonFireSlow');
-                    });
+                    if (!this.fullScreenHitArea || !this.fullScreenHitArea.active) {
+                        this.fullScreenHitArea = this.add.rectangle(
+                            this.cameras.main.width / 2,
+                            this.cameras.main.height / 2,
+                            this.cameras.main.width,
+                            this.cameras.main.height,
+                            0x000000,
+                            0 // 完全透明
+                        )
+                        .setInteractive({ useHandCursor: true })
+                        .on('pointerdown', () => {
+                            if (!this.canClickCannon) return;
+                    
+                            this.canClickCannon = false;
+                            this.selectText
+                                .setVisible(false)
+                                .setText(this.resultsNum === 1 ? 'TAP THE BOX' : 'TAP ALL BOXES');
+                            this.cannon.play(this.resultsNum === 1 ? 'cannonFire' : 'cannonFireSlow');
+                        });
+                    } else {
+                        // 既に存在 → 再表示
+                        this.fullScreenHitArea.setVisible(true).setActive(true);
+                    }                    
                     
                 });
                 
@@ -456,9 +461,6 @@ export default class GachaScene extends Phaser.Scene {
             this.skipButton.setVisible(false);
             this.selectText.setVisible(false);
             this.cannon.off('animationupdate', this.cannonAnimationUpdateHandler);
-
-            this.fullScreenHitArea.destroy();
-            this.fullScreenHitArea = null;
         }
     }
     postPullGacha(){

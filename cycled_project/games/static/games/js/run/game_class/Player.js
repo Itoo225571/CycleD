@@ -18,6 +18,8 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         this.jumpForce = config.jumpForce;
         this.jumps = config.jumps;
         this.lives = config.lives;
+        this.playerSize = gameOptions.oneBlockSize;
+
         // skill関係
         this.chargeSkill = config.chargeSkill || (() => {});
         this.skillEndEvent = null;
@@ -28,13 +30,14 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         this.onSkill = false;
 
         this.invincible = false;
+        this.TrapImmunity = true;
         this.defence = 0;
+
+        this.applyEquipment();
 
         if (gameConfig.physics.matter.debug)    this.jumps=1000;
         if (gameConfig.physics.matter.debug)    this.lives=1000;
         // if (gameConfig.physics.matter.debug)    this.invincible=true;
-
-        this.applyEquipment();
 
         this.speed = this.initSpeed;
         this.jump_count = 0;
@@ -45,7 +48,7 @@ export class Player extends Phaser.Physics.Matter.Sprite {
         this.coin_bronze = 0;
 
         // サイズ・物理設定
-        this.setDisplaySize(gameOptions.oneBlockSize, gameOptions.oneBlockSize);
+        this.setDisplaySize(this.playerSize, this.playerSize);
         this.setFixedRotation(); // 回転しないように固定
 
         // センサーや補助判定が必要なら、ここで `this.setBody()` をカスタム形状で定義することも可能
