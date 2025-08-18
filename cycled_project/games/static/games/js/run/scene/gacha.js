@@ -348,6 +348,7 @@ export default class GachaScene extends Phaser.Scene {
             duration: 1000,
             ease: 'Quart.easeIn',
             onComplete: () => {
+                // 画面振動
                 const duration = Math.min(200 + (this.resultsNum * 100), 500);
                 const intensity = Math.min(0.01 + (this.resultsNum * 0.01), 0.1);
                 this.cameras.main.shake(duration,intensity);
@@ -355,6 +356,7 @@ export default class GachaScene extends Phaser.Scene {
                     // this.sfxManager.play('falling2Sound');
                     this.sfxManager.play(this.resultsNum === 1 ? 'falling2Sound' : 'falling3Sound');
                 });
+                // キャノン砲発射
                 this.time.delayedCall(duration + 500, () => {
                     this.canClickCannon = true;
                     this.selectText.setVisible(true);
@@ -388,8 +390,10 @@ export default class GachaScene extends Phaser.Scene {
             }
         });
 
+        // キャノン砲のアニメーションに合わせて発射
         this.cannonAnimationUpdateHandler = (anim, frame, gameObject) => {
             if (frame.index < 4) {
+                // キャノンをちょっと前後に動かす
                 this.tweens.add({
                     targets: this.cannon,
                     x: this.areaWidth/2 + frame.index*15,
@@ -401,18 +405,24 @@ export default class GachaScene extends Phaser.Scene {
                 this.tweens.add({
                     targets: this.cannon,
                     x: this.areaWidth/2,
+                    y: posY,
                     duration: 100,
                     ease: 'Bounce.easeOut'   // 弾むように落ち着く感じ
                 });
 
                 // box を右から左へ tween で移動
+                var random_angle = Phaser.Math.RND.pick([90, 180, 270]);
                 this.eqBoxes.forEach((box,index) => {
                     box.setVisible(true);
                     this.tweens.chain({
                         targets: box,
                         tweens: [
                             {
-                                x: -this.areaWidth /2, duration: 500, ease: 'Power2',
+                                x: -this.areaWidth /2,
+                                y: posY + 100, 
+                                duration: 500,
+                                angle: -360 - random_angle,
+                                ease: 'Power2',
                                 onComplete: () => {
                                     this.tweens.add({
                                         targets: this.cannon,
@@ -422,9 +432,21 @@ export default class GachaScene extends Phaser.Scene {
                                     });
                                 }
                             },
+                            // 移動
                             {
                                 x: this.areaWidth /2, 
                                 duration: 1000, 
+                                ease: 'Power2',
+                            },
+                            // 向きを直す
+                            {
+                                angle: 0, 
+                                duration: 200, 
+                                ease: 'Power2',
+                            },
+                            {
+                                y: posY, 
+                                duration: 200, 
                                 ease: 'Power2',
                             },
                             {
