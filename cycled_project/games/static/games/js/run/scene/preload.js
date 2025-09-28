@@ -197,9 +197,11 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.audio('jumpSound', `${soundDir}/jump.wav`);
         this.load.audio('stompSound', `${soundDir}/stomp.mp3`);
         this.load.audio('damageSound', `${soundDir}/damage.wav`);
-        this.load.audio('fallingSound', `${soundDir}/falling.wav`);
-        this.load.audio('falling2Sound', `${soundDir}/falling2.wav`);
-        this.load.audio('falling3Sound', `${soundDir}/falling3.wav`);
+        this.load.audio('fellSound', `${soundDir}/fell.wav`);
+        this.load.audio('fell2Sound', `${soundDir}/fell2.wav`);
+        this.load.audio('fell3Sound', `${soundDir}/fell3.wav`);
+        this.load.audio('fallingSound', `${soundDir}/falling.mp3`);
+        this.load.audio('fallingFastSound', `${soundDir}/fallingFast.mp3`);
         this.load.audio('alarmSound', `${soundDir}/alarm.wav`);
         this.load.audio('coinSound', `${soundDir}/coin.wav`);
         this.load.audio('impactSound', `${soundDir}/impact.wav`);

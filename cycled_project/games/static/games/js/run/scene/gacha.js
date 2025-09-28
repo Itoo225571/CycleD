@@ -342,19 +342,24 @@ export default class GachaScene extends Phaser.Scene {
 
         // キャノン砲を押したらガチャスタート
         this.resultsNum = num;  // 非同期処理のためにthisに入れる
+        // 落下アニメーション
         this.tweens.add({
             targets: this.cannon,
             y: posY,
-            duration: 1000,
+            duration: this.resultsNum === 1 ? 1300 : 1100,
             ease: 'Quart.easeIn',
+            onStart: () => {
+                var sound = this.resultsNum === 1 ? 'fallingSound' : 'fallingFastSound'
+                this.sfxManager.play(sound); // 落下中のSE
+            },
             onComplete: () => {
                 // 画面振動
                 const duration = Math.min(200 + (this.resultsNum * 100), 500);
                 const intensity = Math.min(0.01 + (this.resultsNum * 0.01), 0.1);
                 this.cameras.main.shake(duration,intensity);
                 this.time.delayedCall(100, () => {
-                    // this.sfxManager.play('falling2Sound');
-                    this.sfxManager.play(this.resultsNum === 1 ? 'falling2Sound' : 'falling3Sound');
+                    // this.sfxManager.play('fell2Sound');
+                    this.sfxManager.play(this.resultsNum === 1 ? 'fell2Sound' : 'fell3Sound');
                 });
                 // キャノン砲発射
                 this.time.delayedCall(duration + 500, () => {
@@ -518,7 +523,9 @@ export default class GachaScene extends Phaser.Scene {
             data: JSON.stringify({ num: num }),  // ← stringifyが必要
             success: (data) => {
                 this.registry.set('userInfo', data.user_info);  //最新に更新
-                scene.preSelectBox(data.results);
+                this.time.delayedCall(500, () => {
+                    scene.preSelectBox(data.results);
+                });
             },
             error: function(xhr, status, error) {
                 let response = xhr.responseJSON || {};

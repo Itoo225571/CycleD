@@ -110,7 +110,7 @@ export default class PlayScene extends Phaser.Scene {
 
         // 音
         this.impactSound = this.sound.add('impactSound');
-        this.fallingSound = this.sound.add('fallingSound');
+        this.fellSound = this.sound.add('fellSound');
 
         // 説明
         const centerX = this.scale.width / 2;
@@ -197,7 +197,7 @@ export default class PlayScene extends Phaser.Scene {
         const bottomBound = cam.scrollY + cam.height * 7 / 6;
         const outOfBounds = this.player.x < leftBound || this.player.y > bottomBound;
         if (outOfBounds) {
-            this.sfxManager.play('fallingSound');
+            this.sfxManager.play('fellSound');
             this.loseLife(false);
         }
     }
